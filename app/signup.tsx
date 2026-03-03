@@ -41,7 +41,7 @@ export default function SignUpScreen() {
       {/* Sign Up Button */}
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={() => router.replace('/(tabs)')}>
+        onPress={() => router.push('/profile-setup')}>
         <Text style={styles.primaryButtonText}>Create My Account</Text>
       </TouchableOpacity>
 
