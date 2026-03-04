@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -124,7 +125,7 @@ export default function HomeScreen() {
       <View style={styles.centerButtonContainer}>
         <TouchableOpacity
           style={[styles.centerButton, menuOpen && styles.centerButtonOpen]}
-          onPress={() => setMenuOpen(!menuOpen)}>
+         onPress={() => mode === 'customer' ? router.push('/post-job') : setMenuOpen(!menuOpen)}>
           <Text style={styles.centerButtonText}>
             {menuOpen ? '✕' : '+'}
           </Text>
