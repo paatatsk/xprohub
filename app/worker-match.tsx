@@ -110,16 +110,10 @@ export default function WorkerMatchScreen() {
 
       {/* Mini Map */}
       <View style={styles.miniMap}>
-        <View style={styles.mapGrid} />
-        <View style={styles.mapGlow} />
-
-        {/* You pin */}
         <View style={styles.youPin}>
           <Text style={styles.youPinText}>📍</Text>
           <Text style={styles.youLabel}>You</Text>
         </View>
-
-        {/* Worker pins */}
         <View style={[styles.workerPin, { top: '25%', left: '30%' }]}>
           <Text style={styles.workerPinText}>SR</Text>
         </View>
@@ -132,7 +126,6 @@ export default function WorkerMatchScreen() {
         <View style={[styles.workerPin, styles.workerPinBlue, { top: '20%', left: '60%' }]}>
           <Text style={styles.workerPinText}>CM</Text>
         </View>
-
         <View style={styles.mapLabel}>
           <Text style={styles.mapLabelText}>🧹 Deep Cleaning · $50 · ASAP</Text>
         </View>
@@ -144,9 +137,7 @@ export default function WorkerMatchScreen() {
           <TouchableOpacity
             key={worker.id}
             style={[styles.workerCard, selectedWorker?.id === worker.id && styles.workerCardSelected]}
-            onPress={() => setSelectedWorker(worker)}>
-
-            {/* Top Row */}
+            onPress={() => router.push('/worker-profile')}>
             <View style={styles.cardTop}>
               <View style={[styles.avatar, { backgroundColor: worker.color }]}>
                 <Text style={styles.avatarText}>{worker.avatar}</Text>
@@ -168,8 +159,6 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.distance}>📍 {worker.distance} mi</Text>
               </View>
             </View>
-
-            {/* Badges */}
             <View style={styles.badgeRow}>
               {worker.badges.map(b => (
                 <View key={b} style={styles.badge}>
@@ -180,8 +169,6 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.reliabilityText}>⚡ {worker.reliability}% reliable</Text>
               </View>
             </View>
-
-            {/* Bottom Row */}
             <View style={styles.cardBottom}>
               <Text style={styles.stars}>★★★★★</Text>
               <Text style={styles.reviews}>{worker.rating} · {worker.reviews} reviews</Text>
@@ -189,7 +176,6 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.levelText}>{worker.level}</Text>
               </View>
             </View>
-
           </TouchableOpacity>
         ))}
         <View style={{ height: 100 }} />
@@ -199,7 +185,7 @@ export default function WorkerMatchScreen() {
       <View style={styles.hireBar}>
         <TouchableOpacity
           style={styles.hireButton}
-          onPress={() => router.push('/job-posted')}>
+          onPress={() => router.push('/worker-profile')}>
           <Text style={styles.hireButtonText}>
             Hire {selectedWorker?.name.split(' ')[0]} — ${selectedWorker?.price}/hr 🎉
           </Text>
@@ -211,12 +197,7 @@ export default function WorkerMatchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0E0E0F',
-  },
-
-  // Header
+  container: { flex: 1, backgroundColor: '#0E0E0F' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -225,318 +206,123 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     gap: 12,
   },
-  backBtn: {
-    color: '#888890',
-    fontSize: 16,
-  },
+  backBtn: { color: '#888890', fontSize: 16 },
   headerCenter: { flex: 1 },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#E8E8EA',
-  },
-  headerSub: {
-    fontSize: 12,
-    color: '#888890',
-    marginTop: 2,
-  },
+  headerTitle: { fontSize: 18, fontWeight: '800', color: '#E8E8EA' },
+  headerSub: { fontSize: 12, color: '#888890', marginTop: 2 },
   headerBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(201,168,76,0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.4)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  headerBadgeText: {
-    color: '#C9A84C',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  // Filters
-  filterBar: {
-    maxHeight: 44,
-    marginBottom: 8,
-  },
-  filterBarContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
+  headerBadgeText: { color: '#C9A84C', fontSize: 14, fontWeight: '800' },
+  filterBar: { maxHeight: 44, marginBottom: 8 },
+  filterBarContent: { paddingHorizontal: 16, gap: 8 },
   filterChip: {
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: '#171719', borderWidth: 1,
+    borderColor: '#2E2E33', borderRadius: 20,
+    paddingHorizontal: 14, paddingVertical: 8,
   },
   filterChipActive: {
     backgroundColor: 'rgba(201,168,76,0.1)',
     borderColor: 'rgba(201,168,76,0.4)',
   },
-  filterText: {
-    fontSize: 12,
-    color: '#888890',
-    fontWeight: '600',
-  },
-  filterTextActive: {
-    color: '#C9A84C',
-  },
-
-  // Mini Map
+  filterText: { fontSize: 12, color: '#888890', fontWeight: '600' },
+  filterTextActive: { color: '#C9A84C' },
   miniMap: {
-    height: 130,
-    backgroundColor: '#111113',
-    marginHorizontal: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-    position: 'relative',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    marginBottom: 12,
-  },
-  mapGrid: {
-    position: 'absolute',
-    inset: 0,
-    opacity: 0.3,
-  },
-  mapGlow: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(201,168,76,0.05)',
+    height: 130, backgroundColor: '#111113',
+    marginHorizontal: 16, borderRadius: 16,
+    overflow: 'hidden', position: 'relative',
+    borderWidth: 1, borderColor: '#2E2E33', marginBottom: 12,
   },
   youPin: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: 'absolute', top: '50%', left: '50%',
     transform: [{ translateX: -12 }, { translateY: -24 }],
     alignItems: 'center',
   },
   youPinText: { fontSize: 20 },
-  youLabel: {
-    fontSize: 9,
-    color: '#C9A84C',
-    fontWeight: '700',
-  },
+  youLabel: { fontSize: 9, color: '#C9A84C', fontWeight: '700' },
   workerPin: {
-    position: 'absolute',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    position: 'absolute', width: 28, height: 28, borderRadius: 14,
     backgroundColor: 'rgba(201,168,76,0.2)',
-    borderWidth: 1,
-    borderColor: '#C9A84C',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1, borderColor: '#C9A84C',
+    alignItems: 'center', justifyContent: 'center',
   },
-  workerPinGreen: {
-    backgroundColor: 'rgba(76,175,122,0.2)',
-    borderColor: '#4CAF7A',
-  },
-  workerPinPurple: {
-    backgroundColor: 'rgba(155,110,232,0.2)',
-    borderColor: '#9B6EE8',
-  },
-  workerPinBlue: {
-    backgroundColor: 'rgba(85,153,224,0.2)',
-    borderColor: '#5599E0',
-  },
-  workerPinText: {
-    fontSize: 8,
-    fontWeight: '800',
-    color: '#E8E8EA',
-  },
+  workerPinGreen: { backgroundColor: 'rgba(76,175,122,0.2)', borderColor: '#4CAF7A' },
+  workerPinPurple: { backgroundColor: 'rgba(155,110,232,0.2)', borderColor: '#9B6EE8' },
+  workerPinBlue: { backgroundColor: 'rgba(85,153,224,0.2)', borderColor: '#5599E0' },
+  workerPinText: { fontSize: 8, fontWeight: '800', color: '#E8E8EA' },
   mapLabel: {
-    position: 'absolute',
-    bottom: 8,
-    right: 10,
+    position: 'absolute', bottom: 8, right: 10,
     backgroundColor: 'rgba(14,14,15,0.85)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#2E2E33',
+    paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 20, borderWidth: 1, borderColor: '#2E2E33',
   },
-  mapLabelText: {
-    fontSize: 10,
-    color: '#888890',
-  },
-
-  // Worker List
+  mapLabelText: { fontSize: 10, color: '#888890' },
   workerList: { flex: 1, paddingHorizontal: 16 },
   workerCard: {
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 10,
+    backgroundColor: '#171719', borderWidth: 1,
+    borderColor: '#2E2E33', borderRadius: 16,
+    padding: 14, marginBottom: 10,
   },
   workerCardSelected: {
     borderColor: 'rgba(201,168,76,0.5)',
     backgroundColor: 'rgba(201,168,76,0.04)',
   },
-
-  // Card Top
-  cardTop: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 10,
-  },
+  cardTop: { flexDirection: 'row', gap: 12, marginBottom: 10 },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
+    width: 44, height: 44, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
-  avatarText: {
-    color: '#0E0E0F',
-    fontSize: 14,
-    fontWeight: '800',
-  },
+  avatarText: { color: '#0E0E0F', fontSize: 14, fontWeight: '800' },
   workerInfo: { flex: 1 },
-  workerName: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#E8E8EA',
-  },
-  workerRole: {
-    fontSize: 11,
-    color: '#888890',
-    marginTop: 2,
-  },
-  skillRow: {
-    flexDirection: 'row',
-    gap: 4,
-    marginTop: 4,
-  },
+  workerName: { fontSize: 14, fontWeight: '800', color: '#E8E8EA' },
+  workerRole: { fontSize: 11, color: '#888890', marginTop: 2 },
+  skillRow: { flexDirection: 'row', gap: 4, marginTop: 4 },
   skillChip: {
     backgroundColor: 'rgba(201,168,76,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.2)',
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+    borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2,
   },
-  skillChipText: {
-    fontSize: 9,
-    color: '#C9A84C',
-    fontWeight: '600',
-  },
+  skillChipText: { fontSize: 9, color: '#C9A84C', fontWeight: '600' },
   priceBlock: { alignItems: 'flex-end' },
-  price: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#C9A84C',
-  },
-  priceLabel: {
-    fontSize: 10,
-    color: '#888890',
-  },
-  distance: {
-    fontSize: 10,
-    color: '#888890',
-    marginTop: 4,
-  },
-
-  // Badges
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 6,
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
+  price: { fontSize: 18, fontWeight: '800', color: '#C9A84C' },
+  priceLabel: { fontSize: 10, color: '#888890' },
+  distance: { fontSize: 10, color: '#888890', marginTop: 4 },
+  badgeRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', marginBottom: 10 },
   badge: {
     backgroundColor: 'rgba(76,175,122,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(76,175,122,0.3)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderWidth: 1, borderColor: 'rgba(76,175,122,0.3)',
+    borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
   },
-  badgeText: {
-    fontSize: 10,
-    color: '#4CAF7A',
-    fontWeight: '700',
-  },
+  badgeText: { fontSize: 10, color: '#4CAF7A', fontWeight: '700' },
   reliabilityBadge: {
     backgroundColor: 'rgba(201,168,76,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.2)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.2)',
+    borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
   },
-  reliabilityText: {
-    fontSize: 10,
-    color: '#C9A84C',
-    fontWeight: '700',
-  },
-
-  // Card Bottom
-  cardBottom: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stars: {
-    fontSize: 12,
-    color: '#C9A84C',
-  },
-  reviews: {
-    fontSize: 11,
-    color: '#888890',
-    flex: 1,
-  },
+  reliabilityText: { fontSize: 10, color: '#C9A84C', fontWeight: '700' },
+  cardBottom: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  stars: { fontSize: 12, color: '#C9A84C' },
+  reviews: { fontSize: 11, color: '#888890', flex: 1 },
   levelBadge: {
     backgroundColor: 'rgba(155,110,232,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(155,110,232,0.2)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    borderWidth: 1, borderColor: 'rgba(155,110,232,0.2)',
+    borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3,
   },
-  levelText: {
-    fontSize: 10,
-    color: '#9B6EE8',
-    fontWeight: '700',
-  },
-
-  // Hire Bar
+  levelText: { fontSize: 10, color: '#9B6EE8', fontWeight: '700' },
   hireBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    paddingBottom: 32,
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    padding: 16, paddingBottom: 32,
     backgroundColor: 'rgba(14,14,15,0.95)',
-    borderTopWidth: 1,
-    borderTopColor: '#2E2E33',
+    borderTopWidth: 1, borderTopColor: '#2E2E33',
   },
   hireButton: {
-    backgroundColor: '#C9A84C',
-    borderRadius: 14,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: '#C9A84C',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    backgroundColor: '#C9A84C', borderRadius: 14,
+    padding: 16, alignItems: 'center',
+    shadowColor: '#C9A84C', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
   },
-  hireButtonText: {
-    color: '#0E0E0F',
-    fontSize: 15,
-    fontWeight: '800',
-  },
+  hireButtonText: { color: '#0E0E0F', fontSize: 15, fontWeight: '800' },
 });
