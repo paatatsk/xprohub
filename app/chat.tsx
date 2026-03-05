@@ -110,7 +110,7 @@ export default function ChatScreen() {
           <Text style={styles.jobCardTitle}>Deep Cleaning · $75 total</Text>
           <Text style={styles.jobCardSub}>Today 4:30 PM · Manhattan, NY</Text>
         </View>
-        <TouchableOpacity style={styles.jobCardBtn}>
+        <TouchableOpacity style={styles.jobCardBtn} onPress={() => router.push('/payment')}>
           <Text style={styles.jobCardBtnText}>Pay</Text>
         </TouchableOpacity>
       </View>
