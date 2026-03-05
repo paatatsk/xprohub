@@ -181,7 +181,7 @@ export default function WorkerProfileScreen() {
 
       {/* Bottom Action Bar */}
       <View style={styles.actionBar}>
-        <TouchableOpacity style={styles.messageButton}>
+      <TouchableOpacity style={styles.messageButton} onPress={() => router.push('/chat')}>  
           <Text style={styles.messageButtonText}>💬 Message</Text>
         </TouchableOpacity>
         <TouchableOpacity
