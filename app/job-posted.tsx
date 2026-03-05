@@ -14,8 +14,8 @@ export default function JobPostedScreen() {
         <Text style={styles.cardText}>📍 Manhattan, NY</Text>
         <Text style={styles.cardText}>⚡ Average response time: 4 mins</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => router.replace('/(tabs)')}>
-        <Text style={styles.buttonText}>View on Map</Text>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/worker-match')}>
+        <Text style={styles.buttonText}>See Matched Workers 👥</Text>
       </TouchableOpacity>
     </View>
   );
