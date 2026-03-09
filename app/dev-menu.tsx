@@ -18,6 +18,7 @@ const SCREENS = [
   { icon: '✅', name: 'Payment Success', route: '/payment-success', color: '#5599E0' },
   { icon: '⭐', name: 'Review Screen', route: '/review', color: '#5599E0' },
   { icon: '⚡', name: 'Command Center', route: '/command-center', color: '#C9A84C' },
+  { icon: '👤', name: 'My Profile', route: '/my-profile', color: '#C9A84C' },
 ];
 
 const GROUPS = [
@@ -25,7 +26,8 @@ const GROUPS = [
   { label: 'CUSTOMER FLOW', color: '#4CAF7A', screens: SCREENS.slice(4, 8) },
   { label: 'WORKER MATCH', color: '#9B6EE8', screens: SCREENS.slice(8, 11) },
   { label: 'PAYMENT & REVIEWS', color: '#5599E0', screens: SCREENS.slice(11, 14) },
-  { label: 'COMMAND CENTER', color: '#C9A84C', screens: SCREENS.slice(14) },
+  { label: 'COMMAND CENTER', color: '#C9A84C', screens: SCREENS.slice(14, 15) },
+  { label: 'PROFILE', color: '#C9A84C', screens: SCREENS.slice(15) },
 ];
 
 export default function DevMenuScreen() {
