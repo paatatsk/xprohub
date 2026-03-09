@@ -15,7 +15,18 @@ export default function RootLayout() {
         <Stack.Screen name="welcome" />
         <Stack.Screen name="signup" />
         <Stack.Screen name="login" />
+        <Stack.Screen name="profile-setup" />
+        <Stack.Screen name="post-job" />
+        <Stack.Screen name="job-posted" />
+        <Stack.Screen name="worker-match" />
+        <Stack.Screen name="worker-profile" />
+        <Stack.Screen name="chat" />
+        <Stack.Screen name="payment" />
+        <Stack.Screen name="payment-success" />
+        <Stack.Screen name="review" />
+        <Stack.Screen name="command-center" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="dev-menu" />
       </Stack>
     </>
   );

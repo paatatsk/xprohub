@@ -153,11 +153,18 @@ export default function HomeScreen() {
           <Text style={styles.statLabel}>Your Rating</Text>
         </View>
         <View style={styles.statDivider} />
-        <View style={styles.statItem}>
+  <View style={styles.statItem}>
           <Text style={styles.statNumber}>$240</Text>
           <Text style={styles.statLabel}>This Week</Text>
         </View>
       </View>
+
+      {/* Command Center Button */}
+      <TouchableOpacity
+        style={styles.commandBtn}
+        onPress={() => router.push('/command-center')}>
+        <Text style={styles.commandBtnText}>⚡ Command Center</Text>
+      </TouchableOpacity>
 
     </View>
   );
@@ -449,5 +456,20 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     backgroundColor: '#2E2E33',
+  },
+  commandBtn: {
+    backgroundColor: 'rgba(201,168,76,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(201,168,76,0.3)',
+    borderRadius: 14,
+    padding: 14,
+    marginHorizontal: 20,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  commandBtnText: {
+    color: '#C9A84C',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
