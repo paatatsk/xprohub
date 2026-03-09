@@ -6,6 +6,12 @@ export default function JobPostedScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+      {/* Dev Menu Button */}
+<TouchableOpacity
+  style={{ position: 'absolute', top: 52, left: 20, zIndex: 99, backgroundColor: 'rgba(14,14,15,0.8)', borderWidth: 1, borderColor: '#2E2E33', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 }}
+  onPress={() => router.push('/dev-menu')}>
+  <Text style={{ color: '#888890', fontSize: 12, fontWeight: '600' }}>🛠️ Dev</Text>
+</TouchableOpacity>
       <Text style={styles.emoji}>🎉</Text>
       <Text style={styles.title}>Job Posted!</Text>
       <Text style={styles.subtitle}>We're finding the best workers near you right now...</Text>
