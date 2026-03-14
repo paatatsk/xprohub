@@ -20,6 +20,7 @@ const SCREENS = [
   { icon: '⚡', name: 'Command Center', route: '/command-center', color: '#C9A84C' },
   { icon: '👤', name: 'My Profile', route: '/my-profile', color: '#C9A84C' },
   { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#5599E0' },
+  { icon: '🗺️', name: 'Explore Screen', route: '/explore', color: '#4CAF7A' },
 ];
 
 const GROUPS = [
