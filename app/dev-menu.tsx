@@ -19,6 +19,7 @@ const SCREENS = [
   { icon: '⭐', name: 'Review Screen', route: '/review', color: '#5599E0' },
   { icon: '⚡', name: 'Command Center', route: '/command-center', color: '#C9A84C' },
   { icon: '👤', name: 'My Profile', route: '/my-profile', color: '#C9A84C' },
+  { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#5599E0' },
 ];
 
 const GROUPS = [

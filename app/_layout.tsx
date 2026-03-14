@@ -28,6 +28,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="dev-menu" />
         <Stack.Screen name="my-profile" />
+        <Stack.Screen name="notifications" />
       </Stack>
     </>
   );
