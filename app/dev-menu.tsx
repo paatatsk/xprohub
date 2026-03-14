@@ -21,6 +21,7 @@ const SCREENS = [
   { icon: '👤', name: 'My Profile', route: '/my-profile', color: '#C9A84C' },
   { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#5599E0' },
   { icon: '🗺️', name: 'Explore Screen', route: '/explore', color: '#4CAF7A' },
+  { icon: '🏆', name: 'XP & Levels', route: '/xp-levels', color: '#C9A84C' },
 ];
 
 const GROUPS = [

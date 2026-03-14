@@ -30,6 +30,7 @@ export default function RootLayout() {
         <Stack.Screen name="my-profile" />
         <Stack.Screen name="notifications" />
         <Stack.Screen name="explore" />
+        <Stack.Screen name="xp-levels" />
       </Stack>
     </>
   );
