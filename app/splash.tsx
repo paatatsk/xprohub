@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import GoldenDollar from '../components/GoldenDollar';
 const { width, height } = Dimensions.get('window');
 
 export default function SplashScreen() {
@@ -61,6 +61,7 @@ export default function SplashScreen() {
       <Animated.View style={[styles.glow, { opacity: glowOpacity }]} />
 
       {/* Logo */}
+      <GoldenDollar size="hero" speed="slow" pulse={true} glow={true} />
       <Animated.View style={[styles.logoContainer, {
         opacity: logoOpacity,
         transform: [{ scale: logoScale }]
