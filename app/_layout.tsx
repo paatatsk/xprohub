@@ -32,6 +32,7 @@ export default function RootLayout() {
         <Stack.Screen name="explore" />
         <Stack.Screen name="xp-levels" />
         <Stack.Screen name="bookkeeping" />
+        <Stack.Screen name="belt-system" />
       </Stack>
     </>
   );
