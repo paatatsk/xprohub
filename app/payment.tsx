@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import GoldenDollar from '../components/GoldenDollar';
 export default function PaymentSuccessScreen() {
   return (
     <View style={styles.container}>
@@ -12,9 +12,7 @@ export default function PaymentSuccessScreen() {
   onPress={() => router.push('/dev-menu')}>
   <Text style={{ color: '#888890', fontSize: 12, fontWeight: '600' }}>🛠️ Dev</Text>
 </TouchableOpacity>
-      <View style={styles.iconCircle}>
-        <Text style={styles.icon}>✓</Text>
-      </View>
+ <GoldenDollar size="hero" speed="fast" pulse={true} glow={true} />    
       <Text style={styles.title}>Payment Confirmed!</Text>
       <Text style={styles.subtitle}>Your payment of $82.50 is held securely in escrow</Text>
 

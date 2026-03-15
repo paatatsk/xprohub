@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import GoldenDollar from '../components/GoldenDollar';
 
 const { width } = Dimensions.get('window');
 
@@ -62,7 +63,10 @@ export default function WelcomeScreen() {
 
       </View>
 
-      {/* Buttons */}
+      <View style={{ alignItems: 'center', marginVertical: 16 }}>
+  <GoldenDollar size="medium" speed="slow" pulse={true} glow={true} />
+</View>
+{/* Buttons */}
       <View style={styles.buttonSection}>
         <TouchableOpacity
           style={styles.primaryButton}

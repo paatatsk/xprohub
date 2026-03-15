@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import GoldenDollar from '../components/GoldenDollar';
 
 const CATEGORIES = [
   { icon: '🧹', name: 'Cleaning', tasks: ['Deep Clean', 'Regular Clean', 'Move-In/Out', 'Post-Party'] },
@@ -178,7 +179,9 @@ export default function PostJobScreen() {
               onChangeText={setNotes}
             />
           </View>
-
+<View style={{ alignItems: 'center', marginBottom: 12 }}>
+  <GoldenDollar size="small" speed="slow" pulse={true} glow={true} />
+</View>
           {/* Post Button */}
           <TouchableOpacity style={styles.postButton} onPress={handlePost}>
             <Text style={styles.postButtonText}>Find Workers Near Me 🔍</Text>

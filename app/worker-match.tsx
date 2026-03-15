@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import GoldenDollar from '../components/GoldenDollar';
 
 const WORKERS = [
   {
@@ -182,6 +183,9 @@ export default function WorkerMatchScreen() {
       </ScrollView>
 
       {/* Hire Button */}
+      <View style={{ alignItems: 'center', marginBottom: 8 }}>
+  <GoldenDollar size="small" speed="normal" pulse={true} glow={true} />
+</View>
       <View style={styles.hireBar}>
         <TouchableOpacity
           style={styles.hireButton}
