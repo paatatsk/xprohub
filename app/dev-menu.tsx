@@ -22,6 +22,7 @@ const SCREENS = [
   { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#5599E0' },
   { icon: '🗺️', name: 'Explore Screen', route: '/explore', color: '#4CAF7A' },
   { icon: '🏆', name: 'XP & Levels', route: '/xp-levels', color: '#C9A84C' },
+  { icon: '📊', name: 'Bookkeeping', route: '/bookkeeping', color: '#4CAF7A' },
 ];
 
 const GROUPS = [
