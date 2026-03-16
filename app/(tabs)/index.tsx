@@ -160,6 +160,12 @@ export default function HomeScreen() {
               <Text style={styles.mainActionSub}>4 jobs available now</Text>
             </View>
           </TouchableOpacity>
+          <TouchableOpacity
+  style={styles.liveMarketBtn}
+  onPress={() => router.push('/live-market')}>
+  <View style={styles.liveDot} />
+  <Text style={styles.liveMarketText}>🔴 Live Market — 6 jobs now</Text>
+</TouchableOpacity>
 
           {/* Stats Row */}
           <View style={styles.statsRow}>
@@ -431,4 +437,25 @@ const styles = StyleSheet.create({
   statNumber: { fontSize: 16, fontWeight: '800', color: '#C9A84C' },
   statLabel: { fontSize: 10, color: '#888890' },
   statDivider: { width: 1, backgroundColor: '#2E2E33' },
+  liveMarketBtn: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#171719',
+  borderWidth: 1,
+  borderColor: 'rgba(255,59,48,0.3)',
+  borderRadius: 14,
+  padding: 14,
+  gap: 10,
+},
+liveDot: {
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#FF3B30',
+},
+liveMarketText: {
+  fontSize: 14,
+  fontWeight: '700',
+  color: '#E8E8EA',
+},
 });

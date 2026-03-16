@@ -33,6 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="xp-levels" />
         <Stack.Screen name="bookkeeping" />
         <Stack.Screen name="belt-system" />
+        <Stack.Screen name="live-market" />
       </Stack>
     </>
   );
