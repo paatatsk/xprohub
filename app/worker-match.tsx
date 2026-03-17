@@ -14,11 +14,13 @@ const WORKERS = [
     price: 25,
     distance: 0.2,
     level: '⚡ Trusted Expert',
-    badges: ['★ Top Pro', '✓ Verified', '🛡 Insured'],
-    skills: ['Cleaning', 'Organizing'],
     reliability: 99,
     avatar: 'SR',
     color: '#C9A84C',
+    matchScore: 94,
+    matchReasons: ['Perfect skill match', 'Closest to you', '99% reliable'],
+    badges: ['★ Top Pro', '✓ Verified', '🛡 Insured'],
+    skills: ['Cleaning', 'Organizing'],
   },
   {
     id: 2,
@@ -29,11 +31,13 @@ const WORKERS = [
     price: 20,
     distance: 0.5,
     level: '🌟 Rising Pro',
-    badges: ['✓ Verified', '48 Jobs Done'],
-    skills: ['Cleaning', 'Moving'],
     reliability: 97,
     avatar: 'JL',
     color: '#4CAF7A',
+    matchScore: 78,
+    matchReasons: ['Good skill match', 'Competitive price'],
+    badges: ['✓ Verified', '48 Jobs Done'],
+    skills: ['Cleaning', 'Moving'],
   },
   {
     id: 3,
@@ -44,11 +48,13 @@ const WORKERS = [
     price: 22,
     distance: 0.8,
     level: '⭐ Elite Pro',
-    badges: ['✓ Verified', '62 Jobs Done'],
-    skills: ['Deep Clean', 'Move-In/Out'],
     reliability: 100,
     avatar: 'AM',
     color: '#9B6EE8',
+    matchScore: 86,
+    matchReasons: ['100% reliable', 'Excellent reviews'],
+    badges: ['✓ Verified', '62 Jobs Done'],
+    skills: ['Deep Clean', 'Move-In/Out'],
   },
   {
     id: 4,
@@ -59,11 +65,13 @@ const WORKERS = [
     price: 18,
     distance: 1.1,
     level: '🌟 Rising Pro',
-    badges: ['✓ Verified'],
-    skills: ['Cleaning', 'Errands'],
     reliability: 95,
     avatar: 'CM',
     color: '#5599E0',
+    matchScore: 61,
+    matchReasons: ['Budget friendly', 'Growing reputation'],
+    badges: ['✓ Verified'],
+    skills: ['Cleaning', 'Errands'],
   },
 ];
 
@@ -139,6 +147,32 @@ export default function WorkerMatchScreen() {
             key={worker.id}
             style={[styles.workerCard, selectedWorker?.id === worker.id && styles.workerCardSelected]}
             onPress={() => router.push('/worker-profile')}>
+
+            {/* Match Score Bar */}
+            <View style={styles.matchScoreRow}>
+              <View style={styles.matchScoreBarBg}>
+                <View style={[styles.matchScoreBarFill, {
+                  width: `${worker.matchScore}%`,
+                  backgroundColor: worker.matchScore >= 90 ? '#4CAF7A' : worker.matchScore >= 75 ? '#C9A84C' : '#5599E0'
+                }]} />
+              </View>
+              <Text style={[styles.matchScoreText, {
+                color: worker.matchScore >= 90 ? '#4CAF7A' : worker.matchScore >= 75 ? '#C9A84C' : '#5599E0'
+              }]}>
+                {worker.matchScore}% Match
+              </Text>
+            </View>
+
+            {/* Match Reasons */}
+            <View style={styles.matchReasons}>
+              {worker.matchReasons.map((reason, i) => (
+                <View key={i} style={styles.matchReason}>
+                  <Text style={styles.matchReasonText}>✓ {reason}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Card Top */}
             <View style={styles.cardTop}>
               <View style={[styles.avatar, { backgroundColor: worker.color }]}>
                 <Text style={styles.avatarText}>{worker.avatar}</Text>
@@ -160,6 +194,8 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.distance}>📍 {worker.distance} mi</Text>
               </View>
             </View>
+
+            {/* Badges */}
             <View style={styles.badgeRow}>
               {worker.badges.map(b => (
                 <View key={b} style={styles.badge}>
@@ -170,6 +206,8 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.reliabilityText}>⚡ {worker.reliability}% reliable</Text>
               </View>
             </View>
+
+            {/* Card Bottom */}
             <View style={styles.cardBottom}>
               <Text style={styles.stars}>★★★★★</Text>
               <Text style={styles.reviews}>{worker.rating} · {worker.reviews} reviews</Text>
@@ -177,15 +215,16 @@ export default function WorkerMatchScreen() {
                 <Text style={styles.levelText}>{worker.level}</Text>
               </View>
             </View>
+
           </TouchableOpacity>
         ))}
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* Hire Button */}
+      {/* Golden Dollar + Hire Button */}
       <View style={{ alignItems: 'center', marginBottom: 8 }}>
-  <GoldenDollar size="small" speed="normal" pulse={true} glow={true} />
-</View>
+        <GoldenDollar size="small" speed="normal" pulse={true} glow={true} />
+      </View>
       <View style={styles.hireBar}>
         <TouchableOpacity
           style={styles.hireButton}
@@ -274,6 +313,51 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(201,168,76,0.5)',
     backgroundColor: 'rgba(201,168,76,0.04)',
   },
+
+  // Match Score
+  matchScoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  matchScoreBarBg: {
+    flex: 1,
+    height: 6,
+    backgroundColor: '#2E2E33',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  matchScoreBarFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  matchScoreText: {
+    fontSize: 12,
+    fontWeight: '800',
+    width: 70,
+    textAlign: 'right',
+  },
+  matchReasons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  matchReason: {
+    backgroundColor: 'rgba(201,168,76,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(201,168,76,0.2)',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  matchReasonText: {
+    fontSize: 10,
+    color: '#C9A84C',
+    fontWeight: '600',
+  },
+
   cardTop: { flexDirection: 'row', gap: 12, marginBottom: 10 },
   avatar: {
     width: 44, height: 44, borderRadius: 14,
