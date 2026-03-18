@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GoldenDollar from '../components/GoldenDollar';
-
+import HomeBeacon from '../components/HomeBeacon';
 const WORKERS = [
   {
     id: 1,
@@ -93,6 +93,7 @@ export default function WorkerMatchScreen() {
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Workers Found! 🎉</Text>
           <Text style={styles.headerSub}>4 workers available near you</Text>
+          <HomeBeacon />
         </View>
         <View style={styles.headerBadge}>
           <Text style={styles.headerBadgeText}>4</Text>

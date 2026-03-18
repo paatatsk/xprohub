@@ -1,13 +1,14 @@
+import HomeBeacon from '@/components/HomeBeacon';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import {
-    Animated,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import GoldenDollar from '../components/GoldenDollar';
 
@@ -353,7 +354,7 @@ export default function LiveMarketScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
+<HomeBeacon />
     </View>
   );
 }

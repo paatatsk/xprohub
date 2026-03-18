@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
+import HomeBeacon from '../components/HomeBeacon';
 const WORKER = {
   name: 'Sofia Rodriguez',
   role: 'Home Cleaning Specialist',
@@ -190,6 +190,7 @@ export default function WorkerProfileScreen() {
           <Text style={styles.hireButtonText}>Hire Sofia — $25/hr</Text>
         </TouchableOpacity>
       </View>
+      <HomeBeacon />
 
     </View>
   );

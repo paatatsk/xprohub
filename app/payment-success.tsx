@@ -41,6 +41,7 @@ export default function PaymentSuccessScreen() {
         onPress={() => router.push('/chat')}>
         <Text style={styles.chatButtonText}>💬 Message Sofia</Text>
       </TouchableOpacity>
+      
     </View>
   );
 }

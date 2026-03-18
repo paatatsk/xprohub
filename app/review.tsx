@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import HomeBeacon from '../components/HomeBeacon';
 
 export default function ReviewScreen() {
   const [rating, setRating] = useState(0);
@@ -143,6 +144,7 @@ export default function ReviewScreen() {
         </TouchableOpacity>
       </View>
 
+    <HomeBeacon />
     </View>
   );
 }

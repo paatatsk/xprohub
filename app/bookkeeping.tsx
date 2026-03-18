@@ -1,3 +1,4 @@
+import HomeBeacon from '@/components/HomeBeacon';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -330,6 +331,7 @@ export default function BookkeepingScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      <HomeBeacon />
     </View>
   );
 }

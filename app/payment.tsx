@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import GoldenDollar from '../components/GoldenDollar';
+import HomeBeacon from '../components/HomeBeacon';
 export default function PaymentSuccessScreen() {
   return (
     <View style={styles.container}>
@@ -38,6 +39,7 @@ export default function PaymentSuccessScreen() {
         onPress={() => router.push('/chat')}>
         <Text style={styles.chatButtonText}>💬 Message Sofia</Text>
       </TouchableOpacity>
+      <HomeBeacon />
     </View>
   );
 }

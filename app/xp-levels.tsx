@@ -1,3 +1,4 @@
+import HomeBeacon from '@/components/HomeBeacon';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -170,7 +171,7 @@ export default function XPLevelsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
+<HomeBeacon />
     </View>
   );
 }

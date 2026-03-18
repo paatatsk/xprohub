@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import HomeBeacon from '../components/HomeBeacon';
 
 const INITIAL_MESSAGES = [
   {
@@ -214,6 +215,7 @@ export default function ChatScreen() {
 
         </View>
       </KeyboardAvoidingView>
+      <HomeBeacon />
 
     </View>
   );

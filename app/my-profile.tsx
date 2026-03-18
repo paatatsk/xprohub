@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import HomeBeacon from '../components/HomeBeacon';
 
 export default function MyProfileScreen() {
   const [isWorkerMode, setIsWorkerMode] = useState(true);
@@ -217,7 +218,7 @@ export default function MyProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-
+    <HomeBeacon />
     </View>
   );
 }

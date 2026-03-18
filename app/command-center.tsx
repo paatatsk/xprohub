@@ -1,4 +1,6 @@
+import HomeBeacon from '@/components/HomeBeacon';
 import { router } from 'expo-router';
+
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -337,7 +339,7 @@ export default function CommandCenterScreen() {
           <View style={{ height: 40 }} />
         </ScrollView>
       )}
-
+      <HomeBeacon />
     </View>
   );
 }
