@@ -17,12 +17,12 @@ export default function HomeBeacon({ bottom = 40, right = 20 }: HomeBeaconProps)
     Animated.loop(
       Animated.sequence([
         Animated.timing(fadeAnim, {
-          toValue: 0.25,
+        toValue: 0.5,
           duration: 3000,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
-          toValue: 0.1,
+          toValue: 0.25,
           duration: 3000,
           useNativeDriver: true,
         }),
@@ -87,14 +87,18 @@ const styles = StyleSheet.create({
     zIndex: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    bottom: 40,
+    left: 0,
+    right: 0,
+
   },
   button: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(201,168,76,0.15)',
+    backgroundColor: 'rgba(14,14,15,0.85)',
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
+    borderColor: 'rgba(201,168,76,0.6)',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#C9A84C',
