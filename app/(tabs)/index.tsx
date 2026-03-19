@@ -65,9 +65,14 @@ export default function HomeScreen() {
   }, [mode]);
 
   const handleModeSwitch = (newMode) => {
-    spokeAnim.setValue(0);
-    statsAnim.setValue(0);
-    setMode(newMode);
+    if (newMode === mode) return;
+    Animated.timing(spokeAnim, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      setMode(newMode);
+    });
   };
 
   return (
@@ -264,7 +269,7 @@ const styles = StyleSheet.create({
   devBtn: {
     position: 'absolute',
     top: 52,
-    left: 20,
+    right: 20,
     zIndex: 99,
     backgroundColor: 'rgba(14,14,15,0.8)',
     borderWidth: 1,
