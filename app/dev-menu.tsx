@@ -25,6 +25,7 @@ const SCREENS = [
   { icon: '📊', name: 'Bookkeeping', route: '/bookkeeping', color: '#4CAF7A' },
   { icon: '🥋', name: 'Belt System', route: '/belt-system', color: '#4CAF7A' },
   { icon: '🔴', name: 'Live Market', route: '/live-market', color: '#FF3B30' },
+  { icon: '👥', name: 'Team Job', route: '/team-job', color: '#4CAF7A' },
 ];
 
 const GROUPS = [
