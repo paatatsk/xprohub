@@ -19,13 +19,19 @@ const SCREENS = [
   { icon: '⭐', name: 'Review Screen', route: '/review', color: '#5599E0' },
   { icon: '⚡', name: 'Command Center', route: '/command-center', color: '#C9A84C' },
   { icon: '👤', name: 'My Profile', route: '/my-profile', color: '#C9A84C' },
-  { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#5599E0' },
+  { icon: '🔔', name: 'Notifications', route: '/notifications', color: '#C9A84C' },
   { icon: '🗺️', name: 'Explore Screen', route: '/explore', color: '#4CAF7A' },
   { icon: '🏆', name: 'XP & Levels', route: '/xp-levels', color: '#C9A84C' },
   { icon: '📊', name: 'Bookkeeping', route: '/bookkeeping', color: '#4CAF7A' },
   { icon: '🥋', name: 'Belt System', route: '/belt-system', color: '#4CAF7A' },
   { icon: '🔴', name: 'Live Market', route: '/live-market', color: '#FF3B30' },
   { icon: '👥', name: 'Team Job', route: '/team-job', color: '#4CAF7A' },
+  // ── Job Lifecycle Screens ──
+  { icon: '⏰', name: 'Active Job', route: '/active-job', color: '#C9A84C' },
+  { icon: '📸', name: 'Job Proof', route: '/job-proof', color: '#4CAF7A' },
+  { icon: '✅', name: 'Job Confirm', route: '/job-confirm', color: '#C9A84C' },
+  { icon: '💰', name: 'Tip Screen', route: '/tip', color: '#C9A84C' },
+  { icon: '📄', name: 'Job Summary', route: '/job-summary', color: '#4CAF7A' },
 ];
 
 const GROUPS = [
@@ -34,7 +40,8 @@ const GROUPS = [
   { label: 'WORKER MATCH', color: '#9B6EE8', screens: SCREENS.slice(8, 11) },
   { label: 'PAYMENT & REVIEWS', color: '#5599E0', screens: SCREENS.slice(11, 14) },
   { label: 'COMMAND CENTER', color: '#C9A84C', screens: SCREENS.slice(14, 15) },
-  { label: 'PROFILE', color: '#C9A84C', screens: SCREENS.slice(15) },
+  { label: 'PROFILE', color: '#C9A84C', screens: SCREENS.slice(15, 22) },
+  { label: 'JOB LIFECYCLE', color: '#FF3B30', screens: SCREENS.slice(22) },
 ];
 
 export default function DevMenuScreen() {
