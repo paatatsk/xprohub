@@ -1,3 +1,4 @@
+import * as LocalAuthentication from 'expo-local-authentication';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
@@ -38,8 +39,10 @@ function getPosition(angle, radius) {
 export default function HomeScreen() {
   const [mode, setMode] = useState('worker');
   const [greeting, setGreeting] = useState('');
+  const [isOnline, setIsOnline] = useState(false);
   const spokeAnim = useRef(new Animated.Value(0)).current;
   const statsAnim = useRef(new Animated.Value(0)).current;
+  const onlineAnim = useRef(new Animated.Value(0)).current;
 
   const spokes = mode === 'customer' ? CUSTOMER_SPOKES : WORKER_SPOKES;
 
@@ -64,6 +67,16 @@ export default function HomeScreen() {
     ]).start();
   }, [mode]);
 
+  // Animate online toggle
+  useEffect(() => {
+    Animated.spring(onlineAnim, {
+      toValue: isOnline ? 1 : 0,
+      friction: 6,
+      tension: 40,
+      useNativeDriver: false,
+    }).start();
+  }, [isOnline]);
+
   const handleModeSwitch = (newMode) => {
     if (newMode === mode) return;
     Animated.timing(spokeAnim, {
@@ -73,6 +86,37 @@ export default function HomeScreen() {
     }).start(() => {
       setMode(newMode);
     });
+  };
+
+  const handleGoOnline = async () => {
+    // Going offline needs no authentication
+    if (isOnline) {
+      setIsOnline(false);
+      return;
+    }
+    // Going online requires Face ID
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+      if (!hasHardware || !isEnrolled) {
+        // Device has no biometrics — allow online anyway
+        setIsOnline(true);
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Your face is your key',
+        fallbackLabel: 'Use passcode',
+      });
+
+      if (result.success) {
+        setIsOnline(true);
+      }
+    } catch (error) {
+      // Fallback — allow online if auth fails unexpectedly
+      setIsOnline(true);
+    }
   };
 
   return (
@@ -123,6 +167,44 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Online Toggle — Worker Mode Only */}
+      {mode === 'worker' && (
+        <TouchableOpacity
+          style={[
+            styles.onlineToggle,
+            isOnline && styles.onlineToggleActive,
+          ]}
+          onPress={handleGoOnline}
+          activeOpacity={0.85}>
+          <View style={[
+            styles.onlineDot,
+            { backgroundColor: isOnline ? '#4CAF7A' : '#555558' }
+          ]} />
+          <Text style={[
+            styles.onlineToggleText,
+            { color: isOnline ? '#4CAF7A' : '#888890' }
+          ]}>
+            {isOnline
+              ? '● Online — You are visible to customers'
+              : '● Offline — Tap to go online'}
+          </Text>
+          <View style={[
+            styles.onlineSwitch,
+            { backgroundColor: isOnline ? '#4CAF7A' : '#2A2A2E' }
+          ]}>
+            <Animated.View style={[
+              styles.onlineSwitchThumb,
+              {
+                left: onlineAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [3, 23],
+                }),
+              }
+            ]} />
+          </View>
+        </TouchableOpacity>
+      )}
+
       {/* Live Stats Bar */}
       <Animated.View style={[styles.statsBar, { opacity: statsAnim }]}>
         <View style={styles.statItem}>
@@ -145,8 +227,12 @@ export default function HomeScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>$240</Text>
-          <Text style={styles.statLabel}>This Week</Text>
+          <Text style={styles.statNumber}>
+            {isOnline ? '🟢' : '⚫'}
+          </Text>
+          <Text style={styles.statLabel}>
+            {isOnline ? 'Online' : 'Offline'}
+          </Text>
         </View>
       </Animated.View>
 
@@ -208,7 +294,9 @@ export default function HomeScreen() {
           onPress={() => router.push(mode === 'worker' ? '/live-market' : '/post-job')}>
           <GoldenDollar size="large" speed="slow" pulse={true} glow={true} />
           <Text style={styles.hubLabel}>
-            {mode === 'worker' ? 'FIND WORK' : 'POST JOB'}
+            {mode === 'worker'
+              ? (isOnline ? 'FIND WORK' : 'GO ONLINE')
+              : 'POST JOB'}
           </Text>
         </TouchableOpacity>
 
@@ -358,6 +446,54 @@ const styles = StyleSheet.create({
   },
   modeBtnText: { fontSize: 13, fontWeight: '700', color: '#888890' },
   modeBtnTextActive: { color: '#0E0E0F' },
+
+  // Online Toggle
+  onlineToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#171719',
+    borderWidth: 1,
+    borderColor: '#2E2E33',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginHorizontal: 20,
+    marginBottom: 10,
+  },
+  onlineToggleActive: {
+    borderColor: 'rgba(76,175,122,0.4)',
+    backgroundColor: 'rgba(76,175,122,0.06)',
+  },
+  onlineDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  onlineToggleText: {
+    fontSize: 13,
+    fontWeight: '700',
+    flex: 1,
+  },
+  onlineSwitch: {
+    width: 46,
+    height: 26,
+    borderRadius: 13,
+    position: 'relative',
+  },
+  onlineSwitchThumb: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    position: 'absolute',
+    top: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
 
   // Stats Bar
   statsBar: {
