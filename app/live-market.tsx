@@ -1,9 +1,10 @@
+import { loadSounds, playSound, unloadSounds } from '@/components/SoundManager';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import {
-    Animated, Dimensions, PanResponder, ScrollView,
-    StyleSheet, Text, TouchableOpacity, View
+  Animated, Dimensions, PanResponder, ScrollView,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -91,6 +92,10 @@ export default function LiveMarketScreen() {
   const heatAnim = useRef(new Animated.Value(0)).current;
   const confirmAnim = useRef(new Animated.Value(0)).current;
   const liveAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+  loadSounds();
+  return () => { unloadSounds(); };
+}, []);
 
   const currentJob = MOCK_JOBS[jobIndex % MOCK_JOBS.length];
   const nextJob = MOCK_JOBS[(jobIndex + 1) % MOCK_JOBS.length];
@@ -150,6 +155,7 @@ export default function LiveMarketScreen() {
   const handleApply = () => {
     if (isApplied) return;
     setAppliedIds(prev => [...prev, currentJob.id]);
+    playSound('applyClick');
     setShowApplyConfirm(true);
     Animated.spring(confirmAnim, { toValue: 1, friction: 5, useNativeDriver: true }).start();
     setTimeout(() => {
@@ -165,6 +171,7 @@ export default function LiveMarketScreen() {
   const handleSave = () => {
     if (isSaved) return;
     setSavedIds(prev => [...prev, currentJob.id]);
+    playSound('jobChime');
   };
 
   const panResponder = useRef(
