@@ -38,12 +38,13 @@ export default function GoldenDollar({
   useEffect(() => {
     // Spinning animation
     Animated.loop(
-      Animated.timing(rotation, {
-        toValue: 1,
-        duration,
-        useNativeDriver: true,
-      })
-    ).start();
+  Animated.timing(rotation, {
+    toValue: 1,
+    duration,
+    useNativeDriver: true,
+    isInteraction: false,
+  })
+).start();
 
     // Pulse animation
     if (pulse) {
