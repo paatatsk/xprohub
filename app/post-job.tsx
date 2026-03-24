@@ -1,9 +1,13 @@
 import HomeBeacon from '@/components/HomeBeacon';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useRef, useState } from 'react';
+import {
+  Animated, ScrollView, StyleSheet, Text,
+  TextInput, TouchableOpacity, View
+} from 'react-native';
 import GoldenDollar from '../components/GoldenDollar';
+import { playSound } from '../components/SoundManager';
 
 const CATEGORIES = [
   { icon: '🧹', name: 'Cleaning', tasks: ['Deep Clean', 'Regular Clean', 'Move-In/Out', 'Post-Party'] },
@@ -28,28 +32,161 @@ const TIMING = ['ASAP', 'Today', 'Tomorrow', 'Schedule'];
 
 export default function PostJobScreen() {
   const [step, setStep] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedTask, setSelectedTask] = useState<any>(null);
   const [budget, setBudget] = useState(50);
   const [timing, setTiming] = useState('ASAP');
   const [notes, setNotes] = useState('');
+  const [posted, setPosted] = useState(false);
 
-  const handleCategorySelect = (category) => {
+  // Posted state animations
+  const postedScale = useRef(new Animated.Value(0)).current;
+  const postedOpacity = useRef(new Animated.Value(0)).current;
+  const checkScale = useRef(new Animated.Value(0)).current;
+  const statsAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const formOpacity = useRef(new Animated.Value(1)).current;
+
+  const handleCategorySelect = (category: any) => {
     setSelectedCategory(category);
     setStep(2);
   };
 
-  const handleTaskSelect = (task) => {
+  const handleTaskSelect = (task: string) => {
     setSelectedTask(task);
     setStep(3);
   };
 
   const handlePost = () => {
-    router.push('/job-posted');
+    // Play apply sound
+    playSound('applyClick');
+
+    // Fade out the form
+    Animated.timing(formOpacity, {
+      toValue: 0, duration: 300, useNativeDriver: true,
+    }).start(() => {
+      setPosted(true);
+
+      // Play hired chord after transition
+      setTimeout(() => playSound('hiredChord'), 400);
+
+      // Animate the posted state in
+      Animated.sequence([
+        Animated.parallel([
+          Animated.spring(postedScale, {
+            toValue: 1, friction: 5, tension: 40, useNativeDriver: true,
+          }),
+          Animated.timing(postedOpacity, {
+            toValue: 1, duration: 400, useNativeDriver: true,
+          }),
+        ]),
+        Animated.spring(checkScale, {
+          toValue: 1, friction: 4, tension: 50, useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Stats count up
+      setTimeout(() => {
+        Animated.timing(statsAnim, {
+          toValue: 1, duration: 800, useNativeDriver: true,
+        }).start();
+      }, 600);
+
+      // Pulse animation
+      setTimeout(() => {
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(pulseAnim, { toValue: 1.05, duration: 800, useNativeDriver: true }),
+            Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+          ])
+        ).start();
+      }, 800);
+    });
   };
 
+  // ── POSTED STATE ──
+  if (posted) {
+    return (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+
+        <Animated.View style={[
+          styles.postedContainer,
+          { opacity: postedOpacity, transform: [{ scale: postedScale }] }
+        ]}>
+
+          {/* Success Circle */}
+          <Animated.View style={[
+            styles.successCircle,
+            { transform: [{ scale: checkScale }, { scale: pulseAnim }] }
+          ]}>
+            <Text style={styles.successEmoji}>🎉</Text>
+          </Animated.View>
+
+          {/* Title */}
+          <Text style={styles.postedTitle}>Job Posted!</Text>
+          <Text style={styles.postedSub}>
+            {selectedCategory?.icon} {selectedTask} · ${budget} · {timing}
+          </Text>
+
+          {/* Golden Dollar */}
+          <View style={styles.postedDollar}>
+            <GoldenDollar size="medium" speed="normal" pulse={true} glow={true} />
+          </View>
+
+          {/* Live Stats */}
+          <Animated.View style={[styles.statsCard, { opacity: statsAnim }]}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>12</Text>
+              <Text style={styles.statLabel}>Workers Nearby</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>~4 min</Text>
+              <Text style={styles.statLabel}>First Response</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>🔴 Live</Text>
+              <Text style={styles.statLabel}>Status</Text>
+            </View>
+          </Animated.View>
+
+          {/* Info Card */}
+          <Animated.View style={[styles.infoCard, { opacity: statsAnim }]}>
+            <Text style={styles.infoRow}>📍  Workers in Manhattan are being notified</Text>
+            <Text style={styles.infoRow}>🛡️  Payment held in escrow until complete</Text>
+            <Text style={styles.infoRow}>💬  Workers will message you to apply</Text>
+            <Text style={styles.infoRow}>⚡  Average hire time is under 10 minutes</Text>
+          </Animated.View>
+
+          {/* Buttons */}
+          <Animated.View style={[styles.postedButtons, { opacity: statsAnim }]}>
+            <TouchableOpacity
+              style={styles.findWorkersBtn}
+              onPress={() => router.push('/worker-match')}
+              activeOpacity={0.85}>
+              <Text style={styles.findWorkersBtnText}>🔍 View Worker Matches</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.homeBtn}
+              onPress={() => router.push('/(tabs)')}
+              activeOpacity={0.85}>
+              <Text style={styles.homeBtnText}>🏠 Back to Home</Text>
+            </TouchableOpacity>
+          </Animated.View>
+
+        </Animated.View>
+
+        <HomeBeacon />
+      </View>
+    );
+  }
+
+  // ── POSTING FORM ──
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: formOpacity }]}>
       <StatusBar style="light" />
 
       {/* Header */}
@@ -70,7 +207,7 @@ export default function PostJobScreen() {
         <View style={[styles.progressFill, { width: `${(step / 3) * 100}%` }]} />
       </View>
 
-      {/* STEP 1 — Category Selection */}
+      {/* STEP 1 — Category */}
       {step === 1 && (
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Text style={styles.stepTitle}>Choose a category</Text>
@@ -89,12 +226,12 @@ export default function PostJobScreen() {
         </ScrollView>
       )}
 
-      {/* STEP 2 — Task Selection */}
+      {/* STEP 2 — Task */}
       {step === 2 && selectedCategory && (
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <Text style={styles.stepTitle}>What specifically?</Text>
           <View style={styles.taskList}>
-            {selectedCategory.tasks.map((task) => (
+            {selectedCategory.tasks.map((task: string) => (
               <TouchableOpacity
                 key={task}
                 style={styles.taskItem}
@@ -108,11 +245,10 @@ export default function PostJobScreen() {
         </ScrollView>
       )}
 
-      {/* STEP 3 — Job Details */}
+      {/* STEP 3 — Details */}
       {step === 3 && (
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
 
-          {/* Selected Job Summary */}
           <View style={styles.jobSummary}>
             <Text style={styles.jobSummaryIcon}>{selectedCategory?.icon}</Text>
             <View style={styles.jobSummaryText}>
@@ -121,7 +257,6 @@ export default function PostJobScreen() {
             </View>
           </View>
 
-          {/* Budget */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>YOUR BUDGET</Text>
             <View style={styles.budgetRow}>
@@ -140,7 +275,6 @@ export default function PostJobScreen() {
             <Text style={styles.budgetHint}>Typical range for this job: $40–$120</Text>
           </View>
 
-          {/* Timing */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>WHEN DO YOU NEED IT?</Text>
             <View style={styles.timingRow}>
@@ -157,7 +291,6 @@ export default function PostJobScreen() {
             </View>
           </View>
 
-          {/* Photo Upload */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>ADD PHOTOS (OPTIONAL)</Text>
             <TouchableOpacity style={styles.photoUpload}>
@@ -167,12 +300,11 @@ export default function PostJobScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Notes */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>SPECIAL REQUIREMENTS</Text>
             <TextInput
               style={styles.notesInput}
-              placeholder="e.g. Bring own supplies, pet-friendly products, 2BR apartment..."
+              placeholder="e.g. Bring own supplies, pet-friendly products..."
               placeholderTextColor="#444450"
               multiline
               numberOfLines={3}
@@ -180,10 +312,11 @@ export default function PostJobScreen() {
               onChangeText={setNotes}
             />
           </View>
-<View style={{ alignItems: 'center', marginBottom: 12 }}>
-  <GoldenDollar size="small" speed="slow" pulse={true} glow={true} />
-</View>
-          {/* Post Button */}
+
+          <View style={{ alignItems: 'center', marginBottom: 12 }}>
+            <GoldenDollar size="small" speed="slow" pulse={true} glow={true} />
+          </View>
+
           <TouchableOpacity style={styles.postButton} onPress={handlePost}>
             <Text style={styles.postButtonText}>Find Workers Near Me 🔍</Text>
             <Text style={styles.postButtonSub}>
@@ -194,274 +327,173 @@ export default function PostJobScreen() {
           <View style={{ height: 40 }} />
         </ScrollView>
       )}
-     <HomeBeacon /> 
-    </View>
+
+      <HomeBeacon />
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0E0E0F',
+  container: { flex: 1, backgroundColor: '#0E0E0F' },
+
+  // Posted State
+  postedContainer: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 24, gap: 16,
   },
+  successCircle: {
+    width: 100, height: 100, borderRadius: 50,
+    backgroundColor: 'rgba(76,175,122,0.12)',
+    borderWidth: 2, borderColor: 'rgba(76,175,122,0.4)',
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#4CAF7A', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 20, elevation: 8,
+  },
+  successEmoji: { fontSize: 44 },
+  postedTitle: { fontSize: 32, fontWeight: '800', color: '#E8E8EA' },
+  postedSub: { fontSize: 15, color: '#C9A84C', fontWeight: '700' },
+  postedDollar: { marginVertical: 4 },
+  statsCard: {
+    flexDirection: 'row', backgroundColor: '#171719',
+    borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 20, paddingVertical: 16, width: '100%',
+  },
+  statItem: { flex: 1, alignItems: 'center', gap: 4 },
+  statNumber: { fontSize: 16, fontWeight: '800', color: '#C9A84C' },
+  statLabel: { fontSize: 10, color: '#888890' },
+  statDivider: { width: 1, backgroundColor: '#2E2E33' },
+  infoCard: {
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 20, padding: 16, width: '100%', gap: 12,
+  },
+  infoRow: { fontSize: 13, color: '#E8E8EA', fontWeight: '600' },
+  postedButtons: { width: '100%', gap: 10 },
+  findWorkersBtn: {
+    backgroundColor: '#C9A84C', borderRadius: 14,
+    padding: 16, alignItems: 'center',
+    shadowColor: '#C9A84C', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
+  },
+  findWorkersBtnText: { color: '#0E0E0F', fontSize: 16, fontWeight: '800' },
+  homeBtn: {
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 14, padding: 16, alignItems: 'center',
+  },
+  homeBtnText: { color: '#E8E8EA', fontSize: 15, fontWeight: '700' },
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 12,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 20, paddingTop: 60, paddingBottom: 12,
   },
-  backBtn: {
-    color: '#888890',
-    fontSize: 16,
-  },
-  headerTitle: {
-    color: '#E8E8EA',
-    fontSize: 17,
-    fontWeight: '700',
-  },
-  stepIndicator: {
-    color: '#C9A84C',
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  backBtn: { color: '#888890', fontSize: 16 },
+  headerTitle: { color: '#E8E8EA', fontSize: 17, fontWeight: '700' },
+  stepIndicator: { color: '#C9A84C', fontSize: 13, fontWeight: '700' },
 
   // Progress
   progressBar: {
-    height: 3,
-    backgroundColor: '#2A2A2E',
-    marginHorizontal: 20,
-    borderRadius: 2,
-    marginBottom: 20,
+    height: 3, backgroundColor: '#2A2A2E',
+    marginHorizontal: 20, borderRadius: 2, marginBottom: 20,
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#C9A84C',
-    borderRadius: 2,
-  },
+  progressFill: { height: '100%', backgroundColor: '#C9A84C', borderRadius: 2 },
 
   scroll: { flex: 1 },
-
   stepTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#E8E8EA',
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    fontSize: 24, fontWeight: '800', color: '#E8E8EA',
+    paddingHorizontal: 20, marginBottom: 20,
   },
 
-  // Category Grid
+  // Categories
   categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 10,
+    flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 10,
   },
   categoryTile: {
-    width: '30%',
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 14,
-    padding: 14,
-    alignItems: 'center',
-    gap: 8,
+    width: '30%', backgroundColor: '#171719',
+    borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 14, padding: 14, alignItems: 'center', gap: 8,
   },
   categoryIcon: { fontSize: 28 },
-  categoryName: {
-    fontSize: 11,
-    color: '#888890',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
+  categoryName: { fontSize: 11, color: '#888890', fontWeight: '600', textAlign: 'center' },
 
-  // Task List
-  taskList: {
-    paddingHorizontal: 20,
-    gap: 10,
-  },
+  // Tasks
+  taskList: { paddingHorizontal: 20, gap: 10 },
   taskItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 14,
-    padding: 16,
-    gap: 14,
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 14, padding: 16, gap: 14,
   },
   taskIcon: { fontSize: 22 },
-  taskName: {
-    flex: 1,
-    fontSize: 15,
-    color: '#E8E8EA',
-    fontWeight: '600',
-  },
-  taskArrow: {
-    color: '#C9A84C',
-    fontSize: 20,
-  },
+  taskName: { flex: 1, fontSize: 15, color: '#E8E8EA', fontWeight: '600' },
+  taskArrow: { color: '#C9A84C', fontSize: 20 },
 
   // Job Summary
   jobSummary: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center',
     backgroundColor: 'rgba(201,168,76,0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.3)',
-    borderRadius: 14,
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 24,
-    gap: 14,
+    borderWidth: 1, borderColor: 'rgba(201,168,76,0.3)',
+    borderRadius: 14, padding: 16,
+    marginHorizontal: 20, marginBottom: 24, gap: 14,
   },
   jobSummaryIcon: { fontSize: 32 },
   jobSummaryText: { flex: 1 },
-  jobSummaryTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#C9A84C',
-  },
-  jobSummaryCat: {
-    fontSize: 13,
-    color: '#888890',
-    marginTop: 2,
-  },
+  jobSummaryTitle: { fontSize: 18, fontWeight: '800', color: '#C9A84C' },
+  jobSummaryCat: { fontSize: 13, color: '#888890', marginTop: 2 },
 
   // Section
-  section: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-  },
+  section: { paddingHorizontal: 20, marginBottom: 24 },
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#888890',
-    letterSpacing: 2,
-    marginBottom: 12,
+    fontSize: 11, fontWeight: '700', color: '#888890',
+    letterSpacing: 2, marginBottom: 12,
   },
 
   // Budget
   budgetRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 24,
-    marginBottom: 8,
+    flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'center', gap: 24, marginBottom: 8,
   },
   budgetBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    alignItems: 'center', justifyContent: 'center',
   },
-  budgetBtnText: {
-    color: '#C9A84C',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  budgetAmount: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: '#C9A84C',
-  },
-  budgetHint: {
-    textAlign: 'center',
-    fontSize: 12,
-    color: '#444450',
-  },
+  budgetBtnText: { color: '#C9A84C', fontSize: 24, fontWeight: '700' },
+  budgetAmount: { fontSize: 48, fontWeight: '800', color: '#C9A84C' },
+  budgetHint: { textAlign: 'center', fontSize: 12, color: '#444450' },
 
   // Timing
-  timingRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+  timingRow: { flexDirection: 'row', gap: 8 },
   timingBtn: {
-    flex: 1,
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
+    flex: 1, backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 12, padding: 12, alignItems: 'center',
   },
-  timingBtnActive: {
-    borderColor: '#C9A84C',
-    backgroundColor: 'rgba(201,168,76,0.08)',
-  },
-  timingText: {
-    fontSize: 12,
-    color: '#888890',
-    fontWeight: '600',
-  },
-  timingTextActive: {
-    color: '#C9A84C',
-  },
+  timingBtnActive: { borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.08)' },
+  timingText: { fontSize: 12, color: '#888890', fontWeight: '600' },
+  timingTextActive: { color: '#C9A84C' },
 
   // Photo
   photoUpload: {
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 14,
-    borderStyle: 'dashed',
-    padding: 24,
-    alignItems: 'center',
-    gap: 6,
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 14, borderStyle: 'dashed',
+    padding: 24, alignItems: 'center', gap: 6,
   },
   photoIcon: { fontSize: 32 },
-  photoText: {
-    fontSize: 14,
-    color: '#888890',
-    fontWeight: '600',
-  },
-  photoHint: {
-    fontSize: 12,
-    color: '#444450',
-  },
+  photoText: { fontSize: 14, color: '#888890', fontWeight: '600' },
+  photoHint: { fontSize: 12, color: '#444450' },
 
   // Notes
   notesInput: {
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 14,
-    padding: 16,
-    fontSize: 14,
-    color: '#E8E8EA',
-    textAlignVertical: 'top',
-    minHeight: 90,
+    backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
+    borderRadius: 14, padding: 16, fontSize: 14, color: '#E8E8EA',
+    textAlignVertical: 'top', minHeight: 90,
   },
 
   // Post Button
   postButton: {
-    backgroundColor: '#C9A84C',
-    borderRadius: 14,
-    padding: 18,
-    alignItems: 'center',
-    marginHorizontal: 20,
-    shadowColor: '#C9A84C',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
-    gap: 4,
+    backgroundColor: '#C9A84C', borderRadius: 14, padding: 18,
+    alignItems: 'center', marginHorizontal: 20,
+    shadowColor: '#C9A84C', shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 16, elevation: 8, gap: 4,
   },
-  postButtonText: {
-    color: '#0E0E0F',
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  postButtonSub: {
-    color: 'rgba(0,0,0,0.6)',
-    fontSize: 12,
-    fontWeight: '600',
-  },
+  postButtonText: { color: '#0E0E0F', fontSize: 16, fontWeight: '800' },
+  postButtonSub: { color: 'rgba(0,0,0,0.6)', fontSize: 12, fontWeight: '600' },
 });
