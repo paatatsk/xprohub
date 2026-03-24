@@ -32,6 +32,7 @@ const SCREENS = [
   { icon: '✅', name: 'Job Confirm', route: '/job-confirm', color: '#C9A84C' },
   { icon: '💰', name: 'Tip Screen', route: '/tip', color: '#C9A84C' },
   { icon: '📄', name: 'Job Summary', route: '/job-summary', color: '#4CAF7A' },
+  { icon: '🤝', name: 'Job Agreement', route: '/job-agreement', color: '#C9A84C' },
 ];
 
 const GROUPS = [
