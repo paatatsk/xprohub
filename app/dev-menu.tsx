@@ -34,6 +34,7 @@ const SCREENS = [
   { icon: '📄', name: 'Job Summary', route: '/job-summary', color: '#4CAF7A' },
   { icon: '🤝', name: 'Job Agreement', route: '/job-agreement', color: '#C9A84C' },
   { icon: '📋', name: 'Pre Job Brief', route: '/pre-job-brief', color: '#4A9EDB' },
+  { icon: '🔐', name: 'Verification', route: '/verification', color: '#4CAF7A' },
 ];
 
 const GROUPS = [
