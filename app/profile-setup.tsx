@@ -1,6 +1,8 @@
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,7 +15,30 @@ import {
 export default function ProfileSetupScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
+const [location, setLocation] = useState('');
+  const [photo, setPhoto] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      const gallery = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!gallery.granted) return;
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images' as MediaType,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+      if (!result.canceled) setPhoto(result.assets[0].uri);
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (!result.canceled) setPhoto(result.assets[0].uri);
+  };
 
   const isReady = name.trim().length > 0 && location.trim().length > 0;
 
@@ -39,10 +64,16 @@ export default function ProfileSetupScreen() {
           <View style={styles.progressFill} />
         </View>
 
-        <TouchableOpacity style={styles.photoBox}>
-          <Text style={styles.photoIcon}>📷</Text>
-          <Text style={styles.photoText}>Add a photo</Text>
-          <Text style={styles.photoSub}>Helps people trust you</Text>
+        <TouchableOpacity style={styles.photoBox} onPress={pickImage}>
+          {photo ? (
+            <Image source={{ uri: photo }} style={styles.photoPreview} />
+          ) : (
+            <>
+              <Text style={styles.photoIcon}>📷</Text>
+              <Text style={styles.photoText}>Add a photo</Text>
+              <Text style={styles.photoSub}>Helps people trust you</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <Text style={styles.label}>Your Name</Text>
@@ -135,6 +166,13 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     paddingVertical: 28,
     marginBottom: 28,
+    overflow: 'hidden',
+    height: 140,
+  },
+  photoPreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
   },
   photoIcon: {
     fontSize: 36,
