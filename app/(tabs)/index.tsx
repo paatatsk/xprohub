@@ -205,7 +205,7 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0E0E0F' },
 
   devBtn: {
-    position: 'absolute', top: 52, right: 20, zIndex: 999,
+    position: 'absolute', top: 52, right: 80, zIndex: 999,
     backgroundColor: 'rgba(14,14,15,0.95)', borderWidth: 1,
     borderColor: '#2E2E33', borderRadius: 20,
     paddingHorizontal: 12, paddingVertical: 6,
