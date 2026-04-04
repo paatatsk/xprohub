@@ -1,11 +1,11 @@
+import * as LocalAuthentication from 'expo-local-authentication';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Animated, Dimensions, Modal, ScrollView, StyleSheet,
-  Text, TouchableOpacity, View
+  Animated, Dimensions, Modal, ScrollView,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import GoldenDollar from '../../components/GoldenDollar';
 
 const { width, height } = Dimensions.get('window');
@@ -37,7 +37,7 @@ const SPOKES_WORKER = [
   {
     icon: '🔐', label: 'Trust', color: '#4A9EDB', angle: 54,
     subs: [
-      { icon: '👤', label: 'Verify', route: '/verification', color: '#4A9EDB' },
+      { icon: '✅', label: 'Verify', route: '/verification', color: '#4A9EDB' },
       { icon: '👤', label: 'Profile', route: '/my-profile', color: '#4A9EDB' },
       { icon: '🏆', label: 'Badges', route: '/xp-levels', color: '#4A9EDB' },
       { icon: '⭐', label: 'Reviews', route: '/review', color: '#4A9EDB' },
@@ -107,19 +107,37 @@ const SPOKES_CUSTOMER = [
   },
 ];
 
-const WORKER_ACTIVITY = [
+const QUICK_WORKER = [
+  { icon: '🔴', label: 'Live Market', route: '/live-market', color: '#FF3B30' },
+  { icon: '📋', label: 'My Jobs', route: '/command-center', color: '#4CAF7A' },
+  { icon: '💬', label: 'Chat', route: '/chat', color: '#9B6EE8' },
+  { icon: '💰', label: 'Earnings', route: '/bookkeeping', color: '#C9A84C' },
+];
+
+const QUICK_CUSTOMER = [
+  { icon: '📋', label: 'Post Job', route: '/post-job', color: '#4CAF7A' },
+  { icon: '🔍', label: 'Find Workers', route: '/worker-match', color: '#4A9EDB' },
+  { icon: '💬', label: 'Chat', route: '/chat', color: '#9B6EE8' },
+  { icon: '💰', label: 'Payments', route: '/payment', color: '#C9A84C' },
+];
+
+const RECENT_WORKER = [
   { icon: '💰', text: 'Job completed — Plumbing repair', time: '2h ago', color: '#4CAF7A' },
   { icon: '💰', text: '$85 payment received', time: '2h ago', color: '#C9A84C' },
   { icon: '⭐', text: 'New 5 star review from Sarah M.', time: '5h ago', color: '#C9A84C' },
+  { icon: '🔴', text: '4 new jobs near you', time: '1h ago', color: '#FF3B30' },
 ];
 
-const CUSTOMER_ACTIVITY = [
+const RECENT_CUSTOMER = [
   { icon: '🔧', text: 'Worker arriving in 12 min', time: 'Now', color: '#4CAF7A' },
   { icon: '💬', text: 'New message from Mike T.', time: '30m ago', color: '#9B6EE8' },
   { icon: '🏠', text: 'Job confirmed — Cleaning', time: '1h ago', color: '#4CAF7A' },
+  { icon: '💰', text: 'Payment of $120 processed', time: '3h ago', color: '#C9A84C' },
 ];
 
-function HubModal({ visible, mode, spokes, onClose, onNavigate }: {
+function HubModal({
+  visible, mode, spokes, onClose, onNavigate,
+}: {
   visible: boolean;
   mode: string;
   spokes: typeof SPOKES_WORKER;
@@ -241,43 +259,62 @@ function HubModal({ visible, mode, spokes, onClose, onNavigate }: {
 export default function HomeScreen() {
   const [mode, setMode] = useState<'worker' | 'customer'>('worker');
   const [greeting, setGreeting] = useState('');
+  const [isOnline, setIsOnline] = useState(false);
   const [hubVisible, setHubVisible] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+
+  const onlineAnim = useRef(new Animated.Value(0)).current;
+  const statsAnim = useRef(new Animated.Value(0)).current;
+
+  const spokes = mode === 'worker' ? SPOKES_WORKER : SPOKES_CUSTOMER;
+  const quickActions = mode === 'worker' ? QUICK_WORKER : QUICK_CUSTOMER;
+  const recentActivity = mode === 'worker' ? RECENT_WORKER : RECENT_CUSTOMER;
+
+  useEffect(() => {
+    if (!hubVisible && pendingRoute) {
+      router.push(pendingRoute as any);
+      setPendingRoute(null);
+    }
+  }, [hubVisible, pendingRoute]);
 
   useEffect(() => {
     const h = new Date().getHours();
     setGreeting(h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening');
-    Animated.timing(fadeAnim, {
-      toValue: 1, duration: 600, useNativeDriver: true,
-    }).start();
+    Animated.timing(statsAnim, { toValue: 1, duration: 800, useNativeDriver: true }).start();
   }, []);
 
   useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.04, duration: 1000, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      ])
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, []);
+    Animated.spring(onlineAnim, {
+      toValue: isOnline ? 1 : 0, friction: 6, tension: 40, useNativeDriver: false,
+    }).start();
+  }, [isOnline]);
 
-  const activity = mode === 'worker' ? WORKER_ACTIVITY : CUSTOMER_ACTIVITY;
+  const handleGoOnline = async () => {
+    if (isOnline) { setIsOnline(false); return; }
+    try {
+      const hasHw = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!hasHw || !enrolled) { setIsOnline(true); return; }
+      const res = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Your face is your key',
+        fallbackLabel: 'Use passcode',
+      });
+      if (res.success) setIsOnline(true);
+    } catch { setIsOnline(true); }
+  };
 
   return (
-    <SafeAreaView style={s.container}>
+    <View style={s.container}>
       <StatusBar style="light" />
 
       <HubModal
         visible={hubVisible}
         mode={mode}
-        spokes={mode === 'worker' ? SPOKES_WORKER : SPOKES_CUSTOMER}
+        spokes={spokes}
         onClose={() => setHubVisible(false)}
         onNavigate={(route) => {
+          setPendingRoute(route);
           setHubVisible(false);
-          router.push(route as any);
         }}
       />
 
@@ -285,13 +322,11 @@ export default function HomeScreen() {
         <Text style={s.devBtnText}>Dev</Text>
       </TouchableOpacity>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
 
         <View style={s.topBar}>
           <TouchableOpacity onPress={() => router.push('/my-profile')}>
-            <View style={s.avatar}>
-              <Text style={s.avatarText}>S</Text>
-            </View>
+            <View style={s.avatar}><Text style={s.avatarText}>S</Text></View>
           </TouchableOpacity>
           <View style={s.greetingBlock}>
             <Text style={s.greeting}>{greeting}, Sofia! 👋</Text>
@@ -320,81 +355,103 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <Animated.View style={[s.heroCard, { opacity: fadeAnim }]}>
-          <View style={s.heroTop}>
-            <View style={s.liveRow}>
-              <View style={s.liveDot} />
-              <Text style={s.liveText}>LIVE MARKET</Text>
-            </View>
-            <Text style={s.heroJobCount}>6 jobs near you</Text>
-          </View>
-
-          <Animated.View style={[s.dollarWrap, { transform: [{ scale: pulseAnim }] }]}>
-            <GoldenDollar size="large" speed="slow" pulse={true} glow={true} />
-          </Animated.View>
-
-          <Text style={s.heroSub}>
-            {mode === 'worker'
-              ? 'Real jobs. Real pay. Start earning now.'
-              : 'Real workers. Real help. Get it done today.'}
-          </Text>
-
+        {mode === 'worker' && (
           <TouchableOpacity
-            style={s.heroBtn}
-            onPress={() => router.push('/live-market')}
-            activeOpacity={0.85}>
-            <Text style={s.heroBtnText}>
-              {mode === 'worker' ? 'Browse Jobs' : 'Find Workers'}
+            style={[s.onlineToggle, isOnline && s.onlineToggleOn]}
+            onPress={handleGoOnline} activeOpacity={0.85}>
+            <View style={[s.onlineDot, { backgroundColor: isOnline ? '#4CAF7A' : '#555' }]} />
+            <Text style={[s.onlineText, { color: isOnline ? '#4CAF7A' : '#888' }]}>
+              {isOnline ? 'Online — You are visible' : 'Offline — Tap to go online'}
             </Text>
+            <View style={[s.onlineSwitch, { backgroundColor: isOnline ? '#4CAF7A' : '#2A2A2E' }]}>
+              <Animated.View style={[s.onlineThumb, {
+                left: onlineAnim.interpolate({ inputRange: [0, 1], outputRange: [3, 23] }),
+              }]} />
+            </View>
           </TouchableOpacity>
+        )}
+
+        <Animated.View style={[s.statsBar, { opacity: statsAnim }]}>
+          <View style={s.statItem}>
+            <Text style={s.statNum}>{mode === 'worker' ? '4' : '12'}</Text>
+            <Text style={s.statLabel}>{mode === 'worker' ? 'Jobs Near' : 'Workers'}</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Text style={s.statNum}>6</Text>
+            <Text style={s.statLabel}>Live Now</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Text style={s.statNum}>4.9</Text>
+            <Text style={s.statLabel}>Rating</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Text style={[s.statNum, { color: isOnline ? '#4CAF7A' : '#888' }]}>
+              {isOnline ? 'On' : 'Off'}
+            </Text>
+            <Text style={s.statLabel}>{isOnline ? 'Online' : 'Offline'}</Text>
+          </View>
         </Animated.View>
 
-        <View style={s.actionRow}>
-          <TouchableOpacity
-            style={s.actionCard}
-            onPress={() => router.push('/post-job')}
-            activeOpacity={0.85}>
-            <Text style={s.actionIcon}>📋</Text>
-            <Text style={s.actionTitle}>Post a Job</Text>
-            <Text style={s.actionSub}>Get help today</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={s.actionCard}
-            onPress={() => router.push('/worker-match')}
-            activeOpacity={0.85}>
-            <Text style={s.actionIcon}>👷</Text>
-            <Text style={s.actionTitle}>Find a Worker</Text>
-            <Text style={s.actionSub}>Browse available now</Text>
-          </TouchableOpacity>
+        <View style={s.sectionRow}>
+          <Text style={s.sectionTitle}>Quick Actions</Text>
+        </View>
+        <View style={s.quickRow}>
+          {quickActions.map(a => (
+            <TouchableOpacity key={a.label} style={s.quickBtn}
+              onPress={() => router.push(a.route as any)} activeOpacity={0.8}>
+              <View style={[s.quickBox, { borderColor: a.color }]}>
+                <Text style={s.quickIcon}>{a.icon}</Text>
+              </View>
+              <Text style={[s.quickLabel, { color: a.color }]}>{a.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        <TouchableOpacity
-          style={s.exploreBtn}
-          onPress={() => setHubVisible(true)}
-          activeOpacity={0.85}>
-          <Text style={s.exploreBtnIcon}>💫</Text>
-          <Text style={s.exploreBtnText}>Explore All Features</Text>
-          <Text style={s.exploreBtnArrow}>→</Text>
-        </TouchableOpacity>
+        <View style={s.hubTrigger}>
+          <TouchableOpacity
+            style={s.hubTriggerBtn}
+            onPress={() => setHubVisible(true)}
+            activeOpacity={0.85}>
+            <GoldenDollar size="large" speed="slow" pulse={true} glow={true} />
+          </TouchableOpacity>
+          <Text style={s.hubTriggerLabel}>TAP TO EXPLORE ALL FEATURES</Text>
+        </View>
 
         {mode === 'worker' && (
           <TouchableOpacity style={s.xpBar} onPress={() => router.push('/xp-levels')}>
-            <Text style={s.xpLabel}>⚡ Trusted Expert</Text>
-            <View style={s.xpBg}>
-              <View style={s.xpFill} />
-            </View>
+            <Text style={s.xpLabel}>Trusted Expert</Text>
+            <View style={s.xpBg}><View style={s.xpFill} /></View>
             <Text style={s.xpText}>2,450 XP</Text>
           </TouchableOpacity>
         )}
+
+        <View style={s.sectionRow}>
+          <Text style={s.sectionTitle}>Recent Activity</Text>
+          <TouchableOpacity onPress={() => router.push('/notifications')}>
+            <Text style={s.sectionLink}>See all</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={s.activityCard}>
+          {recentActivity.map((item, i) => (
+            <View key={i} style={[s.activityRow, i < recentActivity.length - 1 && s.activityBorder]}>
+              <View style={[s.activityDot, { backgroundColor: item.color }]} />
+              <Text style={s.activityIcon}>{item.icon}</Text>
+              <Text style={s.activityText}>{item.text}</Text>
+              <Text style={s.activityTime}>{item.time}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={{ height: 120 }} />
       </ScrollView>
 
       <View style={s.bottomBar}>
-        <TouchableOpacity style={s.bottomBtn} onPress={() => router.push('/live-market')}>
-          <Text style={s.bottomIcon}>🔴</Text>
-          <Text style={s.bottomText}>Live</Text>
+        <TouchableOpacity style={s.bottomBtn} onPress={() => router.push('/explore')}>
+          <Text style={s.bottomIcon}>🗺️</Text>
+          <Text style={s.bottomText}>Explore</Text>
         </TouchableOpacity>
         <TouchableOpacity style={s.bottomBtn} onPress={() => router.push('/notifications')}>
           <Text style={s.bottomIcon}>🔔</Text>
@@ -416,7 +473,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -461,9 +518,10 @@ const m = StyleSheet.create({
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0E0E0F' },
+  scroll: { flex: 1 },
 
   devBtn: {
-    position: 'absolute', top: 52, right: 80, zIndex: 999,
+    position: 'absolute', top: 52, right: 20, zIndex: 999,
     backgroundColor: 'rgba(14,14,15,0.95)', borderWidth: 1,
     borderColor: '#2E2E33', borderRadius: 20,
     paddingHorizontal: 12, paddingVertical: 6,
@@ -472,7 +530,7 @@ const s = StyleSheet.create({
 
   topBar: {
     flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12, gap: 12,
+    paddingHorizontal: 20, paddingTop: 60, paddingBottom: 12, gap: 12,
   },
   avatar: {
     width: 42, height: 42, borderRadius: 14, backgroundColor: '#C9A84C',
@@ -495,7 +553,7 @@ const s = StyleSheet.create({
   },
 
   modeToggle: {
-    flexDirection: 'row', marginHorizontal: 20, marginBottom: 16,
+    flexDirection: 'row', marginHorizontal: 20, marginBottom: 10,
     backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
     borderRadius: 14, padding: 4, gap: 4,
   },
@@ -504,57 +562,60 @@ const s = StyleSheet.create({
   modeBtnText: { fontSize: 13, fontWeight: '700', color: '#888' },
   modeBtnTextActive: { color: '#0E0E0F' },
 
-  heroCard: {
-    marginHorizontal: 20, marginBottom: 16,
-    backgroundColor: '#0F0E0A',
-    borderWidth: 1, borderColor: '#C9A84C',
-    borderRadius: 24, padding: 24,
-    alignItems: 'center',
-    shadowColor: '#C9A84C',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.15, shadowRadius: 20, elevation: 10,
-  },
-  heroTop: {
-    width: '100%', flexDirection: 'row',
-    justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
-  },
-  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#FF3B30' },
-  liveText: { fontSize: 11, fontWeight: '800', color: '#FF3B30', letterSpacing: 1.5 },
-  heroJobCount: { fontSize: 13, fontWeight: '700', color: '#C9A84C' },
-  dollarWrap: { marginBottom: 16 },
-  heroSub: {
-    fontSize: 14, color: '#888', textAlign: 'center',
-    lineHeight: 20, marginBottom: 20,
-  },
-  heroBtn: {
-    backgroundColor: '#C9A84C', borderRadius: 14,
-    paddingVertical: 14, paddingHorizontal: 40,
-  },
-  heroBtnText: { fontSize: 15, fontWeight: '800', color: '#0E0E0F' },
-
-  actionRow: {
-    flexDirection: 'row', marginHorizontal: 20,
-    gap: 12, marginBottom: 16,
-  },
-  actionCard: {
-    flex: 1, backgroundColor: '#171719',
-    borderWidth: 1, borderColor: '#2E2E33',
-    borderRadius: 18, padding: 18, alignItems: 'center', gap: 6,
-  },
-  actionIcon: { fontSize: 28 },
-  actionTitle: { fontSize: 13, fontWeight: '800', color: '#FFFFFF' },
-  actionSub: { fontSize: 11, color: '#888', textAlign: 'center' },
-
-  exploreBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    marginHorizontal: 20, marginTop: 8, marginBottom: 8,
+  onlineToggle: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
     backgroundColor: '#171719', borderWidth: 1, borderColor: '#2E2E33',
-    borderRadius: 14, paddingVertical: 14, paddingHorizontal: 20, gap: 8,
+    borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12,
+    marginHorizontal: 20, marginBottom: 10,
   },
-  exploreBtnIcon: { fontSize: 18 },
-  exploreBtnText: { fontSize: 14, fontWeight: '700', color: '#888', flex: 1, textAlign: 'center' },
-  exploreBtnArrow: { fontSize: 16, color: '#C9A84C', fontWeight: '800' },
+  onlineToggleOn: {
+    borderColor: 'rgba(76,175,122,0.4)',
+    backgroundColor: 'rgba(76,175,122,0.06)',
+  },
+  onlineDot: { width: 10, height: 10, borderRadius: 5 },
+  onlineText: { fontSize: 13, fontWeight: '700', flex: 1 },
+  onlineSwitch: { width: 46, height: 26, borderRadius: 13, position: 'relative' },
+  onlineThumb: {
+    width: 20, height: 20, borderRadius: 10, backgroundColor: '#FFF',
+    position: 'absolute', top: 3,
+  },
+
+  statsBar: {
+    flexDirection: 'row', backgroundColor: '#171719',
+    borderTopWidth: 1, borderBottomWidth: 1, borderColor: '#2E2E33',
+    paddingVertical: 10, marginBottom: 16,
+  },
+  statItem: { flex: 1, alignItems: 'center', gap: 2 },
+  statNum: { fontSize: 15, fontWeight: '800', color: '#C9A84C' },
+  statLabel: { fontSize: 9, color: '#888' },
+  statDiv: { width: 1, backgroundColor: '#2E2E33' },
+
+  sectionRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 20, marginBottom: 12,
+  },
+  sectionTitle: { fontSize: 14, fontWeight: '800', color: '#E8E8EA' },
+  sectionLink: { fontSize: 12, color: '#C9A84C', fontWeight: '600' },
+
+  quickRow: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 20 },
+  quickBtn: { flex: 1, alignItems: 'center', gap: 6 },
+  quickBox: {
+    width: 52, height: 52, backgroundColor: '#171719',
+    borderRadius: 16, borderWidth: 1.5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  quickIcon: { fontSize: 24 },
+  quickLabel: { fontSize: 10, fontWeight: '700', textAlign: 'center' },
+
+  hubTrigger: {
+    alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 20, marginBottom: 16,
+  },
+  hubTriggerBtn: { marginBottom: 10 },
+  hubTriggerLabel: {
+    fontSize: 10, fontWeight: '800',
+    color: '#C9A84C', letterSpacing: 2,
+  },
 
   xpBar: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
@@ -566,6 +627,20 @@ const s = StyleSheet.create({
   xpBg: { flex: 1, height: 6, backgroundColor: '#2A2A2E', borderRadius: 3, overflow: 'hidden' },
   xpFill: { width: '49%', height: '100%', backgroundColor: '#C9A84C', borderRadius: 3 },
   xpText: { fontSize: 11, color: '#888' },
+
+  activityCard: {
+    marginHorizontal: 20, backgroundColor: '#171719',
+    borderRadius: 16, borderWidth: 1, borderColor: '#2E2E33', overflow: 'hidden',
+  },
+  activityRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 14, paddingVertical: 12, gap: 8,
+  },
+  activityBorder: { borderBottomWidth: 1, borderBottomColor: '#2E2E33' },
+  activityDot: { width: 8, height: 8, borderRadius: 4 },
+  activityIcon: { fontSize: 16 },
+  activityText: { fontSize: 13, color: '#E8E8EA', flex: 1 },
+  activityTime: { fontSize: 11, color: '#555', fontWeight: '600' },
 
   bottomBar: {
     flexDirection: 'row', backgroundColor: '#171719',
