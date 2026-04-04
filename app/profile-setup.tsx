@@ -5,54 +5,21 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-type AccountType = 'individual' | 'business' | 'city_org' | null;
-
-const accountOptions = [
-  {
-    id: 'individual' as AccountType,
-    emoji: '🧑',
-    title: 'Individual',
-    subtitle: 'I need help around the home',
-    badge: '🔒 Email only',
-    badgeColor: '#4A9EDB',
-  },
-  {
-    id: 'business' as AccountType,
-    emoji: '🏢',
-    title: 'Business',
-    subtitle: 'I represent a company',
-    badge: '🔒 Business docs required',
-    badgeColor: '#9B6EE8',
-  },
-  {
-    id: 'city_org' as AccountType,
-    emoji: '🏛️',
-    title: 'City / Organization',
-    subtitle: 'I represent a public institution',
-    badge: '🔒 Official ID required',
-    badgeColor: '#4CAF7A',
-  },
-];
-
 export default function ProfileSetupScreen() {
   const router = useRouter();
-  const [selected, setSelected] = useState<AccountType>(null);
+  const [name, setName] = useState('');
+  const [location, setLocation] = useState('');
 
-  const handleGetStarted = () => {
-    if (!selected) return;
+  const isReady = name.trim().length > 0 && location.trim().length > 0;
 
-    // Navigate based on account type
-    if (selected === 'individual') {
-      router.push('/individual-type');
-    } else if (selected === 'business') {
-      router.push('/business-trust-setup');
-    } else if (selected === 'city_org') {
-      router.push('/city-trust-setup');
-    }
+  const handleContinue = () => {
+    if (!isReady) return;
+    router.push('/(tabs)');
   };
 
   return (
@@ -61,72 +28,56 @@ export default function ProfileSetupScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Dollar Icon */}
         <View style={styles.iconContainer}>
           <Text style={styles.dollarIcon}>💰</Text>
         </View>
 
-        {/* Title */}
-        <Text style={styles.title}>Set Up Your Profile</Text>
-        <Text style={styles.subtitle}>Step 1 of 2 — Choose your account type</Text>
+        <Text style={styles.title}>Welcome to XProHub</Text>
+        <Text style={styles.subtitle}>Let's get you set up in seconds</Text>
 
-        {/* Progress Bar */}
         <View style={styles.progressBar}>
           <View style={styles.progressFill} />
         </View>
 
-        {/* Section Heading */}
-        <Text style={styles.sectionHeading}>What best describes you?</Text>
-        <Text style={styles.sectionSub}>
-          You can always change this later in your profile settings
+        <TouchableOpacity style={styles.photoBox}>
+          <Text style={styles.photoIcon}>📷</Text>
+          <Text style={styles.photoText}>Add a photo</Text>
+          <Text style={styles.photoSub}>Helps people trust you</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.label}>Your Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="What should we call you?"
+          placeholderTextColor="#555"
+          value={name}
+          onChangeText={setName}
+        />
+
+        <Text style={styles.label}>Your Location</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="City or neighbourhood"
+          placeholderTextColor="#555"
+          value={location}
+          onChangeText={setLocation}
+        />
+
+        <Text style={styles.note}>
+          You can find work, post jobs, or do both — you decide when you're ready.
         </Text>
 
-        {/* Options */}
-        {accountOptions.map((option) => {
-          const isSelected = selected === option.id;
-          return (
-            <TouchableOpacity
-              key={option.id}
-              style={[styles.card, isSelected && styles.cardSelected]}
-              onPress={() => setSelected(option.id)}
-              activeOpacity={0.8}
-            >
-              {/* Emoji Icon */}
-              <View style={styles.iconBox}>
-                <Text style={styles.optionEmoji}>{option.emoji}</Text>
-              </View>
-
-              {/* Text */}
-              <View style={styles.cardText}>
-                <Text style={styles.cardTitle}>{option.title}</Text>
-                <Text style={styles.cardSubtitle}>{option.subtitle}</Text>
-                <View style={[styles.badge, { borderColor: option.badgeColor }]}>
-                  <Text style={[styles.badgeText, { color: option.badgeColor }]}>
-                    {option.badge}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Radio */}
-              <View style={[styles.radio, isSelected && styles.radioSelected]}>
-                {isSelected && <View style={styles.radioDot} />}
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-
-        <View style={{ height: 100 }} />
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Get Started Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.button, !selected && styles.buttonDisabled]}
-          onPress={handleGetStarted}
-          disabled={!selected}
+          style={[styles.button, !isReady && styles.buttonDisabled]}
+          onPress={handleContinue}
+          disabled={!isReady}
           activeOpacity={0.85}
         >
-          <Text style={styles.buttonText}>Get $tarted →</Text>
+          <Text style={styles.buttonText}>Let's Go →</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -139,8 +90,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#0E0E0F',
   },
   scroll: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: 24,
+    paddingTop: 24,
   },
   iconContainer: {
     alignItems: 'center',
@@ -160,100 +111,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   progressBar: {
     height: 4,
     backgroundColor: '#2E2E33',
     borderRadius: 2,
-    marginBottom: 28,
+    marginBottom: 32,
   },
   progressFill: {
     height: 4,
-    width: '50%',
+    width: '33%',
     backgroundColor: '#C9A84C',
     borderRadius: 2,
   },
-  sectionHeading: {
-    fontSize: 20,
+  photoBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#171719',
+    borderWidth: 1,
+    borderColor: '#2E2E33',
+    borderRadius: 16,
+    borderStyle: 'dashed',
+    paddingVertical: 28,
+    marginBottom: 28,
+  },
+  photoIcon: {
+    fontSize: 36,
+    marginBottom: 8,
+  },
+  photoText: {
+    fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: 4,
   },
-  sectionSub: {
+  photoSub: {
     fontSize: 13,
     color: '#888',
-    marginBottom: 20,
   },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#171719',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    padding: 16,
-    marginBottom: 12,
-  },
-  cardSelected: {
-    borderColor: '#C9A84C',
-    backgroundColor: '#1E1C14',
-  },
-  iconBox: {
-    width: 52,
-    height: 52,
-    backgroundColor: '#2E2E33',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-  },
-  optionEmoji: {
-    fontSize: 26,
-  },
-  cardText: {
-    flex: 1,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 3,
-  },
-  cardSubtitle: {
-    fontSize: 13,
-    color: '#999',
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#C9A84C',
     marginBottom: 8,
   },
-  badge: {
-    alignSelf: 'flex-start',
+  input: {
+    backgroundColor: '#171719',
     borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    borderColor: '#2E2E33',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: '#FFFFFF',
+    marginBottom: 20,
   },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: '#555',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 10,
-  },
-  radioSelected: {
-    borderColor: '#C9A84C',
-  },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#C9A84C',
+  note: {
+    fontSize: 13,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginTop: 8,
   },
   footer: {
     position: 'absolute',
