@@ -1,27 +1,62 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { supabase } from '../lib/supabase';
 
 export default function SignUpScreen() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      Alert.alert('Missing details', 'Please fill in all fields.');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Weak password', 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name }
+      }
+    });
+    setLoading(false);
+
+    if (error) {
+      Alert.alert('Sign up failed', error.message);
+      return;
+    }
+
+    router.push('/profile-setup');
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backButton}>‹ Back</Text>
+          <Text style={styles.backButton}>Back</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Join XProHub today — it's free</Text>
       </View>
 
-      {/* Input Fields */}
       <View style={styles.form}>
         <TextInput
           style={styles.input}
           placeholder="Full Name"
           placeholderTextColor="#444450"
+          value={name}
+          onChangeText={setName}
         />
         <TextInput
           style={styles.input}
@@ -29,54 +64,41 @@ export default function SignUpScreen() {
           placeholderTextColor="#444450"
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#444450"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
       </View>
 
-      {/* Sign Up Button */}
       <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={() => router.push('/profile-setup')}>
-        <Text style={styles.primaryButtonText}>Create My Account</Text>
+        style={[styles.primaryButton, loading && { opacity: 0.7 }]}
+        onPress={handleSignUp}
+        disabled={loading}>
+        {loading
+          ? <ActivityIndicator color="#0E0E0F" />
+          : <Text style={styles.primaryButtonText}>Create My Account</Text>
+        }
       </TouchableOpacity>
 
-      {/* Divider */}
       <View style={styles.divider}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>or continue with</Text>
+        <Text style={styles.dividerText}>or</Text>
         <View style={styles.dividerLine} />
       </View>
 
-      {/* Social Buttons */}
-      <View style={styles.socialRow}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialIcon}>G</Text>
-          <Text style={styles.socialText}>Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialIcon}>🍎</Text>
-          <Text style={styles.socialText}>Apple</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Text style={styles.socialIcon}>👤</Text>
-          <Text style={styles.socialText}>Face ID</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Footer */}
       <Text style={styles.footer}>
         Already have an account?{' '}
-        <Text style={styles.footerLink}
-          onPress={() => router.push('/login')}>
+        <Text style={styles.footerLink} onPress={() => router.push('/login')}>
           Sign In
         </Text>
       </Text>
-
     </View>
   );
 }
@@ -88,8 +110,6 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
   },
-
-  // Header
   header: {
     marginBottom: 32,
   },
@@ -108,8 +128,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#888890',
   },
-
-  // Form
   form: {
     gap: 12,
     marginBottom: 20,
@@ -123,8 +141,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#E8E8EA',
   },
-
-  // Primary Button
   primaryButton: {
     backgroundColor: '#C9A84C',
     borderRadius: 14,
@@ -142,8 +158,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
   },
-
-  // Divider
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -159,35 +173,6 @@ const styles = StyleSheet.create({
     color: '#888890',
     fontSize: 13,
   },
-
-  // Social
-  socialRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-  },
-  socialButton: {
-    flex: 1,
-    backgroundColor: '#171719',
-    borderWidth: 1,
-    borderColor: '#2E2E33',
-    borderRadius: 14,
-    padding: 14,
-    alignItems: 'center',
-    gap: 6,
-  },
-  socialIcon: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#E8E8EA',
-  },
-  socialText: {
-    fontSize: 12,
-    color: '#888890',
-    fontWeight: '600',
-  },
-
-  // Footer
   footer: {
     textAlign: 'center',
     color: '#888890',
