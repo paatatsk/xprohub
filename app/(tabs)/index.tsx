@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Colors } from '../../constants/theme';
 import { GoldenDollar } from '../../components/GoldenDollar';
+import { supabase } from '../../lib/supabase';
 
 // Screen 6 — Home (Role-Adaptive)
 // Morphs between Worker mode and Customer mode with one toggle.
@@ -28,6 +29,11 @@ export default function HomeScreen() {
           <Text style={styles.btnSub}>Browse jobs</Text>
         </TouchableOpacity>
       </View>
+
+      {/* DEV ONLY — remove before launch */}
+      <TouchableOpacity style={styles.signOut} onPress={() => supabase.auth.signOut()}>
+        <Text style={styles.signOutText}>Sign Out</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -39,6 +45,8 @@ const styles = StyleSheet.create({
   actions:   { flexDirection: 'row', gap: 12, marginTop: 32 },
   btn:       { flex: 1, backgroundColor: Colors.gold, borderRadius: 12, padding: 20, alignItems: 'center' },
   btnWorker: { backgroundColor: Colors.green },
-  btnText:   { color: Colors.background, fontWeight: '800', fontSize: 13 },
-  btnSub:    { color: Colors.background, fontSize: 11, marginTop: 4, opacity: 0.7 },
+  btnText:    { color: Colors.background, fontWeight: '800', fontSize: 13 },
+  btnSub:     { color: Colors.background, fontSize: 11, marginTop: 4, opacity: 0.7 },
+  signOut:    { position: 'absolute', bottom: 32 },
+  signOutText:{ color: Colors.gold, fontSize: 13, opacity: 0.6 },
 });

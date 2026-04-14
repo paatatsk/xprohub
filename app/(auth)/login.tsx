@@ -37,7 +37,7 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.replace('/(onboarding)/welcome')} activeOpacity={0.7}>
-        <Text style={styles.backArrow}>←</Text>
+        <View style={styles.chevron} />
       </TouchableOpacity>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -94,9 +94,22 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe:       { flex: 1, backgroundColor: Colors.background },
-  backButton: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, paddingBottom: Spacing.xs, alignSelf: 'flex-start' },
-  backArrow:  { color: Colors.gold, fontSize: 28, lineHeight: 32 },
+  safe: { flex: 1, backgroundColor: Colors.background },
+  backButton: {
+    position: 'absolute',
+    top: 12,
+    left: 16,
+    zIndex: 10,
+    padding: 12,
+  },
+  chevron: {
+    width: 14,
+    height: 14,
+    borderLeftWidth: 2.5,
+    borderBottomWidth: 2.5,
+    borderColor: Colors.gold,
+    transform: [{ rotate: '45deg' }],
+  },
   kav:  { flex: 1 },
   scroll: {
     flexGrow: 1,
