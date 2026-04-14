@@ -13,13 +13,17 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loading) return;
-    SplashScreen.hideAsync();
 
+    const onSplash = segments[0] === 'splash' || segments.length === 0;
     const inAuthGroup = segments[0] === '(auth)';
+    const inOnboarding = segments[0] === '(onboarding)';
 
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (session && inAuthGroup) {
+    // Splash screen handles its own routing — don't interfere
+    if (onSplash) return;
+
+    if (!session && !inAuthGroup && !inOnboarding) {
+      router.replace('/(onboarding)/welcome');
+    } else if (session && (inAuthGroup || inOnboarding)) {
       router.replace('/(tabs)');
     }
   }, [session, loading, segments]);
@@ -27,7 +31,8 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E0E0F" />
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="splash" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
