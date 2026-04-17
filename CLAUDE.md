@@ -93,6 +93,37 @@ Badges (9): Never Cancels · Top Pro · Verified · Insured · Top 5% · Fast Re
 
 XP earn: job complete +50 · 5-star review +30 · on time +20 · fast response +10 · repeat customer +25 · refer worker +100
 
+## PROGRESSIVE PROFILE SYSTEM
+
+### EXPLORER (Level 1 — Browse Only, default for all new users)
+- Required: full name, email, profile photo (optional)
+- Can do: browse Live Market feed, browse Worker business cards, filter by category
+- Cannot do: apply for jobs, post jobs, message anyone, transact
+
+### STARTER (Level 2A — triggered when user posts or applies for jobs under $50)
+- Gate screen shown when user taps Post a Job or Apply (low-value jobs)
+- Required: phone number (SMS verified), Stripe basic (debit/bank for payouts)
+- Workers also: choose skills from Task Library
+- Unlocks: posting jobs under $50, applying, messaging, basic transactions
+- Stripe handles all banking data — never store financial info directly
+
+### PRO (Level 2B — triggered when user posts or applies for jobs $50+)
+- Gate screen shown when job value or category requires full verification
+- Required: everything in Starter + address + State ID photo + Stripe Connect full
+- Workers also: full background check eligibility
+- Unlocks: all jobs, sensitive categories, team jobs
+- Stripe Connect handles all banking data — never store financial info directly
+
+### KEY RULE
+Never force Starter or Pro upfront. User chooses the path that matches
+what they are trying to do. Show a friendly gate only at the moment of
+action. Stripe handles all banking data in both paths — never store
+financial info directly.
+
+### XPRO (Level 3 — Reputation Builder, optional, unlocks after first transaction)
+- Work history, references, certifications, portfolio photos, bio
+- Feeds into Belt System ranking and match score
+
 ## Progressive Trust Levels (unlock at moment of action)
 | Level | Triggered | Required | Unlocks |
 |---|---|---|---|
@@ -120,6 +151,7 @@ White Belt gets +15% newcomer boost for first 5 jobs ("Give Them A Chance").
 
 ## What Is Built
 - All 14 production screens as TSX files (mostly mock/demo data)
+- Welcome screen — newspaper broadsheet style, single screen, Dark Gold, two symmetrical boxes with yin-yang, Built for Trust strip
 - Sign Up wired to Supabase Auth (email + password)
 - Supabase schema fully written (`xprohub_schema.sql`)
 - GoldenDollar + HomeBeacon reusable components
