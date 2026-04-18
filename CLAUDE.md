@@ -65,17 +65,132 @@ The only design direction. No other aesthetic is in use.
 
 Home = role-adaptive toggle (Customer ↔ Worker). Hub & Spoke = secondary modal only (`Explore All Features`), not primary nav.
 
-## Supabase — 13 Core Tables + 5 Task Library Tables
-Core: `profiles` · `skills` · `user_skills` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `user_badges` · `notifications`
+## Supabase — 15 Tables (Live)
+`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `notifications` · `user_badges`
 
-Task Library (confirmed seed file): `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `belt_history`
-- Seed file: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_task_library_seed.sql` — run this AFTER main schema
 - `task_code` format: `CCTT` e.g. `0101` = category 01, task 01
 - `worker_skills.is_featured` = worker's top 3 "Superpowers" shown on their profile card
-- `worker_match_scores` VIEW produces the "X/X Tasks Match" label shown on applicant cards
-- ⚠️ Seed file references `users` and `job_posts` — main schema uses `profiles` and `jobs`. Fix FKs before running.
+- Migration file: `supabase/migrations/20260417000001_replace_skills_with_task_library.sql`
+- Seed file: `supabase/seed/XProHub_TaskLibrary_Seed_v1.1.sql` — deployed 2026-04-17 (20 categories · 188 tasks)
+- Realtime on: `jobs`, `messages`, `notifications`
+- Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql`
 
-Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql` | Realtime on: `jobs`, `messages`, `notifications`
+## Database Schema — Core Tables
+
+### task_categories
+| Column | Type | Notes |
+|---|---|---|
+| id | SMALLINT PK | 1–20 |
+| name | TEXT | Display name |
+| icon_slug | TEXT | e.g. `home-cleaning` |
+| tier | SMALLINT | 1 = standard, 2 = skilled/premium |
+| billing_type | TEXT | `per_job` \| `per_hour` \| `per_visit_day` \| `mixed` |
+| price_min | INTEGER | USD — lowest across tasks in category |
+| price_max | INTEGER | USD — highest across tasks in category |
+| difficulty_range | TEXT | e.g. `Easy → Skilled` |
+| requires_background_check | BOOLEAN | Category-level flag |
+| sort_order | SMALLINT | Display order |
+
+### task_library
+| Column | Type | Notes |
+|---|---|---|
+| id | SERIAL PK | Auto |
+| task_code | TEXT UNIQUE | Format: CCTT (e.g. `0101`) |
+| category_id | SMALLINT FK | → task_categories.id |
+| name | TEXT | Task display name |
+| description | TEXT | One-sentence description |
+| tags | TEXT[] | Searchable keywords |
+| price_min | INTEGER | USD — customer-facing estimate |
+| price_max | INTEGER | USD — customer-facing estimate |
+| est_time_min_hrs | NUMERIC | 0.5 = 30 min; NULL = open-ended |
+| est_time_max_hrs | NUMERIC | NULL = overnight or variable |
+| difficulty | TEXT | `easy` \| `medium` \| `skilled` |
+| billing_type | TEXT | `per_job` \| `per_hour` \| `per_visit_day` |
+| requires_verification | BOOLEAN | Worker must pass ID verification for this task |
+| is_urgent_eligible | BOOLEAN | Appears in Urgent / Same-Day feed |
+| is_active | BOOLEAN | Soft-delete — false = hidden from app via RLS |
+| created_at | TIMESTAMPTZ | Auto |
+| updated_at | TIMESTAMPTZ | Auto-updated via trigger |
+
+### worker_skills
+| Column | Type | Notes |
+|---|---|---|
+| id | SERIAL PK | |
+| user_id | UUID FK | → profiles.id ON DELETE CASCADE |
+| task_id | INTEGER FK | → task_library.id |
+| years_exp | SMALLINT | Optional |
+| is_featured | BOOLEAN | Up to 3 Superpowers per worker |
+| created_at | TIMESTAMPTZ | |
+
+### job_post_tasks
+| Column | Type | Notes |
+|---|---|---|
+| id | SERIAL PK | |
+| job_post_id | UUID FK | → jobs.id ON DELETE CASCADE |
+| task_id | INTEGER FK | → task_library.id |
+
+## Key Business Rules
+
+- **Difficulty vs Urgency**: `difficulty` describes skill level only (`easy`/`medium`/`skilled`). Urgency is a separate flag (`is_urgent_eligible = true`). Never use `urgent` as a difficulty value — it was removed in v1.1.
+- **Task codes (CCTT)**: 4-character zero-padded string. First 2 = category, last 2 = task within category. e.g. `0101` = Category 01, Task 01. `2009` = Category 20, Task 09. Max 99 tasks per category.
+- **Billing types**: Three values in task_library — `per_job` (fixed), `per_hour` (hourly), `per_visit_day` (per visit/day, used for pet care). Categories use `mixed` when tasks within the category vary.
+- **Verification**: `requires_verification = true` means the worker must pass platform ID verification before offering that task. All Child Care (cat 4), Elder Care (cat 5), and Electrical (cat 15) tasks require it. Plumbing (cat 16) and most HVAC (cat 20) skilled tasks also require it.
+- **Pricing**: All `price_min`/`price_max` are in USD. Customer-facing estimates only — not hard payment caps.
+- **Soft deletes**: Never DELETE rows from `task_library`. Set `is_active = false`. RLS enforces `is_active = true` for all app reads, so it disappears automatically.
+- **Superpowers**: `worker_skills.is_featured` — max 3 per worker. These appear prominently on the worker profile card.
+
+## Indexes Available
+
+| Index | Table | Column(s) | Notes |
+|---|---|---|---|
+| `idx_task_library_category` | task_library | category_id | Full category scan |
+| `idx_task_library_active` | task_library | category_id WHERE is_active=true | Partial — browse/home screens |
+| `idx_task_library_urgent` | task_library | id WHERE is_urgent_eligible=true | Partial — Live Market urgent feed |
+| `idx_worker_skills_user` | worker_skills | user_id | Worker profile skill lookup |
+| `idx_worker_skills_task` | worker_skills | task_id | Task → which workers offer it |
+| `idx_job_post_tasks_job` | job_post_tasks | job_post_id | Job → its required tasks |
+
+## Common Query Patterns
+
+```sql
+-- All active tasks in a category (browse / home screen)
+SELECT * FROM task_library
+WHERE category_id = 1 AND is_active = true;
+
+-- A worker's full skill list with Superpower flag
+SELECT tl.name, tl.category_id, ws.years_exp, ws.is_featured
+FROM worker_skills ws
+JOIN task_library tl ON tl.id = ws.task_id
+WHERE ws.user_id = '<uuid>';
+
+-- Match workers to a job's required tasks (match score)
+SELECT ws.user_id, COUNT(*) AS matched_tasks
+FROM job_post_tasks jpt
+JOIN worker_skills ws ON ws.task_id = jpt.task_id
+WHERE jpt.job_post_id = '<uuid>'
+GROUP BY ws.user_id
+ORDER BY matched_tasks DESC;
+
+-- All urgent-eligible tasks (Live Market same-day feed)
+SELECT * FROM task_library
+WHERE is_urgent_eligible = true AND is_active = true;
+
+-- Tasks requiring worker verification
+SELECT task_code, name, category_id
+FROM task_library
+WHERE requires_verification = true AND is_active = true
+ORDER BY category_id, task_code;
+```
+
+## Development Conventions
+
+- **Adding a task**: INSERT into `task_library` with `ON CONFLICT (task_code) DO NOTHING`. Never reuse a retired task code.
+- **Adding a category**: INSERT into `task_categories` with the next `id` in sequence (currently 1–20). Update `sort_order` if reordering display.
+- **Retiring a task**: Set `is_active = false`. RLS hides it automatically. Do not DELETE rows.
+- **New migrations**: Place in `supabase/migrations/` with timestamp prefix `YYYYMMDDHHMMSS_description.sql`. Always wrap in `BEGIN`/`COMMIT`.
+- **Seed updates**: Changes to task data go in `supabase/seed/`. Use `ON CONFLICT (task_code) DO NOTHING` for inserts or `DO UPDATE SET ...` for corrections.
+- **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
+- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies (safe for unauthenticated browse). `worker_skills` and `job_post_tasks` need auth-restricted RLS policies when wired to the app.
 
 ## Belt System (Workers)
 | Belt | Jobs | Min Rating | Key Unlock |
@@ -166,7 +281,7 @@ White Belt gets +15% newcomer boost for first 5 jobs ("Give Them A Chance").
 - Smart match algorithm not implemented
 - PostGIS geo-matching not active
 - Trust Level II/III verification flow
-- Task Library tables not confirmed deployed
+- Task Library not yet wired to app UI (tables live, app still uses mock data)
 - Team Jobs / Squads / Regional system (Phase 2+)
 
 ## Session Start Checklist
