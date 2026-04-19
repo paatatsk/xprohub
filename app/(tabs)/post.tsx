@@ -4,15 +4,13 @@ import {
   TextInput, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // Screen 7 — Post a Job
-// Step 4A: Form scaffold + category pre-fill. No Supabase write yet.
-// TODO Step 4B: INSERT into jobs + job_post_tasks on submit
-// TODO Step 4B: Level 2 gate check before form loads
-// FLAG: job_post_tasks has no RLS INSERT policy yet — add before 4B
+// Step 4B: Submit wired to Supabase jobs + job_post_tasks INSERT.
+// TODO Step 4C: Level 2 gate check before allowing submit
 
 type Timing = 'asap' | 'scheduled' | 'flexible';
 
@@ -31,6 +29,7 @@ interface FormErrors {
 }
 
 export default function PostScreen() {
+  const router = useRouter();
   const { category_id } = useLocalSearchParams<{ category_id?: string }>();
   const catId = category_id ? parseInt(category_id, 10) : null;
 
@@ -52,8 +51,9 @@ export default function PostScreen() {
   const [isUrgent, setIsUrgent]         = useState(false);
 
   // UI state
-  const [errors, setErrors]       = useState<FormErrors>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors]           = useState<FormErrors>({});
+  const [submitting, setSubmitting]   = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Load tasks (filtered by category if present) + category name
   useEffect(() => {
@@ -107,52 +107,69 @@ export default function PostScreen() {
     return e;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // 1. Validate
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
-    const payload = {
-      title:        title.trim(),
-      description:  description.trim() || null,
-      category:     categoryName ?? null,
-      budget_min:   budgetMin ? parseFloat(budgetMin) : null,
-      budget_max:   budgetMax ? parseFloat(budgetMax) : null,
-      neighborhood: neighborhood.trim(),
-      timing,
-      is_urgent:    isUrgent,
-      status:       'open',
-      task_ids:     Array.from(selectedTaskIds), // → job_post_tasks at Step 4B
-    };
+    // 2. Confirm auth
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setSubmitError('You must be logged in to post a job.');
+      return; // TODO 4C: redirect to Level 2 gate here
+    }
 
-    console.log('[Post a Job] payload:', JSON.stringify(payload, null, 2));
-    setSubmitted(true);
+    // 3. Begin submit
+    setSubmitting(true);
+    setSubmitError(null);
+
+    // 4. INSERT into jobs
+    const { data: newJob, error: jobErr } = await supabase
+      .from('jobs')
+      .insert({
+        customer_id:  user.id,
+        title:        title.trim(),
+        description:  description.trim() || null,
+        category:     categoryName ?? null,
+        budget_min:   budgetMin ? parseFloat(budgetMin) : null,
+        budget_max:   budgetMax ? parseFloat(budgetMax) : null,
+        neighborhood: neighborhood.trim(),
+        timing,
+        is_urgent:    isUrgent,
+      })
+      .select('id')
+      .single();
+
+    if (jobErr || !newJob) {
+      setSubmitError(jobErr?.message ?? 'Failed to post job. Please try again.');
+      setSubmitting(false);
+      return;
+    }
+
+    // 5. INSERT into job_post_tasks (one row per selected task)
+    const taskRows = Array.from(selectedTaskIds).map(task_id => ({
+      job_post_id: newJob.id,
+      task_id,
+    }));
+
+    const { error: tasksErr } = await supabase
+      .from('job_post_tasks')
+      .insert(taskRows);
+
+    if (tasksErr) {
+      // Job was created — don't block the user, but surface the issue
+      setSubmitError('Job posted, but tasks failed to save. Contact support if this persists.');
+      setSubmitting(false);
+      return;
+    }
+
+    // 6. Full success — navigate to Live Market
+    setSubmitting(false);
+    router.replace('/(tabs)/market');
   };
 
-  const resetForm = () => {
-    setTitle(''); setDescription(''); setBudgetMin(''); setBudgetMax('');
-    setNeighborhood(''); setTiming('flexible'); setIsUrgent(false);
-    setSelectedTaskIds(new Set()); setErrors({}); setSubmitted(false);
-  };
-
-  if (submitted) {
-    return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <View style={styles.successBox}>
-          <View style={styles.successRing}>
-            <Text style={styles.successIcon}>✓</Text>
-          </View>
-          <Text style={styles.successHeading}>JOB READY TO POST</Text>
-          <Text style={styles.successSub}>
-            Supabase write wired in Step 4B.{'\n'}Check console for payload.
-          </Text>
-          <TouchableOpacity style={styles.resetBtn} onPress={resetForm}>
-            <Text style={styles.resetText}>POST ANOTHER</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const isSubmitDisabled = submitting || selectedTaskIds.size === 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -326,9 +343,21 @@ export default function PostScreen() {
         </View>
 
         {/* ── Submit ── */}
-        <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} activeOpacity={0.85}>
-          <Text style={styles.submitText}>POST JOB</Text>
+        <TouchableOpacity
+          style={[styles.submitBtn, isSubmitDisabled && styles.submitBtnDisabled]}
+          onPress={handleSubmit}
+          activeOpacity={0.85}
+          disabled={isSubmitDisabled}
+        >
+          {submitting
+            ? <ActivityIndicator color={Colors.background} />
+            : <Text style={styles.submitText}>POST JOB</Text>
+          }
         </TouchableOpacity>
+
+        {submitError && (
+          <Text style={styles.submitError}>{submitError}</Text>
+        )}
 
       </ScrollView>
     </SafeAreaView>
@@ -466,41 +495,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.sm,
   },
+  submitBtnDisabled: { opacity: 0.5 },
   submitText: {
     color: Colors.background,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 2,
   },
-
-  // Success state
-  successBox: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
-    gap: 16,
+  submitError: {
+    color: Colors.red,
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
   },
-  successRing: {
-    width: 88,
-    height: 88,
-    borderRadius: Radius.full,
-    borderWidth: 2,
-    borderColor: Colors.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  successIcon:    { color: Colors.gold, fontSize: 36, fontWeight: 'bold' },
-  successHeading: { color: Colors.textPrimary, fontSize: 20, fontWeight: 'bold', letterSpacing: 1.5 },
-  successSub:     { color: Colors.textSecondary, fontSize: 14, textAlign: 'center', lineHeight: 20 },
-  resetBtn: {
-    marginTop: 8,
-    borderWidth: 1.5,
-    borderColor: Colors.gold,
-    borderRadius: Radius.full,
-    paddingVertical: 10,
-    paddingHorizontal: 28,
-  },
-  resetText: { color: Colors.gold, fontWeight: 'bold', fontSize: 13, letterSpacing: 1.5 },
 });
