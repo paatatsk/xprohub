@@ -4,7 +4,7 @@ import {
   FlatList, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -80,6 +80,7 @@ function JobCard({ job }: { job: Job }) {
 export default function MarketScreen() {
   const router = useRouter();
   const [activeFeed, setActiveFeed] = useState<Feed>('jobs');
+  const { category_id } = useLocalSearchParams<{ category_id?: string }>();
 
   // Jobs feed state
   const [jobs, setJobs]             = useState<Job[]>([]);
@@ -207,7 +208,12 @@ export default function MarketScreen() {
           style={styles.fab}
           activeOpacity={0.85}
           onPress={() => {
-            // TODO: gate check → Level 2 gate → Post a Job flow
+            // TODO 4C: gate check → Level 2 gate before navigating
+            router.push(
+              category_id
+                ? `/(tabs)/post?category_id=${category_id}`
+                : '/(tabs)/post'
+            );
           }}
         >
           <Text style={styles.fabText}>+ POST A JOB</Text>
