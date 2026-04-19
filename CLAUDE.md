@@ -9,7 +9,7 @@
 - Mission: Economic empowerment for everyday people regardless of background
 - Tagline: **"Real Work. Fair Pay. For Everyone."**
 - Model: eBay buyer/seller dual-role (users freely switch Customer ↔ Worker)
-- Repo: `github.com/paatatsk/xprohub` | Local: `C:\Users\sophi\Documents\xprohub`
+- Repo: `github.com/paatatsk/xprohub-v3` | Local: `C:\Users\sophi\Documents\xprohub-v3`
 - Start: `npx expo start --clear` | Test: iPhone via Expo Go
 
 ## Tech Stack
@@ -37,7 +37,8 @@ The only design direction. No other aesthetic is in use.
 | Purple | `#9B6EE8` | XP, growth, Royal theme |
 | Red | `#E05252` | Urgent, live, alerts, cancel |
 
-- **Heading font**: Space Grotesk Bold or Plus Jakarta Sans ExtraBold
+- **Headline font**: Oswald
+- **Serif accent font**: Playfair Display
 - **Body font**: Inter
 - **Big numbers**: always gold — the loudest element on every screen
 - **Cards**: glassmorphism — frosted glass effect, gold border glow, photo/illustration fills top 50%, gradient fade into dark info panel below
@@ -45,25 +46,26 @@ The only design direction. No other aesthetic is in use.
 
 **5 feed card themes** (user-selectable): Broadsheet · Western · Gold Press · Dispatch · Chronicle
 
-## 14 Production Screens (build order)
+## 15 Production Screens (build order)
 | # | Screen | File | Status |
 |---|---|---|---|
-| 1 | Splash | `app/(tabs)/splash.tsx` | Built |
-| 2 | Welcome | `app/(tabs)/welcome.tsx` | Built |
-| 3 | Sign Up | `app/(tabs)/signup.tsx` | **Wired to Supabase Auth** |
-| 4 | Login | `app/(tabs)/login.tsx` | Built |
-| 5 | Profile Setup | `app/(tabs)/profile-setup.tsx` | Built |
-| 6 | Home (Hub & Spoke) | `app/(tabs)/index.tsx` | Built |
-| 7 | Post a Job | `app/(tabs)/post-job.tsx` | Built |
-| 8 | Worker Match | `app/(tabs)/worker-match.tsx` | Built (mock data) |
+| 1 | Splash | `app/splash.tsx` | Built |
+| 2 | Welcome | `app/(onboarding)/welcome.tsx` | Built |
+| 3 | Sign Up | `app/(auth)/signup.tsx` | **Wired to Supabase Auth** |
+| 4 | Login | `app/(auth)/login.tsx` | Built |
+| 5 | Profile Setup | `app/(onboarding)/profile-setup.tsx` | Built |
+| 6 | Home (Category Grid) | `app/(tabs)/index.tsx` | Category Grid — 20 categories wired to live Supabase data, 2-column layout, tier badges, emoji icons, tapping category routes to Live Market filtered by that category. |
+| 7 | Post a Job | `app/(tabs)/post.tsx` | stub, ~23 lines, TODO |
+| 8 | Worker Match | `app/(tabs)/match.tsx` | Built (mock data) |
 | 9 | Chat | `app/(tabs)/chat.tsx` | Built (mock data) |
 | 10 | Payment / Escrow | `app/(tabs)/payment.tsx` | Built (no Stripe yet) |
 | 11 | Rate / Review | `app/(tabs)/review.tsx` | Built |
 | 12 | Notifications | `app/(tabs)/notifications.tsx` | Built |
-| 13 | Live Market | `app/(tabs)/live-market.tsx` | Built (mock feed) |
-| 14 | Belt System | `app/(tabs)/belt-system.tsx` | Built |
+| 13 | Live Market | `app/(tabs)/market.tsx` | stub, ~24 lines, TODO — two-feed toggle not yet built |
+| 14 | Belt System | `app/(tabs)/belt.tsx` | Built |
+| 15 | Earnings / Wallet | `app/(tabs)/earnings.tsx` | stub, ~23 lines, TODO Phase 2 |
 
-Home = role-adaptive toggle (Customer ↔ Worker). Hub & Spoke = secondary modal only (`Explore All Features`), not primary nav.
+Home = Category Grid hub. HELP WANTED → Post a Job. START EARNING → Live Market. Category card → Live Market filtered by category_id.
 
 ## Supabase — 15 Tables (Live)
 `profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `notifications` · `user_badges`
@@ -250,11 +252,41 @@ financial info directly.
 Location 25% · Skill Match 35% · Belt/Experience 20% · Behavioral 20%
 White Belt gets +15% newcomer boost for first 5 jobs ("Give Them A Chance").
 
+## LIVE MARKET — Navigation Model (Locked)
+
+Live Market is the heartbeat of XProHub. All navigation from Home's
+top buttons and category cards routes here.
+
+### Entry points
+- HELP WANTED button → /live-market (Jobs Feed default)
+- START EARNING button → /live-market (Jobs Feed default)
+- Category card tap → /live-market?category_id=X (filtered)
+
+### Structure
+- Two-feed toggle: Jobs Feed (default) | Workers Feed
+- Jobs Feed = pulled from `jobs` table, sorted by recency
+- Workers Feed = pulled from `profiles` + `worker_skills`,
+  acts as a business card wall
+- Category filter powered by `task_categories` (20 rows)
+
+### Level 2 gate triggers
+Explorer users browse freely. Gate fires only at:
+- Tap "+ Post a Job" → gate → Post a Job flow
+- Tap "Apply" on job card → gate → Apply flow
+- Tap "Hire Directly" on worker card → gate → Direct Hire flow
+
+### Task Library as spine
+Category grid on Home and filters in Live Market both pull from
+task_categories. Worker profiles pick tasks from task_library.
+Job posts pick tasks from task_library. Matching algorithm runs
+on task_library overlap. This is the connective tissue of the
+whole platform — do not bypass it.
+
 ## Code Rules
 1. **Design system** — Dark Gold only: `#0E0E0F` bg, `#C9A84C` gold, `#171719` cards
 2. **SafeAreaView** — import from `react-native-safe-area-context` ONLY (not `react-native` — SDK 54 breaking change)
 3. **New files** — always `app/filename.tsx`, NEVER `app/app/filename.tsx` (causes Unmatched Route)
-4. **Hub & Spoke nav** — React Native Modal + store pending route in state + useEffect to navigate after modal closes
+4. **Live Market is primary nav** — Home top buttons and category cards all route to `/(tabs)/market`. Do not add new modal-based hub navigation; flat Expo Router `router.push()` is the pattern.
 5. **No pure white** — use background color from chosen design system
 6. **Every screen answers one question** — no feature creep per screen
 7. **No mock data in production** — connect to Supabase or gate the screen
@@ -265,23 +297,25 @@ White Belt gets +15% newcomer boost for first 5 jobs ("Give Them A Chance").
 12. **app.json assets**: splash = `splash-icon.png`, Android icon = `android-icon-foreground.png`
 
 ## What Is Built
-- All 14 production screens as TSX files (mostly mock/demo data)
-- Welcome screen — newspaper broadsheet style, single screen, Dark Gold, two symmetrical boxes with yin-yang, Built for Trust strip
+- All 15 production screens as TSX files (mostly stubs or mock data)
+- Welcome screen — THE XPROHUB masthead, ticker bar, Playfair Display tagline "All The Work That's Fit To Post", yin-yang interactive boxes (color-swap on tap), dollar-sign boxes, BUILT FOR TRUST strip
+- Home screen — 20-category grid, live Supabase data, 2-column layout, tier badges, emoji icons
 - Sign Up wired to Supabase Auth (email + password)
 - Supabase schema fully written (`xprohub_schema.sql`)
 - GoldenDollar + HomeBeacon reusable components
-- Hub & Spoke modal via Explore All Features button
-- Job Categories screen (`job-categories.tsx`) using real image + invisible overlay buttons
 
 ## What Is NOT Built Yet
-- Supabase not wired beyond Sign Up (Login, Profile, Jobs all use mock data)
+- Category card routing on Home currently points to /post?category_id=X — must be changed to /market?category_id=X to match Live Market navigation model (pending code fix in next step)
+- Supabase not wired beyond Sign Up + Home categories (Login, Profile, Jobs all use mock data)
+- Live Market two-feed toggle (Jobs Feed + Workers Feed) — market.tsx is a stub
+- Direct Hire flow (tap "Hire Directly" on worker card)
+- Level 2 Gate screen (shown at moment of action — Post, Apply, Hire)
 - Stripe integration (no real payments)
-- Live Market not connected to Supabase Realtime
 - Push notifications not configured
 - Smart match algorithm not implemented
 - PostGIS geo-matching not active
 - Trust Level II/III verification flow
-- Task Library not yet wired to app UI (tables live, app still uses mock data)
+- Task Library not yet wired to Post a Job or Live Market filter
 - Team Jobs / Squads / Regional system (Phase 2+)
 
 ## Session Start Checklist
