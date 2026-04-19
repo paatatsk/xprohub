@@ -11,8 +11,9 @@ import { supabase } from '../../lib/supabase';
 // Screen 13 — Live Market
 // Two-feed toggle: Jobs Feed | Workers Feed
 // Step 3B: Jobs Feed wired to Supabase jobs table (status = 'open', newest first)
+// Step 3C: category_id query param → filter Jobs Feed by category name
+// TODO Step 5: Wire category filter to Workers Feed
 // TODO Step 3B: Workers Feed — profiles + worker_skills business card wall
-// TODO Step 3C: category_id query param → filter both feeds
 
 type Feed = 'jobs' | 'workers';
 
@@ -82,23 +83,50 @@ export default function MarketScreen() {
   const [activeFeed, setActiveFeed] = useState<Feed>('jobs');
   const { category_id } = useLocalSearchParams<{ category_id?: string }>();
 
+  // Category filter state
+  const [categoryName, setCategoryName] = useState<string | null>(null);
+
   // Jobs feed state
   const [jobs, setJobs]             = useState<Job[]>([]);
   const [loading, setLoading]       = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError]           = useState<string | null>(null);
 
+  // Resolve category name from id on mount / when category_id changes
+  useEffect(() => {
+    if (!category_id) {
+      setCategoryName(null);
+      return;
+    }
+
+    supabase
+      .from('task_categories')
+      .select('name')
+      .eq('id', Number(category_id))
+      .single()
+      .then(({ data }) => {
+        // Silently fall back to unfiltered if lookup fails
+        setCategoryName(data?.name ?? null);
+      });
+  }, [category_id]);
+
   const fetchJobs = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     setError(null);
 
-    const { data, error: err } = await supabase
+    let query = supabase
       .from('jobs')
       .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at')
       .eq('status', 'open')
       .order('created_at', { ascending: false })
       .limit(50);
+
+    if (categoryName) {
+      query = query.eq('category', categoryName);
+    }
+
+    const { data, error: err } = await query;
 
     if (err) {
       setError(err.message);
@@ -108,11 +136,28 @@ export default function MarketScreen() {
 
     if (isRefresh) setRefreshing(false);
     else setLoading(false);
-  }, []);
+  }, [categoryName]);
 
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
+
+  const clearFilter = () => {
+    router.replace('/(tabs)/market');
+  };
+
+  const renderFilterStrip = () => {
+    if (!categoryName) return null;
+    return (
+      <View style={styles.filterStrip}>
+        <View style={styles.filterAccent} />
+        <Text style={styles.filterText}>Showing: {categoryName}</Text>
+        <TouchableOpacity onPress={clearFilter} activeOpacity={0.7}>
+          <Text style={styles.filterClear}>Clear</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const renderJobsContent = () => {
     if (loading) {
@@ -136,6 +181,10 @@ export default function MarketScreen() {
       );
     }
 
+    const emptyLabel = categoryName
+      ? `No ${categoryName} jobs posted yet`
+      : 'Be the first to post a job';
+
     return (
       <FlatList
         data={jobs}
@@ -155,7 +204,7 @@ export default function MarketScreen() {
               <Text style={styles.emptyIconGlyph}>📋</Text>
             </View>
             <Text style={styles.emptyHeading}>NO JOBS POSTED YET</Text>
-            <Text style={styles.emptySub}>Be the first to post a job</Text>
+            <Text style={styles.emptySub}>{emptyLabel}</Text>
           </View>
         }
       />
@@ -188,10 +237,14 @@ export default function MarketScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* ── Category filter strip (sits below toggle, above feed) ── */}
+      {/* TODO Step 5: also filter Workers Feed by categoryName when wired */}
+      {renderFilterStrip()}
+
       {/* ── Jobs feed ── */}
       {activeFeed === 'jobs' && renderJobsContent()}
 
-      {/* ── Workers feed — empty state (unchanged from 3A) ── */}
+      {/* ── Workers feed — empty state ── */}
       {activeFeed === 'workers' && (
         <View style={styles.centerBox}>
           <View style={styles.emptyIconRing}>
@@ -260,6 +313,38 @@ const styles = StyleSheet.create({
     color: Colors.background,
   },
 
+  // Filter strip
+  filterStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.card,
+    marginHorizontal: Spacing.md,
+    marginBottom: Spacing.md,
+    borderRadius: Radius.sm,
+    overflow: 'hidden',
+    gap: 10,
+  },
+  filterAccent: {
+    width: 3,
+    alignSelf: 'stretch',
+    backgroundColor: Colors.gold,
+  },
+  filterText: {
+    flex: 1,
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '600',
+    paddingVertical: 10,
+  },
+  filterClear: {
+    color: Colors.gold,
+    fontSize: 13,
+    fontWeight: 'bold',
+    paddingVertical: 10,
+    paddingRight: 14,
+    letterSpacing: 0.5,
+  },
+
   // Layout helpers
   centerBox: {
     flex: 1,
@@ -276,7 +361,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: Spacing.md,
-    paddingBottom: 100, // space for FAB
+    paddingBottom: 100,
   },
 
   // Empty / error states
