@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, TextInput, ActivityIndicator,
-  KeyboardAvoidingView, Platform,
+  KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -28,7 +28,7 @@ interface ChatRow {
   worker_id: string;
   customer: ChatProfile | null;
   worker: ChatProfile | null;
-  job: { title: string | null } | null;
+  job: { id: string; title: string | null; status: string } | null;
 }
 
 interface Message {
@@ -100,6 +100,8 @@ export default function JobChatScreen() {
   const [composerText,  setComposerText]  = useState('');
   const [sending,       setSending]       = useState(false);
   const [sendError,     setSendError]     = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError,   setActionError]   = useState<string | null>(null);
 
   // ── Initial load ──────────────────────────────────────────────────────────
 
@@ -127,7 +129,7 @@ export default function JobChatScreen() {
           id, customer_id, worker_id,
           customer:profiles!customer_id(id, full_name),
           worker:profiles!worker_id(id, full_name),
-          job:jobs!job_id(title)
+          job:jobs!job_id(id, title, status)
         `)
         .eq('id', chat_id)
         .single();
@@ -227,6 +229,72 @@ export default function JobChatScreen() {
     setSending(false);
   }, [composerText, currentUserId, chat_id]);
 
+  // ── Refetch job status ────────────────────────────────────────────────────
+
+  const refetchJobStatus = useCallback(async () => {
+    if (!chat?.job?.id) return;
+    const { data, error } = await supabase
+      .from('jobs')
+      .select('id, title, status')
+      .eq('id', chat.job.id)
+      .single();
+    if (!error && data) {
+      setChat(prev => prev ? { ...prev, job: data } : prev);
+    }
+  }, [chat]);
+
+  // ── Lifecycle handlers ────────────────────────────────────────────────────
+
+  const handleMarkInProgress = useCallback(() => {
+    if (!chat?.job?.id) return;
+    Alert.alert(
+      'Mark In Progress',
+      'Mark this job as in progress? Both you and the other party will see the update.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Mark in progress',
+          onPress: async () => {
+            setActionLoading(true);
+            setActionError(null);
+            const { error } = await supabase.rpc('mark_in_progress', { p_job_id: chat.job!.id });
+            if (error) {
+              setActionError(error.message);
+            } else {
+              await refetchJobStatus();
+            }
+            setActionLoading(false);
+          },
+        },
+      ]
+    );
+  }, [chat, refetchJobStatus]);
+
+  const handleMarkComplete = useCallback(() => {
+    if (!chat?.job?.id) return;
+    Alert.alert(
+      'Mark Completed',
+      'Mark this job as completed?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Mark completed',
+          onPress: async () => {
+            setActionLoading(true);
+            setActionError(null);
+            const { error } = await supabase.rpc('mark_completed', { p_job_id: chat.job!.id });
+            if (error) {
+              setActionError(error.message);
+            } else {
+              await refetchJobStatus();
+            }
+            setActionLoading(false);
+          },
+        },
+      ]
+    );
+  }, [chat, refetchJobStatus]);
+
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (loading) {
@@ -280,7 +348,8 @@ export default function JobChatScreen() {
     : chat?.customer;
 
   const otherName  = otherParty?.full_name ?? 'User';
-  const jobTitle   = (chat as any)?.job?.title ?? null;
+  const jobTitle   = chat?.job?.title ?? null;
+  const jobStatus  = chat?.job?.status ?? null;
 
   // ── Main JSX ──────────────────────────────────────────────────────────────
 
@@ -298,6 +367,69 @@ export default function JobChatScreen() {
             <Text style={styles.contextJob} numberOfLines={1}>About: {jobTitle}</Text>
           ) : null}
         </View>
+
+        {/* ── Lifecycle banner ── */}
+        {jobStatus === 'matched' && (
+          <View style={styles.lifecycleBanner}>
+            {actionLoading
+              ? <ActivityIndicator size="small" color={Colors.gold} />
+              : (
+                <TouchableOpacity
+                  style={styles.lifecycleBtn}
+                  onPress={handleMarkInProgress}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.lifecycleBtnText}>MARK IN PROGRESS</Text>
+                </TouchableOpacity>
+              )
+            }
+            {actionError ? (
+              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+                {actionError}
+              </Text>
+            ) : null}
+          </View>
+        )}
+
+        {jobStatus === 'in_progress' && (
+          <View style={styles.lifecycleBanner}>
+            {actionLoading
+              ? <ActivityIndicator size="small" color={Colors.green} />
+              : (
+                <TouchableOpacity
+                  style={[styles.lifecycleBtn, { borderColor: Colors.green }]}
+                  onPress={handleMarkComplete}
+                  activeOpacity={0.85}
+                >
+                  <Text style={[styles.lifecycleBtnText, { color: Colors.green }]}>
+                    MARK COMPLETED
+                  </Text>
+                </TouchableOpacity>
+              )
+            }
+            {actionError ? (
+              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+                {actionError}
+              </Text>
+            ) : null}
+          </View>
+        )}
+
+        {jobStatus === 'completed' && (
+          <View style={styles.lifecycleBanner}>
+            <View style={styles.lifecycleStaticBadgeCompleted}>
+              <Text style={styles.lifecycleStaticText}>JOB COMPLETED</Text>
+            </View>
+          </View>
+        )}
+
+        {(jobStatus === 'cancelled' || jobStatus === 'canceled') && (
+          <View style={styles.lifecycleBanner}>
+            <View style={styles.lifecycleStaticBadgeCancelled}>
+              <Text style={styles.lifecycleStaticText}>JOB CANCELLED</Text>
+            </View>
+          </View>
+        )}
 
         {/* ── Messages list ── */}
         <FlatList
@@ -433,6 +565,57 @@ const styles = StyleSheet.create({
   contextJob: {
     color: Colors.textSecondary,
     fontSize: 12,
+  },
+
+  // ── Lifecycle banner ──────────────────────────────────────────
+  lifecycleBanner: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+    gap: 6,
+  },
+  lifecycleBtn: {
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: Radius.full,
+    paddingVertical: 8,
+    paddingHorizontal: 28,
+  },
+  lifecycleBtnText: {
+    color: Colors.gold,
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 1.5,
+  },
+  lifecycleStaticBadge: {
+    borderWidth: 1,
+    borderColor: Colors.textSecondary,
+    borderRadius: Radius.full,
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  lifecycleStaticBadgeCompleted: {
+    borderWidth: 1,
+    borderColor: Colors.green,
+    borderRadius: Radius.full,
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  lifecycleStaticBadgeCancelled: {
+    borderWidth: 1,
+    borderColor: Colors.red,
+    borderRadius: Radius.full,
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  lifecycleStaticText: {
+    color: Colors.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 12,
+    letterSpacing: 1.5,
   },
 
   // ── Empty state ────────────────────────────────────────────────
