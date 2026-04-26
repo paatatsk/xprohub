@@ -92,9 +92,14 @@ export default function HomeScreen() {
           <Text style={styles.btnSub}>Browse jobs</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.myJobsBtn} onPress={() => router.push('/(tabs)/my-jobs')}>
-        <Text style={styles.myJobsBtnText}>MY JOBS</Text>
-      </TouchableOpacity>
+      <View style={styles.dashboardRow}>
+        <TouchableOpacity style={styles.dashboardBtn} onPress={() => router.push('/(tabs)/my-jobs')}>
+          <Text style={styles.dashboardBtnText}>MY JOBS</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dashboardBtn} onPress={() => router.push('/(tabs)/my-applications')}>
+          <Text style={styles.dashboardBtnText}>MY APPLICATIONS</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={styles.sectionLabel}>BROWSE CATEGORIES</Text>
     </View>
   ), [router, handleStartEarning]);
@@ -159,8 +164,9 @@ const styles = StyleSheet.create({
   btnWorker:      { backgroundColor: Colors.green },
   btnText:        { color: Colors.background, fontWeight: '800', fontSize: 13 },
   btnSub:         { color: Colors.background, fontSize: 11, marginTop: 4, opacity: 0.7 },
-  myJobsBtn:      { width: '100%', borderWidth: 1.5, borderColor: Colors.gold, borderRadius: 999, paddingVertical: 12, alignItems: 'center', marginTop: 4 },
-  myJobsBtnText:  { color: Colors.gold, fontWeight: 'bold', fontSize: 13, letterSpacing: 1.5 },
+  dashboardRow:     { flexDirection: 'row', gap: 8, marginTop: 4, width: '100%' },
+  dashboardBtn:     { flex: 1, borderWidth: 1.5, borderColor: Colors.gold, borderRadius: 999, paddingVertical: 12, alignItems: 'center' },
+  dashboardBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 13, letterSpacing: 1.5 },
   sectionLabel:   { color: Colors.textSecondary, fontSize: 11, letterSpacing: 2, marginTop: 16, alignSelf: 'flex-start' },
   card:                { flex: 1, backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, padding: 16, margin: 6 },
   cardTop:             { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },

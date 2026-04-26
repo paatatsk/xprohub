@@ -42,8 +42,9 @@ export default function TabLayout() {
       <Tabs.Screen name="job-detail"    options={{ ...headerDefaults, headerShown: true, title: 'JOB DETAILS',    headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="apply"         options={{ ...headerDefaults, headerShown: true, title: 'APPLY',          headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="apply-success" options={{ ...headerDefaults, headerShown: true, title: 'SENT', gestureEnabled: false }} />
-      <Tabs.Screen name="my-jobs"  options={{ ...headerDefaults, headerShown: true, title: 'MY JOBS',      headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="job-bids" options={{ ...headerDefaults, headerShown: true, title: 'APPLICATIONS', headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="my-jobs"         options={{ ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="my-applications" options={{ ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="job-bids"        options={{ ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
     </Tabs>
   );
 }
