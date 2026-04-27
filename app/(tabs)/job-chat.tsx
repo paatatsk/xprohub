@@ -100,8 +100,9 @@ export default function JobChatScreen() {
   const [composerText,  setComposerText]  = useState('');
   const [sending,       setSending]       = useState(false);
   const [sendError,     setSendError]     = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [actionError,   setActionError]   = useState<string | null>(null);
+  const [actionLoading,   setActionLoading]   = useState(false);
+  const [actionError,     setActionError]     = useState<string | null>(null);
+  const [userHasReviewed, setUserHasReviewed] = useState(false);
 
   // ── Initial load ──────────────────────────────────────────────────────────
 
@@ -126,7 +127,7 @@ export default function JobChatScreen() {
       const { data: chatData, error: chatErr } = await supabase
         .from('chats')
         .select(`
-          id, customer_id, worker_id,
+          id, customer_id, worker_id, job_id,
           customer:profiles!customer_id(id, full_name),
           worker:profiles!worker_id(id, full_name),
           job:jobs!job_id(id, title, status)
@@ -164,6 +165,21 @@ export default function JobChatScreen() {
         setMessages((msgRows ?? []) as Message[]);
       }
       // If msgErr: show empty list — non-fatal, Realtime will still work
+
+      // Step 5 — check if current user has already reviewed this job
+      const jobId = (chatData as any).job_id as string | undefined;
+      if (jobId) {
+        const { data: existingReview } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('job_id', jobId)
+          .eq('reviewer_id', user.id)
+          .maybeSingle();
+
+        if (existingReview) {
+          setUserHasReviewed(true);
+        }
+      }
 
       setLoading(false);
     })();
@@ -295,6 +311,24 @@ export default function JobChatScreen() {
     );
   }, [chat, refetchJobStatus]);
 
+  const handleLeaveReview = useCallback(() => {
+    if (!chat?.job?.id || !currentUserId) return;
+    const revieweeId   = currentUserId === chat.customer_id
+      ? chat.worker_id
+      : chat.customer_id;
+    const revieweeName = currentUserId === chat.customer_id
+      ? chat.worker?.full_name ?? ''
+      : chat.customer?.full_name ?? '';
+    const jobTitle = chat.job.title ?? '';
+
+    router.push(
+      `/(tabs)/review?job_id=${chat.job.id}` +
+      `&reviewee_id=${revieweeId}` +
+      `&reviewee_name=${encodeURIComponent(revieweeName)}` +
+      `&job_title=${encodeURIComponent(jobTitle)}` as any
+    );
+  }, [chat, currentUserId, router]);
+
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (loading) {
@@ -417,9 +451,19 @@ export default function JobChatScreen() {
 
         {jobStatus === 'completed' && (
           <View style={styles.lifecycleBanner}>
-            <View style={styles.lifecycleStaticBadgeCompleted}>
-              <Text style={styles.lifecycleStaticText}>JOB COMPLETED</Text>
-            </View>
+            {userHasReviewed ? (
+              <View style={styles.lifecycleStaticBadgeCompleted}>
+                <Text style={styles.lifecycleStaticText}>✓ REVIEW SUBMITTED</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.lifecycleBtn}
+                onPress={handleLeaveReview}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.lifecycleBtnText}>LEAVE A REVIEW</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
