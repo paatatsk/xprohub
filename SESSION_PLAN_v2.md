@@ -1,6 +1,6 @@
 # XProHub — Session Plan v2
 
-**Last updated:** 2026-04-26 (post Step 8 completion)
+**Last updated:** 2026-04-27 (post Step 12 completion)
 
 This document tracks the build sequence for XProHub. It supersedes any earlier
 session plan documents.
@@ -45,11 +45,11 @@ locked into CLAUDE.md, 18 task categories with emoji icons in Supabase.
 ### 🟡 Milestone 3 — Transactions (in progress)
 - ✅ Step 8 — Bid Acceptance (Postgres functions + My Jobs + Job Bids screens +
   navigation wiring) — **shipped 2026-04-26**
-- 🔲 Step 9 — Worker dashboard ("My Applications") ← **NEXT**
-- 🔲 Step 10 — Real Chat UI (Supabase Realtime, message bubbles, typing indicators)
-- 🔲 Step 11 — Job lifecycle progression (matched → in_progress → completed)
-- 🔲 Step 12 — Review flow (post-completion ratings)
-- 🔲 Step 13 — Payment flow (Stripe Connect escrow + 10% platform fee)
+- ✅ Step 9 — Worker dashboard ("My Applications") — **shipped 2026-04-27**
+- ✅ Step 10 — Real Chat UI (Supabase Realtime, message bubbles) — **shipped 2026-04-27**
+- ✅ Step 11 — Job lifecycle progression (matched → in_progress → completed) — **shipped 2026-04-27**
+- ✅ Step 12 — Review flow (post-completion ratings, wired into chat) — **shipped 2026-04-27**
+- 🔲 Step 13 — Payment flow (Stripe Connect escrow + 10% platform fee) ← **NEXT**
 
 ### 🔲 Milestone 4 — Trust & Reputation (deferred)
 - Belt System UI (currently data-only)
@@ -66,17 +66,13 @@ Only revisit when volume signals justify (50+ jobs/day, 100+ workers).
 
 ## Active Build Order — Milestone 3 Remaining
 
-**Step 9 — My Applications (worker dashboard)** ← NEXT
-- Symmetric to "My Jobs" (customer side)
-- Lists worker's bid history grouped by status
-- Filter by: pending / accepted / declined / withdrawn
-- Each row: job title + customer name + proposed price + status badge + timeAgo
-- Tap → navigate to job-detail (or job-chat if accepted)
-- No new schema needed — reads existing `bids` table filtered by `worker_id`
-- Wires Worker Dignity Implementation B ("Released" / "Project Closed" copy)
-  naturally — pair with this build
+**Step 13 — Payment Flow** ← NEXT
+- Stripe Connect onboarding for workers
+- Customer pays at job acceptance (escrow held)
+- Worker receives payment minus 10% platform fee at completion
+- Dispute handling: deferred to post-MVP
 
-**Step 10 — Real Chat UI**
+**Step 10 — Real Chat UI** ✅ COMPLETE
 - Replace placeholder `job-chat.tsx` with Realtime-powered message thread
 - Message bubbles, sender alignment, timestamp grouping
 - Supabase Realtime subscription on `messages` table filtered by chat_id

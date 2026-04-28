@@ -3,7 +3,7 @@
 **Purpose:** This document orients a new Claude conversation when the previous chat
 becomes too long or context is lost. Read this first; act second.
 
-**Last updated:** 2026-04-26 (post Step 8 completion)
+**Last updated:** 2026-04-27 (post Step 12 completion)
 
 ---
 
@@ -143,7 +143,7 @@ These have been earned through real bugs caught:
 
 **Milestone 1 (Foundation & Auth):** ✅ COMPLETE
 **Milestone 2 (The Live Loop):** ✅ COMPLETE 12/12 steps
-**Milestone 3 (Transactions):** 🟡 PARTIAL — Step 8 just completed
+**Milestone 3 (Transactions):** 🟡 PARTIAL — Steps 9–12 complete, Step 13 (Payments) is next
 
 **To check latest commits, run:** `git log --oneline -10`
 
@@ -158,14 +158,14 @@ These have been earned through real bugs caught:
 - Workers Feed: customer can browse workers and Hire Directly (full job form) ✅
 - Become a Worker onboarding ✅
 - Trust gates fire at action moments (Post, Apply, Hire) ✅
+- Worker's "My Applications" dashboard — bid history grouped by status ✅
+- Real Chat UI — Supabase Realtime message thread, bubbles, send input ✅
+- Job lifecycle CTAs — Mark In Progress / Mark Complete on chat screen ✅
+- Review flow — rating + comment form, wired into chat completed state ✅
 
 **What's NOT built yet (gaps in the loop):**
-- **Gap 1:** Workers can't see their own application history. No "My Applications"
-  worker dashboard. ← **NEXT BUILD TARGET**
-- **Gap 2:** Real chat UI — `job-chat.tsx` is still a placeholder. No Realtime
-  message subscriptions, no message bubbles.
-- **Gap 3:** Job lifecycle progression — no `matched → in_progress → completed`
-  transition, no review flow, no payment flow.
+- **Gap 1 (NEXT):** Payment flow — Stripe Connect escrow, pay-on-accept,
+  release-on-complete, 10% platform fee. ← **Step 13 — active target**
 
 ---
 
