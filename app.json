@@ -41,7 +41,9 @@
     "plugins": [
       "expo-router",
       "expo-local-authentication",
-      "@stripe/stripe-react-native"
+      ["@stripe/stripe-react-native", {
+        "merchantIdentifier": "merchant.com.paatatsk.xprohubv3"
+      }]
     ],
     "experiments": {
       "typedRoutes": true
