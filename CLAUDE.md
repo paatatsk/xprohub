@@ -276,12 +276,11 @@ XP earn: job complete +50 · 5-star review +30 · on time +20 · fast response +
 - Stripe handles all banking data — never store financial info directly
 
 ### KEY RULE
-Never force Starter or Pro upfront. User chooses the path that matches
-what they are trying to do. Show a friendly gate only at the moment of
-action. Stripe handles all banking data in both paths — never store
-financial info directly.
+Gates fire at moment of action only. Never force payment or identity
+setup upfront. Stripe handles all banking data — never store financial
+info directly.
 
-### XPRO (Level 3 — Reputation Builder, optional, unlocks after first transaction)
+### XPRO (Reputation Builder, optional, unlocks after first transaction)
 - Work history, references, certifications, portfolio photos, bio
 - Feeds into Belt System ranking and match score
 

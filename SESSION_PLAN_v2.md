@@ -54,7 +54,7 @@ locked into CLAUDE.md, 18 task categories with emoji icons in Supabase.
 ### 🔲 Milestone 4 — Trust & Reputation (deferred)
 - Belt System UI (currently data-only)
 - Notification system (Worker Dignity Implementation A)
-- Background check integration (Level 2B verification)
+- Background check integration (high-trust categories — spec TBD at Milestone 4)
 
 ### 🔲 Milestone 5 — Polish Pass (deferred)
 All 6+ items in POLISH_PASS.md. Run when Milestone 3 completes.

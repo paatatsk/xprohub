@@ -71,12 +71,16 @@ direction. That was rejected. Dark Gold is the locked aesthetic.**
    customers post from it, matching runs on it.
 3. **Workers Feed = business card wall.** Customers can hire directly bypassing
    public job posts.
-4. **Progressive Trust System:**
-   - Explorer (default, browse only)
-   - Starter / Level 2A (phone + basic Stripe, jobs <$50)
-   - Pro / Level 2B (full ID + Stripe Connect)
-   - XPro / Level 3 (reputation builder)
-   Gates fire only at moment of action (Post/Apply/Hire), never upfront.
+4. **Progressive Profile Gates:**
+   - Default: every user can browse, message after hire, and build
+     their ID profile freely.
+   - Apply Gate (worker side): triggered when user taps Apply on a
+     job. Requires photo + ≥1 skill + Stripe Express.
+   - Post Gate (customer side): triggered when user taps Post a
+     Job. Requires customer payment method (Chunk D).
+   - XPro tier: optional reputation/identity investment beyond the
+     gate minimum. Belt level, certifications, work samples, bio.
+   Gates fire at moment of action only — never upfront.
 5. **Worker dignity:** closure is respect. Auto-decline cascade on accept. No
    ghosting. Smart templates protect working-class users from writing burden.
 
