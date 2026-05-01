@@ -2,8 +2,8 @@
 
 Status: Design revised 2026-05-01 to reflect dual-role architecture.
 Original worker-only model superseded. Q1 and Q3 resolved; Q2 reframed
-for the two-component apply gate; Q4 confirmed. One open question
-remains — see end of document.
+for the two-component apply gate; Q4 confirmed. All decisions resolved
+as of 2026-05-01.
 
 Captured: 2026-05-01 | Revised: 2026-05-01
 
@@ -647,32 +647,26 @@ TWO-COMPONENT APPLY GATE (apply.tsx)
 
 ## Open Questions
 
-One question requires Paata's decision before C-2 implementation
-begins.
-
-**Q2 (reframed) — Two-component apply gate: hard block or soft warn
-for each component?**
-
-The current design specifies hard block for both — the apply form does
-not load until both the ID gate and the Stripe gate pass.
-
-For the **Stripe gate**: hard block is the clear right answer. Allowing
-a bid to be accepted when no payout account exists is the exact failure
-mode Worker Dignity prevents. No soft option here.
-
-For the **ID gate specifically**: soft warn is an argument. A user
-with skills but no photo is still a real person who might be hired.
-The counter-argument for hard block: a worker with no photo is
-significantly less likely to be hired — the gate is protecting their
-time investment, not excluding them. For MVP, recommendation is hard
-block for both. Can be revisited if evidence shows the ID gate is
-causing disproportionate drop-off.
-
-**Confirm or override before C-2 begins.**
+All architectural decisions resolved as of 2026-05-01. See
+Resolved Decisions below.
 
 ---
 
 ## Resolved Decisions
+
+**Q2 (reframed) — Two-component apply gate: hard block or soft warn
+for each component?**
+**Resolved: Hard block on both components.**
+- Stripe gate: hard block — bids accepted without a payout
+  account create the exact Worker Dignity violation the
+  platform exists to prevent.
+- ID gate: hard block — workers without photo + skill claim
+  compete unfairly. Soft warn would let them invest time on
+  bids that get filtered out by customers, which hurts workers
+  more than the gate does. MVP cost (one photo + one skill
+  tap) is small; worker gets a fair shot in return.
+- Revisit if post-launch evidence shows disproportionate
+  drop-off at photo-upload step.
 
 **Q1 — Does become-worker route to stripe-connect after finishing?**
 **Resolved: No change needed.** `become-worker.tsx` (pending rename:
