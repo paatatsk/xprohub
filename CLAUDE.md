@@ -5,7 +5,7 @@
 **Paata** — non-technical founder, zero prior coding experience. Building with Claude AI session by session since March 2026. GitHub: `paatatskhadia`. My job is vision + product decisions; Claude writes the code.
 
 ## Project Overview
-**XProHub** — two-sided gig economy marketplace. Workers earn. Customers get things done.
+**XProHub** — platform for X (various) professionals. Every user is both customer and worker. No permanent role assignment.
 - Mission: Economic empowerment for everyday people regardless of background
 - Tagline: **"Real Work. Fair Pay. For Everyone."**
 - Model: eBay buyer/seller dual-role (users freely switch Customer ↔ Worker)
@@ -19,6 +19,40 @@
 - `POLISH_PASS.md` — deferred items and parked architectural explorations
 
 For current commit state: `git log --oneline -10`
+---
+
+## Platform Architecture (Locked)
+
+### Dual-Role Model
+Every user is both customer and worker. No role fork at sign-up. No permanent role assignment.
+
+Two Stripe objects serve the two transaction directions:
+- **Stripe Express account** — for receiving payment after completing a job. Set up via `stripe-connect.tsx`.
+- **Customer payment method** — for funding escrow when posting a job. Set up in Chunk D.
+
+### Gate Philosophy
+Gates fire at moment of action only. No persistent banners or nags.
+
+### Gate Specifications
+
+| Action | ID Gate | Stripe Gate | Notes |
+|---|---|---|---|
+| Sign up | — | Offered, skippable | Express account offered but not required |
+| Browse Live Market | — | — | Fully open to all signed-in users |
+| Post a job | — | Customer payment method (Chunk D) | Checks payment method on file |
+| Apply for a job | Required: photo + >=1 skill | Required: stripe_charges_enabled | ID check fires first; both must pass |
+| Chat | — | — | Opens after hire; both parties already cleared |
+| Hire / acceptance | — | — | Triggers charge (Chunk D); both sides verified |
+
+### Action Continuity
+Completing a gate returns the user to exactly the screen they came from — apply form pre-populated for the specific job, post-job form with content preserved. Never drop on Home.
+
+### Hire Moment = Charge Moment
+Customer is charged at hire. Funds held in escrow. Worker confirmed paid before work begins. **Worker Dignity** — non-negotiable.
+
+### Professional Identity (`id.tsx`)
+Photo + ≥1 skill claim = the apply-gate minimum. Belt level, certifications, work samples, bio = optional investment beyond the minimum. Not a forced wizard.
+
 ---
 
 ## Tech Stack
@@ -223,26 +257,23 @@ Badges (9): Never Cancels · Top Pro · Verified · Insured · Top 5% · Fast Re
 
 XP earn: job complete +50 · 5-star review +30 · on time +20 · fast response +10 · repeat customer +25 · refer worker +100
 
-## PROGRESSIVE PROFILE SYSTEM
+## Progressive Profile Gates
 
 ### EXPLORER (Level 1 — Browse Only, default for all new users)
 - Required: full name, email, profile photo (optional)
 - Can do: browse Live Market feed, browse Worker business cards, filter by category
 - Cannot do: apply for jobs, post jobs, message anyone, transact
 
-### STARTER (Level 2A — triggered when user posts or applies for jobs under $50)
-- Gate screen shown when user taps Post a Job or Apply (low-value jobs)
-- Required: phone number (SMS verified), Stripe basic (debit/bank for payouts)
-- Workers also: choose skills from Task Library
-- Unlocks: posting jobs under $50, applying, messaging, basic transactions
+### APPLY GATE (worker side — triggered when worker taps Apply on any job)
+- Required: profile photo + ≥1 skill category claimed + Stripe Express (`stripe_charges_enabled = true`)
+- ID check fires first; Stripe check second — both must pass before apply form loads
+- On gate fire: routes to `id.tsx` (profile) or `stripe-connect.tsx` (payouts); returns to the specific job on completion
 - Stripe handles all banking data — never store financial info directly
 
-### PRO (Level 2B — triggered when user posts or applies for jobs $50+)
-- Gate screen shown when job value or category requires full verification
-- Required: everything in Starter + address + State ID photo + Stripe Connect full
-- Workers also: full background check eligibility
-- Unlocks: all jobs, sensitive categories, team jobs
-- Stripe Connect handles all banking data — never store financial info directly
+### POST GATE (customer side — triggered when customer taps Post a Job)
+- Required: customer payment method on file
+- Chunk D scope
+- Stripe handles all banking data — never store financial info directly
 
 ### KEY RULE
 Never force Starter or Pro upfront. User chooses the path that matches
@@ -254,12 +285,18 @@ financial info directly.
 - Work history, references, certifications, portfolio photos, bio
 - Feeds into Belt System ranking and match score
 
-## Progressive Trust Levels (unlock at moment of action)
-| Level | Triggered | Required | Unlocks |
+## Gate Specifications
+
+| Action | ID Gate | Stripe Gate | Notes |
 |---|---|---|---|
-| I Explorer | Sign up | Name + Email + Phone | Browse, view, post basic jobs |
-| II Professional | Applying to a job | Photo + Bio + Portfolio | Apply, full profile, messaging |
-| III Trusted | Accepting paid job | Address + Gov ID + Stripe | Payments, sensitive categories |
+| Sign up | — | Offered, skippable | Express account offered but not required |
+| Browse Live Market | — | — | Fully open to all signed-in users |
+| Post a job | — | Customer payment method (Chunk D) | Checks payment method on file |
+| Apply for a job | Required: photo + >=1 skill | Required: stripe_charges_enabled | ID check fires first; both must pass |
+| Chat | — | — | Opens after hire; both parties already cleared |
+| Hire / acceptance | — | — | Triggers charge (Chunk D); both sides verified |
+
+*(Identical to the table in CHUNK_C_DESIGN.md and the Platform Architecture section above. If they ever drift, one is wrong.)*
 
 ## Matching Algorithm
 Location 25% · Skill Match 35% · Belt/Experience 20% · Behavioral 20%
@@ -282,11 +319,12 @@ top buttons and category cards routes here.
   acts as a business card wall
 - Category filter powered by `task_categories` (20 rows)
 
-### Level 2 gate triggers
+### Gate triggers
 Explorer users browse freely. Gate fires only at:
-- Tap "+ Post a Job" → gate → Post a Job flow
-- Tap "Apply" on job card → gate → Apply flow
-- Tap "Hire Directly" on worker card → gate → Direct Hire flow
+- Tap "+ Post a Job" → customer Stripe gate (Chunk D) → Post a Job flow
+- Tap "Apply" on job card → ID gate then Stripe gate → Apply flow
+
+(Direct Hire pathway parked in POLISH_PASS — future feature.)
 
 ### Task Library as spine
 Category grid on Home and filters in Live Market both pull from
@@ -308,6 +346,8 @@ whole platform — do not bypass it.
 10. **Plan Mode** (`Shift+Tab`) before multi-file changes
 11. **Windows PowerShell** cannot handle `(tabs)` in paths — use File Explorer for those folders
 12. **app.json assets**: splash = `splash-icon.png`, Android icon = `android-icon-foreground.png`
+13. **Dual-role** — no role-specific screen patterns. Any transactional screen must work for any user regardless of which side they're acting on. No "workers-only" or "customers-only" UI.
+14. **Gate philosophy** — gates fire at moment of action only. No persistent Stripe setup banners, no persistent ID prompts, no nags. Nothing surfaces until the user takes the relevant action.
 
 ## What Is Built
 
