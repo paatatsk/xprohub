@@ -419,3 +419,13 @@ entrypoint = "./functions/stripe-webhook/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/stripe-webhook/*.html" ]
+
+[functions.create-stripe-account]
+enabled = true
+# App sends a Supabase JWT in Authorization: Bearer <token>.
+# verify_jwt = true ensures Supabase rejects unauthenticated requests
+# at the edge before the function code runs. Opposite of stripe-webhook
+# (which must be false because Stripe does not send Supabase JWTs).
+verify_jwt = true
+import_map = "./functions/create-stripe-account/deno.json"
+entrypoint = "./functions/create-stripe-account/index.ts"
