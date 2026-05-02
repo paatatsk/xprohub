@@ -57,22 +57,29 @@ const RETURN_URL  = 'xprohub://stripe-return'
 const REFRESH_URL = 'xprohub://stripe-refresh'
 
 // To:
-const RETURN_URL  = 'xprohubv3://stripe-return'
-const REFRESH_URL = 'xprohubv3://stripe-refresh'
+const RETURN_URL  = 'xprohub://stripe-return'
+const REFRESH_URL = 'xprohub://stripe-refresh'
 ```
 
 Deploy after editing. Commit as:
 `fix: Step 13 C-3.1 — correct deep link scheme in create-onboarding-link`
 
-**Prerequisite 2 — CHUNK_C_DESIGN.md doc fix**
+**Prerequisite 2 — superseded 2026-05-02**
 
-Find and replace `xprohub://` → `xprohubv3://` throughout
-`docs/CHUNK_C_DESIGN.md`. Approximately 8–10 occurrences. Commit
-with Prerequisite 1 or separately.
+The original prerequisite called for find/replace `xprohub://` →
+`xprohubv3://` in `docs/CHUNK_C_DESIGN.md`. Superseded when the
+project rename direction was reversed: tonight's Phase 1 of the
+xprohubv3 → xprohub rename made all `xprohub://` references in
+the C-1 design doc already correct. No action needed on this doc.
+See POLISH_PASS.md "Project rename" entry for full rename context.
 
 The source of truth for the app scheme is `app.json`:
-`"scheme": "xprohubv3"`. The bundle ID `com.paatatsk.xprohubv3`
-confirms this. All deep link references in docs and code must match.
+`"scheme": "xprohub"`. The bundle ID is currently
+`com.paatatsk.xprohubv3`, scheduled for rename to
+`com.paatatsk.xprohub` in Phase 2 of the project rename
+(see POLISH_PASS.md). Until Phase 2 ships, scheme and bundle ID
+intentionally do not match — this is documented temporary
+asymmetry, not drift.
 
 **Prerequisite 3 — Install expo-linking**
 
@@ -129,7 +136,7 @@ tracked in POLISH_PASS.md under Documentation Hygiene.
 | Deep link approach | Option B — redirect routes `app/stripe-return.tsx` / `app/stripe-refresh.tsx` |
 | BackButton | Modified with optional `returnTo` prop, default `'/(tabs)'` |
 | Back navigation | `returnTo` param passed in URL from calling screen |
-| Deep link scheme | `xprohubv3://` — matches `app.json` `"scheme"` field |
+| Deep link scheme | `xprohub://` — matches `app.json` `"scheme"` field |
 | Visual style | Dark Gold system — single-file screen, inline StyleSheet at bottom |
 
 **Why Option B for deep links:** Deterministic. No Expo Router
@@ -479,7 +486,7 @@ redirect immediately to `stripe-connect`. Expo Router handles them
 as ordinary routes — no URL interception, no version-specific
 behavior.
 
-When Stripe navigates to `xprohubv3://stripe-return`, the OS
+When Stripe navigates to `xprohub://stripe-return`, the OS
 activates the app at path `/stripe-return`. Without a route, Expo
 Router would render an unmatched-route error. These files prevent
 that.
@@ -509,7 +516,7 @@ renders nothing — no flash, no layout. `replace` removes
 `stripe-return` from the stack.
 
 **Known limitation:** `returnTo` is not preserved through this
-redirect. The Stripe Edge Function hardcodes `xprohubv3://stripe-return`
+redirect. The Stripe Edge Function hardcodes `xprohub://stripe-return`
 as the return URL with no query params, so the original `returnTo`
 value cannot be included. After Stripe setup completes, the user
 lands on stripe-connect without a job context. The CONTINUE TO
@@ -862,7 +869,7 @@ function dotStyle(state: StripeStatus, index: number) {
 
 **returnTo not preserved through Stripe redirect (known limitation)**
 
-When the user returns from Stripe via `xprohubv3://stripe-return`,
+When the user returns from Stripe via `xprohub://stripe-return`,
 `stripe-return.tsx` redirects to `/(tabs)/stripe-connect` with no
 params. The original `returnTo` value is lost because Stripe's
 return URL is hardcoded without query params. State 4's CONTINUE

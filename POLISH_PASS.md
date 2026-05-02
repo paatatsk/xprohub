@@ -392,9 +392,9 @@ Scope of full rename (~3-4 hours, single dedicated session):
 - Apple Developer App ID + new bundle (com.paatatsk.xprohub)
 - New provisioning profiles + distribution cert
 - New EAS dev build with new bundle
-- app.json scheme (xprohubv3:// → xprohub://)
+- app.json scheme (xprohubv3:// → xprohub://) ✅ DONE 2026-05-02 (Phase 1)
 - Edge Function constants (RETURN_URL, REFRESH_URL in
-  create-onboarding-link)
+  create-onboarding-link) ✅ DONE 2026-05-02 (Phase 1)
 - GitHub repo rename (xprohub-v3 → xprohub)
 - Local folder rename
 - Supabase project display name
