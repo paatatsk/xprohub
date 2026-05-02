@@ -358,3 +358,54 @@ sql_paths = ["./seed/XProHub_TaskLibrary_Seed_v1.1.sql"]
 ```
 
 **Build this when:** Only if local Supabase dev is ever set up.
+
+---
+
+## Documentation Hygiene
+
+**Reconcile font references across docs**
+**Captured:** 2026-05-02 | **Severity:** Low
+
+`CLAUDE.md` and `docs/CHUNK_C_DESIGN.md` reference "Oswald" as the
+heading font in the Dark Gold design system. Actual codebase uses
+`Fonts.heading = 'SpaceGrotesk-Bold'` in `constants/theme.ts`.
+Discrepancy discovered while drafting `CHUNK_C_C4_DESIGN.md`.
+
+Update `CLAUDE.md` and `CHUNK_C_DESIGN.md` to reference SpaceGrotesk
+(and any other typography references that may have drifted), or update
+`theme.ts` to actually use Oswald if the docs reflect the intended
+design.
+
+**Resolve when:** Next batch of doc cleanup, alongside the Belt System
+and pricing items already parked.
+
+---
+
+**Project rename: xprohubv3 → xprohub**
+**Captured:** 2026-05-02 | **Severity:** Low (cosmetic / brand)
+
+The bundle ID, app scheme, GitHub repo, local folder, and various
+display names all carry "xprohubv3" as a development-time identifier.
+The brand is "XProHub" — the v3 is internal-only.
+
+Scope of full rename (~3-4 hours, single dedicated session):
+- Apple Developer App ID + new bundle (com.paatatsk.xprohub)
+- New provisioning profiles + distribution cert
+- New EAS dev build with new bundle
+- app.json scheme (xprohubv3:// → xprohub://)
+- Edge Function constants (RETURN_URL, REFRESH_URL in
+  create-onboarding-link)
+- GitHub repo rename (xprohub-v3 → xprohub)
+- Local folder rename
+- Supabase project display name
+- Stripe Connect business name
+- Code grep for any xprohubv3 references
+- Doc updates (CLAUDE.md path refs, design docs scheme refs, etc.)
+
+**Resolve when:** Before NYC test launch, ideally as a single
+focused session with fresh capacity. Not blocking C-4 through C-7
+work.
+
+**Decision context:** Discussed and deferred 2026-05-02. Considered
+rebuild-as-v4 alternative — rejected as significantly higher cost
+than the rename.
