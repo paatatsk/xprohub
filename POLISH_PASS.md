@@ -395,10 +395,16 @@ Scope of full rename (~3-4 hours, single dedicated session):
 - app.json scheme (xprohubv3:// → xprohub://) ✅ DONE 2026-05-02 (Phase 1)
 - Edge Function constants (RETURN_URL, REFRESH_URL in
   create-onboarding-link) ✅ DONE 2026-05-02 (Phase 1)
-- GitHub repo rename (xprohub-v3 → xprohub)
-- Local folder rename
-- Supabase project display name
-- Stripe Connect business name
+- GitHub repo rename (xprohub-v3 → xprohub) ✅ DONE 2026-05-02 (Phase 3 partial)
+- Local folder rename (C:\Users\sophi\Documents\xprohub-v3 → ...\xprohub)
+- Expo project slug in app.json ("slug": "xprohub-v3") — affects EAS project
+  identity, treat as Phase 2 alongside bundle ID
+- Expo project name in app.json ("name": "xprohub-v3")
+- npm package name in package.json + auto-update package-lock.json
+- Supabase CLI project_id in supabase/config.toml — verify CLI link survives
+  the change before committing
+- Supabase project display name (cosmetic, dashboard only)
+- Stripe Connect business name (cosmetic)
 - Code grep for any xprohubv3 references
 - Doc updates (CLAUDE.md path refs, design docs scheme refs, etc.)
 

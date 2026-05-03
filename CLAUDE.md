@@ -9,7 +9,7 @@
 - Mission: Economic empowerment for everyday people regardless of background
 - Tagline: **"Real Work. Fair Pay. For Everyone."**
 - Model: eBay buyer/seller dual-role (users freely switch Customer ↔ Worker)
-- Repo: `github.com/paatatsk/xprohub-v3` | Local: `C:\Users\sophi\Documents\xprohub-v3`
+- Repo: `github.com/paatatsk/xprohub` | Local: `C:\Users\sophi\Documents\xprohub-v3`
 - Start: `npx expo start --clear` | Test: iPhone via Expo Go
 
 ---

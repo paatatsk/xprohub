@@ -49,7 +49,7 @@ Differentiates from Uber/TaskRabbit by:
 - **Frontend:** React Native + Expo Router + TypeScript (SDK 54)
 - **Backend:** Supabase (PostgreSQL + Auth + Realtime + PostGIS)
 - **Payments:** Stripe Connect (deferred — not yet wired)
-- **Repo:** github.com/paatatsk/xprohub-v3
+- **Repo:** github.com/paatatsk/xprohub
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
 - **Test device:** iPhone via Expo Go on LAN mode
 
