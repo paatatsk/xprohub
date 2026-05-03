@@ -24,7 +24,8 @@ checkpoints, not parked work.
 5. ⏳ Stage 3 — `app/stripe-return.tsx` + `app/stripe-refresh.tsx` redirects
 6. → Commit checkpoint
 7. ⏳ Stage 4 — `app/(tabs)/_layout.tsx` + `app/_layout.tsx` edits
-8. → Commit checkpoint + full-codebase `tsc --noEmit` integration check
+8. → Commit checkpoint + tsc baseline comparison (see
+   `docs/TSC_BASELINE_2026-05-03.txt` — expect 24 errors, no new ones)
 9. ⏳ Deploy `create-stripe-account` + `create-onboarding-link` Edge Functions
    to remote Supabase
 10. ⏳ Apply migration `20260503000001_accept_bid_set_agreed_price.sql`
@@ -34,13 +35,21 @@ checkpoints, not parked work.
 13. ⏳ Update this Active Task Blueprint marking C-4a complete and defining
     the next task
 
-### NEXT TASK (locked, do not start until C-4a is fully done):
+### NEXT TASKS (ordered, locked — do not start any until C-4a is fully done):
 
-**Doc reconciliation cleanup batch.** Eleven pending findings from the
-2026-05-03 reconciliation pass — deprecate `NEW_CHAT_PROMPT.md`, refresh
+**Task 1 — Doc reconciliation cleanup batch.** Eleven pending findings from
+the 2026-05-03 reconciliation pass — deprecate `NEW_CHAT_PROMPT.md`, refresh
 `SESSION_HANDOUT.md` build state section, plus 9 cosmetic findings.
 Definition of done: all 11 closed, single coordinated commit, this blueprint
 updated.
+
+**Task 2 — Fix pre-existing tsc errors.** 24 errors captured in
+`docs/TSC_BASELINE_2026-05-03.txt` at the time of C-4a Stage 2 commit. Of
+these, 8 are in app code (potentially fixable) and 16 are Deno runtime
+errors in Edge Functions (need separate tsconfig or exclusion strategy).
+Definition of done: investigation pass surfaces what's fixable vs what needs
+config change, plan agreed, errors resolved or formally excluded, baseline
+file deleted, this blueprint updated.
 
 ---
 

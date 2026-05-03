@@ -1,0 +1,30 @@
+TypeScript Compiler Baseline — 2026-05-03
+
+Captured immediately before C-4a Stage 2 commit (post-stripe-connect.tsx save).
+Purpose: distinguish pre-existing errors from any new errors introduced by
+C-4a Stages 3 and 4 (which edit _layout.tsx files).
+
+Total: 24 errors across 8 files.
+
+React Native app code (potentially fixable):
+  app/(tabs)/_layout.tsx                          1 error
+  app/(tabs)/direct-hire.tsx                      1 error
+  app/(tabs)/market.tsx                           4 errors
+  app/(tabs)/my-applications.tsx                  1 error
+  app/_layout.tsx                                 1 error
+  Subtotal:                                       8 errors
+
+Supabase Edge Functions (Deno runtime — NOT fixable from app tsconfig):
+  supabase/functions/_shared/stripe-client.ts     2 errors
+  supabase/functions/create-onboarding-link/      5 errors
+  supabase/functions/create-stripe-account/       5 errors
+  supabase/functions/stripe-webhook/              4 errors
+  Subtotal:                                       16 errors
+
+Stage 4 verification check:
+  npx tsc --noEmit 2>&1 | grep -c "error TS"
+  Expected output: 24 (or fewer, if any pre-existing errors get incidentally
+  fixed by Stage 3/4 edits — that's fine, just not expected). If output is
+  25+, something new was introduced and needs investigation before commit.
+
+This file is ephemeral. Delete when the "Fix tsc errors" task completes.
