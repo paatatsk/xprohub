@@ -28,3 +28,23 @@ Stage 4 verification check:
   25+, something new was introduced and needs investigation before commit.
 
 This file is ephemeral. Delete when the "Fix tsc errors" task completes.
+
+---
+
+Insight surfaced during C-4a Stage 4 (2026-05-03):
+
+The 8 React Native app code errors (in _layout.tsx, direct-hire.tsx,
+market.tsx, my-applications.tsx, _layout.tsx) are caused by missing
+`as any` casts on dynamic route strings passed to router.push/replace and
+on route.params access. The codebase already establishes `as any` as the
+accepted workaround pattern (see app/(tabs)/_layout.tsx BackButton and
+stripe-connect Tabs.Screen, plus app/(tabs)/stripe-connect.tsx line 290).
+
+Likely fix path for Task 2: audit the 8 app errors, add `as any` casts
+where the design pattern matches, OR introduce a properly-typed RouteList
+declaration as a one-time fix that retires the `as any` workaround
+globally. The latter is more work but cleaner.
+
+The 16 Edge Function errors are unrelated — they're Deno runtime types
+not visible to the app's tsconfig. Separate fix path: configure Deno-aware
+tsconfig OR exclude supabase/functions/ from the app's tsc run.

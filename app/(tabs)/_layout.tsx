@@ -14,10 +14,10 @@ const headerDefaults = {
   headerBackVisible:   false, // we supply our own back button
 };
 
-function BackButton() {
+function BackButton({ returnTo = '/(tabs)' }: { returnTo?: string }) {
   const router = useRouter();
   return (
-    <TouchableOpacity onPress={() => router.push('/(tabs)')} style={{ paddingLeft: 16 }}>
+    <TouchableOpacity onPress={() => router.push(returnTo as any)} style={{ paddingLeft: 16 }}>
       <Text style={{ color: Colors.gold, fontSize: 22 }}>‹</Text>
     </TouchableOpacity>
   );
@@ -45,6 +45,17 @@ export default function TabLayout() {
       <Tabs.Screen name="my-jobs"         options={{ ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="my-applications" options={{ ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-bids"        options={{ ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen
+        name="stripe-connect"
+        options={({ route }) => ({
+          ...headerDefaults,
+          headerShown: true,
+          title: 'GET PAID',
+          headerLeft: () => (
+            <BackButton returnTo={(route.params as any)?.returnTo ?? '/(tabs)'} />
+          ),
+        })}
+      />
     </Tabs>
   );
 }

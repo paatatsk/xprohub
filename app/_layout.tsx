@@ -100,6 +100,8 @@ export default function RootLayout() {
         <Stack.Screen name="(onboarding)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="job/[id]" />
+        <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
+        <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
       </Stack>
     </>
   );
