@@ -116,19 +116,24 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 
 22 discrepancies found 2026-05-03 between docs and codebase. Status:
 
-**Fixed (2 of 22):**
+**Fixed (10 of 22):**
 - Finding #2 — Font system (Space Grotesk per Blueprint) → commit `7fd0820`
-- Finding #11 — `accept_bid()` populates `agreed_price` → commit `1ea262d` (migration not yet pushed to remote)
-
-**In flight:**
-- Phase 1 project rename (deep link scheme `xprohub://`) → commit `3b96a86`
-- Phase 3 partial — GitHub repo `xprohub-v3` → `xprohub` → commit `b1631ee`
+- Finding #11 — `accept_bid()` populates `agreed_price` → commit `1ea262d`
+- Findings #1 + #3 — Milestone 3 "Built" / "Not Built" sections rewritten → commit `397cc3b`
+- Finding #5 — Oswald → Space Grotesk font references → commit `397cc3b`
+- Finding #21 — Trust System line replaced with progressive gates → commit `397cc3b`
+- Finding #4 — Production Screens table corrected → commit `93b5c47`
+- Finding #9 — Migrations list completed → commit `93b5c47`
+- Finding #16 — RLS state note corrected → commit `93b5c47`
+- Finding #18 — Stale Code Rule deleted + PROJECT_STATUS rule ref updated → commit `93b5c47`
+- Project rename Phase 1 (deep link scheme `xprohub://`) → commit `3b96a86`
+- Project rename Phase 3 partial (GitHub repo `xprohub-v3` → `xprohub`) → commit `b1631ee`
 - Supabase project display renamed "Production"
 
-**Pending (20 of 22):**
-- Findings #1, #3–10, #12, #16–17 — CLAUDE.md doc reconciliation (single coordinated rewrite)
+**Pending (12 of 22):**
+- Findings #6–8, #10, #12, #17 — CLAUDE.md remaining items
 - Findings #13–15 — SESSION_HANDOUT.md, NEW_CHAT_PROMPT.md, POLISH_PASS small updates
-- Findings #18–22 — cosmetic batch
+- Findings #19–20, #22 — cosmetic batch
 
 ---
 
@@ -136,12 +141,11 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 
 These need to land in CLAUDE.md or POLISH_PASS:
 
-1. **CLAUDE.md six-change update** approved 2026-05-01, never executed (session ended). Covers dual-role wording, new Platform Architecture section, Progressive Profile System update, Trust Levels table replacement, gate triggers rename, Code Rules (Dual-role, Gate philosophy).
+1. **CLAUDE.md six-change update** approved 2026-05-01 — substantially executed in commits `397cc3b` and `93b5c47`. Covered: font system fix, screen table rewrite, migrations list expansion, RLS note correction, Trust System line replaced with progressive gates, stale Code Rule deletion, Milestone 3 "Built" / "Not Built" rewrite. Any residual items from the original six-change spec are covered by the 11 remaining reconciliation findings tracked above.
 2. **Direct Hire pathway** — drafted POLISH_PASS entry never saved.
-3. **Levels framing as user lifecycle narrative** — never written down.
-4. **Belt System is opt-in** (not structural matching). Currently described as if structural in CLAUDE.md.
-5. **10% platform fee is not actually locked** — assumed into CLAUDE.md, never explicitly decided.
-6. **SESSION_HANDOUT.md update** flagged for update before C-2, never executed.
+3. **Belt System is opt-in** (not structural matching). Currently described as if structural in CLAUDE.md.
+4. **10% platform fee is not actually locked** — assumed into CLAUDE.md, never explicitly decided.
+5. **SESSION_HANDOUT.md update** flagged for update before C-2, never executed.
 
 ---
 
