@@ -9,7 +9,7 @@ import {
   ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
@@ -86,6 +86,9 @@ export default function StripeConnectScreen() {
   const {
     derivedState, loading, error, refresh,
   } = useStripeStatus();
+
+  // Refetch Stripe status when screen regains focus (e.g. returning from Safari)
+  useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
 
   const [ctaLoading, setCtaLoading] = useState(false);
   const [ctaError, setCtaError]     = useState<string | null>(null);

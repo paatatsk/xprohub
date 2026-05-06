@@ -11,6 +11,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 
 import type Stripe from 'https://esm.sh/stripe@14?target=denonext'
+import { createClient } from '@supabase/supabase-js'
 import { stripe, cryptoProvider } from '../_shared/stripe-client.ts'
 
 // Validate STRIPE_WEBHOOK_SECRET at module import time (fail-fast).
@@ -24,6 +25,12 @@ if (!webhookSecret) {
     'Run: supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...'
   )
 }
+
+// Service role client — module level, reused across requests.
+// Used by account.updated handler to write stripe_* columns on profiles.
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
 Deno.serve(async (req: Request): Promise<Response> => {
 
@@ -74,11 +81,58 @@ Deno.serve(async (req: Request): Promise<Response> => {
   try {
     switch (event.type) {
 
-      case 'account.updated':
+      case 'account.updated': {
         // Chunk C — Worker's Stripe Express account status changed.
-        // Updates profiles.stripe_onboarding_complete and stripe_charges_enabled.
-        console.log('[stripe-webhook] account.updated — handler wired in Chunk C')
+        // Syncs charges_enabled and payouts_enabled to profiles row.
+        const account = event.data.object as Stripe.Account
+        const acctId = account.id
+
+        console.log(
+          `[stripe-webhook] account.updated for ${acctId}: ` +
+          `charges_enabled=${account.charges_enabled}, payouts_enabled=${account.payouts_enabled}`
+        )
+
+        // Read current row to check stripe_onboarding_completed_at (first-time-only logic).
+        const { data: profile, error: readError } = await serviceClient
+          .from('profiles')
+          .select('stripe_onboarding_completed_at')
+          .eq('stripe_account_id', acctId)
+          .single()
+
+        if (readError || !profile) {
+          console.warn(`[stripe-webhook] No profile found for stripe_account_id=${acctId} — skipping`)
+          break
+        }
+
+        // Build update payload. stripe_onboarding_completed_at is set once:
+        // first time charges_enabled flips to true.
+        const updatePayload: Record<string, unknown> = {
+          stripe_charges_enabled: account.charges_enabled ?? false,
+          stripe_payouts_enabled: account.payouts_enabled ?? false,
+        }
+
+        if (account.charges_enabled && !profile.stripe_onboarding_completed_at) {
+          updatePayload.stripe_onboarding_completed_at = new Date().toISOString()
+        }
+
+        const { data: updated, error: updateError } = await serviceClient
+          .from('profiles')
+          .update(updatePayload)
+          .eq('stripe_account_id', acctId)
+          .select('id')
+
+        if (updateError) {
+          throw new Error(`[stripe-webhook] DB update failed for ${acctId}: ${updateError.message}`)
+        }
+
+        if (!updated || updated.length === 0) {
+          console.warn(`[stripe-webhook] Update matched 0 rows for stripe_account_id=${acctId}`)
+        } else {
+          console.log(`[stripe-webhook] Updated profile ${updated[0].id} for ${acctId}`)
+        }
+
         break
+      }
 
       case 'payment_intent.succeeded':
         // Chunk D — Customer payment confirmed; mark escrow held in payments table.
