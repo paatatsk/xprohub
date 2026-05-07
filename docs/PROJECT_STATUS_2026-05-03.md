@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-06
+**As of:** 2026-05-07
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -33,7 +33,7 @@ Closed 2026-05-06, commit `2a8b947`.
 13. ✅ Item 13 — this doc sync
 
 **Known issues from C-4a:**
-- stripe-redirect proxy is non-functional. Supabase CSP strips HTML rendering on unauthenticated Edge Functions. The function deploys, returns the right body, but the browser receives `text/plain` with `default-src 'none'; sandbox` CSP. Five architectural alternatives identified, future task. Not blocking C-4a — webhook → DB → gate path works fine; only post-onboarding return-to-app UX is affected.
+- stripe-redirect proxy is non-functional. Supabase CSP strips HTML rendering on unauthenticated Edge Functions. The function deploys, returns the right body, but the browser receives `text/plain` with `default-src 'none'; sandbox` CSP. Five architectural alternatives analyzed in `docs/STRIPE_REDIRECT_OPTIONS.md`. Not blocking C-4a — webhook → DB → gate path works fine; only post-onboarding return-to-app UX is affected.
 
 ### CURRENT TASK: Task 1 — Doc reconciliation cleanup batch
 
@@ -179,7 +179,7 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 - Repo: `https://github.com/paatatsk/xprohub.git` (renamed from `xprohub-v3`)
 - Local: `C:\Users\sophi\Documents\xprohub-v3` (folder rename pending — Phase 3)
 - Supabase project ref: `ygnpjmldabewzogyrjbb` (display name: "Production")
-- Latest commit: `2a8b947`
+- Latest commit: `a9412df`
 
 ---
 
