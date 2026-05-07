@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-03
+**As of:** 2026-05-06
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -13,43 +13,39 @@ including loose ends, deploys, and tests — before starting the next. No
 parking findings to "deal with later." Intermediate commits within a task are
 checkpoints, not parked work.
 
-### CURRENT TASK: C-4a IMPLEMENTATION — Stripe Connect onboarding feature
+### COMPLETED: C-4a IMPLEMENTATION — Stripe Connect onboarding feature
 
-**Definition of done — all 13 items must complete before next task begins:**
+Closed 2026-05-06, commit `2a8b947`.
 
-1. ✅ Stage 1 — `hooks/useStripeStatus.ts` (saved, tsc clean)
-2. → Commit checkpoint: Stage 1 + this status doc update
-3. ⏳ Stage 2 — `app/(tabs)/stripe-connect.tsx` (the screen)
-4. → Commit checkpoint
-5. ⏳ Stage 3 — `app/stripe-return.tsx` + `app/stripe-refresh.tsx` redirects
-6. → Commit checkpoint
-7. ⏳ Stage 4 — `app/(tabs)/_layout.tsx` + `app/_layout.tsx` edits
-8. → Commit checkpoint + tsc baseline comparison (see
-   `docs/TSC_BASELINE_2026-05-03.txt` — expect 24 errors, no new ones)
-9. ⏳ Deploy `create-stripe-account` + `create-onboarding-link` Edge Functions
-   to remote Supabase
-10. ⏳ Apply migration `20260503000001_accept_bid_set_agreed_price.sql`
-    (committed in `1ea262d`) to remote Supabase
-11. ⏳ iPhone smoke test — verify all 4 screen states render correctly
-12. → Final commit if any test reveals fixes
-13. ⏳ Update this Active Task Blueprint marking C-4a complete and defining
-    the next task
+**Items completed:**
+1. ✅ Stage 1 — `hooks/useStripeStatus.ts` → commit `0da1f19`
+2. ✅ Stage 2 — `app/(tabs)/stripe-connect.tsx` → commit `1f8d256`
+3. ✅ Stage 3 — `app/stripe-return.tsx` + `app/stripe-refresh.tsx` → commit `739c1ec`
+4. ✅ Stage 4 — `app/(tabs)/_layout.tsx` + `app/_layout.tsx` → commit `c6cfa3d`
+5. ✅ Task 2 — 24 pre-existing tsc errors resolved → commit `f385ad0`
+6. ✅ Item 9 — Edge Functions deployed (create-stripe-account v2, create-onboarding-link v3, stripe-redirect v1)
+7. ✅ Item 9b — Stripe SDK apiVersion bug fixed → commit `02e5036`
+8. ✅ Item 9c — Stripe URL scheme bug fixed (stripe-redirect proxy) → commit `02e5036`
+9. ⚠️ Item 10 — Migration `20260503000001_accept_bid_set_agreed_price.sql` pending verification (reviewed, not confirmed applied to remote)
+10. ✅ Item 11 partial — States 1–2 visually verified on iPhone. States 3–4 data path verified (webhook → DB → gate pass). Visual verification deferred to first session with Profile → Get Paid navigation path.
+11. ✅ Path 2 — Stripe-only gate wired in apply.tsx → commit `c36ddb6`
+12. ✅ C-6 — account.updated webhook handler + stripe-webhook deployed (ACTIVE v1) → commit `2a8b947`
+13. ✅ Item 13 — this doc sync
 
-### NEXT TASKS (ordered, locked — do not start any until C-4a is fully done):
+**Known issues from C-4a:**
+- stripe-redirect proxy auto-redirect does not fire in iOS Safari after Stripe form submit. Meta-refresh and inline JS to custom scheme (`xprohub://`) are silently blocked. Possible cause: Safari blocks JS-driven custom scheme redirects without user tap. Possible fix: add visible "Return to XProHub" button. Re-investigation needed (Task 1 or Polish Pass scope).
+- States 3–4 visual verification deferred (no Profile → Get Paid nav path yet).
 
-**Task 1 — Doc reconciliation cleanup batch.** Eleven pending findings from
-the 2026-05-03 reconciliation pass — deprecate `NEW_CHAT_PROMPT.md`, refresh
-`SESSION_HANDOUT.md` build state section, plus 9 cosmetic findings.
-Definition of done: all 11 closed, single coordinated commit, this blueprint
-updated.
+### CURRENT TASK: Task 1 — Doc reconciliation cleanup batch
 
-**Task 2 — Fix pre-existing tsc errors.** All 24 errors resolved (fixes
-applied, awaiting commit). Approach: excluded `supabase/functions/**`
-from app tsconfig (16 Deno errors), fixed 6 mechanical `as any`/`as
-unknown as` casts in app code (plus 2 adjacent matching-pattern lines
-for consistency), replaced broken `gestureEnabled` with proper
-`BackHandler` interception on apply-success screen, widened
-`segments.length === 0` check to satisfy Expo Router tuple typing.
+Twelve pending findings from the 2026-05-03 reconciliation pass —
+deprecate `NEW_CHAT_PROMPT.md`, refresh `SESSION_HANDOUT.md` build state
+section (delete stale 60-line Step 13 Investigation Brief, replace with
+2-line pointer to design docs), update POLISH_PASS.md, plus cosmetic
+findings. Definition of done: all 12 closed, single coordinated commit,
+this blueprint updated.
+
+### NEXT TASKS (ordered):
 
 **Task 3 — Set up Deno tooling for Edge Functions.** When ready: install
 Deno CLI, create `supabase/functions/deno.json` with compiler config and
@@ -57,6 +53,11 @@ ESM import map matching Supabase's standard pattern, run `deno check`
 to verify it works, integrate into deploy workflow when CI is built.
 Until then, Edge Functions are excluded from app tsc and rely on
 Supabase's runtime checks at deploy time.
+
+**Task 4 — Complete C-4b (ID gate).** Stripe gate is wired (Path 2).
+Remaining: photo + skill count check before Stripe gate fires. Per
+design CHUNK_C_DESIGN.md:616-643 the gate is two-component: Check 1
+(ID) + Check 2 (Stripe). Only Check 2 is wired.
 
 ---
 
@@ -73,12 +74,11 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
   - ✅ C-2 `create-stripe-account` Edge Function (commit `865278b`)
   - ✅ C-3 `create-onboarding-link` Edge Function (commit `2cddce8`)
   - ✅ C-4a design doc, 909 lines (commit `76ce55e`)
-  - 🟡 **C-4a implementation — in progress, staged build:**
-    (See Active Task Blueprint above for stage-by-stage definition of done)
-  - ⏳ C-4b apply.tsx Stripe gate replacement
-  - ⏳ C-5 deep link return integration
-  - ⏳ C-6 `account.updated` webhook handler implementation
-  - ⏳ C-7 end-to-end test
+  - ✅ C-4a implementation — closed 2026-05-06 (commit `2a8b947`)
+  - 🟡 C-4b apply.tsx Stripe gate — Stripe check wired (commit `c36ddb6`), ID gate (photo + skill) pending (Task 4)
+  - ✅ C-5 deep link return — `stripe-return.tsx` + `stripe-refresh.tsx` + `stripe-redirect` proxy
+  - ✅ C-6 `account.updated` webhook handler (commit `2a8b947`)
+  - ⏳ C-7 end-to-end test — deferred to post-C-4b (ID gate must be wired first for full gate coverage)
 - ⏳ Chunks D, E, F (customer payment, payouts, UI polish)
 
 ---
@@ -93,6 +93,8 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 6. **Mission framing.** XProHub = hub for X (various) professionals.
 7. **Levels framing.** Levels 1/2/3 are user lifecycle narrative, NOT gate enforcement. Code stays parallel-gates-on-action.
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).
+9. **Stripe redirect proxy.** Stripe rejects custom URL schemes; production pattern is an HTTPS-served HTML page that bridges to the deep link. `stripe-redirect` Edge Function (`verify_jwt = false`) serves this role. Known issue: auto-redirect doesn't fire in iOS Safari — needs re-investigation.
+10. **Secrets handling.** Stripe secrets and other sensitive credentials are set by Paata directly, not by Claude Code. Especially critical for live-mode keys in production.
 
 ---
 
@@ -139,29 +141,37 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 
 ## Decisions Made in Chat But Never Documented
 
-These need to land in CLAUDE.md or POLISH_PASS:
+Remaining items that need to land in CLAUDE.md or POLISH_PASS (Task 1 scope):
 
-1. **CLAUDE.md six-change update** approved 2026-05-01 — substantially executed in commits `397cc3b` and `93b5c47`. Covered: font system fix, screen table rewrite, migrations list expansion, RLS note correction, Trust System line replaced with progressive gates, stale Code Rule deletion, Milestone 3 "Built" / "Not Built" rewrite. Any residual items from the original six-change spec are covered by the 11 remaining reconciliation findings tracked above.
-2. **Direct Hire pathway** — drafted POLISH_PASS entry never saved.
-3. **Belt System is opt-in** (not structural matching). Currently described as if structural in CLAUDE.md.
-4. **10% platform fee is not actually locked** — assumed into CLAUDE.md, never explicitly decided.
-5. **SESSION_HANDOUT.md update** flagged for update before C-2, never executed.
+1. **Direct Hire pathway** — drafted POLISH_PASS entry never saved.
+2. **Belt System is opt-in** (not structural matching). Currently described as if structural in CLAUDE.md.
+3. **10% platform fee is not actually locked** — assumed into CLAUDE.md, never explicitly decided.
+
+**Resolved (removed from tracking):**
+- ~~CLAUDE.md six-change update~~ — substantially executed in commits `397cc3b` and `93b5c47`. Residual items covered by 12 remaining reconciliation findings.
+- ~~SESSION_HANDOUT.md update~~ — tracked in Doc Reconciliation section pending findings — will be addressed in Task 1.
 
 ---
 
-## Pending Deploys (Not Yet Executed)
+## Deploy Status
 
-- Apply migration `20260503000001_accept_bid_set_agreed_price.sql` to remote Supabase
-- Deploy `create-stripe-account` Edge Function
-- Deploy `create-onboarding-link` Edge Function
-- Register Stripe webhook endpoint in Stripe dashboard
-- Set Stripe secrets in Supabase (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
+**Completed:**
+- ✅ Deploy `create-stripe-account` Edge Function — ACTIVE v2
+- ✅ Deploy `create-onboarding-link` Edge Function — ACTIVE v3
+- ✅ Deploy `stripe-redirect` Edge Function — ACTIVE v1 (`verify_jwt = false`)
+- ✅ Deploy `stripe-webhook` Edge Function — ACTIVE v1 (`verify_jwt = false`), deployed 2026-05-06
+- ✅ Set `STRIPE_SECRET_KEY` in Supabase secrets
+- ✅ Set `STRIPE_WEBHOOK_SECRET` in Supabase secrets (set 2026-05-06; one-time exception — Claude Code ran the command. Protocol going forward per Locked Decision 10 is user-run only.)
+- ✅ Register Stripe webhook endpoint in Stripe dashboard (XProHub sandbox, `account.updated` event only)
+
+**Pending:**
+- ⚠️ Apply migration `20260503000001_accept_bid_set_agreed_price.sql` to remote Supabase — pending verification
 
 ---
 
 ## Stripe Sandbox Situation (Parked)
 
-User has TWO sandbox accounts: `XRroHub` (typo, original — `acct_1TRNSi0Iw0nTUvYW`, all dev work wired here) and `XProHub` (correct spelling, empty duplicate — `acct_1TSoj1DlB111ylOV`). The empty one couldn't be deleted. Decision: park it. Sandbox naming has zero customer impact. Live production Stripe is what matters for NYC launch.
+User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `acct_1TRNSu08l7Que01i`, all dev work wired here, `STRIPE_SECRET_KEY` sourced from this account) and a second empty duplicate (`acct_1TSoj1DlB111ylOV`). The empty one couldn't be deleted. Decision: park it. Sandbox naming has zero customer impact. Live production Stripe is what matters for NYC launch. Note: Stripe Connect platform branding still shows "XRroHub sandbox" in worker-facing onboarding — cosmetic, separate future task.
 
 ---
 
@@ -170,10 +180,10 @@ User has TWO sandbox accounts: `XRroHub` (typo, original — `acct_1TRNSi0Iw0nTU
 - Repo: `https://github.com/paatatsk/xprohub.git` (renamed from `xprohub-v3`)
 - Local: `C:\Users\sophi\Documents\xprohub-v3` (folder rename pending — Phase 3)
 - Supabase project ref: `ygnpjmldabewzogyrjbb` (display name: "Production")
-- Latest commit: `1ea262d`
+- Latest commit: `2a8b947`
 
 ---
 
 ## Next Concrete Step
 
-Finish doc reconciliation pass (the 20 remaining findings). Then C-4a implementation against `docs/CHUNK_C_C4_DESIGN.md`.
+C-4a is complete. Next: Task 1 — doc reconciliation cleanup batch (12 pending findings). Then Task 3 (Deno tooling) and Task 4 (complete C-4b ID gate).

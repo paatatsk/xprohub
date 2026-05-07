@@ -883,17 +883,16 @@ Future fix: persist `returnTo` to AsyncStorage before calling
 `Linking.openURL(url)`, read and pass it through `stripe-return.tsx`
 on return.
 
-**Polling after deep link return (not specified)**
+**Polling after deep link return (partially addressed)**
 
-The current design re-fetches profile state once when `stripe-return.tsx`
-redirects to stripe-connect (the hook re-runs on mount). If the
-`account.updated` webhook is slow, the user sees State 2 indefinitely.
-There is no polling or push update mechanism in C-4a scope.
+`useFocusEffect(refresh)` added in commit `2a8b947` — the screen
+re-fetches profile state whenever it regains focus (e.g. returning
+from Safari after Stripe form, or navigating back to the screen).
+This covers the primary stale-state scenario.
 
-The State 2 body copy covers this honestly: "This usually takes a
-few minutes." The user can leave and return, and the screen will
-re-fetch on mount. Active polling is a future improvement (C-6 or
-Polish Pass scope).
+Active polling (periodic refetch while on screen) remains a future
+improvement (Polish Pass scope) for cases where the webhook fires
+while the user is already viewing the screen.
 
 **Stripe Dashboard link (deferred)**
 
@@ -902,15 +901,15 @@ DASHBOARD" secondary link. This requires a fourth Edge Function
 (`create-stripe-dashboard-link`). Deferred to Polish Pass — out
 of scope for C-4a.
 
-**C-4b dependency**
+**C-4b dependency — partially resolved**
 
-The two-component apply gate (CHUNK_C_DESIGN.md Section 4,
-"Two-Component Apply Gate") is not wired in C-4a. `apply.tsx`
-currently has an older trust-level gate check that does not cover
-the Stripe Express requirement. C-4b will REPLACE the trust-level
-gate (router.replace to /(onboarding)/verify-level-2) with the
-two-component apply gate. The old verify-level-2 routing is
-architecturally deprecated under the dual-role model and must not
-coexist with the new Stripe gate. The stripe-connect screen is
-reachable only if navigated to directly (e.g., from the sign-up
-offer path) until C-4b lands.
+The Stripe gate (Check 2) is wired as of commit `c36ddb6`:
+`apply.tsx` now uses `useStripeStatus` and routes to
+`stripe-connect` with `returnTo` param when `!chargesEnabled`.
+The old `useTrustLevel` / `verify-level-2` routing has been
+replaced in apply.tsx.
+
+Remaining: Check 1 (ID gate — photo + skill count) is not yet
+wired. Task 4 will add it before the Stripe check. The full
+two-component gate per CHUNK_C_DESIGN.md Section 4 requires
+both checks in sequence.
