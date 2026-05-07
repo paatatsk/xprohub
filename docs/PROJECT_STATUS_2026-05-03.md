@@ -35,23 +35,24 @@ Closed 2026-05-06, commit `2a8b947`.
 **Known issues from C-4a:**
 - stripe-redirect proxy is non-functional. Supabase CSP strips HTML rendering on unauthenticated Edge Functions. The function deploys, returns the right body, but the browser receives `text/plain` with `default-src 'none'; sandbox` CSP. Five architectural alternatives analyzed in `docs/STRIPE_REDIRECT_OPTIONS.md`. Not blocking C-4a — webhook → DB → gate path works fine; only post-onboarding return-to-app UX is affected.
 
-### CURRENT TASK: Task 1 — Doc reconciliation cleanup batch
+### COMPLETED: Task 1 — Doc reconciliation cleanup batch
 
-Twelve pending findings from the 2026-05-03 reconciliation pass —
-deprecate `NEW_CHAT_PROMPT.md`, refresh `SESSION_HANDOUT.md` build state
-section (delete stale 60-line Step 13 Investigation Brief, replace with
-2-line pointer to design docs), update POLISH_PASS.md, plus cosmetic
-findings. Definition of done: all 12 closed, single coordinated commit,
-this blueprint updated.
+Closed 2026-05-07. All 22 reconciliation findings resolved. Files updated:
+CLAUDE.md (Step 13 status, Belt System opt-in, platform fee qualifier),
+SESSION_HANDOUT.md (build state rewrite, Investigation Brief deleted, font fix),
+POLISH_PASS.md (Worker Dignity B trigger, font item, Direct Hire entry),
+NEW_CHAT_PROMPT.md (deprecated with banner).
 
-### NEXT TASKS (ordered):
+### CURRENT TASK: Task 3 — Set up Deno tooling for Edge Functions
 
-**Task 3 — Set up Deno tooling for Edge Functions.** When ready: install
+When ready: install
 Deno CLI, create `supabase/functions/deno.json` with compiler config and
 ESM import map matching Supabase's standard pattern, run `deno check`
 to verify it works, integrate into deploy workflow when CI is built.
 Until then, Edge Functions are excluded from app tsc and rely on
 Supabase's runtime checks at deploy time.
+
+### NEXT TASKS (ordered):
 
 **Task 4 — Complete C-4b (ID gate).** Stripe gate is wired (Path 2).
 Remaining: photo + skill count check before Stripe gate fires. Per
@@ -117,38 +118,28 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 
 22 discrepancies found 2026-05-03 between docs and codebase. Status:
 
-**Fixed (10 of 22):**
-- Finding #2 — Font system (Space Grotesk per Blueprint) → commit `7fd0820`
-- Finding #11 — `accept_bid()` populates `agreed_price` → commit `1ea262d`
-- Findings #1 + #3 — Milestone 3 "Built" / "Not Built" sections rewritten → commit `397cc3b`
-- Finding #5 — Oswald → Space Grotesk font references → commit `397cc3b`
-- Finding #21 — Trust System line replaced with progressive gates → commit `397cc3b`
-- Finding #4 — Production Screens table corrected → commit `93b5c47`
-- Finding #9 — Migrations list completed → commit `93b5c47`
-- Finding #16 — RLS state note corrected → commit `93b5c47`
-- Finding #18 — Stale Code Rule deleted + PROJECT_STATUS rule ref updated → commit `93b5c47`
+**Fixed (22 of 22) — reconciliation pass complete:**
+- Findings #1–5, #9, #11, #16, #18, #21 — CLAUDE.md reconciled (commits `397cc3b`, `93b5c47`, `7fd0820`, `1ea262d`)
+- Findings #6–8, #10, #12 — CLAUDE.md screen table verified accurate (resolved by #4 fix in `93b5c47`)
+- Finding #17 — CLAUDE.md Step 13 status updated to reflect C-4a complete (Task 1, 2026-05-07)
+- Finding #13 — SESSION_HANDOUT.md: build state rewritten, Investigation Brief deleted, font fixed (Task 1, 2026-05-07)
+- Finding #14 — NEW_CHAT_PROMPT.md deprecated with banner (Task 1, 2026-05-07)
+- Finding #15 — POLISH_PASS.md: Worker Dignity B trigger updated, font item marked partial, Direct Hire entry added (Task 1, 2026-05-07)
+- Findings #19–20, #22 — cosmetic items resolved as part of Task 1 doc sweep (2026-05-07)
 - Project rename Phase 1 (deep link scheme `xprohub://`) → commit `3b96a86`
 - Project rename Phase 3 partial (GitHub repo `xprohub-v3` → `xprohub`) → commit `b1631ee`
 - Supabase project display renamed "Production"
-
-**Pending (12 of 22):**
-- Findings #6–8, #10, #12, #17 — CLAUDE.md remaining items
-- Findings #13–15 — SESSION_HANDOUT.md, NEW_CHAT_PROMPT.md, POLISH_PASS small updates
-- Findings #19–20, #22 — cosmetic batch
 
 ---
 
 ## Decisions Made in Chat But Never Documented
 
-Remaining items that need to land in CLAUDE.md or POLISH_PASS (Task 1 scope):
-
-1. **Direct Hire pathway** — drafted POLISH_PASS entry never saved.
-2. **Belt System is opt-in** (not structural matching). Currently described as if structural in CLAUDE.md.
-3. **10% platform fee is not actually locked** — assumed into CLAUDE.md, never explicitly decided.
-
-**Resolved (removed from tracking):**
-- ~~CLAUDE.md six-change update~~ — substantially executed in commits `397cc3b` and `93b5c47`. Residual items covered by 12 remaining reconciliation findings.
-- ~~SESSION_HANDOUT.md update~~ — tracked in Doc Reconciliation section pending findings — will be addressed in Task 1.
+**All items resolved as of Task 1 (2026-05-07):**
+- ~~CLAUDE.md six-change update~~ — executed in commits `397cc3b`, `93b5c47`
+- ~~Direct Hire pathway~~ — POLISH_PASS entry saved (Task 1, 2026-05-07)
+- ~~Belt System is opt-in~~ — qualifier added to CLAUDE.md Belt System section (Task 1, 2026-05-07)
+- ~~10% platform fee~~ — CLAUDE.md updated to "~10% platform fee — exact rate TBD before launch" (Task 1, 2026-05-07)
+- ~~SESSION_HANDOUT.md update~~ — build state rewritten, Investigation Brief deleted (Task 1, 2026-05-07)
 
 ---
 
@@ -185,4 +176,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a is complete. Next: Task 1 — doc reconciliation cleanup batch (12 pending findings). Then Task 3 (Deno tooling) and Task 4 (complete C-4b ID gate).
+C-4a complete. Task 1 complete. Next: Task 3 (Deno tooling for Edge Functions), then Task 4 (complete C-4b ID gate).

@@ -60,7 +60,7 @@ Photo + ≥1 skill claim = the apply-gate minimum. Belt level, certifications, w
 |---|---|
 | Framework | React Native + Expo Router + TypeScript (SDK 54) |
 | Backend | Supabase — PostgreSQL, Auth, Realtime, Storage, PostGIS |
-| Payments | Stripe Connect (escrow model, 10% platform fee) |
+| Payments | Stripe Connect (escrow model, ~10% platform fee — exact rate TBD before launch) |
 | Push | Expo Push Notifications |
 | Est. cost | $0/month until real traction |
 
@@ -248,7 +248,9 @@ ORDER BY category_id, task_code;
 - **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
 - **RLS state**: `task_categories` and `task_library` have anon-safe public read policies (safe for unauthenticated browse). `worker_skills` has public read + auth CRUD policies (migration 20260419000002). `job_post_tasks` has INSERT + SELECT policies as of migration 20260419000001.
 
-## Belt System (Workers)
+## Belt System (Workers — opt-in, not structural)
+The Belt System is optional progression, not a structural matching requirement. Workers are not gated by belt level for job access. Belt data enriches profiles and enables future features but does not restrict platform participation.
+
 | Belt | Jobs | Min Rating | Key Unlock |
 |---|---|---|---|
 | Newcomer (White) | 0 | — | 2× XP first 5 jobs, XProHub Guarantee |
@@ -380,7 +382,7 @@ whole platform — do not bypass it.
 - Step 10: Real Chat UI — Supabase Realtime message thread, bubbles, send input (`job-chat.tsx`)
 - Step 11: Job lifecycle CTAs — Mark In Progress / Mark Complete on chat screen
 - Step 12: Review flow — rating + comment form, wired into chat completed state
-- Step 13: Payment flow — Chunks A (schema) and B (infrastructure) complete. Chunk C (Worker Stripe Connect) in progress: C-1 design, C-2/C-3 Edge Functions, C-4a design doc done. C-4a implementation is next. See `docs/PROJECT_STATUS_2026-05-03.md` for detailed chunk status.
+- Step 13: Payment flow — Chunks A (schema) and B (infrastructure) complete. Chunk C-4a (Worker Stripe Connect onboarding) complete: stripe-connect screen, useStripeStatus hook, deep link return routes, Stripe gate in apply.tsx, account.updated webhook handler, 4 Edge Functions deployed. C-4b (ID gate), C-7 (end-to-end test), and Chunks D/E/F remaining. See `docs/PROJECT_STATUS_2026-05-03.md` for detailed status.
 
 ### Design
 - Dark Gold theme locked: bg `#0E0E0F`, gold `#C9A84C`, card `#171719`
@@ -391,7 +393,8 @@ whole platform — do not bypass it.
 ## What Is NOT Built Yet
 
 ### 🔲 Milestone 3 — Transactions (Step 13 remaining)
-- Step 13 Chunk C-4a implementation through C-7: `stripe-connect.tsx` screen, apply.tsx Stripe gate, deep link return, webhook handler, end-to-end test
+- Step 13 Chunk C-4b: ID gate (photo + skill count check) in apply.tsx — Stripe gate already wired
+- Step 13 Chunk C-7: end-to-end test (deferred to post-C-4b)
 - Step 13 Chunks D, E, F: customer payment method, payout release, payment UI polish
 
 ### 🔲 Milestone 4 — Trust & Reputation (deferred)
@@ -400,11 +403,10 @@ whole platform — do not bypass it.
 - Background check integration — Level 2B verification flow
 
 ### 🔲 Polish Pass (deferred)
-See `POLISH_PASS.md` for the current list. As of Step 8 there are
-6 numbered polish items plus two parked architectural blocks:
-Worker Dignity (Notifications + Released copy + While-You-Wait cards,
-sub-items A/B/C) and Hybrid Matching exploration (Milestone 4+ with
-critique).
+See `POLISH_PASS.md` for the current list. Includes UX refinements,
+Worker Dignity items (Notifications + Released copy + While-You-Wait
+cards), Hybrid Matching exploration, and operational tracking items.
+`docs/STRIPE_REDIRECT_OPTIONS.md` covers the redirect proxy rework.
 
 ### 🔲 Long-term (Milestone 6+)
 - Hybrid Matching exploration — instant-dispatch + market density UX (see POLISH_PASS.md)

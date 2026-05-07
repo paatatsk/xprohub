@@ -1,4 +1,12 @@
-# XProHub — Drop-In Prompt for New Chat
+# ⚠️ DEPRECATED — Use `HANDOUT_FOR_FRESH_CHAT.md` instead
+
+This file is superseded by `HANDOUT_FOR_FRESH_CHAT.md`, which points to
+`docs/PROJECT_STATUS_2026-05-03.md` as the canonical status anchor.
+Kept for git history reference only. Do not paste this into new chats.
+
+---
+
+# XProHub — Drop-In Prompt for New Chat (DEPRECATED)
 
 Copy and paste everything below into a fresh Claude conversation.
 

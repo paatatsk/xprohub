@@ -116,6 +116,25 @@ Creates meaningful progression — earning belts unlocks real throughput.
 
 ---
 
+## Direct Hire Pathway (Parked)
+
+**Captured:** 2026-05-01 | **Area:** Product — navigation model | **Severity:** Future feature
+
+Workers Feed currently shows worker business cards. The Direct Hire
+flow (`direct-hire.tsx`) exists with full job form parity to Post a Job,
+targeted at a specific worker. However, there is no production navigation
+path that connects browsing a worker card to initiating a Direct Hire.
+
+This is parked as a future feature. The current flow (Post a Job → workers
+apply via Live Market) is the MVP path. Direct Hire adds a customer-initiated
+alternative that bypasses the public job listing. Design and gate integration
+(customer payment method required) are deferred to a future milestone.
+
+**Build this when:** After Chunk D (customer payment method) lands and the
+core marketplace loop has real usage data.
+
+---
+
 ## Worker Dignity — Notifications, Closure Language, "While You Wait"
 
 **Captured:** 2026-04-26 (synthesized from Paata's conversation with Grok + review with Claude)
@@ -145,7 +164,7 @@ Don't add UI copy that says "We commit to Worker Dignity™" or "We never ghost.
 
 **Why park:** Depends on the "My Applications" worker dashboard screen. The label change is small (~10 lines of conditional rendering) but needs the surface to render on first.
 
-**Build this when:** My Applications screen exists (TASK 3 will create it — pair this with that build or do it as immediate follow-up).
+**Build this when:** My Applications screen exists ✅ (built in Step 9). Ready to implement — ~10 lines of conditional rendering in `my-applications.tsx`.
 
 ### Implementation C — "While You Wait" cards on apply-success (MEDIUM, ready to build)
 
@@ -364,20 +383,13 @@ sql_paths = ["./seed/XProHub_TaskLibrary_Seed_v1.1.sql"]
 ## Documentation Hygiene
 
 **Reconcile font references across docs**
-**Captured:** 2026-05-02 | **Severity:** Low
+**Captured:** 2026-05-02 | **Severity:** Low | **Partially resolved**
 
-`CLAUDE.md` and `docs/CHUNK_C_DESIGN.md` reference "Oswald" as the
-heading font in the Dark Gold design system. Actual codebase uses
+`CLAUDE.md` fixed (commit `397cc3b`). `SESSION_HANDOUT.md` fixed
+(2026-05-07 Task 1). `docs/CHUNK_C_DESIGN.md` still references
+"Oswald" in two places (lines 438, 450) — cosmetic, the design doc
+describes intent at time of writing. Actual codebase uses
 `Fonts.heading = 'SpaceGrotesk-Bold'` in `constants/theme.ts`.
-Discrepancy discovered while drafting `CHUNK_C_C4_DESIGN.md`.
-
-Update `CLAUDE.md` and `CHUNK_C_DESIGN.md` to reference SpaceGrotesk
-(and any other typography references that may have drifted), or update
-`theme.ts` to actually use Oswald if the docs reflect the intended
-design.
-
-**Resolve when:** Next batch of doc cleanup, alongside the Belt System
-and pricing items already parked.
 
 ---
 

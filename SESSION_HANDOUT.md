@@ -3,7 +3,7 @@
 **Purpose:** This document orients a new Claude conversation when the previous chat
 becomes too long or context is lost. Read this first; act second.
 
-**Last updated:** 2026-04-27 (post Step 12 completion)
+**Last updated:** 2026-05-07 (post C-4a completion)
 
 ---
 
@@ -48,7 +48,7 @@ Differentiates from Uber/TaskRabbit by:
 
 - **Frontend:** React Native + Expo Router + TypeScript (SDK 54)
 - **Backend:** Supabase (PostgreSQL + Auth + Realtime + PostGIS)
-- **Payments:** Stripe Connect (deferred — not yet wired)
+- **Payments:** Stripe Connect (Chunk C-4a complete — onboarding, webhook, gate wired)
 - **Repo:** github.com/paatatsk/xprohub
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
 - **Test device:** iPhone via Expo Go on LAN mode
@@ -56,7 +56,7 @@ Differentiates from Uber/TaskRabbit by:
 **Design system: Dark Gold (locked).**
 - bg `#0E0E0F`, gold `#C9A84C`, card `#171719`, border `#2E2E33`
 - text `#FFFFFF`/`#888890`, green `#4CAF7A`, red `#E05252`
-- Fonts: Oswald (headlines), Playfair Display (serif), Inter (body)
+- Fonts: Space Grotesk (headlines), Playfair Display (serif), Inter (body)
 
 **Earlier the project considered a "Vintage Americana / 1940s Wartime Poster"
 direction. That was rejected. Dark Gold is the locked aesthetic.**
@@ -143,33 +143,29 @@ These have been earned through real bugs caught:
 
 ---
 
-## Current Build State (as of 2026-04-26)
+## Current Build State (as of 2026-05-07)
 
 **Milestone 1 (Foundation & Auth):** ✅ COMPLETE
 **Milestone 2 (The Live Loop):** ✅ COMPLETE 12/12 steps
-**Milestone 3 (Transactions):** 🟡 PARTIAL — Steps 9–12 complete, Step 13 (Payments) is next
+**Milestone 3 (Transactions):** 🟡 PARTIAL — Steps 8–12 complete, Step 13 Chunk C-4a complete
 
 **To check latest commits, run:** `git log --oneline -10`
 
-**What works end-to-end today:**
-- Customer posts a job ✅
-- Worker browses Live Market, sees jobs filtered by category ✅
-- Worker applies via Apply flow with smart templates + custom message + price ✅
-- Customer reviews applications via My Jobs → Applications screen ✅
-- Customer accepts a bid (atomic Postgres function) → other bids auto-decline ✅
-- Job status flips to `matched`, chat row created ✅
-- Customer can decline individual bids before accepting one ✅
-- Workers Feed: customer can browse workers and Hire Directly (full job form) ✅
-- Become a Worker onboarding ✅
-- Trust gates fire at action moments (Post, Apply, Hire) ✅
-- Worker's "My Applications" dashboard — bid history grouped by status ✅
-- Real Chat UI — Supabase Realtime message thread, bubbles, send input ✅
-- Job lifecycle CTAs — Mark In Progress / Mark Complete on chat screen ✅
-- Review flow — rating + comment form, wired into chat completed state ✅
+**What works end-to-end today (includes Step 13 Chunk C-4a):**
+- Everything from Milestones 1–2 (post, browse, apply, accept, decline, chat, review) ✅
+- Stripe Connect onboarding: GET PAID screen with 4 states, all verified on iPhone ✅
+- Stripe gate in apply.tsx: workers without charges_enabled route to stripe-connect ✅
+- Edge Functions: create-stripe-account, create-onboarding-link, stripe-redirect, stripe-webhook ✅
+- Webhook: account.updated handler syncs charges/payouts status to profiles ✅
+- Deep link return routes (stripe-return.tsx, stripe-refresh.tsx) ✅
 
-**What's NOT built yet (gaps in the loop):**
-- **Gap 1 (NEXT):** Payment flow — Stripe Connect escrow, pay-on-accept,
-  release-on-complete, 10% platform fee. ← **Step 13 — active target**
+**What's NOT built yet:**
+- Step 13 C-4b: ID gate (photo + skill check) in apply.tsx
+- Step 13 C-7: end-to-end test
+- Step 13 Chunks D, E, F: customer payment, payout release, payment UI polish
+- Milestone 4: Belt System UI, notifications, background checks
+
+**Canonical status:** `docs/PROJECT_STATUS_2026-05-03.md`
 
 ---
 
@@ -218,77 +214,24 @@ The compaction-detection instinct was his. He's the careful one.
 
 If a new chat starts cold:
 
-1. Paste the **drop-in prompt** (separate file: `NEW_CHAT_PROMPT.md`) at the top of
-   the conversation
+1. Paste the **fresh chat handoff** (`HANDOUT_FOR_FRESH_CHAT.md`) at the top of
+   the conversation — it points to `docs/PROJECT_STATUS_2026-05-03.md` as
+   the canonical status anchor
 2. Ask the new Claude to read this file via Claude Code (`view SESSION_HANDOUT.md`)
 3. Confirm orientation back to Paata in 4-6 lines before doing anything
-4. Resume from "Active Task / Where We Left Off"
+4. Resume from the current task in PROJECT_STATUS
 
 That's it. The handoff should take ~2 turns.
 
+(`NEW_CHAT_PROMPT.md` is deprecated — use `HANDOUT_FOR_FRESH_CHAT.md` instead.)
+
 ---
 
-## Step 13 Investigation Brief — Stripe Connect (active target)
+## Step 13 — Stripe Connect
 
-### What is locked
+The investigation brief that was here has been completed. All three
+architectural questions (account type, charge timing, fee mechanism)
+were resolved in the C-1 design phase. Decisions documented in
+`docs/CHUNK_C_DESIGN.md` and `docs/CHUNK_C_C4_DESIGN.md`.
 
-**LOCKED — Worker Dignity payment constraint:**
-The customer's payment must be confirmed BEFORE the worker begins work.
-This rules out any "customer pays after job complete" model. The whole
-point of XProHub vs Craigslist is that workers don't show up to ghost
-payments. Funds confirmed → worker confidence → worker shows up.
-Treat this as a hard architectural constraint, not a preference.
-
-**LOCKED — Platform fee:** 10% of agreed_price, kept by XProHub.
-
-**LOCKED — Currency:** USD (NYC market launch).
-
-### What needs investigation and recommendation
-
-Three architectural questions are deliberately OPEN. Paata wants you to
-research Stripe Connect, present tradeoffs in plain English (not Stripe
-jargon), and recommend a path. Don't commit to an architecture before
-Paata confirms.
-
-1. **Account type for workers**
-   - Express vs Standard vs Custom
-   - Tradeoffs in onboarding UX, compliance burden, dashboard access
-   - Recommendation expected
-
-2. **Charge timing**
-   - Constraint: must confirm payment before work begins (see above)
-   - Within that constraint: charge at acceptance? Authorize at acceptance
-     and capture later? Hold via separate escrow account?
-   - Cancellation/refund flows for each option
-
-3. **10% fee collection mechanism**
-   - Stripe's `application_fee_amount` (native split on the charge)
-   - Manual transfer pattern (charge platform, then transfer 90% to worker)
-   - Tradeoffs in accounting, refund logic, complexity
-
-### What's already in place (no migration to Step 13's data layer needed)
-
-- `jobs.agreed_price` populated when bid is accepted (Step 8)
-- `jobs.status` lifecycle: matched → in_progress → completed (Step 11)
-- `profiles.stripe_account_id` column already in schema (currently NULL)
-- `payments` table exists in schema (currently empty, awaiting wire-up)
-
-### Known dependencies and concerns
-
-- Workers need to onboard to Stripe Connect BEFORE they can accept bids
-  with payment. This is a new gate before the existing "Apply to job" flow.
-- Webhook handling will be needed for charge.succeeded, charge.refunded,
-  account.updated, and payout events. Likely a Supabase Edge Function or
-  a small server-side endpoint.
-- iPhone testing will require Stripe test mode and test cards. No real
-  money during build phase.
-- Disputes/chargebacks: deferred to post-MVP. Don't build dispute UI yet.
-
-### Working pattern reminder
-
-Same pattern that shipped Steps 8-12:
-1. Investigation phase first (read-only, no code)
-2. Architectural recommendation with tradeoffs in plain English
-3. Paata confirms direction
-4. Build in small chunks (migrations first, then UI in 2-3 part reviews)
-5. iPhone test each chunk before moving on
+For current Step 13 status, see `docs/PROJECT_STATUS_2026-05-03.md`.
