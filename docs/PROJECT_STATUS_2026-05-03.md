@@ -26,7 +26,7 @@ Closed 2026-05-06, commit `2a8b947`.
 6. ✅ Item 9 — Edge Functions deployed (create-stripe-account v2, create-onboarding-link v3, stripe-redirect v1)
 7. ✅ Item 9b — Stripe SDK apiVersion bug fixed → commit `02e5036`
 8. ✅ Item 9c — Stripe URL scheme bug fixed (stripe-redirect proxy) → commit `02e5036`
-9. ⚠️ Item 10 — Migration `20260503000001_accept_bid_set_agreed_price.sql` — idempotent apply+verify SQL prepared, pending Paata's SQL Editor execution
+9. ✅ Item 10 — Migration `20260503000001_accept_bid_set_agreed_price.sql` applied to remote and verified (has_agreed_price = true)
 10. ✅ Item 11 partial — States 1–2 visually verified on iPhone. States 3–4 data path verified (webhook → DB → gate pass). Visual verification deferred to first session with Profile → Get Paid navigation path.
 11. ✅ Path 2 — Stripe-only gate wired in apply.tsx → commit `c36ddb6`
 12. ✅ C-6 — account.updated webhook handler + stripe-webhook deployed (ACTIVE v1) → commit `2a8b947`
@@ -165,7 +165,7 @@ Remaining items that need to land in CLAUDE.md or POLISH_PASS (Task 1 scope):
 - ✅ Register Stripe webhook endpoint in Stripe dashboard (XProHub sandbox, `account.updated` event only)
 
 **Pending:**
-- ⚠️ Apply migration `20260503000001_accept_bid_set_agreed_price.sql` to remote Supabase — idempotent apply+verify SQL prepared, pending Paata's SQL Editor execution
+- (none — all deploys complete)
 
 ---
 
