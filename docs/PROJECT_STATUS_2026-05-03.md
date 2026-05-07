@@ -27,14 +27,13 @@ Closed 2026-05-06, commit `2a8b947`.
 7. ✅ Item 9b — Stripe SDK apiVersion bug fixed → commit `02e5036`
 8. ✅ Item 9c — Stripe URL scheme bug fixed (stripe-redirect proxy) → commit `02e5036`
 9. ✅ Item 10 — Migration `20260503000001_accept_bid_set_agreed_price.sql` applied to remote and verified (has_agreed_price = true)
-10. ✅ Item 11 partial — States 1–2 visually verified on iPhone. States 3–4 data path verified (webhook → DB → gate pass). Visual verification deferred to first session with Profile → Get Paid navigation path.
+10. ✅ Item 11 — All 4 states visually verified on iPhone. States 1–2 in prior sessions, States 3–4 verified 2026-05-06 via temporary debug button on Home screen (since reverted). State 4 screenshot confirmed: PAYMENT ACCOUNT eyebrow, "YOU'RE ALL SET" heading, all 3 green dots, VERIFIED badge.
 11. ✅ Path 2 — Stripe-only gate wired in apply.tsx → commit `c36ddb6`
 12. ✅ C-6 — account.updated webhook handler + stripe-webhook deployed (ACTIVE v1) → commit `2a8b947`
 13. ✅ Item 13 — this doc sync
 
 **Known issues from C-4a:**
 - stripe-redirect proxy is non-functional. Supabase CSP strips HTML rendering on unauthenticated Edge Functions. The function deploys, returns the right body, but the browser receives `text/plain` with `default-src 'none'; sandbox` CSP. Five architectural alternatives identified, future task. Not blocking C-4a — webhook → DB → gate path works fine; only post-onboarding return-to-app UX is affected.
-- States 3–4 visual verification deferred (no Profile → Get Paid nav path yet).
 
 ### CURRENT TASK: Task 1 — Doc reconciliation cleanup batch
 
