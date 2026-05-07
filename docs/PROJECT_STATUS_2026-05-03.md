@@ -33,7 +33,7 @@ Closed 2026-05-06, commit `2a8b947`.
 13. ✅ Item 13 — this doc sync
 
 **Known issues from C-4a:**
-- stripe-redirect proxy auto-redirect does not fire in iOS Safari after Stripe form submit. Meta-refresh and inline JS to custom scheme (`xprohub://`) are silently blocked. Possible cause: Safari blocks JS-driven custom scheme redirects without user tap. Possible fix: add visible "Return to XProHub" button. Re-investigation needed (Task 1 or Polish Pass scope).
+- stripe-redirect proxy is non-functional. Supabase CSP strips HTML rendering on unauthenticated Edge Functions. The function deploys, returns the right body, but the browser receives `text/plain` with `default-src 'none'; sandbox` CSP. Five architectural alternatives identified, future task. Not blocking C-4a — webhook → DB → gate path works fine; only post-onboarding return-to-app UX is affected.
 - States 3–4 visual verification deferred (no Profile → Get Paid nav path yet).
 
 ### CURRENT TASK: Task 1 — Doc reconciliation cleanup batch
@@ -93,7 +93,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 6. **Mission framing.** XProHub = hub for X (various) professionals.
 7. **Levels framing.** Levels 1/2/3 are user lifecycle narrative, NOT gate enforcement. Code stays parallel-gates-on-action.
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).
-9. **Stripe redirect proxy.** Stripe rejects custom URL schemes; production pattern is an HTTPS-served HTML page that bridges to the deep link. `stripe-redirect` Edge Function (`verify_jwt = false`) serves this role. Known issue: auto-redirect doesn't fire in iOS Safari — needs re-investigation.
+9. **Stripe redirect proxy.** Stripe rejects custom URL schemes; production pattern is an HTTPS-served HTML page that bridges to the deep link. Initial implementation as `stripe-redirect` Edge Function (`verify_jwt = false`) does NOT work: Supabase's gateway applies a strict Content-Security-Policy (`default-src 'none'; sandbox`) and overrides Content-Type to `text/plain` on unauthenticated Edge Functions as XSS mitigation. The browser receives raw text, not rendered HTML — neither auto-redirect nor manual button can fire. Architectural rework required. Five options under consideration: JWT endpoint (doesn't fit), external HTML hosting (GitHub Pages, Vercel, Supabase Storage), Stripe return_url to owned domain, iOS Universal Links, or HTTP 302 redirect from Edge Function. Tracked as a future task — not blocking C-4a (apply gate works via webhook → DB → gate read; the broken redirect UX only affects polish of the post-onboarding return-to-app flow).
 10. **Secrets handling.** Stripe secrets and other sensitive credentials are set by Paata directly, not by Claude Code. Especially critical for live-mode keys in production.
 
 ---
