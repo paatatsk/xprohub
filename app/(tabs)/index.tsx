@@ -100,6 +100,10 @@ export default function HomeScreen() {
           <Text style={styles.dashboardBtnText}>MY APPLICATIONS</Text>
         </TouchableOpacity>
       </View>
+      {/* TEMP DEBUG — navigate to GET PAID screen for State 3/4 verification. REVERT before production. */}
+      <TouchableOpacity style={[styles.dashboardBtn, { marginTop: 8, borderColor: '#E05252' }]} onPress={() => router.push('/(tabs)/stripe-connect')}>
+        <Text style={[styles.dashboardBtnText, { color: '#E05252' }]}>DEBUG: GET PAID</Text>
+      </TouchableOpacity>
       <Text style={styles.sectionLabel}>BROWSE CATEGORIES</Text>
     </View>
   ), [router, handleStartEarning]);
