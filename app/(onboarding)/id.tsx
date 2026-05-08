@@ -4,7 +4,7 @@ import {
   ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -56,6 +56,8 @@ function iconForSlug(slug: string): string {
 
 export default function IdScreen() {
   const router = useRouter();
+  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const destination = returnTo ? decodeURIComponent(returnTo) : '/(tabs)/market';
   const [step, setStep] = useState<Step>(1);
 
   // Step 1 state
@@ -195,7 +197,7 @@ export default function IdScreen() {
     }
 
     setSubmitting(false);
-    router.replace('/(tabs)/market');
+    router.replace(destination as any);
   };
 
   // ── STEP 1 — Category picker ────────────────────────────────────

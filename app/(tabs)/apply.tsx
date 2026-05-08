@@ -28,6 +28,7 @@ interface ApplyJob {
 interface WorkerProfile {
   full_name: string | null;
   belt_level: string | null;
+  avatar_url: string | null;
 }
 
 // Compute final message from mode selection
@@ -56,6 +57,7 @@ export default function ApplyScreen() {
   const [firstTaskName, setFirstTaskName]   = useState<string | null>(null);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [isOwnJob, setIsOwnJob]             = useState(false);
+  const [skillCount, setSkillCount]         = useState(0);
 
   // Form state
   const [messageMode, setMessageMode]     = useState<MessageMode | null>(null);
@@ -84,7 +86,7 @@ export default function ApplyScreen() {
         return;
       }
 
-      const [jobRes, profileRes, tasksRes, bidRes] = await Promise.all([
+      const [jobRes, profileRes, tasksRes, bidRes, skillsRes] = await Promise.all([
         supabase
           .from('jobs')
           .select('id, title, category, budget_min, budget_max, timing, customer_id')
@@ -92,7 +94,7 @@ export default function ApplyScreen() {
           .single(),
         supabase
           .from('profiles')
-          .select('full_name, belt_level')
+          .select('full_name, belt_level, avatar_url')
           .eq('id', user.id)
           .single(),
         supabase
@@ -106,6 +108,10 @@ export default function ApplyScreen() {
           .eq('job_id', job_id)
           .eq('worker_id', user.id)
           .maybeSingle(),
+        supabase
+          .from('worker_skills')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
       ]);
 
       if (jobRes.error || !jobRes.data) {
@@ -121,6 +127,7 @@ export default function ApplyScreen() {
       );
       setAlreadyApplied(!!bidRes.data);
       setIsOwnJob(jobRes.data.customer_id === user.id);
+      setSkillCount(skillsRes.count ?? 0);
       setLoading(false);
     })();
   }, [job_id]);
@@ -183,14 +190,6 @@ export default function ApplyScreen() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSubmitError('Session expired. Please sign in again.'); return; }
 
-    // Stripe gate — worker must have charges enabled to apply
-    if (!stripeLoading && !chargesEnabled) {
-      router.push(
-        `/(tabs)/stripe-connect?returnTo=${encodeURIComponent(`/(tabs)/apply?job_id=${job_id}`)}` as any
-      );
-      return;
-    }
-
     setSubmitting(true);
     setSubmitError(null);
 
@@ -221,7 +220,7 @@ export default function ApplyScreen() {
 
   // ── Loading ────────────────────────────────────────────────────
 
-  if (loading) {
+  if (loading || stripeLoading) {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
@@ -279,6 +278,66 @@ export default function ApplyScreen() {
           </Text>
           <TouchableOpacity style={styles.outlineBtn} onPress={() => router.back()} activeOpacity={0.8}>
             <Text style={styles.outlineBtnText}>GO BACK</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── Guard: ID gate (Check 1) — photo + skills ─────────────────
+
+  if (!workerProfile?.avatar_url || skillCount === 0) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.center}>
+          <Text style={styles.gateGlyph}>📋</Text>
+          <Text style={styles.gateHeading}>SET UP YOUR PROFILE</Text>
+          <Text style={styles.gateSub}>
+            To apply for jobs, add a photo and claim at least one skill.
+            It takes about a minute — and customers are more likely to
+            hire workers with a complete profile.
+          </Text>
+          <TouchableOpacity
+            style={styles.submitBtn}
+            onPress={() => router.push(
+              `/(onboarding)/id?returnTo=${encodeURIComponent(`/(tabs)/apply?job_id=${job_id}`)}` as any
+            )}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.submitText}>SET UP PROFILE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.outlineBtn} onPress={() => router.back()} activeOpacity={0.8}>
+            <Text style={styles.outlineBtnText}>BACK TO JOBS</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // ── Guard: Stripe gate (Check 2) — charges enabled ────────────
+
+  if (!chargesEnabled) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.center}>
+          <Text style={styles.gateGlyph}>💳</Text>
+          <Text style={styles.gateHeading}>ONE MORE STEP</Text>
+          <Text style={styles.gateSub}>
+            To apply for paid jobs, connect your payment account first.
+            It takes about 2 minutes — and then you're ready to earn
+            on every job.
+          </Text>
+          <TouchableOpacity
+            style={styles.submitBtn}
+            onPress={() => router.push(
+              `/(tabs)/stripe-connect?returnTo=${encodeURIComponent(`/(tabs)/apply?job_id=${job_id}`)}` as any
+            )}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.submitText}>SET UP PAYOUTS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.outlineBtn} onPress={() => router.back()} activeOpacity={0.8}>
+            <Text style={styles.outlineBtnText}>BACK TO JOBS</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
