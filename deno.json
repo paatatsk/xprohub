@@ -1,0 +1,17 @@
+// Root-level Deno config — used by `deno check` and dev/CI tooling only.
+//
+// Deno resolves config by walking up from CWD and using the first config
+// it finds. Without this file, the walk hits package.json at the project
+// root and stops there, never reaching the per-function deno.json files
+// deeper in supabase/functions/<name>/.
+//
+// Per-function deno.json files are used by the Supabase CLI at deploy
+// time (referenced via config.toml's import_map field). Keep import maps
+// in this file and per-function files in sync.
+{
+  "imports": {
+    "@supabase/functions-js": "jsr:@supabase/functions-js@^2",
+    "@supabase/functions-js/": "jsr:/@supabase/functions-js@^2/",
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2"
+  }
+}

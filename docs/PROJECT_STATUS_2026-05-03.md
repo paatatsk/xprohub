@@ -43,21 +43,21 @@ SESSION_HANDOUT.md (build state rewrite, Investigation Brief deleted, font fix),
 POLISH_PASS.md (Worker Dignity B trigger, font item, Direct Hire entry),
 NEW_CHAT_PROMPT.md (deprecated with banner).
 
-### CURRENT TASK: Task 3 — Set up Deno tooling for Edge Functions
+### COMPLETED: Task 3 — Set up Deno tooling for Edge Functions
 
-When ready: install
-Deno CLI, create `supabase/functions/deno.json` with compiler config and
-ESM import map matching Supabase's standard pattern, run `deno check`
-to verify it works, integrate into deploy workflow when CI is built.
-Until then, Edge Functions are excluded from app tsc and rely on
-Supabase's runtime checks at deploy time.
+Closed 2026-05-07. Deno CLI installed locally (2.7.14). Subpath mapping
+(`@supabase/functions-js/` → `jsr:/@supabase/functions-js@^2/`) added to
+all 4 per-function deno.json files. Root `deno.json` created for dev/CI
+`deno check` from project root (see Locked Decision 11). `deno.lock`
+gitignored (Deno used for type-checking only, not deploy). All 4 Edge
+Functions pass `deno check` from project root. CI integration deferred
+to when CI pipeline is built.
 
-### NEXT TASKS (ordered):
+### CURRENT TASK: Task 4 — Complete C-4b (ID gate)
 
-**Task 4 — Complete C-4b (ID gate).** Stripe gate is wired (Path 2).
-Remaining: photo + skill count check before Stripe gate fires. Per
-design CHUNK_C_DESIGN.md:616-643 the gate is two-component: Check 1
-(ID) + Check 2 (Stripe). Only Check 2 is wired.
+Stripe gate is wired (Path 2). Remaining: photo + skill count check
+before Stripe gate fires. Per design CHUNK_C_DESIGN.md:616-643 the gate
+is two-component: Check 1 (ID) + Check 2 (Stripe). Only Check 2 is wired.
 
 ---
 
@@ -95,6 +95,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).
 9. **Stripe redirect proxy.** Stripe rejects custom URL schemes; production pattern is an HTTPS-served HTML page that bridges to the deep link. Initial implementation as `stripe-redirect` Edge Function (`verify_jwt = false`) does NOT work: Supabase's gateway applies a strict Content-Security-Policy (`default-src 'none'; sandbox`) and overrides Content-Type to `text/plain` on unauthenticated Edge Functions as XSS mitigation. The browser receives raw text, not rendered HTML — neither auto-redirect nor manual button can fire. Architectural rework required. Five options under consideration: JWT endpoint (doesn't fit), external HTML hosting (GitHub Pages, Vercel, Supabase Storage), Stripe return_url to owned domain, iOS Universal Links, or HTTP 302 redirect from Edge Function. Tracked as a future task — not blocking C-4a (apply gate works via webhook → DB → gate read; the broken redirect UX only affects polish of the post-onboarding return-to-app flow).
 10. **Secrets handling.** Stripe secrets and other sensitive credentials are set by Paata directly, not by Claude Code. Especially critical for live-mode keys in production.
+11. **Deno dual-config.** Root `deno.json` is the dev/CI config (`deno check` from project root). Per-function `deno.json` files in `supabase/functions/<name>/` are deploy configs (referenced by `config.toml` `import_map`). The two configs serve different audiences and Deno does not auto-merge them — when adding a new import to any function, update both the per-function file (for deploy) and root `deno.json` (for dev/CI), or `deno check` and `supabase functions deploy` will disagree.
 
 ---
 
@@ -176,4 +177,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Task 1 complete. Next: Task 3 (Deno tooling for Edge Functions), then Task 4 (complete C-4b ID gate).
+C-4a complete. Tasks 1–3 complete. Next: Task 4 (complete C-4b ID gate).
