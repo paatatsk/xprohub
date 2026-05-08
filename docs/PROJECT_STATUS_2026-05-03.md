@@ -112,7 +112,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 2. **Gate philosophy.** Gates fire at moment of action only. No persistent banners or nags.
 3. **Gate triggers.** Apply (worker) requires photo + ≥1 skill + Stripe Express. Post (customer) requires Stripe payment method. Browse, message, build ID — all free.
 4. **Hire = Charge moment.** Funds escrowed before work begins. Worker Dignity, non-negotiable.
-5. **ID = Business Card.** `become-worker.tsx` → `id.tsx` rename pending. Lives within Profile tab. Five tabs unchanged.
+5. **ID = Business Card.** Professional identity setup (photo + skills) at `app/(onboarding)/id.tsx`. Accessed via Profile tab. Five tabs unchanged.
 6. **Mission framing.** XProHub = hub for X (various) professionals.
 7. **Levels framing.** Levels 1/2/3 are user lifecycle narrative, NOT gate enforcement. Code stays parallel-gates-on-action.
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).

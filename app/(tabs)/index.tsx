@@ -58,7 +58,7 @@ export default function HomeScreen() {
     if (isWorker) {
       router.push('/(tabs)/market');
     } else {
-      router.push('/(onboarding)/become-worker');
+      router.push('/(onboarding)/id');
     }
   }, [isWorker, workerLoading, router]);
 

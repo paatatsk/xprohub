@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
-// Become a Worker — 3-step onboarding
+// ID (Business Card) — 3-step setup
 // Step 1: pick categories  →  Step 2: pick tasks  →  Step 3: choose Superpowers
 // On Finish: upserts worker_skills (onConflict user_id,task_id) → Live Market
 
@@ -54,7 +54,7 @@ function iconForSlug(slug: string): string {
   return map[slug] ?? '▪';
 }
 
-export default function BecomeWorkerScreen() {
+export default function IdScreen() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
 

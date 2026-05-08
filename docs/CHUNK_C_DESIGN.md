@@ -421,15 +421,13 @@ codebase.
   `borderColor: #2E2E33` — same as every other card in the app
 - Gold-glow variant for State 1 (not started, needs attention):
   `borderColor: #C9A84C`, `backgroundColor: #C9A84C1A` — same
-  treatment as `catTileActive` in `id.tsx` (the pending rename of
-  `become-worker.tsx` per dual-role architecture decisions)
+  treatment as `catTileActive` in `id.tsx`
 
 ### Typography hierarchy
 
 ```
 Eyebrow:  #C9A84C, 11px, fontWeight 700, letterSpacing 3
           -- matches id.tsx's `eyebrow` style exactly
-             (currently become-worker.tsx until rename lands)
           e.g. "GET PAID SETUP"
 
 Heading:  #C9A84C, 28px, fontWeight bold, letterSpacing 2
@@ -493,7 +491,7 @@ borderRadius: Radius.md
 paddingVertical: 16
 color: #0E0E0F (background on gold)
 fontWeight: bold, fontSize: 15, letterSpacing: 1.5
--- exact match to `continueBtn` in id.tsx (become-worker.tsx)
+-- exact match to `continueBtn` in id.tsx
 ```
 
 Secondary (State 2 — medium urgency):
@@ -668,9 +666,9 @@ for each component?**
 - Revisit if post-launch evidence shows disproportionate
   drop-off at photo-upload step.
 
-**Q1 — Does become-worker route to stripe-connect after finishing?**
-**Resolved: No change needed.** `become-worker.tsx` (pending rename:
-`id.tsx`) continues routing to Live Market after the user sets up
+**Q1 — Does id.tsx route to stripe-connect after finishing?**
+**Resolved: No change needed.** `id.tsx` continues routing to
+Live Market after the user sets up
 their professional identity. Stripe Express setup fires at the moment
 of action (apply), not as part of identity setup. No routing change
 required.
