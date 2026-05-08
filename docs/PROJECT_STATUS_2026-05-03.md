@@ -59,6 +59,29 @@ Stripe gate is wired (Path 2). Remaining: photo + skill count check
 before Stripe gate fires. Per design CHUNK_C_DESIGN.md:616-643 the gate
 is two-component: Check 1 (ID) + Check 2 (Stripe). Only Check 2 is wired.
 
+### NEXT TASKS (ordered):
+
+**Task 5 — Implement Universal Links / App Links for Stripe redirect (Option D).**
+Decision locked 2026-05-08. Custom URL schemes rejected for production payments
+flow (security: any app can register the scheme). Universal Links (iOS) + App
+Links (Android) is the production-grade solution. See `docs/STRIPE_REDIRECT_OPTIONS.md`
+for full analysis and decision audit trail.
+
+Scope:
+- Host AASA file at `https://<domain>/.well-known/apple-app-site-association`
+- Host `assetlinks.json` at `https://<domain>/.well-known/assetlinks.json`
+- Update `app.json`: `associatedDomains` (iOS) + `intentFilters` (Android)
+- Update `stripe-redirect` Edge Function: 302 to `https://<domain>/stripe-return`
+- Update Stripe Connect dashboard `return_url` and `refresh_url`
+- EAS rebuild for both platforms
+- End-to-end test on iPhone (both return and refresh paths)
+
+Prerequisites (Paata gathers before session):
+- Domain name and DNS access
+- Apple Developer Team ID
+- Android package name + SHA256 keystore fingerprints (`eas credentials`)
+- Hosting decision for AASA/assetlinks files (Cloudflare Pages / Vercel / Netlify / Supabase Storage with custom domain)
+
 ---
 
 ## What's Built and Working
@@ -93,7 +116,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 6. **Mission framing.** XProHub = hub for X (various) professionals.
 7. **Levels framing.** Levels 1/2/3 are user lifecycle narrative, NOT gate enforcement. Code stays parallel-gates-on-action.
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).
-9. **Stripe redirect proxy.** Stripe rejects custom URL schemes; production pattern is an HTTPS-served HTML page that bridges to the deep link. Initial implementation as `stripe-redirect` Edge Function (`verify_jwt = false`) does NOT work: Supabase's gateway applies a strict Content-Security-Policy (`default-src 'none'; sandbox`) and overrides Content-Type to `text/plain` on unauthenticated Edge Functions as XSS mitigation. The browser receives raw text, not rendered HTML — neither auto-redirect nor manual button can fire. Architectural rework required. Five options under consideration: JWT endpoint (doesn't fit), external HTML hosting (GitHub Pages, Vercel, Supabase Storage), Stripe return_url to owned domain, iOS Universal Links, or HTTP 302 redirect from Edge Function. Tracked as a future task — not blocking C-4a (apply gate works via webhook → DB → gate read; the broken redirect UX only affects polish of the post-onboarding return-to-app flow).
+9. **Stripe redirect proxy — Option D selected (Universal Links / App Links).** Custom URL schemes rejected for production payments flow (any malicious app can register `xprohub://` and intercept the Stripe return). Option E (302 redirect) was empirically confirmed to work through Supabase's gateway (tested 2026-05-08) but rejected for the same custom-scheme security concern. Option D (Universal Links + App Links via owned domain) is the locked production solution. Execution deferred to a dedicated 3–4 hour session (Task 5). Current stripe-redirect (ACTIVE v3) remains non-functional but non-blocking — webhook → DB → gate path works. See `docs/STRIPE_REDIRECT_OPTIONS.md` for full decision audit trail.
 10. **Secrets handling.** Stripe secrets and other sensitive credentials are set by Paata directly, not by Claude Code. Especially critical for live-mode keys in production.
 11. **Deno dual-config.** Root `deno.json` is the dev/CI config (`deno check` from project root). Per-function `deno.json` files in `supabase/functions/<name>/` are deploy configs (referenced by `config.toml` `import_map`). The two configs serve different audiences and Deno does not auto-merge them — when adding a new import to any function, update both the per-function file (for deploy) and root `deno.json` (for dev/CI), or `deno check` and `supabase functions deploy` will disagree.
 
@@ -177,4 +200,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–3 complete. Next: Task 4 (complete C-4b ID gate).
+C-4a complete. Tasks 1–3 complete. Next: Task 4 (complete C-4b ID gate), then Task 5 (Universal Links / App Links for Stripe redirect).

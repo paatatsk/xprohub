@@ -220,30 +220,35 @@ no domain purchase. 10 minutes to know.**
 
 ## Summary and Recommendation
 
-| Option | Feasibility | Cost | Timeline | Production-ready |
-|---|---|---|---|---|
-| A. JWT endpoint | Not viable | N/A | N/A | No |
-| B. External HTML hosting | High | Free | 10–15 min | Yes |
-| C. Owned domain | High | ~$12/yr | 30–60 min | Yes (best) |
-| D. Universal Links | Medium-high | ~$12/yr + rebuild | 1–2 hours | Yes (best) |
-| E. HTTP 302 redirect | Medium | Free | 10 min | Maybe |
+| Option | Feasibility | Cost | Timeline | Production-ready | Status |
+|---|---|---|---|---|---|
+| A. JWT endpoint | Not viable | N/A | N/A | No | **REJECTED** — architecturally infeasible |
+| B. External HTML hosting | High | Free | 10–15 min | Yes | REJECTED — D does the same job without intermediate HTML hop |
+| C. Owned domain | High | ~$12/yr | 30–60 min | Yes (best) | Subsumed by D |
+| D. Universal Links | Medium-high | ~$12/yr + rebuild | 1–2 hours | Yes (best) | **CHOSEN** |
+| E. HTTP 302 redirect | High (confirmed) | Free | 10 min | No | **REJECTED** — custom scheme not production-grade |
 
-**Recommended path: Try E first, fall back to B.**
+## Decision (2026-05-08)
 
-Option E (302 redirect) is a 10-minute test with zero infrastructure
-cost. Change 2 lines, deploy, curl to check if the `Location` header
-survives the Supabase gateway, then iPhone test. If it works, the
-problem is solved with no new accounts, no hosting, no domain.
+**Option D — Universal Links (iOS) + App Links (Android).**
 
-If E fails (gateway strips `Location` header), fall back to Option B
-using **Supabase Storage** — upload two static HTML files to a public
-bucket in the existing Supabase project. No new infrastructure, no new
-accounts, ~15 minutes.
+Option E (302 redirect) was empirically tested on 2026-05-08 and
+confirmed to work: Supabase's gateway preserves `Location` headers
+with custom scheme URLs on 302/303 responses (no CSP injection on
+non-200 statuses). However, custom URL schemes (`xprohub://`) are
+not production-grade for a payments flow — any malicious app can
+register the same scheme and intercept the Stripe return redirect.
+Apple has been steering away from custom schemes in favor of
+Universal Links for years.
 
-Options C and D are the right answers for production launch but are
-overkill during development. Revisit when preparing for NYC launch.
+Option D eliminates the custom scheme entirely. When the user taps
+the Stripe return link, iOS checks the AASA file for the domain and
+routes the URL directly to the registered app instead of the
+browser. Android does the same via assetlinks.json. No custom
+scheme, no scheme hijacking risk.
 
-Option A is rejected — architecturally infeasible.
+Execution deferred to a dedicated 3–4 hour session (Task 5 in
+PROJECT_STATUS). Prerequisites: domain, Apple Team ID, Android
+SHA256 fingerprints, hosting for well-known files.
 
-**Decision belongs to Paata.** This memo provides the analysis; Paata
-chooses the path.
+Original analysis above preserved as decision audit trail.
