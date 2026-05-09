@@ -1,18 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, ActivityIndicator,
+  ScrollView, ActivityIndicator, Image,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
-// ID (Business Card) — 3-step setup
-// Step 1: pick categories  →  Step 2: pick tasks  →  Step 3: choose Superpowers
-// On Finish: upserts worker_skills (onConflict user_id,task_id) → Live Market
+// ID (Business Card) — 4-step setup
+// Step 1: photo  →  Step 2: pick categories  →  Step 3: pick tasks  →  Step 4: choose Superpowers
+// On Finish: uploads avatar + upserts worker_skills (onConflict user_id,task_id)
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 interface Category {
   id: number;
@@ -71,14 +72,18 @@ export default function IdScreen() {
   const [tasksLoading, setTasksLoading]       = useState(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<number>>(new Set());
 
-  // Step 3 state
+  // Photo state
+  const [existingAvatarUrl, setExistingAvatarUrl] = useState<string | null>(null);
+  const [avatarUri, setAvatarUri]                 = useState<string | null>(null);
+
+  // Step 4 state
   const [featuredTaskIds, setFeaturedTaskIds] = useState<Set<number>>(new Set());
 
   // Submit state
   const [submitting, setSubmitting]   = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // ── Load categories + task counts on mount ─────────────────────
+  // ── Load categories + task counts + existing avatar on mount ───
 
   useEffect(() => {
     supabase
@@ -102,14 +107,50 @@ export default function IdScreen() {
         }
         setTaskCounts(counts);
       });
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.avatar_url) setExistingAvatarUrl(data.avatar_url);
+        });
+    });
   }, []);
+
+  // ── Photo picker ───────────────────────────────────────────────
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setSubmitError('Photo library permission is required.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setAvatarUri(result.assets[0].uri);
+      setSubmitError(null);
+    }
+  };
 
   // ── Step transitions ────────────────────────────────────────────
 
-  const goToStep2 = async () => {
+  const goToStep2 = () => {
+    setStep(2);
+  };
+
+  const goToStep3 = async () => {
     setTasks([]);           // clear stale tasks from previous attempt
     setTasksLoading(true);
-    setStep(2);
+    setStep(3);
     const { data } = await supabase
       .from('task_library')
       .select('id, name, category_id, price_min, price_max')
@@ -120,22 +161,26 @@ export default function IdScreen() {
     setTasksLoading(false);
   };
 
-  const goToStep3 = () => {
+  const goToStep4 = () => {
     // Pre-select up to 3 tasks as Superpowers (first 3 from selection)
     const all = [...selectedTaskIds];
     setFeaturedTaskIds(new Set(all.slice(0, 3)));
-    setStep(3);
+    setStep(4);
   };
 
   const goBackToStep1 = () => {
-    // Preserve category selections; clear task state in case categories change
-    setTasks([]);
-    setSelectedTaskIds(new Set());
     setStep(1);
   };
 
   const goBackToStep2 = () => {
+    // Preserve category selections; clear task state in case categories change
+    setTasks([]);
+    setSelectedTaskIds(new Set());
     setStep(2);
+  };
+
+  const goBackToStep3 = () => {
+    setStep(3);
   };
 
   // ── Toggle helpers ──────────────────────────────────────────────
@@ -168,7 +213,7 @@ export default function IdScreen() {
     });
   }, []);
 
-  // ── Finish: upsert worker_skills ────────────────────────────────
+  // ── Finish: upload avatar + upsert worker_skills ───────────────
 
   const handleFinish = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -180,6 +225,34 @@ export default function IdScreen() {
     setSubmitting(true);
     setSubmitError(null);
 
+    // Upload new avatar if user picked one (skip if using existing)
+    if (avatarUri) {
+      const ext = avatarUri.split('.').pop() ?? 'jpg';
+      const fileName = `${user.id}/avatar.${ext}`;
+      const response = await fetch(avatarUri);
+      const blob = await response.blob();
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, blob, { upsert: true, contentType: `image/${ext}` });
+
+      if (uploadError) {
+        setSubmitError('Photo upload failed. Please try again.');
+        setSubmitting(false);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      await supabase
+        .from('profiles')
+        .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
+    }
+
+    // Upsert worker skills
     const rows = [...selectedTaskIds].map(task_id => ({
       user_id:     user.id,
       task_id,
@@ -200,9 +273,62 @@ export default function IdScreen() {
     router.replace(destination as any);
   };
 
-  // ── STEP 1 — Category picker ────────────────────────────────────
+  // ── STEP 1 — Photo ─────────────────────────────────────────────
+
+  const photoPreview = avatarUri ?? existingAvatarUrl;
 
   if (step === 1) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.eyebrow}>STEP 1 OF 4</Text>
+          <Text style={styles.heading}>YOUR PHOTO</Text>
+          <Text style={styles.subhead}>
+            Customers want to know who they're hiring.
+          </Text>
+
+          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
+            {photoPreview ? (
+              <Image source={{ uri: photoPreview }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarIcon}>+</Text>
+                <Text style={styles.avatarLabel}>ADD PHOTO</Text>
+              </View>
+            )}
+            {photoPreview && (
+              <View style={styles.avatarEditBadge}>
+                <Text style={styles.avatarEditText}>EDIT</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.bottomBar}>
+            {submitError && <Text style={styles.errorText}>{submitError}</Text>}
+            <Text style={styles.counterText}>
+              {photoPreview ? 'Photo added ✓' : 'Tap to add a photo'}
+            </Text>
+            <TouchableOpacity
+              style={[styles.continueBtn, !photoPreview && styles.continueBtnDisabled]}
+              onPress={goToStep2}
+              disabled={!photoPreview}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.continueBtnText}>Continue →</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // ── STEP 2 — Category picker ────────────────────────────────────
+
+  if (step === 2) {
     const n = selectedCatIds.size;
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -211,7 +337,7 @@ export default function IdScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.eyebrow}>STEP 1 OF 3</Text>
+          <Text style={styles.eyebrow}>STEP 2 OF 4</Text>
           <Text style={styles.heading}>WHAT DO YOU DO?</Text>
           <Text style={styles.subhead}>
             Pick one or more categories where you have skills
@@ -253,7 +379,7 @@ export default function IdScreen() {
             </Text>
             <TouchableOpacity
               style={[styles.continueBtn, n === 0 && styles.continueBtnDisabled]}
-              onPress={goToStep2}
+              onPress={goToStep3}
               disabled={n === 0}
               activeOpacity={0.85}
             >
@@ -265,9 +391,9 @@ export default function IdScreen() {
     );
   }
 
-  // ── STEP 2 — Task picker ────────────────────────────────────────
+  // ── STEP 3 — Task picker ────────────────────────────────────────
 
-  if (step === 2) {
+  if (step === 3) {
     const n = selectedTaskIds.size;
     const catOrder = categories.filter(c => selectedCatIds.has(c.id));
     return (
@@ -277,7 +403,7 @@ export default function IdScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.eyebrow}>STEP 2 OF 3</Text>
+          <Text style={styles.eyebrow}>STEP 3 OF 4</Text>
           <Text style={styles.heading}>PICK YOUR SKILLS</Text>
           <Text style={styles.subhead}>
             {n === 0
@@ -330,14 +456,14 @@ export default function IdScreen() {
             <View style={styles.bottomRow}>
               <TouchableOpacity
                 style={styles.backBtn}
-                onPress={goBackToStep1}
+                onPress={goBackToStep2}
                 activeOpacity={0.7}
               >
                 <Text style={styles.backBtnText}>← Back</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.continueBtn, styles.continueBtnFlex, n === 0 && styles.continueBtnDisabled]}
-                onPress={goToStep3}
+                onPress={goToStep4}
                 disabled={n === 0}
                 activeOpacity={0.85}
               >
@@ -350,7 +476,7 @@ export default function IdScreen() {
     );
   }
 
-  // ── STEP 3 — Superpower picker ──────────────────────────────────
+  // ── STEP 4 — Superpower picker ──────────────────────────────────
 
   const selectedTasks = tasks.filter(t => selectedTaskIds.has(t.id));
   const nFeatured = featuredTaskIds.size;
@@ -362,7 +488,7 @@ export default function IdScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.eyebrow}>STEP 3 OF 3</Text>
+        <Text style={styles.eyebrow}>STEP 4 OF 4</Text>
         <Text style={styles.heading}>YOUR SUPERPOWERS</Text>
         <Text style={styles.subhead}>
           Pick up to 3 skills to feature on your business card
@@ -401,7 +527,7 @@ export default function IdScreen() {
           <View style={styles.bottomRow}>
             <TouchableOpacity
               style={styles.backBtn}
-              onPress={goBackToStep2}
+              onPress={goBackToStep3}
               activeOpacity={0.7}
             >
               <Text style={styles.backBtnText}>← Back</Text>
@@ -510,7 +636,7 @@ const styles = StyleSheet.create({
   chipPrice:       { color: Colors.textSecondary, fontSize: 11 },
   chipPriceActive: { color: Colors.gold, opacity: 0.8 },
 
-  // Superpower rows (step 3)
+  // Superpower rows (step 4)
   superRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -539,6 +665,59 @@ const styles = StyleSheet.create({
   superTaskName:        { color: Colors.textPrimary, fontSize: 14, fontWeight: '600' },
   superTaskNameActive:  { color: Colors.gold },
   superTaskPrice:       { color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+
+  // Avatar (step 1)
+  avatarContainer: {
+    alignSelf: 'center',
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.lg,
+  },
+  avatarPlaceholder: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 2,
+    borderColor: Colors.gold,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.card,
+  },
+  avatarImage: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 2,
+    borderColor: Colors.gold,
+  },
+  avatarIcon: {
+    color: Colors.gold,
+    fontSize: 32,
+    fontWeight: '300',
+    lineHeight: 36,
+  },
+  avatarLabel: {
+    color: Colors.gold,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    marginTop: 2,
+  },
+  avatarEditBadge: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: Colors.gold,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  avatarEditText: {
+    color: Colors.background,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
 
   // Bottom bar
   bottomBar: {
