@@ -53,13 +53,34 @@ gitignored (Deno used for type-checking only, not deploy). All 4 Edge
 Functions pass `deno check` from project root. CI integration deferred
 to when CI pipeline is built.
 
-### CURRENT TASK: Task 4 — Complete C-4b (ID gate)
+### COMPLETED: Task 4 — Complete C-4b (ID gate)
 
-Stripe gate is wired (Path 2). Remaining: photo + skill count check
-before Stripe gate fires. Per design CHUNK_C_DESIGN.md:616-643 the gate
-is two-component: Check 1 (ID) + Check 2 (Stripe). Only Check 2 is wired.
+Closed 2026-05-08. Two-component apply gate fully wired per design spec
+(CHUNK_C_DESIGN.md:616-643). Check 1 (photo + skills) and Check 2 (Stripe)
+both fire as load-time render-path guards before the apply form loads.
 
-### NEXT TASKS (ordered):
+Commits:
+- `3aa6fcb` Task 4: apply.tsx gate logic (load-time guards, Promise.all
+  skill count query, loading gate widened, handleSubmit gate deleted)
+  + id.tsx returnTo support
+- `d40d58b` Task 4b: id.tsx photo step. Identified during Task 4
+  iPhone testing — id.tsx originally only handled skills, leaving
+  users without photo in an infinite gate loop. 4-step setup: photo
+  → categories → tasks → superpowers. Photo upload to avatars
+  bucket, pre-population of existing avatar, error handling.
+  Discovered and fixed adjacent infrastructure gap: avatars bucket
+  did not exist in the Supabase project (profile-setup.tsx had been
+  silently failing on upload since Milestone 1).
+
+Empirically verified on iPhone (2026-05-08 / 2026-05-09):
+States A–D tested, both gate cards verified, returnTo round-trips for
+id.tsx and stripe-connect confirmed, end-to-end APPLICATION SENT.
+
+Known follow-ups tracked in POLISH_PASS.md:
+- id.tsx status bar overlap on all steps
+- profile-setup.tsx silent-fail upload error handling
+
+### CURRENT TASK: Task 5 — Universal Links / App Links for Stripe redirect
 
 **Task 5 — Implement Universal Links / App Links for Stripe redirect (Option D).**
 Decision locked 2026-05-08. Custom URL schemes rejected for production payments
@@ -194,10 +215,10 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 - Repo: `https://github.com/paatatsk/xprohub.git` (renamed from `xprohub-v3`)
 - Local: `C:\Users\sophi\Documents\xprohub-v3` (folder rename pending — Phase 3)
 - Supabase project ref: `ygnpjmldabewzogyrjbb` (display name: "Production")
-- Latest commit: `a9412df`
+- Latest commit: `d40d58b`
 
 ---
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–3 complete. Next: Task 4 (complete C-4b ID gate), then Task 5 (Universal Links / App Links for Stripe redirect).
+C-4a complete. Tasks 1–4 complete. Next: Task 5 (Universal Links / App Links for Stripe redirect).

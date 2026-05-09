@@ -20,6 +20,22 @@
   SELECT (filtered by `job_id` + `reviewer_id`) every time the screen regains focus.
   Short, isolated — hotfix-eligible between any major step. Captured 2026-04-30.
 
+- **id.tsx Step 1 header hidden behind iOS status bar** — the eyebrow
+  ("STEP 1 OF 4") and heading partially render behind the iOS status bar
+  at the top of the screen. Affects all steps (photo, categories, tasks,
+  superpowers) since they share the same layout. Likely fix: add `'top'`
+  to `SafeAreaView edges` (currently `edges={['bottom']}` only). Captured
+  2026-05-08, observed during Task 4 iPhone testing.
+
+- **profile-setup.tsx silently swallows avatar upload errors** — line 70
+  checks `if (!uploadError)` and proceeds to set the public URL, but the
+  else branch is empty. If the upload fails (network error, bucket missing,
+  RLS denial), the profile UPDATE runs without `avatar_url`, leaving the
+  user with no photo and no error message. Surfaced by Task 4b investigation
+  (commit `d40d58b`) when the avatars Storage bucket was discovered to not
+  exist. **Fix:** mirror id.tsx's pattern — display error, return early.
+  Captured 2026-05-09.
+
 ---
 
 ## Semantic Category Color System
