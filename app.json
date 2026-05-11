@@ -23,6 +23,7 @@
       "associatedDomains": ["applinks:xprohub.com"]
     },
     "android": {
+      "package": "com.paatatsk.xprohubv3",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
