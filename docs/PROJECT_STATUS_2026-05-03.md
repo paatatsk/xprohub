@@ -80,28 +80,84 @@ Known follow-ups tracked in POLISH_PASS.md:
 - id.tsx status bar overlap on all steps
 - profile-setup.tsx silent-fail upload error handling
 
-### CURRENT TASK: Task 5 — Universal Links / App Links for Stripe redirect
+### Task 5 — iOS Universal Links for Stripe redirect ✅ COMPLETED 2026-05-11
 
-**Task 5 — Implement Universal Links / App Links for Stripe redirect (Option D).**
-Decision locked 2026-05-08. Custom URL schemes rejected for production payments
-flow (security: any app can register the scheme). Universal Links (iOS) + App
-Links (Android) is the production-grade solution. See `docs/STRIPE_REDIRECT_OPTIONS.md`
-for full analysis and decision audit trail.
+Replaces the broken Supabase Function HTML proxy with iOS
+Universal Link routing via Apple App Site Association file
+hosted on xprohub.com.
 
-Scope:
-- Host AASA file at `https://<domain>/.well-known/apple-app-site-association`
-- Host `assetlinks.json` at `https://<domain>/.well-known/assetlinks.json`
-- Update `app.json`: `associatedDomains` (iOS) + `intentFilters` (Android)
-- Update `stripe-redirect` Edge Function: 302 to `https://<domain>/stripe-return`
-- Update Stripe Connect dashboard `return_url` and `refresh_url`
-- EAS rebuild for both platforms
-- End-to-end test on iPhone (both return and refresh paths)
+Empirical validation on Paata's iPhone (UDID
+00008120-001A2C161ED2201E) confirmed Universal Link routing in
+both warm-start (app in background) and cold-start (app closed)
+cases. Both land on (tabs)/stripe-connect screen without error.
 
-Prerequisites (Paata gathers before session):
-- Domain name and DNS access
-- Apple Developer Team ID
-- Android package name + SHA256 keystore fingerprints (`eas credentials`)
-- Hosting decision for AASA/assetlinks files (Cloudflare Pages / Vercel / Netlify / Supabase Storage with custom domain)
+Code changes:
+- app.json — added ios.associatedDomains: ["applinks:xprohub.com"]
+- supabase/functions/create-onboarding-link/index.ts — hardcoded
+  return URLs to https://xprohub.com/stripe-return and
+  /stripe-refresh
+- app/stripe-return.tsx — replaced imperative router.replace()
+  with declarative <Redirect> (fixes cold-start race)
+- app/stripe-refresh.tsx — same Redirect pattern for symmetry
+- supabase/functions/stripe-redirect/ — deleted (obsolete HTML
+  proxy)
+
+Infrastructure changes outside the repo:
+- Cloudflare account created (paatatskhadiashvili@gmail.com)
+- xprohub.com nameservers migrated GoDaddy → Cloudflare
+  (jermaine.ns.cloudflare.com, tani.ns.cloudflare.com)
+- Cloudflare Pages project "xprohub" created, deploys from /web
+  folder (committed earlier in 319e62f)
+- xprohub.com custom domain attached to Pages, SSL auto-provisioned
+- Apple Developer App ID com.paatatsk.xprohubv3 — Associated
+  Domains capability enabled in App ID configuration
+- EAS Provisioning Profile regenerated to include Associated
+  Domains entitlement (forced via `eas credentials` deletion +
+  fresh build)
+- Edge Function create-onboarding-link redeployed (v5)
+- stripe-redirect Edge Function deleted from Supabase runtime
+
+Locked Decision #9 (Stripe redirect proxy Option D — Universal
+Links / App Links) implemented in full for iOS. Android side
+deferred to Task 6.
+
+### Task 6 — Android App Links + first EAS Android build [QUEUED]
+
+Mirror of Task 5 for Android. Implements Locked Decision #9
+Path B (Android side, deferred from Task 5).
+
+Steps:
+- Set explicit android.package in app.json (currently inherits
+  from defaultConfig)
+- First EAS Android build (generates keystore — auto-managed
+  by EAS)
+- Extract SHA256 fingerprint from generated keystore
+- Host /web/.well-known/assetlinks.json on Cloudflare Pages
+  with package name + SHA256 fingerprint
+- Add android.intentFilters config to app.json
+- EAS Android rebuild
+- Empirical test on Android device
+
+### Future Task — Bundle ID rename (com.paatatsk.xprohubv3 → com.paatatsk.xprohub)
+
+Currently using xprohubv3 due to v1/v2 history on Apple
+Developer account. Visible only in technical surfaces (Xcode,
+EAS dashboard, Apple Developer Console) — never to end users.
+
+When: Before App Store submission, after MVP feature freeze.
+Why deferred: Apple bundle ID changes lock in at App Store
+submission. We're far from that. Touching it now triples Task
+scope.
+
+Coordinated atomic change across:
+- app.json (ios.bundleIdentifier)
+- web/.well-known/apple-app-site-association (appIDs)
+- web/.well-known/assetlinks.json (when added in Task 6)
+- EAS rebuild
+- Apple Developer Portal new App ID registration (if v3 hasn't
+  aged out — VERIFY com.paatatsk.xprohub availability BEFORE
+  making any changes)
+- New provisioning profile
 
 ---
 
@@ -215,10 +271,10 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 - Repo: `https://github.com/paatatsk/xprohub.git` (renamed from `xprohub-v3`)
 - Local: `C:\Users\sophi\Documents\xprohub-v3` (folder rename pending — Phase 3)
 - Supabase project ref: `ygnpjmldabewzogyrjbb` (display name: "Production")
-- Latest commit: `d40d58b`
+- Latest commit: `319e62f`
 
 ---
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–4 complete. Next: Task 5 (Universal Links / App Links for Stripe redirect).
+C-4a complete. Tasks 1–5 complete. Next: Task 6 (Android App Links + first EAS Android build).

@@ -1,10 +1,5 @@
-import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import { Redirect } from 'expo-router';
 
 export default function StripeRefresh() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace('/(tabs)/stripe-connect' as any);
-  }, []);
-  return null;
+  return <Redirect href="/(tabs)/stripe-connect" />;
 }

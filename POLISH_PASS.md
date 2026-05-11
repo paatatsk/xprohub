@@ -443,3 +443,32 @@ work.
 **Decision context:** Discussed and deferred 2026-05-02. Considered
 rebuild-as-v4 alternative — rejected as significantly higher cost
 than the rename.
+
+---
+
+## Task 5 closure additions (2026-05-11)
+
+### Expo SDK 54.0 patch updates (4 packages)
+Surfaced by `expo doctor` warning in EAS build log (build URL
+1b91e6d3-d21f-4849-8a9e-26d412d1d593).
+
+Packages out of date (patch versions only):
+- expo: 54.0.33 → 54.0.34
+- expo-image-picker: 17.0.10 → 17.0.11
+- expo-linking: 8.0.11 → 8.0.12
+- expo-web-browser: 15.0.10 → 15.0.11
+
+Fix: Run `npx expo install --check`, accept updates. Requires
+EAS rebuild to pick up new versions in iOS bundle.
+
+### Cloudflare Email Routing for hello@xprohub.com
+Placeholder index.html references mailto:hello@xprohub.com but
+the address doesn't route. Set up forwarding via Cloudflare
+Email Routing → Paata's Gmail.
+
+### Workers subdomain stub cleanup
+Audit logs showed "Create Subdomain workers 13m ago" when we
+accidentally went through the Workers wizard before finding
+Pages. Likely created an empty Workers subdomain. Investigate
+if it's safe to delete (probably yes, but verify doesn't break
+Pages routing).

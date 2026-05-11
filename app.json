@@ -19,7 +19,8 @@
         "NSFaceIDUsageDescription": "XProHub uses Face ID to sign you in quickly and securely.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.paatatsk.xprohubv3"
+      "bundleIdentifier": "com.paatatsk.xprohubv3",
+      "associatedDomains": ["applinks:xprohub.com"]
     },
     "android": {
       "adaptiveIcon": {
