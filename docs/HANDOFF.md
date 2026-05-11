@@ -78,6 +78,7 @@ Other queued work:
 - Chunks D, E, F: Customer payment, payout release, payment UI polish
 - POLISH_PASS items (see file): expo SDK patches, Cloudflare Email Routing, Workers subdomain cleanup
 - Future task: Bundle ID rename `com.paatatsk.xprohubv3 → com.paatatsk.xprohub` (deferred to pre-App-Store)
+- Visual design direction: explored Hall/Ledger/Ticket aesthetics in earlier sessions, currently using default styling. Not a formally locked decision — revisit closer to launch. Design tokens enable multi-theme switching later.
 
 ---
 
@@ -111,7 +112,6 @@ Other queued work:
 9. Stripe redirect = Universal Links / App Links (Option D)
 10. Paata sets secrets/credentials directly
 11. Deno dual-config (root + per-function)
-12. Visual design parked until launch (Hall/Ledger/Ticket explorations not chosen)
 
 ---
 
