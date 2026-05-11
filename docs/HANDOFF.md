@@ -3,7 +3,7 @@
 > This file is for fresh chat-Claude instances joining the XProHub project mid-stream. Read this first, then the linked docs in order. After reading, summarize what you understand back to Paata before starting work.
 
 **Last updated:** 2026-05-11 (after Task 5 closure)
-**Latest commit on master:** `dc8f55c` — feat: Task 5 — iOS Universal Links for Stripe redirect
+**Latest commit on master:** `a0c8406` — docs: HANDOFF.md — demote visual design from Locked Decisions to parked topic
 
 ---
 
