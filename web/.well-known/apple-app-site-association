@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["67NL4S6Y9P.com.paatatsk.xprohubv3"],
+        "components": [
+          { "/": "/stripe-return" },
+          { "/": "/stripe-refresh" }
+        ]
+      }
+    ]
+  }
+}
