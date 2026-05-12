@@ -72,6 +72,26 @@ Before any of the following, explicitly confirm current state:
 
 "Trust but verify" — even when chat-Claude is confident, ask Paata to screenshot or describe the current state. Once today, an "Apple Save" looked like it persisted but didn't — only verification caught it.
 
+### Rule 6 — Consult Claude Code on ground-truth questions
+
+Chat-Claude reasons from docs, history, and pattern recognition. Claude Code has direct access to the file system, the CLI, the live database, and the build environment. When a decision depends on the actual current state of any of those — not what the docs say, not what's "usually" true, not what the pattern suggests — consult Claude Code before proposing a path.
+
+Examples of ground-truth questions:
+- "What will this CLI command actually do against our project right now?"
+- "Is this column actually in the live DB?"
+- "Did this file save correctly to disk?"
+- "What's the actual state of this Edge Function deployment?"
+- "Has this migration been applied?"
+
+Examples of NOT ground-truth questions (chat-Claude can answer directly):
+- "Should the gate fire at Submit or Load?"
+- "Which Stripe object handles this case?"
+- "Is this design consistent with our locked decisions?"
+
+This rule was earned the hard way on 2026-05-12 during Chunk D-1. Chat-Claude initially recommended `supabase db push` based on docs and pattern recognition. Paata pushed back and asked to consult Claude Code. Claude Code surfaced that the migration tracking table was empty — meaning `db push` would have tried to re-run all 9 existing migrations against production. Catching this required ground-truth access chat-Claude didn't have.
+
+When in doubt about whether a question is ground-truth: it probably is. The cost of asking Claude Code is low. The cost of proceeding on incomplete information against a live production DB is high.
+
 ---
 
 ## Three-way team patterns
