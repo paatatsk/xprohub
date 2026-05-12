@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-07
+**As of:** 2026-05-12
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -121,14 +121,15 @@ Locked Decision #9 (Stripe redirect proxy Option D — Universal
 Links / App Links) implemented in full for iOS. Android side
 deferred to Task 6.
 
-### Task 6 — Android App Links + first EAS Android build [QUEUED]
+### Task 6 — Android App Links + first EAS Android build [PARTIAL]
 
 Mirror of Task 5 for Android. Implements Locked Decision #9
 Path B (Android side, deferred from Task 5).
 
-Steps:
-- Set explicit android.package in app.json (currently inherits
-  from defaultConfig)
+Step 1 complete (2026-05-11): android.package set to
+com.paatatsk.xprohubv3 in app.json. Commit fbee972.
+
+Remaining steps (parked — require Android test device):
 - First EAS Android build (generates keystore — auto-managed
   by EAS)
 - Extract SHA256 fingerprint from generated keystore
@@ -137,6 +138,40 @@ Steps:
 - Add android.intentFilters config to app.json
 - EAS Android rebuild
 - Empirical test on Android device
+
+Parked because: Paata does not currently have access to an
+Android device. Remaining steps complete in one focused
+session once a device is borrowable.
+
+### Chunk D — Customer payment method gate [DESIGN COMPLETE]
+
+Design doc committed 2026-05-11 (commit 3e235ff):
+docs/CHUNK_D_DESIGN.md, 224 lines.
+
+Scope: customer-side payment gate. When a user taps Submit on
+Post a Job, check stripe_payment_method_added on profiles. If
+false, route to a new payment-setup screen with returnTo
+continuity. PaymentSheet handles card entry in-app.
+
+Locked decisions:
+- Gate fires at Submit (not Load) — preserves draft, respects time
+- Gate flag: stripe_payment_method_added boolean on profiles
+- Payment UX: Stripe PaymentSheet (in-app SDK, no Universal Link)
+- Dual-role aware: separate from worker-side stripe_charges_enabled
+
+Build sequence (8 steps):
+- D-1: Migration — add stripe_payment_method_added column
+- D-2: Edge Function — create-setup-intent
+- D-3: Webhook amendment — setup_intent.succeeded
+- D-4: New screen — app/(tabs)/payment-setup.tsx
+- D-5: Gate in post.tsx — replace TODO at handleSubmit
+- D-6: Register new screen in (tabs)/_layout.tsx
+- D-7: Deploy Edge Functions + register webhook event
+- D-8: End-to-end test on iPhone (both accounts)
+
+Live DB pre-verified: stripe_customer_id column already exists
+(original schema, pre-migration). stripe_payment_method_added
+is the only new column required.
 
 ### Future Task — Bundle ID rename (com.paatatsk.xprohubv3 → com.paatatsk.xprohub)
 
@@ -175,11 +210,12 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
   - ✅ C-3 `create-onboarding-link` Edge Function (commit `2cddce8`)
   - ✅ C-4a design doc, 909 lines (commit `76ce55e`)
   - ✅ C-4a implementation — closed 2026-05-06 (commit `2a8b947`)
-  - 🟡 C-4b apply.tsx Stripe gate — Stripe check wired (commit `c36ddb6`), ID gate (photo + skill) pending (Task 4)
+  - ✅ C-4b apply.tsx gate — Stripe check (commit `c36ddb6`) and ID gate (commits `3aa6fcb`, `d40d58b`) both wired. Task 4 closed 2026-05-08.
   - ✅ C-5 deep link return — `stripe-return.tsx` + `stripe-refresh.tsx` + `stripe-redirect` proxy
   - ✅ C-6 `account.updated` webhook handler (commit `2a8b947`)
-  - ⏳ C-7 end-to-end test — deferred to post-C-4b (ID gate must be wired first for full gate coverage)
-- ⏳ Chunks D, E, F (customer payment, payouts, UI polish)
+  - ⏳ C-7 end-to-end test — deferred. C-4b complete, but C-7 can roll into Chunk D end-to-end testing rather than running in isolation.
+- 🟡 Chunk D — design complete (docs/CHUNK_D_DESIGN.md, commit `3e235ff`). Build pending.
+- ⏳ Chunks E, F — payouts, UI polish (not yet designed)
 
 ---
 
@@ -193,7 +229,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
 6. **Mission framing.** XProHub = hub for X (various) professionals.
 7. **Levels framing.** Levels 1/2/3 are user lifecycle narrative, NOT gate enforcement. Code stays parallel-gates-on-action.
 8. **Direct Hire pathway** parked as future feature (POLISH_PASS).
-9. **Stripe redirect proxy — Option D selected (Universal Links / App Links).** Custom URL schemes rejected for production payments flow (any malicious app can register `xprohub://` and intercept the Stripe return). Option E (302 redirect) was empirically confirmed to work through Supabase's gateway (tested 2026-05-08) but rejected for the same custom-scheme security concern. Option D (Universal Links + App Links via owned domain) is the locked production solution. Execution deferred to a dedicated 3–4 hour session (Task 5). Current stripe-redirect (ACTIVE v3) remains non-functional but non-blocking — webhook → DB → gate path works. See `docs/STRIPE_REDIRECT_OPTIONS.md` for full decision audit trail.
+9. **Stripe redirect proxy — Option D (Universal Links / App Links) — iOS shipped, Android pending.** Custom URL schemes rejected for production payments flow (any malicious app can register `xprohub://` and intercept the Stripe return). Option E (302 redirect) was empirically confirmed to work but rejected for the same custom-scheme security concern. Option D (Universal Links + App Links via owned domain) is the locked production solution. iOS shipped 2026-05-11 (Task 5, commit `dc8f55c`) — apple-app-site-association live on xprohub.com, EAS provisioning profile regenerated with Associated Domains entitlement, empirically verified on iPhone in both warm-start and cold-start. Android side pending (Task 6 partial, awaiting test device). stripe-redirect Edge Function deleted from Supabase runtime as part of Task 5 closure. See `docs/STRIPE_REDIRECT_OPTIONS.md` for full decision audit trail.
 10. **Secrets handling.** Stripe secrets and other sensitive credentials are set by Paata directly, not by Claude Code. Especially critical for live-mode keys in production.
 11. **Deno dual-config.** Root `deno.json` is the dev/CI config (`deno check` from project root). Per-function `deno.json` files in `supabase/functions/<name>/` are deploy configs (referenced by `config.toml` `import_map`). The two configs serve different audiences and Deno does not auto-merge them — when adding a new import to any function, update both the per-function file (for deploy) and root `deno.json` (for dev/CI), or `deno check` and `supabase functions deploy` will disagree.
 
@@ -249,7 +285,7 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 **Completed:**
 - ✅ Deploy `create-stripe-account` Edge Function — ACTIVE v2
 - ✅ Deploy `create-onboarding-link` Edge Function — ACTIVE v3
-- ✅ Deploy `stripe-redirect` Edge Function — ACTIVE v1 (`verify_jwt = false`)
+- 🗑️ `stripe-redirect` Edge Function — DELETED 2026-05-11 (Task 5 closure). Replaced by iOS Universal Links via xprohub.com AASA file.
 - ✅ Deploy `stripe-webhook` Edge Function — ACTIVE v1 (`verify_jwt = false`), deployed 2026-05-06
 - ✅ Set `STRIPE_SECRET_KEY` in Supabase secrets
 - ✅ Set `STRIPE_WEBHOOK_SECRET` in Supabase secrets (set 2026-05-06; one-time exception — Claude Code ran the command. Protocol going forward per Locked Decision 10 is user-run only.)
@@ -271,10 +307,10 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 - Repo: `https://github.com/paatatsk/xprohub.git` (renamed from `xprohub-v3`)
 - Local: `C:\Users\sophi\Documents\xprohub-v3` (folder rename pending — Phase 3)
 - Supabase project ref: `ygnpjmldabewzogyrjbb` (display name: "Production")
-- Latest commit: `319e62f`
+- Latest commit: `d5cecd2`
 
 ---
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Next: Task 6 (Android App Links + first EAS Android build).
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D design complete (docs/CHUNK_D_DESIGN.md). Working patterns codified in docs/WORKING_GUIDELINES.md. Next: Chunk D-1 (migration to add stripe_payment_method_added column to profiles).
