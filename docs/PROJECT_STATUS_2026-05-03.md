@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-12
+**As of:** 2026-05-12 (D-1 closed)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -143,7 +143,7 @@ Parked because: Paata does not currently have access to an
 Android device. Remaining steps complete in one focused
 session once a device is borrowable.
 
-### Chunk D — Customer payment method gate [DESIGN COMPLETE]
+### Chunk D — Customer payment method gate [IN PROGRESS — D-1 complete]
 
 Design doc committed 2026-05-11 (commit 3e235ff):
 docs/CHUNK_D_DESIGN.md, 224 lines.
@@ -160,7 +160,10 @@ Locked decisions:
 - Dual-role aware: separate from worker-side stripe_charges_enabled
 
 Build sequence (8 steps):
-- D-1: Migration — add stripe_payment_method_added column
+- ✅ D-1: Migration — stripe_payment_method_added column added 
+  to profiles, applied to live DB 2026-05-12, commit 85ff667.
+  Migration tracking backfilled for 9 prior migrations during 
+  this step (see POLISH_PASS.md).
 - D-2: Edge Function — create-setup-intent
 - D-3: Webhook amendment — setup_intent.succeeded
 - D-4: New screen — app/(tabs)/payment-setup.tsx
@@ -313,4 +316,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D design complete (docs/CHUNK_D_DESIGN.md). Working patterns codified in docs/WORKING_GUIDELINES.md. Next: Chunk D-1 (migration to add stripe_payment_method_added column to profiles).
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1 complete 2026-05-12 (commit 85ff667). Migration tracking backfilled to clean state during D-1. Next: Chunk D-2 (create-setup-intent Edge Function).
