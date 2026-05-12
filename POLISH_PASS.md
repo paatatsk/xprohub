@@ -329,6 +329,35 @@ finding clears, the vulnerability is resolved.
 
 ---
 
+**Supabase migration tracking backfilled 2026-05-12**
+**Captured:** 2026-05-12 | **Area:** Schema / migration history | **Severity:** Resolved (historical note)
+
+Prior to 2026-05-12, the supabase_migrations.schema_migrations
+table on the linked Supabase project was empty — all 9 existing
+migrations had been applied via the Supabase SQL Editor in the
+dashboard, not via `supabase db push`. The local migrations
+folder and the remote DB state were both correct, but the CLI's
+tracking table was out of sync with reality.
+
+This was discovered during Chunk D-1 when `supabase migration
+list --linked` showed all migrations as pending despite their
+schema changes being live.
+
+Fix applied 2026-05-12: ran `supabase migration repair <version>
+--status applied --linked` for each of the 9 existing migrations,
+then applied the new D-1 migration cleanly via `supabase db push`.
+
+All 10 migrations now show matching Local and Remote versions.
+Future migrations can use `db push` normally.
+
+**No action needed going forward.** This entry exists so that
+future-Claude doesn't get confused if they see `supabase migration
+repair` in git history (it isn't, but they might search for it)
+or if they wonder why the schema_migrations table state changed
+suddenly between commits 9172c98 and 85ff667.
+
+---
+
 ## Deployment & Dev Environment
 
 Deployment prep and local dev config items. None block current development;
