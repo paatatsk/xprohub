@@ -401,6 +401,45 @@ Conventions section pointing back to this entry.
 
 ---
 
+**Supabase dashboard Edge Function editor: implicit deploy risk**
+**Captured:** 2026-05-13 | **Area:** Workflow / Edge Function deploys | **Severity:** Latent — depends on dashboard interactions
+
+The Supabase dashboard's Edge Function detail page has a Code tab
+showing the deployed source. The editor is treated as live-editable
+by default — any keystroke or cursor activity inside the code area
+can trigger an "unsaved changes" state that surfaces a "Deploy
+updates" button. Clicking that button would push the in-browser
+edited content live, bypassing git entirely and creating drift
+between repo and production.
+
+This was almost triggered accidentally during D-3 verification
+(2026-05-13). Caught by chat-Claude flagging the deploy dialog
+before Paata clicked anything. Cancel + navigate-away exited
+cleanly without deploying.
+
+**Fix / discipline:**
+
+- Treat the dashboard Code tab as READ-ONLY for verification only
+- Never edit Edge Function source via the dashboard
+- All deploys go through: edit locally → commit → push →
+  `npx supabase functions deploy <name> --project-ref ...`
+- If the "Deploy updates" button appears, ALWAYS cancel and
+  navigate away from the page (clicking "Edge Functions"
+  breadcrumb is safest). If prompted "you have unsaved changes,"
+  discard them.
+
+**Why it matters:** Bypassing git for deploys means commit history
+no longer reflects what's running in production. Same family of
+problem as the migration_tracking_table backfill we fixed earlier
+this week — except harder to detect because there's no equivalent
+of `supabase migration list` for Edge Functions.
+
+**Optional follow-up:** Investigate whether Supabase dashboard has
+a setting to disable in-browser editing of Edge Functions for our
+project. If yes, enable it.
+
+---
+
 ## Deployment & Dev Environment
 
 Deployment prep and local dev config items. None block current development;
