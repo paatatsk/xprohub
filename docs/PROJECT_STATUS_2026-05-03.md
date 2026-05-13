@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-12 (D-1 closed)
+**As of:** 2026-05-12 (D-2 closed)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -164,7 +164,10 @@ Build sequence (8 steps):
   to profiles, applied to live DB 2026-05-12, commit 85ff667.
   Migration tracking backfilled for 9 prior migrations during 
   this step (see POLISH_PASS.md).
-- D-2: Edge Function — create-setup-intent
+- ✅ D-2: Edge Function — create-setup-intent deployed
+  ACTIVE v1, 2026-05-12. Code commit de05d34, config commit
+  2629891. verify_jwt = true. Stale [functions.stripe-redirect]
+  config entry removed as housekeeping (commit 2629891).
 - D-3: Webhook amendment — setup_intent.succeeded
 - D-4: New screen — app/(tabs)/payment-setup.tsx
 - D-5: Gate in post.tsx — replace TODO at handleSubmit
@@ -293,9 +296,11 @@ Two-AI workflow: chat-Claude (strategist) writes prompts FOR Claude Code (termin
 - ✅ Set `STRIPE_SECRET_KEY` in Supabase secrets
 - ✅ Set `STRIPE_WEBHOOK_SECRET` in Supabase secrets (set 2026-05-06; one-time exception — Claude Code ran the command. Protocol going forward per Locked Decision 10 is user-run only.)
 - ✅ Register Stripe webhook endpoint in Stripe dashboard (XProHub sandbox, `account.updated` event only)
+- ✅ Deploy `create-setup-intent` Edge Function — ACTIVE v1 (`verify_jwt = true`), deployed 2026-05-12
+- 🧹 `stripe-redirect` config.toml entry removed (commit 2629891) — function was deleted in Task 5 but config entry remained
 
 **Pending:**
-- (none — all deploys complete)
+- D-3: Register `setup_intent.succeeded` webhook event in Stripe dashboard
 
 ---
 
@@ -316,4 +321,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1 complete 2026-05-12 (commit 85ff667). Migration tracking backfilled to clean state during D-1. Next: Chunk D-2 (create-setup-intent Edge Function).
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1 complete 2026-05-12 (commit 85ff667), D-2 complete 2026-05-12 (commits de05d34, 2629891, deployed ACTIVE v1). Next: Chunk D-3 (webhook amendment — add setup_intent.succeeded handler to stripe-webhook).
