@@ -1,6 +1,6 @@
 # XProHub — Chunk D Design: Customer Payment Method Gate
 
-**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13)
+**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13; D-4 prerequisites shipped 2026-05-13)
 **Author:** Paata Tskhadiashvili + chat-Claude
 **Status:** Design complete — ready to build
 
@@ -68,6 +68,31 @@ Existing columns confirmed in live DB (no migration needed):
 ---
 
 ## New Screen: app/(tabs)/payment-setup.tsx
+
+### Prerequisites (completed 2026-05-13)
+
+Three items identified during D-4 readiness investigation
+(Claude Code consultation) and resolved before screen build:
+
+1. **StripeProvider wired at app root.** app/_layout.tsx now
+   wraps the root Stack with `<StripeProvider>` passing
+   publishableKey and urlScheme="xprohub". Without this,
+   initPaymentSheet throws immediately. Commit eaa29f9.
+
+2. **Publishable key location: hardcoded in _layout.tsx.**
+   Decision: option A (hardcode) over option B (app.json extra)
+   because the key is read in exactly one place and there's no
+   existing Constants.expoConfig pattern in the codebase. The
+   key is public by design (safe to embed per Stripe docs).
+   Live-mode rollover is a one-line swap documented in the
+   constant's comment block.
+
+3. **EAS dev client confirmed — no rebuild needed.** The most
+   recent iOS build (2026-05-11, commit 319e62f) used the
+   development profile with developmentClient: true. The Stripe
+   plugin was in app.json at that commit, so the native module
+   is already in the installed binary. D-4 changes are JS-only
+   and hot-reload via Metro.
 
 Customer-side payment method setup. Mirrors stripe-connect.tsx in
 structure.
@@ -294,3 +319,11 @@ D-8: End-to-end test on iPhone
   existing Connected accounts endpoint. Corrected during D-3
   strategy consultation with Claude Code (2026-05-13). Source:
   https://docs.stripe.com/connect/webhooks
+- D-4 readiness investigation (Claude Code consultation,
+  2026-05-13) discovered three prerequisites not in the original
+  design doc: (1) StripeProvider must wrap the app root for
+  PaymentSheet to initialize, (2) publishable key placement
+  decision needed, (3) EAS dev client confirmation needed to
+  verify native Stripe module is in the binary. All three
+  resolved same day — commit eaa29f9 (StripeProvider + key),
+  stale Expo Go references fixed in commit f7e9405.
