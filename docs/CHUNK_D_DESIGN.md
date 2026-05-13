@@ -1,6 +1,6 @@
 # XProHub — Chunk D Design: Customer Payment Method Gate
 
-**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12)
+**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13)
 **Author:** Paata Tskhadiashvili + chat-Claude
 **Status:** Design complete — ready to build
 
@@ -150,20 +150,67 @@ create-onboarding-link Edge Functions.
 
 ---
 
-## Webhook Addition: setup_intent.succeeded
+## Webhook Architecture: Two Endpoints, One Edge Function
 
-File: supabase/functions/stripe-webhook/index.ts (amend existing)
+Stripe Connect separates webhook endpoints by scope. An endpoint
+scoped to "Connected accounts" cannot receive events from "Your
+account" and vice versa. XProHub needs both:
 
-New event to handle: setup_intent.succeeded
+- **account.updated** fires on Connected accounts (workers'
+  Stripe Express accounts) — already wired in C-6
+- **setup_intent.succeeded** fires on Your account (platform-side
+  Customer objects created in D-2) — requires a second endpoint
 
-Handler logic:
-1. Extract customer ID from event object
+Both endpoints point to the same Edge Function URL:
+`https://ygnpjmldabewzogyrjbb.supabase.co/functions/v1/stripe-webhook`
+
+### Endpoint 1: Connected accounts (existing)
+
+- Scope: Connected accounts
+- Events: account.updated
+- Secret: STRIPE_WEBHOOK_SECRET (already set in Supabase secrets)
+- Status: ACTIVE since C-6 (2026-05-06)
+
+### Endpoint 2: Your account (new for Chunk D)
+
+- Scope: Your account
+- Events: setup_intent.succeeded
+- Secret: STRIPE_WEBHOOK_SECRET_PLATFORM (new Supabase secret)
+- Status: Must be created in Stripe dashboard
+
+### Dual-secret verification
+
+Each endpoint has its own signing secret. The Edge Function must
+try both secrets when verifying the webhook signature. Logic:
+1. Try STRIPE_WEBHOOK_SECRET first
+2. If verification fails, try STRIPE_WEBHOOK_SECRET_PLATFORM
+3. If both fail, return 400 (invalid signature)
+
+This is a common pattern for Connect platforms with a single
+backend webhook handler.
+
+### Handler logic (setup_intent.succeeded)
+
+File: supabase/functions/stripe-webhook/index.ts (already amended
+in D-3 commit 1ef47c0)
+
+1. Extract customer ID from SetupIntent event object
 2. Look up profiles row where stripe_customer_id = customer ID
-3. Set stripe_payment_method_added = true
-4. Return 200
+3. Idempotency check (skip if stripe_payment_method_added already true)
+4. Set stripe_payment_method_added = true
+5. Throw on failure (triggers Stripe retry via 500 response)
 
-Register in Stripe dashboard: Add setup_intent.succeeded to the
-existing webhook endpoint alongside account.updated.
+### Manual setup steps (Paata in Stripe dashboard)
+
+1. Go to Stripe dashboard → Developers → Webhooks
+2. Add endpoint: same URL as existing endpoint
+3. Set "Events from" to "Your account"
+4. Select event: setup_intent.succeeded
+5. Save → copy the signing secret (whsec_...)
+6. Set in Supabase: supabase secrets set STRIPE_WEBHOOK_SECRET_PLATFORM=whsec_...
+
+Source: https://docs.stripe.com/connect/webhooks (scope separation
+documented under "Events from" filter)
 
 ---
 
@@ -230,3 +277,11 @@ D-8: End-to-end test on iPhone
   Function creates all three Stripe objects in a single call and
   returns them together. Discovered during D-2 strategy consultation
   with Claude Code (2026-05-12).
+- Stripe Connect webhook endpoints are scoped: "Your account" vs
+  "Connected accounts" cannot share a single endpoint. XProHub
+  needs two endpoints (one per scope) pointing to the same Edge
+  Function, with dual-secret verification. Original design doc
+  incorrectly specified adding setup_intent.succeeded to the
+  existing Connected accounts endpoint. Corrected during D-3
+  strategy consultation with Claude Code (2026-05-13). Source:
+  https://docs.stripe.com/connect/webhooks
