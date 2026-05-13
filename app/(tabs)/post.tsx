@@ -12,7 +12,7 @@ import { supabase } from '../../lib/supabase';
 // Step 4-FIX-2: Category-first task picker for HELP WANTED path.
 //   - No catId → show category grid first, tap to drill into tasks
 //   - With catId (from Home category card) → skip straight to tasks
-// TODO Step 4C: Level 2 gate check before allowing submit
+// D-5: Payment method gate fires at handleSubmit (not load)
 
 type Timing   = 'asap' | 'scheduled' | 'flexible';
 type ViewMode = 'categories' | 'tasks';
@@ -216,7 +216,21 @@ export default function PostScreen() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setSubmitError('You must be logged in to post a job.');
-      return; // TODO 4C: redirect to Level 2 gate here
+      return;
+    }
+
+    // D-5: Customer payment method gate — check before INSERT
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_payment_method_added')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.stripe_payment_method_added) {
+      router.push(
+        `/(tabs)/payment-setup?returnTo=${encodeURIComponent('/(tabs)/post')}` as any
+      );
+      return;
     }
 
     setSubmitting(true);

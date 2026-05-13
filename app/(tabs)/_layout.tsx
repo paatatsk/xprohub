@@ -46,6 +46,17 @@ export default function TabLayout() {
       <Tabs.Screen name="my-applications" options={{ ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-bids"        options={{ ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
       <Tabs.Screen
+        name="payment-setup"
+        options={({ route }) => ({
+          ...headerDefaults,
+          headerShown: true,
+          title: 'PAYMENT SETUP',
+          headerLeft: () => (
+            <BackButton returnTo={(route.params as any)?.returnTo ?? '/(tabs)'} />
+          ),
+        })}
+      />
+      <Tabs.Screen
         name="stripe-connect"
         options={({ route }) => ({
           ...headerDefaults,

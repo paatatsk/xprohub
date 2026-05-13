@@ -290,6 +290,12 @@ D-8: End-to-end test on iPhone
   you'll see `[stripe-webhook] Primary secret failed, trying
   platform secret` first — that's the dual-secret fallback
   working as designed.
+- **Form state preservation:** Enter full job details in
+  post.tsx (category, tasks, budget, timing, description),
+  tap Submit, complete payment-setup flow, return to
+  post.tsx. Verify form fields are still populated. If
+  blank, the round trip unmounted the tab screen — flag for
+  a follow-up "save draft" pattern.
 
 ---
 
