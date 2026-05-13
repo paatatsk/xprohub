@@ -26,6 +26,13 @@ if (!webhookSecret) {
   )
 }
 
+// Platform-side webhook secret — optional. When set, the function
+// can verify events from a second Stripe webhook endpoint scoped to
+// "Your account" (e.g. setup_intent.succeeded). When absent, only
+// the primary Connected accounts secret is used (no regression).
+// See docs/CHUNK_D_DESIGN.md "Webhook Architecture" section.
+const webhookSecretPlatform = Deno.env.get('STRIPE_WEBHOOK_SECRET_PLATFORM') || null
+
 // Service role client — module level, reused across requests.
 // Used by account.updated handler to write stripe_* columns on profiles.
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
@@ -57,16 +64,38 @@ Deno.serve(async (req: Request): Promise<Response> => {
   //    is 4th and left as undefined to use the SDK default of 300 seconds).
   //    Empty or malformed bodies are caught here naturally — Stripe never
   //    signs empty bodies, so verification fails and returns 400 below.
+  //
+  //    Dual-secret verification: XProHub has two Stripe webhook endpoints
+  //    (Connected accounts + Your account) pointing to this single Edge
+  //    Function. Each endpoint has its own signing secret. Try the primary
+  //    secret first; if it fails and a platform secret is configured, retry
+  //    with that. If both fail, return 400.
   let event: Stripe.Event
 
   try {
-    event = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      webhookSecret,
-      undefined,      // tolerance: SDK default (300 seconds)
-      cryptoProvider  // Deno-compatible async crypto provider
-    )
+    try {
+      event = await stripe.webhooks.constructEventAsync(
+        body,
+        signature,
+        webhookSecret,
+        undefined,      // tolerance: SDK default (300 seconds)
+        cryptoProvider  // Deno-compatible async crypto provider
+      )
+    } catch (primaryErr) {
+      // Primary secret failed. If no platform secret is configured,
+      // this is the only secret — rethrow to hit the outer catch.
+      if (!webhookSecretPlatform) throw primaryErr
+
+      // Platform secret is configured — retry verification with it.
+      console.log('[stripe-webhook] Primary secret failed, trying platform secret')
+      event = await stripe.webhooks.constructEventAsync(
+        body,
+        signature,
+        webhookSecretPlatform,
+        undefined,
+        cryptoProvider
+      )
+    }
   } catch (err) {
     console.error('[stripe-webhook] Signature verification failed:', err)
     return new Response(
