@@ -134,6 +134,58 @@ Deno.serve(async (req: Request): Promise<Response> => {
         break
       }
 
+      case 'setup_intent.succeeded': {
+        // Chunk D — Customer saved a payment method via PaymentSheet.
+        // Flips stripe_payment_method_added = true on the matching profile.
+        const setupIntent = event.data.object as Stripe.SetupIntent
+        const customerId = setupIntent.customer as string
+
+        console.log(
+          `[stripe-webhook] setup_intent.succeeded for customer ${customerId}`
+        )
+
+        if (!customerId) {
+          console.error('[stripe-webhook] setup_intent.succeeded missing customer ID — skipping')
+          break
+        }
+
+        // Look up profile by stripe_customer_id (not user ID — webhook
+        // events identify the Stripe Customer, not the Supabase user).
+        const { data: custProfile, error: custReadError } = await serviceClient
+          .from('profiles')
+          .select('id, stripe_payment_method_added')
+          .eq('stripe_customer_id', customerId)
+          .single()
+
+        if (custReadError || !custProfile) {
+          console.error(
+            `[stripe-webhook] No profile found for stripe_customer_id=${customerId}:`,
+            custReadError?.message
+          )
+          throw new Error(`No profile for customer ${customerId}`)
+        }
+
+        // Skip if already true (idempotent — Stripe may retry)
+        if (custProfile.stripe_payment_method_added) {
+          console.log(`[stripe-webhook] stripe_payment_method_added already true for profile ${custProfile.id} — skipping`)
+          break
+        }
+
+        const { error: custUpdateError } = await serviceClient
+          .from('profiles')
+          .update({ stripe_payment_method_added: true })
+          .eq('stripe_customer_id', customerId)
+
+        if (custUpdateError) {
+          throw new Error(
+            `[stripe-webhook] DB update failed for customer ${customerId}: ${custUpdateError.message}`
+          )
+        }
+
+        console.log(`[stripe-webhook] stripe_payment_method_added set to true for profile ${custProfile.id}`)
+        break
+      }
+
       case 'payment_intent.succeeded':
         // Chunk D — Customer payment confirmed; mark escrow held in payments table.
         console.log('[stripe-webhook] payment_intent.succeeded — handler wired in Chunk D')
