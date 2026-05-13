@@ -247,6 +247,7 @@ ORDER BY category_id, task_code;
 - **Seed updates**: Changes to task data go in `supabase/seed/`. Use `ON CONFLICT (task_code) DO NOTHING` for inserts or `DO UPDATE SET ...` for corrections.
 - **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
 - **RLS state**: `task_categories` and `task_library` have anon-safe public read policies (safe for unauthenticated browse). `worker_skills` has public read + auth CRUD policies (migration 20260419000002). `job_post_tasks` has INSERT + SELECT policies as of migration 20260419000001.
+- **New table migrations**: Include explicit `GRANT` statements for `anon`, `authenticated`, and `service_role` (Supabase Data API change, enforced 2026-10-30 — see POLISH_PASS.md).
 
 ## Belt System (Workers — opt-in, not structural)
 The Belt System is optional progression, not a structural matching requirement. Workers are not gated by belt level for job access. Belt data enriches profiles and enables future features but does not restrict platform participation.

@@ -358,6 +358,49 @@ suddenly between commits 9172c98 and 85ff667.
 
 ---
 
+**Supabase Data API: explicit GRANTs required for new tables**
+**Captured:** 2026-05-13 | **Area:** Schema / Data API security | **Severity:** Latent — deadline October 30, 2026
+
+Supabase announced on 2026-05-12 that the implicit grant from the
+Data API (supabase-js, REST, GraphQL) to tables in public schema
+is being removed. Starting October 30, 2026, every new table in
+public requires explicit GRANT statements or supabase-js calls
+return 42501 errors.
+
+Existing tables on project ygnpjmldabewzogyrjbb keep their current
+grants — confirmed by the announcement language and by the fact
+that the app currently works without errors. The change only
+affects new tables created after the rollout.
+
+Chunk D is unaffected (D-1 already shipped its column addition;
+D-3 through D-8 are code-only).
+
+**Fix when needed:** When creating any new table in a future
+migration, include three blocks in the migration:
+
+  GRANT SELECT ON new_table TO anon;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON new_table TO authenticated;
+  GRANT ALL ON new_table TO service_role;
+  ALTER TABLE new_table ENABLE ROW LEVEL SECURITY;
+  -- then RLS policies as usual
+
+Adjust per-role permissions to match the table's access pattern.
+
+**Audit check (optional, before October 30):** To confirm all
+13 existing tables have proper grants, run in the Supabase SQL
+Editor:
+
+  SELECT grantee, table_name, privilege_type
+  FROM information_schema.role_table_grants
+  WHERE table_schema = 'public'
+    AND grantee IN ('anon', 'authenticated', 'service_role')
+  ORDER BY table_name, grantee;
+
+**Related:** One-line flag added to CLAUDE.md Development
+Conventions section pointing back to this entry.
+
+---
+
 ## Deployment & Dev Environment
 
 Deployment prep and local dev config items. None block current development;
