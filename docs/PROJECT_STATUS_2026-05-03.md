@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-13 (D-3 closed)
+**As of:** 2026-05-14 (D-7 closed)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -179,10 +179,18 @@ Build sequence (8 steps):
   happen organically during D-8 iPhone test by checking Edge 
   Function logs for [stripe-webhook] setup_intent.succeeded event 
   arrival and stripe_payment_method_added flag flip.
-- D-4: New screen — app/(tabs)/payment-setup.tsx
-- D-5: Gate in post.tsx — replace TODO at handleSubmit
-- D-6: Register new screen in (tabs)/_layout.tsx
-- D-7: Deploy Edge Functions + register webhook event
+- ✅ D-4: New screen — payment-setup.tsx + usePaymentMethodStatus
+  hook, 395 lines. Shipped 2026-05-13, commit 1ae6972.
+- ✅ D-5: Payment gate in post.tsx handleSubmit — fetch
+  stripe_payment_method_added, route to payment-setup if false.
+  Shipped 2026-05-14 with D-6, commit 0e7a26b.
+- ✅ D-6: payment-setup screen registered in (tabs)/_layout.tsx
+  with returnTo-aware BackButton. Shipped 2026-05-14 with D-5,
+  commit 0e7a26b.
+- ✅ D-7: Deploy verification — all four Edge Functions confirmed
+  ACTIVE, all three Stripe secrets confirmed present, both webhook
+  endpoints registered. Completed incrementally during D-2 and
+  D-3; verified satisfied 2026-05-14.
 - D-8: End-to-end test on iPhone (both accounts)
 
 Live DB pre-verified: stripe_customer_id column already exists
@@ -332,4 +340,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1, D-2, D-3 complete 2026-05-13. Next: Chunk D-4 (build app/(tabs)/payment-setup.tsx screen with Stripe PaymentSheet integration).
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D nearly complete: D-1 through D-7 all done (2026-05-12 to 2026-05-14). Next: D-8 iPhone end-to-end test with two accounts (Paata + Khatuna) — verifies the full Chunk D flow including the deferred D-3 dual-secret synthetic test (via Edge Function logs) and the D-5 form state preservation question.

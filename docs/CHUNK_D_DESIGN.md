@@ -1,6 +1,6 @@
 # XProHub — Chunk D Design: Customer Payment Method Gate
 
-**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13; D-4 prerequisites shipped 2026-05-13)
+**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13; D-4 prerequisites shipped 2026-05-13; D-4 through D-7 closed 2026-05-14)
 **Author:** Paata Tskhadiashvili + chat-Claude
 **Status:** Design complete — ready to build
 
@@ -333,3 +333,12 @@ D-8: End-to-end test on iPhone
   verify native Stripe module is in the binary. All three
   resolved same day — commit eaa29f9 (StripeProvider + key),
   stale Expo Go references fixed in commit f7e9405.
+- D-7 verified satisfied 2026-05-14 (Claude Code consultation).
+  All four Edge Functions confirmed ACTIVE in production
+  (create-stripe-account v4, create-onboarding-link v6,
+  stripe-webhook v5, create-setup-intent v2). All three Stripe
+  secrets confirmed present in Supabase (STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET_PLATFORM). Both
+  Stripe webhook endpoints registered (Connected accounts +
+  Your account). No deploy work remained — D-7 was effectively
+  closed incrementally during D-2 and D-3.
