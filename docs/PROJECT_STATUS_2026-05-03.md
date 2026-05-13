@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-13 (D-3 in progress)
+**As of:** 2026-05-13 (D-3 closed)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -168,16 +168,17 @@ Build sequence (8 steps):
   ACTIVE v1, 2026-05-12. Code commit de05d34, config commit
   2629891. verify_jwt = true. Stale [functions.stripe-redirect]
   config entry removed as housekeeping (commit 2629891).
-- 🟡 D-3: Webhook amendment — partial. Handler code deployed
-  2026-05-12 (commit 1ef47c0, stripe-webhook v3). Architecture
-  correction 2026-05-13 (commit 81ddf70): D-3 requires a SECOND
-  webhook endpoint in Stripe dashboard ("Your account" scope) and
-  dual-secret verification in stripe-webhook/index.ts because
-  Stripe scopes webhook endpoints — Connected accounts and Your
-  account events cannot share one endpoint. Remaining work:
-  amend Edge Function for dual-secret verification, register
-  second endpoint in Stripe dashboard, set
-  STRIPE_WEBHOOK_SECRET_PLATFORM in Supabase secrets, redeploy.
+- ✅ D-3: Webhook amendment — complete 2026-05-13. Three commits:
+  handler code 1ef47c0 (stripe-webhook v3), dual-secret 
+  verification 2c4cc0b (stripe-webhook v4), architecture doc 
+  correction 81ddf70. Paata-side work: second Stripe webhook 
+  endpoint "XProHub D-3 setup_intent.succeeded" created in 
+  dashboard (Your account scope, destination ID 
+  we_1TVCfm08l7Que01iJZIVS9bP), STRIPE_WEBHOOK_SECRET_PLATFORM 
+  set in Supabase. Synthetic test deferred — verification will 
+  happen organically during D-8 iPhone test by checking Edge 
+  Function logs for [stripe-webhook] setup_intent.succeeded event 
+  arrival and stripe_payment_method_added flag flip.
 - D-4: New screen — app/(tabs)/payment-setup.tsx
 - D-5: Gate in post.tsx — replace TODO at handleSubmit
 - D-6: Register new screen in (tabs)/_layout.tsx
@@ -330,4 +331,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1 complete 2026-05-12 (commit 85ff667), D-2 complete 2026-05-12 (commits de05d34, 2629891, deployed ACTIVE v1), D-3 partial 2026-05-13 (handler deployed commit 1ef47c0, dual-secret architecture correction commit 81ddf70). Next: amend stripe-webhook/index.ts for dual-secret verification, then Paata creates second Stripe webhook endpoint + STRIPE_WEBHOOK_SECRET_PLATFORM secret, then redeploy.
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D in progress: D-1, D-2, D-3 complete 2026-05-13. Next: Chunk D-4 (build app/(tabs)/payment-setup.tsx screen with Stripe PaymentSheet integration).

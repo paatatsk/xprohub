@@ -256,6 +256,15 @@ D-8: End-to-end test on iPhone
   job posts directly
 - Verified with two accounts (Paata + Khatuna) for two-sided
   coverage
+- **D-3 dual-secret verification (deferred synthetic test):**
+  After completing the iPhone PaymentSheet flow, inspect Edge
+  Function logs at the Supabase dashboard. Look for
+  `[stripe-webhook] setup_intent.succeeded for customer cus_...`
+  followed by `[stripe-webhook] stripe_payment_method_added set
+  to true for profile ...`. If the platform secret path fires,
+  you'll see `[stripe-webhook] Primary secret failed, trying
+  platform secret` first — that's the dual-secret fallback
+  working as designed.
 
 ---
 
