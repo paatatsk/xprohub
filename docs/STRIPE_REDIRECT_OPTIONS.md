@@ -157,7 +157,7 @@ problem — no intermediate page, no custom scheme restrictions.
 - Requires EAS rebuild (native config change — flags stop condition).
 - AASA file must be served correctly (specific Content-Type, no
   redirects, accessible from Apple's CDN crawler).
-- Testing requires production or TestFlight build (not Expo Go).
+- Testing requires EAS dev client, TestFlight, or production build (not Expo Go).
 
 **Recommendation: The right answer for production. Implement when
 preparing for NYC launch, alongside Option C. Not for current dev

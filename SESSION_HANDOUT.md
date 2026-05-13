@@ -51,7 +51,7 @@ Differentiates from Uber/TaskRabbit by:
 - **Payments:** Stripe Connect (Chunk C-4a complete — onboarding, webhook, gate wired)
 - **Repo:** github.com/paatatsk/xprohub
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
-- **Test device:** iPhone via Expo Go on LAN mode
+- **Test device:** iPhone via EAS dev client on LAN mode
 
 **Design system: Dark Gold (locked).**
 - bg `#0E0E0F`, gold `#C9A84C`, card `#171719`, border `#2E2E33`

@@ -10,7 +10,7 @@
 - Tagline: **"Real Work. Fair Pay. For Everyone."**
 - Model: eBay buyer/seller dual-role (users freely switch Customer ↔ Worker)
 - Repo: `github.com/paatatsk/xprohub` | Local: `C:\Users\sophi\Documents\xprohub-v3`
-- Start: `npx expo start --clear` | Test: iPhone via Expo Go
+- Start: `npx expo start --clear` | Test: iPhone via EAS dev client
 
 ---
 **See also (for full project orientation):**
@@ -415,7 +415,7 @@ cards), Hybrid Matching exploration, and operational tracking items.
 
 ## Session Start Checklist
 - [ ] `npx expo start --clear`
-- [ ] Open Expo Go on iPhone → scan QR
+- [ ] Open EAS dev client on iPhone → scan QR
 - [ ] `git status` — check what changed last session
 - [ ] Confirm screens use `#0E0E0F` background and `#C9A84C` gold (fix any that don't)
 - [ ] State what screen/feature we're wiring today
