@@ -136,6 +136,76 @@ When Paata pastes a prompt from chat-Claude, it should look operational:
 
 Claude Code should not improvise beyond the prompt. If the prompt says "stop after step 4," stop after step 4. If unsure whether step 5 is implied, ask.
 
+### Division of responsibility in prompts
+
+chat-Claude defines WHAT to build. Claude Code drafts HOW to build it.
+
+**Define behavior, not code.** Tell Claude Code what a function should do (inputs, outputs, error cases, security model). Do not write full file content — chat-Claude can't see existing codebase patterns and will introduce deviations. Instead: "Draft the Edge Function per the design doc. Match the pattern from create-stripe-account." Claude Code drafts, chat-Claude reviews.
+
+**Ask before prescribing deploy/infrastructure commands.** Before writing exact CLI commands (deploy, config changes, flags), ask Claude Code: "What deploy steps does this function need? Check config.toml and report." chat-Claude cannot see config.toml, deno.json, or other infrastructure files.
+
+**Strategy consultations before new integrations.** Before writing code for a new Stripe integration, new screen, or new Edge Function, ask Claude Code judgment questions first. The D-2 strategy consultation caught the missing EphemeralKey requirement before any code was written.
+
+**Include infrastructure in build sequences.** Design docs with build steps must include config file updates as explicit steps. For a new Edge Function: index.ts, per-function deno.json, config.toml entry (verify_jwt, import_map, entrypoint), deploy command. These are required steps, not optional details.
+
+### chat-Claude's blind spots
+
+chat-Claude cannot verify:
+
+- Existing code patterns (import style, module-level vs per-request clients, error response shape)
+- Config file state (config.toml, deno.json, app.json current values)
+- What's deployed vs what's committed
+- Whether a column/table actually exists in the live DB right now
+
+For any of these, ask Claude Code to check rather than assuming. (See also Rule 6.)
+
+### The handoff template
+
+When chat-Claude is ready for Claude Code to build something:
+
+    Build [STEP ID]: [name]
+
+    WHAT IT DOES:
+    [2-3 sentences on behavior, inputs, outputs]
+
+    DESIGN REFERENCE:
+    [doc path and relevant section]
+
+    PATTERN TO FOLLOW:
+    [name the closest existing file to mirror]
+
+    CONSTRAINTS:
+    [security model, error handling rules, naming conventions]
+
+    Draft the code, show me for review. Do NOT save yet.
+
+### Good vs bad prompts
+
+**Good — specific, self-contained, verifiable:**
+
+> Read app/(tabs)/apply.tsx lines 1-50. Look at the existing gate logic.
+> Context: The apply gate currently checks Stripe status but not photo + skills.
+> Task: Add a load-time guard that queries the user's profile for avatar_url and counts their worker_skills rows.
+> Constraints: Import SafeAreaView from 'react-native-safe-area-context'. Background #0E0E0F.
+> Verify: npx tsc --noEmit should show 0 errors. Stop before committing.
+
+**Bad — assumes shared context:**
+
+> Add the ID gate we discussed to the apply screen.
+
+Claude Code wasn't in the discussion. It doesn't know what "the ID gate we discussed" means, which file, or what the gate checks.
+
+### Common prompt mistakes
+
+| Mistake | Why it fails | Fix |
+|---|---|---|
+| "Fix the bug we found" | Claude Code wasn't there | Describe the bug, the file, the line |
+| "Use the same pattern" | No shared memory | Name the file that has the pattern |
+| Chaining 5+ changes | Scope creep | One focused change per prompt |
+| No file path | Claude Code guesses | Always include the exact path |
+| No verification step | Silent failures | Include tsc/deno check |
+| Full file content in prompt | Pattern deviations | Define behavior, let Claude Code draft |
+
 ---
 
 ## Slice-based work
