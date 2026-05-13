@@ -232,6 +232,7 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
   - ⏳ C-7 end-to-end test — deferred. C-4b complete, but C-7 can roll into Chunk D end-to-end testing rather than running in isolation.
 - 🟡 Chunk D — design complete (docs/CHUNK_D_DESIGN.md, commit `3e235ff`). Build pending.
 - ⏳ Chunks E, F — payouts, UI polish (not yet designed)
+- ⏳ Chunk G — Launch Compliance (Apple App Store + Stripe). Design doc shipped 2026-05-14 (docs/CHUNK_G_COMPLIANCE_DESIGN.md). Build deferred until after Chunks D and E.
 
 ---
 
