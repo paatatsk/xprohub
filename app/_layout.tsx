@@ -6,10 +6,18 @@ import { useFonts } from 'expo-font';
 import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 SplashScreen.preventAutoHideAsync();
 
 const AUTH_TIMEOUT_MS = 3000;
+
+// Stripe publishable key (sandbox). Public by design — safe to embed
+// in client code per Stripe docs. Visible in every web integration's
+// HTML source. For live-mode rollover: swap pk_test_ for pk_live_
+// from the XProHub Stripe dashboard (acct_1TRNSu08l7Que01i).
+const STRIPE_PUBLISHABLE_KEY =
+  'pk_test_51TRNSu08l7Que01i7wSpWjuTyIRYdzJHv3RjJMPtQzjcCSTIMXgnscC85ZyqLnPMbEnnIW23QAgdmYuO9Sne0FFq00vCTmyxqg';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({ SpaceGrotesk_700Bold });
@@ -92,7 +100,7 @@ export default function RootLayout() {
   }, [session, loading, segments]);
 
   return (
-    <>
+    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
       <StatusBar style="light" backgroundColor="#0E0E0F" />
       <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="splash" />
@@ -103,6 +111,6 @@ export default function RootLayout() {
         <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
         <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
       </Stack>
-    </>
+    </StripeProvider>
   );
 }
