@@ -1,6 +1,6 @@
 # XProHub — Chunk D Design: Customer Payment Method Gate
 
-**Created:** 2026-05-11
+**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12)
 **Author:** Paata Tskhadiashvili + chat-Claude
 **Status:** Design complete — ready to build
 
@@ -94,7 +94,7 @@ State 2 — ADDED: stripe_payment_method_added = true
 2. Edge Function creates Stripe SetupIntent + Customer object
    (creates Customer if stripe_customer_id is null, stores ID back
    to profiles)
-3. Returns client_secret to app
+3. Returns { client_secret, ephemeral_key, customer_id } to app
 4. App initialises Stripe PaymentSheet with client_secret
 5. User completes card entry in native sheet
 6. On success: webhook fires setup_intent.succeeded →
@@ -140,7 +140,10 @@ Responsibilities:
 3. If null: create a new Stripe Customer object, store the ID back
    to profiles.stripe_customer_id
 4. Create a Stripe SetupIntent attached to the Customer
-5. Return { client_secret, customer_id }
+5. Create a Stripe EphemeralKey for the Customer (required for
+   PaymentSheet to access saved payment methods on the client side
+   without exposing the secret key)
+6. Return { client_secret, ephemeral_key, customer_id }
 
 Follows same structure as create-stripe-account and
 create-onboarding-link Edge Functions.
@@ -222,3 +225,8 @@ D-8: End-to-end test on iPhone
   in the app.
 - Chunk E (payout release) and Chunk F (payment UI polish) are
   out of scope for Chunk D.
+- PaymentSheet requires three values to initialize: SetupIntent
+  client_secret, EphemeralKey secret, and Customer ID. The Edge
+  Function creates all three Stripe objects in a single call and
+  returns them together. Discovered during D-2 strategy consultation
+  with Claude Code (2026-05-12).
