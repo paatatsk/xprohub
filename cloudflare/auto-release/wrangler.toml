@@ -1,0 +1,13 @@
+name = "xprohub-auto-release"
+main = "src/index.ts"
+compatibility_date = "2025-12-01"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[vars]
+SUPABASE_URL = "https://ygnpjmldabewzogyrjbb.supabase.co"
+
+# Secrets (set via `wrangler secret put`, NOT in this file):
+# - SUPABASE_SERVICE_ROLE_KEY
+# - RELEASE_PAYMENT_SECRET
