@@ -448,3 +448,11 @@ verify_jwt = true
 import_map = "./functions/create-setup-intent/deno.json"
 entrypoint = "./functions/create-setup-intent/index.ts"
 
+[functions.hire-and-charge]
+enabled = true
+# Customer-authenticated endpoint. Creates PaymentIntent and
+# accepts bid atomically (Chunk E-3).
+verify_jwt = true
+import_map = "./functions/hire-and-charge/deno.json"
+entrypoint = "./functions/hire-and-charge/index.ts"
+
