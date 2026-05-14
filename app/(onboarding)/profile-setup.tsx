@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -17,10 +17,28 @@ import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
+  const { mode, returnTo } = useLocalSearchParams<{ mode?: string; returnTo?: string }>();
+  const isGate = mode === 'gate';
+
   const [fullName, setFullName] = useState('');
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // In gate mode, pre-populate full_name from existing profile
+  useEffect(() => {
+    if (!isGate) return;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .single();
+      if (data?.full_name) setFullName(data.full_name);
+    })();
+  }, [isGate]);
 
   async function pickImage() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -43,6 +61,10 @@ export default function ProfileSetupScreen() {
   async function handleContinue() {
     if (!fullName.trim()) {
       setError('Please enter your full name.');
+      return;
+    }
+    if (isGate && !avatarUri) {
+      setError('A photo is required to post jobs.');
       return;
     }
     setError('');
@@ -95,7 +117,11 @@ export default function ProfileSetupScreen() {
       return;
     }
 
-    router.replace('/(tabs)');
+    if (returnTo) {
+      router.replace(decodeURIComponent(returnTo) as any);
+    } else {
+      router.replace('/(tabs)');
+    }
   }
 
   return (
@@ -108,10 +134,12 @@ export default function ProfileSetupScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.eyebrow}>WELCOME TO XPROHUB</Text>
-          <Text style={styles.title}>SET UP YOUR{'\n'}PROFILE</Text>
+          <Text style={styles.eyebrow}>{isGate ? 'POSTING A JOB' : 'WELCOME TO XPROHUB'}</Text>
+          <Text style={styles.title}>{isGate ? 'ADD YOUR PHOTO\nAND NAME' : 'SET UP YOUR\nPROFILE'}</Text>
           <Text style={styles.sub}>
-            This is how the community will know you.
+            {isGate
+              ? 'Workers want to know who they\'re working for. This is part of how XProHub keeps both sides accountable.'
+              : 'This is how the community will know you.'}
           </Text>
 
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
@@ -121,7 +149,9 @@ export default function ProfileSetupScreen() {
               <View style={styles.avatarPlaceholder}>
                 <Text style={styles.avatarIcon}>+</Text>
                 <Text style={styles.avatarLabel}>ADD PHOTO</Text>
-                <Text style={styles.avatarHint}>optional</Text>
+                <Text style={isGate ? styles.avatarRequired : styles.avatarHint}>
+                  {isGate ? 'required' : 'optional'}
+                </Text>
               </View>
             )}
             {avatarUri && (
@@ -146,9 +176,11 @@ export default function ProfileSetupScreen() {
             onSubmitEditing={handleContinue}
           />
 
-          <Text style={styles.hint}>
-            You can add more details — skills, location, bio — once you're inside.
-          </Text>
+          {!isGate && (
+            <Text style={styles.hint}>
+              You can add more details — skills, location, bio — once you're inside.
+            </Text>
+          )}
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
@@ -159,7 +191,7 @@ export default function ProfileSetupScreen() {
             {loading ? (
               <ActivityIndicator color={Colors.background} />
             ) : (
-              <Text style={styles.buttonText}>LET'S GO →</Text>
+              <Text style={styles.buttonText}>{isGate ? 'SAVE AND CONTINUE' : 'LET\'S GO →'}</Text>
             )}
           </TouchableOpacity>
 
@@ -237,6 +269,13 @@ const styles = StyleSheet.create({
   avatarHint: {
     color: Colors.textSecondary,
     fontSize: 10,
+    marginTop: 2,
+  },
+  avatarRequired: {
+    color: Colors.gold,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1,
     marginTop: 2,
   },
   avatarEditBadge: {

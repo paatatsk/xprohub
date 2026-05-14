@@ -219,13 +219,22 @@ export default function PostScreen() {
       return;
     }
 
-    // D-5: Customer payment method gate — check before INSERT
+    // Customer identity + payment method gates — check before INSERT
     const { data: profile } = await supabase
       .from('profiles')
-      .select('stripe_payment_method_added')
+      .select('full_name, avatar_url, stripe_payment_method_added')
       .eq('id', user.id)
       .single();
 
+    // Identity gate — name + photo required to post jobs
+    if (!profile?.full_name || !profile?.avatar_url) {
+      router.push(
+        `/(onboarding)/profile-setup?mode=gate&returnTo=${encodeURIComponent('/(tabs)/post')}` as any
+      );
+      return;
+    }
+
+    // Payment method gate (D-5)
     if (!profile?.stripe_payment_method_added) {
       router.push(
         `/(tabs)/payment-setup?returnTo=${encodeURIComponent('/(tabs)/post')}` as any
