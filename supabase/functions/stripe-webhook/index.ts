@@ -314,11 +314,65 @@ Deno.serve(async (req: Request): Promise<Response> => {
         console.log('[stripe-webhook] payment_intent.payment_failed — handler wired in Chunk D')
         break
 
-      case 'transfer.created':
-        // Chunk E — Platform transferred funds to worker's Express account.
-        // Marks payout complete in payments table.
-        console.log('[stripe-webhook] transfer.created — handler wired in Chunk E')
+      case 'transfer.created': {
+        // Chunk E — Idempotent backup for release-payment Edge Function (E-5).
+        // Primary writer is the Edge Function. This webhook covers the
+        // [CRITICAL] path: Transfer succeeded but Edge Function's DB call
+        // to release_payment failed. On the happy path, release_payment
+        // exits early at the idempotency check (escrow_status = 'released').
+        const xfer = event.data.object as Stripe.Transfer
+        const xferJobId = xfer.metadata?.job_id
+        const xferPaymentId = xfer.metadata?.payment_id
+
+        // Guard: skip Transfers not created by release-payment
+        if (!xferJobId || !xferPaymentId) {
+          console.log(
+            `[stripe-webhook] transfer.created for ${xfer.id} — ` +
+            'missing XProHub metadata, likely external transfer. Skipping.'
+          )
+          break
+        }
+
+        console.log(
+          `[stripe-webhook] transfer.created for ${xfer.id}: ` +
+          `job=${xferJobId}, payment=${xferPaymentId}`
+        )
+
+        // Read worker_payout and platform_fee from the payments row
+        const { data: xferPayment, error: xferPayErr } = await serviceClient
+          .from('payments')
+          .select('worker_payout, platform_fee')
+          .eq('id', xferPaymentId)
+          .single()
+
+        if (xferPayErr || !xferPayment) {
+          throw new Error(
+            `[stripe-webhook] Payment row ${xferPaymentId} not found for transfer ${xfer.id}: ` +
+            (xferPayErr?.message ?? 'no data')
+          )
+        }
+
+        // Call release_payment — idempotent. If Edge Function already
+        // updated DB, this exits clean at escrow_status = 'released' check.
+        const { error: xferReleaseErr } = await serviceClient
+          .rpc('release_payment', {
+            p_job_id: xferJobId,
+            p_stripe_transfer_id: xfer.id,
+            p_worker_payout: xferPayment.worker_payout,
+            p_platform_fee: xferPayment.platform_fee,
+          })
+
+        if (xferReleaseErr) {
+          throw new Error(
+            `[stripe-webhook] release_payment failed for transfer ${xfer.id}: ${xferReleaseErr.message}`
+          )
+        }
+
+        console.log(
+          `[stripe-webhook] release_payment confirmed for transfer ${xfer.id}, payment ${xferPaymentId}`
+        )
         break
+      }
 
       default:
         console.log(`[stripe-webhook] Unhandled event type: ${event.type}`)
