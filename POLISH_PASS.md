@@ -177,13 +177,11 @@ Don't add UI copy that says "We commit to Worker Dignity™" or "We never ghost.
 
 **Build this when:** ready to invest in a notification milestone (Milestone 4+).
 
-### Implementation B — "Released" / "Project Closed" copy (SMALL, depends on Worker Dashboard)
+### ~~Implementation B — "Released" / "Project Closed" copy~~ (SMALL, depends on Worker Dashboard)
 
 **Scope:** When workers view their own bid history, declined bids should display as "Released" or "Project Closed" — not "Declined." System-oriented language reframes rejection as the project's status, not the worker's failure. Customer's view stays "Declined" (technically accurate from their action).
 
-**Why park:** Depends on the "My Applications" worker dashboard screen. The label change is small (~10 lines of conditional rendering) but needs the surface to render on first.
-
-**Build this when:** My Applications screen exists ✅ (built in Step 9). Ready to implement — ~10 lines of conditional rendering in `my-applications.tsx`.
+**Resolved 2026-05-15 (commit `4d5fc51`).** bidStatusLabel in my-applications.tsx now maps `declined` → `RELEASED`. Customer's view (job-bids.tsx) keeps `DECLINED` — intentional asymmetry preserved.
 
 ### Implementation C — "While You Wait" cards on apply-success (MEDIUM, ready to build)
 
