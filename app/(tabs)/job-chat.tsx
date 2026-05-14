@@ -38,6 +38,15 @@ interface Message {
   created_at: string;
 }
 
+interface PaymentRow {
+  amount: number;
+  platform_fee: number;
+  worker_payout: number;
+  auto_release_at: string | null;
+  escrow_status: string;
+  disputed_at: string | null;
+}
+
 // ── Time formatter ─────────────────────────────────────────────────────────
 
 function formatMessageTime(iso: string): string {
@@ -103,6 +112,9 @@ export default function JobChatScreen() {
   const [actionLoading,   setActionLoading]   = useState(false);
   const [actionError,     setActionError]     = useState<string | null>(null);
   const [userHasReviewed, setUserHasReviewed] = useState(false);
+  const [payment,         setPayment]         = useState<PaymentRow | null>(null);
+  const [disputeMode,     setDisputeMode]     = useState(false);
+  const [disputeText,     setDisputeText]     = useState('');
 
   // ── Initial load ──────────────────────────────────────────────────────────
 
@@ -204,6 +216,22 @@ export default function JobChatScreen() {
     }, [chat?.job?.id, currentUserId])
   );
 
+  // ── Payment data (fee panel + timer) ──────────────────────────────────────
+
+  const fetchPayment = useCallback(async () => {
+    if (!chat?.job?.id || chat.job.status === 'open') return;
+    const { data } = await supabase
+      .from('payments')
+      .select('amount, platform_fee, worker_payout, auto_release_at, escrow_status, disputed_at')
+      .eq('job_id', chat.job.id)
+      .maybeSingle();
+    if (data) setPayment(data as PaymentRow);
+  }, [chat?.job?.id, chat?.job?.status]);
+
+  useEffect(() => { fetchPayment(); }, [fetchPayment]);
+
+  useFocusEffect(useCallback(() => { fetchPayment(); }, [fetchPayment]));
+
   // ── Realtime subscription ─────────────────────────────────────────────────
 
   useEffect(() => {
@@ -263,6 +291,34 @@ export default function JobChatScreen() {
     setComposerText('');
     setSending(false);
   }, [composerText, currentUserId, chat_id]);
+
+  // ── Timer + notification copy helpers ─────────────────────────────────────
+
+  function formatTimeRemaining(autoReleaseAt: string | null): string {
+    if (!autoReleaseAt) return '';
+    const ms = new Date(autoReleaseAt).getTime() - Date.now();
+    if (ms <= 0) return 'Auto-release imminent';
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    if (hours >= 72) return 'Auto-releases in 3 days';
+    if (hours >= 48) return 'Auto-releases in 2 days';
+    if (hours >= 24) return 'Auto-releases in 1 day';
+    if (hours >= 1) return `Auto-releases in ${hours} hour${hours > 1 ? 's' : ''}`;
+    return 'Auto-releases in under 1 hour';
+  }
+
+  function getConfirmationBannerCopy(autoReleaseAt: string | null, isCustomerView: boolean): string {
+    if (!autoReleaseAt) return isCustomerView
+      ? 'Work marked complete. Please review and confirm.'
+      : 'Waiting for customer confirmation.';
+    const ms = new Date(autoReleaseAt).getTime() - Date.now();
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    if (isCustomerView) {
+      if (hours >= 48) return 'Work marked complete. Please review and confirm.';
+      if (hours >= 24) return 'Your worker is waiting. Confirming helps them get paid promptly.';
+      return 'Payment releases automatically soon. Have a concern?';
+    }
+    return 'Waiting for customer confirmation.';
+  }
 
   // ── Refetch job status ────────────────────────────────────────────────────
 
@@ -348,6 +404,67 @@ export default function JobChatScreen() {
     );
   }, [chat, currentUserId, router]);
 
+  const handleConfirmCompletion = useCallback(async () => {
+    if (!chat?.job?.id) return;
+    Alert.alert(
+      'Confirm Completion',
+      'Confirm the work is done? Payment will be released to the worker.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm & Release',
+          onPress: async () => {
+            setActionLoading(true);
+            setActionError(null);
+            const { error: confirmErr } = await supabase
+              .rpc('confirm_completion', { p_job_id: chat.job!.id });
+            if (confirmErr) {
+              setActionError(confirmErr.message);
+              setActionLoading(false);
+              return;
+            }
+            // Best-effort release — confirm_completion already set
+            // auto_release_at = now(), so the cron catches this within
+            // 15 minutes if the Edge Function call below fails.
+            const { error: releaseErr } = await supabase.functions.invoke(
+              'release-payment',
+              { body: { job_id: chat.job!.id, mode: 'customer_confirm' } },
+            );
+            if (releaseErr) {
+              console.error('[job-chat] release-payment failed after confirm:', releaseErr);
+              setActionError('Confirmation saved. Payment will release shortly.');
+            }
+            await refetchJobStatus();
+            await fetchPayment();
+            setActionLoading(false);
+          },
+        },
+      ]
+    );
+  }, [chat, refetchJobStatus, fetchPayment]);
+
+  const handleRaiseConcern = useCallback(async () => {
+    if (!chat?.job?.id) return;
+    const trimmed = disputeText.trim();
+    if (!trimmed) {
+      setActionError('Please describe your concern.');
+      return;
+    }
+    setActionLoading(true);
+    setActionError(null);
+    const { error } = await supabase
+      .rpc('raise_dispute', { p_job_id: chat.job!.id, p_reason: trimmed });
+    if (error) {
+      setActionError(error.message);
+    } else {
+      setDisputeMode(false);
+      setDisputeText('');
+      await refetchJobStatus();
+      await fetchPayment();
+    }
+    setActionLoading(false);
+  }, [chat, disputeText, refetchJobStatus, fetchPayment]);
+
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (loading) {
@@ -396,10 +513,8 @@ export default function JobChatScreen() {
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const otherParty = currentUserId === chat?.customer_id
-    ? chat?.worker
-    : chat?.customer;
-
+  const isCustomer = currentUserId === chat?.customer_id;
+  const otherParty = isCustomer ? chat?.worker : chat?.customer;
   const otherName  = otherParty?.full_name ?? 'User';
   const jobTitle   = chat?.job?.title ?? null;
   const jobStatus  = chat?.job?.status ?? null;
@@ -421,7 +536,8 @@ export default function JobChatScreen() {
           ) : null}
         </View>
 
-        {/* ── Lifecycle banner ── */}
+        {/* ── Lifecycle banners (E-7/E-8 expansion point) ── */}
+
         {jobStatus === 'matched' && (
           <View style={styles.lifecycleBanner}>
             {actionLoading
@@ -444,7 +560,7 @@ export default function JobChatScreen() {
           </View>
         )}
 
-        {jobStatus === 'in_progress' && (
+        {jobStatus === 'in_progress' && !isCustomer && (
           <View style={styles.lifecycleBanner}>
             {actionLoading
               ? <ActivityIndicator size="small" color={Colors.green} />
@@ -460,6 +576,87 @@ export default function JobChatScreen() {
                 </TouchableOpacity>
               )
             }
+            {actionError ? (
+              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+                {actionError}
+              </Text>
+            ) : null}
+          </View>
+        )}
+
+        {jobStatus === 'pending_confirmation' && (
+          <View style={styles.lifecycleBanner}>
+            <Text style={styles.bannerCopy}>
+              {getConfirmationBannerCopy(payment?.auto_release_at ?? null, isCustomer)}
+            </Text>
+            <Text style={styles.timerText}>
+              {formatTimeRemaining(payment?.auto_release_at ?? null)}
+            </Text>
+
+            {isCustomer && !disputeMode && (
+              actionLoading
+                ? <ActivityIndicator size="small" color={Colors.gold} />
+                : (
+                  <View style={styles.bannerBtnRow}>
+                    <TouchableOpacity
+                      style={[styles.lifecycleBtn, { borderColor: Colors.green, flex: 1 }]}
+                      onPress={handleConfirmCompletion}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={[styles.lifecycleBtnText, { color: Colors.green }]}>
+                        CONFIRM COMPLETION
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.lifecycleBtn, { borderColor: Colors.red, flex: 1 }]}
+                      onPress={() => setDisputeMode(true)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={[styles.lifecycleBtnText, { color: Colors.red }]}>
+                        RAISE CONCERN
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )
+            )}
+
+            {isCustomer && disputeMode && (
+              <View style={styles.disputeInputWrap}>
+                <TextInput
+                  style={styles.disputeInput}
+                  placeholder="Describe your concern..."
+                  placeholderTextColor={Colors.textSecondary}
+                  value={disputeText}
+                  onChangeText={t => setDisputeText(t.slice(0, 500))}
+                  multiline
+                  numberOfLines={3}
+                  maxLength={500}
+                  autoFocus
+                />
+                <Text style={styles.disputeCharCount}>{disputeText.length}/500</Text>
+                <View style={styles.bannerBtnRow}>
+                  <TouchableOpacity
+                    style={[styles.lifecycleBtn, { borderColor: Colors.red, flex: 1 }]}
+                    onPress={handleRaiseConcern}
+                    disabled={actionLoading || !disputeText.trim()}
+                    activeOpacity={0.85}
+                  >
+                    {actionLoading
+                      ? <ActivityIndicator size="small" color={Colors.red} />
+                      : <Text style={[styles.lifecycleBtnText, { color: Colors.red }]}>SUBMIT CONCERN</Text>
+                    }
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.lifecycleBtn, { flex: 1 }]}
+                    onPress={() => { setDisputeMode(false); setDisputeText(''); }}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.lifecycleBtnText}>CANCEL</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+
             {actionError ? (
               <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
                 {actionError}
@@ -490,6 +687,28 @@ export default function JobChatScreen() {
           <View style={styles.lifecycleBanner}>
             <View style={styles.lifecycleStaticBadgeCancelled}>
               <Text style={styles.lifecycleStaticText}>JOB CANCELLED</Text>
+            </View>
+          </View>
+        )}
+
+        {/* ── Fee transparency panel (matched state onward) ── */}
+        {payment && jobStatus && ['matched', 'in_progress', 'pending_confirmation', 'completed', 'disputed'].includes(jobStatus) && (
+          <View style={styles.feePanel}>
+            <View style={styles.feeRow}>
+              <Text style={styles.feeLabel}>Job total</Text>
+              <Text style={styles.feeValue}>${payment.amount.toFixed(2)}</Text>
+            </View>
+            <View style={styles.feeRow}>
+              <Text style={styles.feeLabel}>Platform fee (10%)</Text>
+              <Text style={styles.feeValue}>${payment.platform_fee.toFixed(2)}</Text>
+            </View>
+            <View style={[styles.feeRow, styles.feeRowHighlight]}>
+              <Text style={[styles.feeLabel, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
+                {isCustomer ? 'Your cost' : 'Your earnings'}
+              </Text>
+              <Text style={[styles.feeValue, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
+                ${isCustomer ? payment.amount.toFixed(2) : payment.worker_payout.toFixed(2)}
+              </Text>
             </View>
           </View>
         )}
@@ -799,5 +1018,75 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 24,
+  },
+
+  // ── Pending confirmation + dispute ──────────────────────────
+  bannerCopy: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  timerText: {
+    color: Colors.gold,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  bannerBtnRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+  },
+  disputeInputWrap: {
+    width: '100%',
+    gap: 6,
+  },
+  disputeInput: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    color: Colors.textPrimary,
+    fontSize: 14,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    minHeight: 70,
+    textAlignVertical: 'top',
+  },
+  disputeCharCount: {
+    color: Colors.textSecondary,
+    fontSize: 11,
+    textAlign: 'right',
+  },
+
+  // ── Fee transparency panel ──────────────────────────────────
+  feePanel: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.card,
+    gap: 4,
+  },
+  feeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  feeRowHighlight: {
+    marginTop: 4,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  feeLabel: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+  },
+  feeValue: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
