@@ -168,6 +168,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         // Flips stripe_payment_method_added = true on the matching profile.
         const setupIntent = event.data.object as Stripe.SetupIntent
         const customerId = setupIntent.customer as string
+        const paymentMethodId = setupIntent.payment_method as string | null
 
         console.log(
           `[stripe-webhook] setup_intent.succeeded for customer ${customerId}`
@@ -194,7 +195,9 @@ Deno.serve(async (req: Request): Promise<Response> => {
           throw new Error(`No profile for customer ${customerId}`)
         }
 
-        // Skip if already true (idempotent — Stripe may retry)
+        // Idempotency: skip if already added. Note — this also means
+        // stripe_payment_method_id won't refresh on card changes. Revisit
+        // at E-3 when expired-card fallback flow is wired.
         if (custProfile.stripe_payment_method_added) {
           console.log(`[stripe-webhook] stripe_payment_method_added already true for profile ${custProfile.id} — skipping`)
           break
@@ -202,7 +205,10 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
         const { error: custUpdateError } = await serviceClient
           .from('profiles')
-          .update({ stripe_payment_method_added: true })
+          .update({
+            stripe_payment_method_added: true,
+            ...(paymentMethodId ? { stripe_payment_method_id: paymentMethodId } : {}),
+          })
           .eq('stripe_customer_id', customerId)
 
         if (custUpdateError) {
@@ -211,7 +217,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
           )
         }
 
-        console.log(`[stripe-webhook] stripe_payment_method_added set to true for profile ${custProfile.id}`)
+        console.log(`[stripe-webhook] stripe_payment_method_added set to true for profile ${custProfile.id}, payment_method=${paymentMethodId ?? 'none'}`)
         break
       }
 

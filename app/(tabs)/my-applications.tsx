@@ -69,21 +69,25 @@ function bidStatusLabel(status: string): string {
 // Job status — the underlying job's lifecycle state
 function jobStatusColor(status: string): string {
   switch (status) {
-    case 'open':        return Colors.gold;
-    case 'matched':     return Colors.green;
-    case 'in_progress': return '#E5901A';
-    case 'completed':   return Colors.textSecondary;
-    default:            return Colors.textSecondary;
+    case 'open':                  return Colors.gold;
+    case 'matched':               return Colors.green;
+    case 'in_progress':           return '#E5901A';
+    case 'pending_confirmation':  return '#E5901A';
+    case 'completed':             return Colors.textSecondary;
+    case 'disputed':              return Colors.red;
+    default:                      return Colors.textSecondary;
   }
 }
 
 function jobStatusLabel(status: string): string {
   switch (status) {
-    case 'open':        return 'OPEN';
-    case 'matched':     return 'MATCHED';
-    case 'in_progress': return 'IN PROGRESS';
-    case 'completed':   return 'COMPLETED';
-    default:            return status.toUpperCase();
+    case 'open':                  return 'OPEN';
+    case 'matched':               return 'MATCHED';
+    case 'in_progress':           return 'IN PROGRESS';
+    case 'pending_confirmation':  return 'AWAITING CONFIRMATION';
+    case 'completed':             return 'COMPLETED';
+    case 'disputed':              return 'DISPUTED';
+    default:                      return status.toUpperCase();
   }
 }
 
