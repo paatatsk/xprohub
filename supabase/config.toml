@@ -456,3 +456,13 @@ verify_jwt = true
 import_map = "./functions/hire-and-charge/deno.json"
 entrypoint = "./functions/hire-and-charge/index.ts"
 
+[functions.release-payment]
+enabled = true
+# Dual-path: customer JWT (Path A) or service secret (Path B).
+# verify_jwt = true — service role calls bypass at infra level;
+# auto-release cron authenticates via X-Service-Secret header
+# checked inside the function (Chunk E-5).
+verify_jwt = true
+import_map = "./functions/release-payment/deno.json"
+entrypoint = "./functions/release-payment/index.ts"
+
