@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-14 (D-8 verified Tests 1-4)
+**As of:** 2026-05-14 (Chunk D complete)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -191,10 +191,11 @@ Build sequence (8 steps):
   ACTIVE, all three Stripe secrets confirmed present, both webhook
   endpoints registered. Completed incrementally during D-2 and
   D-3; verified satisfied 2026-05-14.
-- 🟡 D-8: End-to-end iPhone test — Tests 1-4 PASS 2026-05-14
-  (full Account 1 flow including form preservation). Test 5
-  (Account 2 second-user verification) pending. Production bug
-  found and fixed during test — see POLISH_PASS.md.
+- ✅ D-8: End-to-end iPhone test — All 5 tests PASS 2026-05-14.
+  Account 1 full happy path + form preservation + DB flag flip +
+  webhook logs (D-3 dual-secret verified on production traffic) +
+  Account 2 second-user full flow with independent Stripe Customer.
+  Production bug found and fixed during test — see POLISH_PASS.md.
 
 Live DB pre-verified: stripe_customer_id column already exists
 (original schema, pre-migration). stripe_payment_method_added
@@ -343,4 +344,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D effectively complete: D-1 through D-7 shipped, D-8 Tests 1-4 PASS (2026-05-14). Test 5 (Khatuna second-account verification) pending — can run anytime, no code dependency. Next milestone: Chunk E (payout release) design and build.
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D COMPLETE: all 8 steps shipped and verified end-to-end on iPhone 2026-05-14 (two independent accounts, full Stripe sandbox flow, production bug caught and fixed during test). Next milestone: Chunk E (payout release) design and build.
