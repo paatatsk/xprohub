@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, TextInput, ActivityIndicator,
-  KeyboardAvoidingView, Platform, Alert,
+  KeyboardAvoidingView, Platform, Alert, Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
@@ -45,6 +45,7 @@ interface PaymentRow {
   auto_release_at: string | null;
   escrow_status: string;
   disputed_at: string | null;
+  dispute_reason: string | null;
 }
 
 // ── Time formatter ─────────────────────────────────────────────────────────
@@ -222,7 +223,7 @@ export default function JobChatScreen() {
     if (!chat?.job?.id || chat.job.status === 'open') return;
     const { data } = await supabase
       .from('payments')
-      .select('amount, platform_fee, worker_payout, auto_release_at, escrow_status, disputed_at')
+      .select('amount, platform_fee, worker_payout, auto_release_at, escrow_status, disputed_at, dispute_reason')
       .eq('job_id', chat.job.id)
       .maybeSingle();
     if (data) setPayment(data as PaymentRow);
@@ -683,6 +684,28 @@ export default function JobChatScreen() {
           </View>
         )}
 
+        {jobStatus === 'disputed' && (
+          <View style={styles.lifecycleBanner}>
+            <View style={styles.disputedBadge}>
+              <Text style={styles.disputedBadgeText}>CONCERN RAISED</Text>
+            </View>
+            {payment?.dispute_reason ? (
+              <Text style={styles.disputeReasonText}>
+                "{payment.dispute_reason}"
+              </Text>
+            ) : null}
+            <Text style={styles.bannerCopy}>
+              Contact support to resolve this concern.
+            </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('mailto:hello@xprohub.com')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.emailLink}>hello@xprohub.com</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {(jobStatus === 'cancelled' || jobStatus === 'canceled') && (
           <View style={styles.lifecycleBanner}>
             <View style={styles.lifecycleStaticBadgeCancelled}>
@@ -1059,6 +1082,34 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: 11,
     textAlign: 'right',
+  },
+  disputedBadge: {
+    borderWidth: 1.5,
+    borderColor: Colors.red,
+    borderRadius: Radius.full,
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  disputedBadgeText: {
+    color: Colors.red,
+    fontWeight: 'bold',
+    fontSize: 12,
+    letterSpacing: 1.5,
+  },
+  disputeReasonText: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    lineHeight: 18,
+    paddingHorizontal: Spacing.sm,
+  },
+  emailLink: {
+    color: Colors.gold,
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textDecorationLine: 'underline',
   },
 
   // ── Fee transparency panel ──────────────────────────────────
