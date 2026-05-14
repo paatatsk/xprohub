@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
+import { handleNextAction } from '@stripe/stripe-react-native';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -298,34 +299,135 @@ export default function JobBidsScreen() {
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   function handleAccept(bid: BidWithWorker) {
+    const workerName = bid.worker?.full_name ?? 'Worker';
+    const price = bid.proposed_price?.toFixed(2) ?? '0.00';
+
     Alert.alert(
-      'Accept Application',
-      'This will decline all other pending applications on this job.',
+      `Hire ${workerName}?`,
+      `This charges your card $${price} and declines all other applications.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Accept',
+          text: 'Hire & Charge',
           onPress: async () => {
             setActionError(null);
             setActionLoading(prev => ({ ...prev, [bid.id]: true }));
 
-            const { data, error: rpcErr } = await supabase
-              .rpc('accept_bid', { p_bid_id: bid.id });
-
-            setActionLoading(prev => ({ ...prev, [bid.id]: false }));
-
-            if (rpcErr) { setActionError(rpcErr.message); return; }
-
-            const chatId     = (data as string | null) ?? null;
-            const workerName = bid.worker?.full_name ?? 'Worker';
-
-            if (chatId) {
-              router.replace(
-                `/(tabs)/job-chat?chat_id=${chatId}&worker_name=${encodeURIComponent(workerName)}` as any
+            try {
+              // Step 1: invoke hire-and-charge Edge Function
+              const { data, error: fnError } = await supabase.functions.invoke(
+                'hire-and-charge',
+                { body: { bid_id: bid.id } },
               );
-            } else {
-              // Fallback: refresh bids so accepted state renders
-              await fetchBids();
+
+              // Handle Edge Function invocation error (network, 5xx)
+              if (fnError) {
+                setActionError(fnError.message ?? 'Something went wrong. Please try again.');
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                return;
+              }
+
+              // Handle card_requires_action (SCA / 3DS)
+              if (data?.error === 'card_requires_action' && data.client_secret) {
+                const { error: nextActionErr } = await handleNextAction(
+                  data.client_secret,
+                  'xprohub://stripe-return',
+                );
+
+                if (nextActionErr) {
+                  setActionError('Verification failed. Please try again or update your payment method.');
+                  setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                  return;
+                }
+
+                // Step 2: resume hire with the verified PaymentIntent
+                const { data: resumeData, error: resumeErr } = await supabase.functions.invoke(
+                  'hire-and-charge',
+                  { body: { bid_id: bid.id, payment_intent_id: data.payment_intent_id } },
+                );
+
+                if (resumeErr || resumeData?.error) {
+                  setActionError(resumeData?.message ?? resumeErr?.message ?? 'Hire failed after verification.');
+                  setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                  return;
+                }
+
+                // SCA resume succeeded — navigate to chat
+                const resumeChatId = resumeData?.chat_id as string | null;
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                if (resumeChatId) {
+                  router.replace(
+                    `/(tabs)/job-chat?chat_id=${resumeChatId}&worker_name=${encodeURIComponent(workerName)}` as any
+                  );
+                } else {
+                  await fetchBids();
+                }
+                return;
+              }
+
+              // Handle card_expired — route to payment-setup
+              if (data?.error === 'card_expired') {
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                Alert.alert(
+                  'Card Expired',
+                  data.message ?? 'The card on file has expired. Please update your payment method.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Update Card',
+                      onPress: () => router.push(
+                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/(tabs)/job-bids?job_id=${job_id}`)}` as any
+                      ),
+                    },
+                  ]
+                );
+                return;
+              }
+
+              // Handle no payment method — route to payment-setup
+              if (
+                data?.error === 'No Stripe customer on file. Please add a payment method first.' ||
+                data?.error === 'No payment method on file. Please add a card first.'
+              ) {
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                Alert.alert(
+                  'Payment Method Required',
+                  'Please add a card before hiring.',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Set Up Payment',
+                      onPress: () => router.push(
+                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/(tabs)/job-bids?job_id=${job_id}`)}` as any
+                      ),
+                    },
+                  ]
+                );
+                return;
+              }
+
+              // Handle other errors (card_declined, hire_failed, etc.)
+              if (data?.error) {
+                setActionError(data.message ?? 'Hire could not be completed. Please try again.');
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                return;
+              }
+
+              // Success — navigate to chat
+              const chatId = data?.chat_id as string | null;
+              setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+
+              if (chatId) {
+                router.replace(
+                  `/(tabs)/job-chat?chat_id=${chatId}&worker_name=${encodeURIComponent(workerName)}` as any
+                );
+              } else {
+                await fetchBids();
+              }
+            } catch (err) {
+              console.error('[job-bids] handleAccept unexpected error:', err);
+              setActionError('Something went wrong. Please try again.');
+              setActionLoading(prev => ({ ...prev, [bid.id]: false }));
             }
           },
         },
