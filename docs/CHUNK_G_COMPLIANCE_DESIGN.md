@@ -166,19 +166,24 @@ functionality. Stub screens with placeholder text trigger
 "incomplete functionality" rejection.
 
 Scope — decide per screen:
-- match.tsx (23 lines, stub) — hide from tab bar or "Coming Soon"
-- chat.tsx (22 lines, stub) — hide; real chat is job-chat.tsx
-- payment.tsx (23 lines, stub) — hide or redirect to
-  payment-setup.tsx
-- belt.tsx (23 lines, stub) — hide or "Coming Soon" state
-- earnings.tsx (23 lines, stub) — hide or "Coming Soon" state
-- notifications.tsx (22 lines, stub) — hide or "Coming Soon"
+- match.tsx (23 lines, stub) — ✅ unregistered
+- chat.tsx (22 lines, stub) — ✅ unregistered; real chat is job-chat.tsx
+- payment.tsx (23 lines, stub) — ✅ unregistered; real screen is payment-setup.tsx
+- belt.tsx (23 lines, stub) — ✅ unregistered
+- earnings.tsx (23 lines, stub) — ✅ unregistered
+- notifications.tsx (22 lines, stub) — ✅ unregistered
 
-Decision criteria: if the screen is reachable from any navigation
-path in the app, it must either show useful content or be removed
-from navigation. Apple testers will find every reachable screen.
+Approach taken: removed Tabs.Screen registrations from
+app/(tabs)/_layout.tsx. Source .tsx files retained as templates
+for future builds. Without registrations, screens lose the Dark
+Gold header treatment and are not discoverable via normal UI
+navigation. Caveat: Expo Router file-based auto-discovery may
+still create routes for the underlying .tsx files; if iPhone
+testing reveals they're reachable via direct URL, escalate to
+href: null on individual entries. direct-hire.tsx stays
+registered — wired from market.tsx:444 (Workers Feed tap).
 
-Status: ⏳
+Status: ✅ Shipped 2026-05-15 (commit `7dc8112`)
 
 ### G-8: Privacy nutrition labels in App Store Connect
 

@@ -12,22 +12,24 @@
   with dual-handle slider. Needs: max value cap (logarithmic?),
   tick marks, haptic feedback. Captured 2026-04-19.
 
-- **Step 12 chat-screen review-state race** — `userHasReviewed` is read once on
+- ~~**Step 12 chat-screen review-state race**~~ — `userHasReviewed` is read once on
   initial load; after submitting a review and navigating back, the state is stale
   and "LEAVE A REVIEW" stays visible. Tapping it triggers a duplicate INSERT that
   hits the `reviews` unique constraint and surfaces an error the user shouldn't see.
   **Fix:** Add `useFocusEffect` to `job-chat.tsx` to re-run the existing-review
   SELECT (filtered by `job_id` + `reviewer_id`) every time the screen regains focus.
   Short, isolated — hotfix-eligible between any major step. Captured 2026-04-30.
+  **Resolved 2026-05-15 (commit `0af9e9a`).** useFocusEffect added to job-chat.tsx.
 
-- **id.tsx Step 1 header hidden behind iOS status bar** — the eyebrow
+- ~~**id.tsx Step 1 header hidden behind iOS status bar**~~ — the eyebrow
   ("STEP 1 OF 4") and heading partially render behind the iOS status bar
   at the top of the screen. Affects all steps (photo, categories, tasks,
   superpowers) since they share the same layout. Likely fix: add `'top'`
   to `SafeAreaView edges` (currently `edges={['bottom']}` only). Captured
   2026-05-08, observed during Task 4 iPhone testing.
+  **Resolved 2026-05-15 (commit `0af9e9a`).** All four SafeAreaView edges changed to `['top', 'bottom']`.
 
-- **profile-setup.tsx silently swallows avatar upload errors** — line 70
+- ~~**profile-setup.tsx silently swallows avatar upload errors**~~ — line 70
   checks `if (!uploadError)` and proceeds to set the public URL, but the
   else branch is empty. If the upload fails (network error, bucket missing,
   RLS denial), the profile UPDATE runs without `avatar_url`, leaving the
@@ -35,6 +37,7 @@
   (commit `d40d58b`) when the avatars Storage bucket was discovered to not
   exist. **Fix:** mirror id.tsx's pattern — display error, return early.
   Captured 2026-05-09.
+  **Resolved 2026-05-15 (commit `0af9e9a`).** Inverted to fail-fast: setError + setLoading(false) + return.
 
 ---
 
@@ -588,16 +591,13 @@ useful before any Stripe production-mode testing.
 ---
 
 **Redundant supabase/.temp/ entry in root .gitignore**
-**Captured:** 2026-04-30 | **Area:** Tidiness | **Severity:** Cosmetic
+**Captured:** 2026-04-30 | **Area:** Tidiness | **Severity:** Resolved 2026-05-15 (commit `7dc8112`)
 
 After `supabase init` in B-3, `supabase/.gitignore` was auto-created and already
 ignores `.temp`. The earlier entry in the root `.gitignore` (`supabase/.temp/`) is
 therefore redundant. Both work, no conflict, but duplicate coverage.
 
-**Fix:** Remove `supabase/.temp/` line from root `.gitignore`. Verify by running
-`git status` after creating a file inside `supabase/.temp/` — should still be ignored.
-
-**Build this when:** Anytime. Cosmetic cleanup, low priority.
+Removed the comment header and redundant line from root `.gitignore`.
 
 ---
 
@@ -635,13 +635,12 @@ sql_paths = ["./seed/XProHub_TaskLibrary_Seed_v1.1.sql"]
 ## Documentation Hygiene
 
 **Reconcile font references across docs**
-**Captured:** 2026-05-02 | **Severity:** Low | **Partially resolved**
+**Captured:** 2026-05-02 | **Severity:** Resolved 2026-05-15 (commit `7dc8112`)
 
 `CLAUDE.md` fixed (commit `397cc3b`). `SESSION_HANDOUT.md` fixed
-(2026-05-07 Task 1). `docs/CHUNK_C_DESIGN.md` still references
-"Oswald" in two places (lines 438, 450) — cosmetic, the design doc
-describes intent at time of writing. Actual codebase uses
-`Fonts.heading = 'SpaceGrotesk-Bold'` in `constants/theme.ts`.
+(2026-05-07 Task 1). `docs/CHUNK_C_DESIGN.md` two Oswald references
+corrected to Space Grotesk (commit `7dc8112`). All font references
+now consistent across all docs.
 
 ---
 
