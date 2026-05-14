@@ -60,7 +60,7 @@ function bidStatusLabel(status: string): string {
   switch (status) {
     case 'pending':   return 'PENDING';
     case 'accepted':  return 'ACCEPTED';
-    case 'declined':  return 'DECLINED';
+    case 'declined':  return 'RELEASED';
     case 'withdrawn': return 'WITHDRAWN';
     default:          return status.toUpperCase();
   }
