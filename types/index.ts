@@ -7,7 +7,8 @@ export type BeltLevel =
   | 'blue' | 'purple' | 'brown' | 'black';
 
 export type JobStatus =
-  | 'open' | 'matched' | 'in_progress' | 'completed' | 'cancelled' | 'expired';
+  | 'open' | 'matched' | 'in_progress' | 'pending_confirmation'
+  | 'completed' | 'cancelled' | 'expired' | 'disputed';
 
 export type EscrowStatus =
   | 'pending' | 'held' | 'released' | 'refunded' | 'disputed';
