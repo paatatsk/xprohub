@@ -221,10 +221,93 @@ Deno.serve(async (req: Request): Promise<Response> => {
         break
       }
 
-      case 'payment_intent.succeeded':
-        // Chunk D — Customer payment confirmed; mark escrow held in payments table.
-        console.log('[stripe-webhook] payment_intent.succeeded — handler wired in Chunk D')
+      case 'payment_intent.succeeded': {
+        // Chunk E — Customer payment captured at hire. Creates the
+        // payments row with escrow_status = 'held' via create_payment_record.
+        // Single-writer: this webhook is the SOLE writer for payment records.
+        // hire-and-charge Edge Function (E-3) does charge → accept_bid only.
+        const pi = event.data.object as Stripe.PaymentIntent
+        const jobId = pi.metadata?.job_id
+        const feeCentsStr = pi.metadata?.platform_fee_cents
+        const payoutCentsStr = pi.metadata?.worker_payout_cents
+
+        // Guard: skip PaymentIntents not created by hire-and-charge
+        if (!jobId || !feeCentsStr || !payoutCentsStr) {
+          console.log(
+            `[stripe-webhook] payment_intent.succeeded for ${pi.id} — ` +
+            'missing XProHub metadata, likely external event. Skipping.'
+          )
+          break
+        }
+
+        const feeCents = parseInt(feeCentsStr, 10)
+        const payoutCents = parseInt(payoutCentsStr, 10)
+
+        if (isNaN(feeCents) || isNaN(payoutCents)) {
+          console.warn(
+            `[stripe-webhook] payment_intent.succeeded for ${pi.id} — ` +
+            `invalid metadata: fee=${feeCentsStr}, payout=${payoutCentsStr}. Skipping.`
+          )
+          break
+        }
+
+        // Convert cents → dollars for NUMERIC(10,2) columns
+        const amountDollars = pi.amount / 100
+        const feeDollars = feeCents / 100
+        const payoutDollars = payoutCents / 100
+
+        console.log(
+          `[stripe-webhook] payment_intent.succeeded for ${pi.id}: ` +
+          `job=${jobId}, amount=$${amountDollars}, fee=$${feeDollars}, payout=$${payoutDollars}`
+        )
+
+        // Create payment record. State gate inside the function requires
+        // job.status = 'matched'. If the webhook arrives before accept_bid
+        // completes (race between Stripe delivery and Edge Function RPC),
+        // the function raises an exception → Stripe retries with backoff
+        // (~5 min), by which time accept_bid will have completed.
+        const { data: paymentId, error: createErr } = await serviceClient
+          .rpc('create_payment_record', {
+            p_job_id: jobId,
+            p_stripe_payment_intent_id: pi.id,
+            p_amount: amountDollars,
+            p_platform_fee: feeDollars,
+            p_worker_payout: payoutDollars,
+          })
+
+        if (createErr) {
+          throw new Error(
+            `[stripe-webhook] create_payment_record failed for PI ${pi.id}: ${createErr.message}`
+          )
+        }
+
+        // Store stripe_charge_id on the payment row (needed by E-5
+        // release-payment for Transfer source_transaction).
+        const chargeId = typeof pi.latest_charge === 'string'
+          ? pi.latest_charge
+          : (pi.latest_charge as any)?.id ?? null
+
+        if (chargeId && paymentId) {
+          const { error: chargeUpdateErr } = await serviceClient
+            .from('payments')
+            .update({ stripe_charge_id: chargeId })
+            .eq('id', paymentId)
+
+          if (chargeUpdateErr) {
+            throw new Error(
+              `[stripe-webhook] Failed to set stripe_charge_id on payment ${paymentId}: ${chargeUpdateErr.message}`
+            )
+          }
+          console.log(
+            `[stripe-webhook] stripe_charge_id=${chargeId} set on payment ${paymentId}`
+          )
+        }
+
+        console.log(
+          `[stripe-webhook] Payment record created: id=${paymentId} for PI ${pi.id}`
+        )
         break
+      }
 
       case 'payment_intent.payment_failed':
         // Chunk D — Payment attempt failed; notify customer, handle job state.
