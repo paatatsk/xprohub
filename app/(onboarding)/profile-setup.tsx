@@ -117,8 +117,8 @@ export default function ProfileSetupScreen() {
       return;
     }
 
-    if (returnTo) {
-      router.replace(decodeURIComponent(returnTo) as any);
+    if (isGate) {
+      router.back();
     } else {
       router.replace('/(tabs)');
     }
