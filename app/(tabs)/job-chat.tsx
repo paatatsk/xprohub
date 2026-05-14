@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -184,6 +184,25 @@ export default function JobChatScreen() {
       setLoading(false);
     })();
   }, [chat_id]);
+
+  // Re-check review status when screen regains focus (fixes stale state
+  // after submitting a review and navigating back — POLISH_PASS #2)
+  useFocusEffect(
+    useCallback(() => {
+      if (!chat?.job?.id || !currentUserId) return;
+
+      (async () => {
+        const { data } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('job_id', chat.job!.id)
+          .eq('reviewer_id', currentUserId)
+          .maybeSingle();
+
+        setUserHasReviewed(!!data);
+      })();
+    }, [chat?.job?.id, currentUserId])
+  );
 
   // ── Realtime subscription ─────────────────────────────────────────────────
 

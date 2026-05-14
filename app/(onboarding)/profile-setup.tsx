@@ -67,12 +67,16 @@ export default function ProfileSetupScreen() {
         .from('avatars')
         .upload(fileName, blob, { upsert: true, contentType: `image/${ext}` });
 
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
-        avatarUrl = urlData.publicUrl;
+      if (uploadError) {
+        setError('Photo upload failed. Please try again.');
+        setLoading(false);
+        return;
       }
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+      avatarUrl = urlData.publicUrl;
     }
 
     const { error: profileError } = await supabase

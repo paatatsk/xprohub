@@ -279,7 +279,7 @@ export default function IdScreen() {
 
   if (step === 1) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -331,7 +331,7 @@ export default function IdScreen() {
   if (step === 2) {
     const n = selectedCatIds.size;
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -397,7 +397,7 @@ export default function IdScreen() {
     const n = selectedTaskIds.size;
     const catOrder = categories.filter(c => selectedCatIds.has(c.id));
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -482,7 +482,7 @@ export default function IdScreen() {
   const nFeatured = featuredTaskIds.size;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
