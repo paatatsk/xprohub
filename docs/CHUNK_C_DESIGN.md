@@ -433,7 +433,7 @@ Eyebrow:  #C9A84C, 11px, fontWeight 700, letterSpacing 3
 Heading:  #C9A84C, 28px, fontWeight bold, letterSpacing 2
           -- matches id.tsx's `heading` style
           e.g. "UNLOCK YOUR EARNINGS"
-          -- Oswald font family if loaded, system bold fallback
+          -- Space Grotesk font family (heading), system bold fallback
 
 Subhead:  #888890, 13px, lineHeight 19
           -- matches id.tsx's `subhead` style
@@ -445,7 +445,7 @@ Body:     #888890, 14px, lineHeight 20
 
 Playfair Display is not appropriate here — that's the serif editorial
 font (taglines and inspirational text). This is transactional/
-functional UI. Oswald/bold is right.
+functional UI. Space Grotesk Bold is right.
 
 ### Status indicator — 3-step progress track
 

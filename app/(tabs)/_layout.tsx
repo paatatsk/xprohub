@@ -29,13 +29,7 @@ export default function TabLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="market"        options={{ ...headerDefaults, headerShown: true, title: 'LIVE MARKET',   headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="post"          options={{ ...headerDefaults, headerShown: true, title: 'POST A JOB',    headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="earnings"      options={{ ...headerDefaults, headerShown: true, title: 'EARNINGS',      headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="profile"       options={{ ...headerDefaults, headerShown: true, title: 'PROFILE',       headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="notifications" options={{ ...headerDefaults, headerShown: true, title: 'NOTIFICATIONS', headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="chat"          options={{ ...headerDefaults, headerShown: true, title: 'CHAT',          headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="belt"          options={{ ...headerDefaults, headerShown: true, title: 'BELT SYSTEM',   headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="match"         options={{ ...headerDefaults, headerShown: true, title: 'WORKER MATCH',  headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="payment"       options={{ ...headerDefaults, headerShown: true, title: 'PAYMENT',       headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="review"        options={{ ...headerDefaults, headerShown: true, title: 'RATE & REVIEW',  headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="direct-hire"   options={{ ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-chat"      options={{ ...headerDefaults, headerShown: true, title: 'CHAT',           headerLeft: () => <BackButton /> }} />
