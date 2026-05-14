@@ -514,6 +514,57 @@ confirmed in codebase.
 
 ---
 
+**D-8 production bug: webhook secret mismatch — found and fixed during live iPhone test**
+**Captured:** 2026-05-14 | **Area:** Operational / Stripe webhook secrets | **Severity:** Resolved — operational learning, no code change needed
+
+During D-8 iPhone end-to-end testing, Test 1 (happy path) hit
+the polling timeout fallback unexpectedly. PaymentSheet completed
+successfully, Stripe captured `setup_intent.succeeded`
+(evt_1TWoVc...), but both delivery attempts returned HTTP 400
+with body "Webhook signature verification failed."
+
+**Root cause:** `STRIPE_WEBHOOK_SECRET_PLATFORM` stored in
+Supabase secrets did not match the actual signing secret of the
+D-3 Stripe endpoint. The value was likely mangled when originally
+set via Windows PowerShell CLI on 2026-05-13 (special characters,
+quoting, or trailing newline in the `whsec_...` string).
+
+**Diagnosis path:** Edge Function logs showed the dual-secret
+fallback working correctly:
+1. `[stripe-webhook] Primary secret failed, trying platform secret`
+   — expected, because `setup_intent.succeeded` comes from the
+   "Your account" endpoint, not Connected accounts
+2. `[stripe-webhook] Signature verification failed` — platform
+   secret also failed, confirming the value was wrong
+
+The code was correct. The crypto was correct. The architecture
+was correct. Only the stored secret value was wrong.
+
+**Fix:** Re-revealed the signing secret from Stripe dashboard
+for the D-3 endpoint, then set the correct value via Supabase
+dashboard UI (Method A — bypasses shell encoding entirely).
+Verified via Stripe's "Resend" button on the failed event.
+Result: 200 OK delivery, "Recovered" status in Stripe dashboard,
+`stripe_payment_method_added` flipped to `true` in profiles table.
+
+**Discipline going forward:** Prefer Supabase dashboard UI over
+CLI for setting webhook secrets (`whsec_...` values contain
+characters that Windows PowerShell can mangle). CLI is fine for
+non-sensitive secrets; webhook signing secrets should use the
+dashboard's Environment Variables editor. This refines (does not
+replace) Locked Decision 10 in PROJECT_STATUS — Paata still sets
+all secrets directly; this just specifies the preferred input
+method for webhook signing secrets specifically.
+
+**Outcome:** Full Chunk D chain proven on production traffic:
+PaymentSheet → create-setup-intent → SetupIntent → webhook →
+dual-secret verification → DB flag flip → gate passes → job posts.
+The D-3 deferred synthetic test was fulfilled organically — the
+bug actually made it a better test because it exercised both the
+failure path and the recovery path.
+
+---
+
 ## Deployment & Dev Environment
 
 Deployment prep and local dev config items. None block current development;

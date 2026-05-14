@@ -1,6 +1,6 @@
 # XProHub — Chunk D Design: Customer Payment Method Gate
 
-**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13; D-4 prerequisites shipped 2026-05-13; D-4 through D-7 closed 2026-05-14)
+**Created:** 2026-05-11 (D-2 spec corrected 2026-05-12; D-3 webhook architecture corrected 2026-05-13; D-4 prerequisites shipped 2026-05-13; D-4 through D-7 closed 2026-05-14; D-8 verified 2026-05-14)
 **Author:** Paata Tskhadiashvili + chat-Claude
 **Status:** Design complete — ready to build
 
@@ -342,3 +342,21 @@ D-8: End-to-end test on iPhone
   Stripe webhook endpoints registered (Connected accounts +
   Your account). No deploy work remained — D-7 was effectively
   closed incrementally during D-2 and D-3.
+- D-8 iPhone end-to-end test executed 2026-05-14. All four
+  primary test paths PASS: gate fires correctly on Submit when
+  stripe_payment_method_added is false (D-5), PaymentSheet
+  renders and captures test card via create-setup-intent (D-4),
+  webhook lands flag flip via dual-secret path (D-3), form
+  state preserved across the payment-setup round trip (D-5
+  deferred verification confirmed — all fields populated on
+  return), job posts successfully after gate passes.
+- D-3 deferred synthetic test fulfilled: real
+  setup_intent.succeeded event produced the "Primary secret
+  failed, trying platform secret" log line, confirming
+  dual-secret architecture works on production traffic.
+- Production bug found during test: STRIPE_WEBHOOK_SECRET_PLATFORM
+  was mismatched (likely mangled by PowerShell CLI during D-3
+  setup). Fixed via Supabase dashboard UI re-set. Full
+  diagnostic and fix captured in POLISH_PASS.md entry from
+  2026-05-14. No code change needed — architecture was correct,
+  only the stored secret value was wrong.

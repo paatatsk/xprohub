@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-14 (D-7 closed)
+**As of:** 2026-05-14 (D-8 verified Tests 1-4)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -191,7 +191,10 @@ Build sequence (8 steps):
   ACTIVE, all three Stripe secrets confirmed present, both webhook
   endpoints registered. Completed incrementally during D-2 and
   D-3; verified satisfied 2026-05-14.
-- D-8: End-to-end test on iPhone (both accounts)
+- 🟡 D-8: End-to-end iPhone test — Tests 1-4 PASS 2026-05-14
+  (full Account 1 flow including form preservation). Test 5
+  (Account 2 second-user verification) pending. Production bug
+  found and fixed during test — see POLISH_PASS.md.
 
 Live DB pre-verified: stripe_customer_id column already exists
 (original schema, pre-migration). stripe_payment_method_added
@@ -340,4 +343,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D nearly complete: D-1 through D-7 all done (2026-05-12 to 2026-05-14). Next: D-8 iPhone end-to-end test with two accounts (Paata + Khatuna) — verifies the full Chunk D flow including the deferred D-3 dual-secret synthetic test (via Edge Function logs) and the D-5 form state preservation question.
+C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D effectively complete: D-1 through D-7 shipped, D-8 Tests 1-4 PASS (2026-05-14). Test 5 (Khatuna second-account verification) pending — can run anytime, no code dependency. Next milestone: Chunk E (payout release) design and build.
