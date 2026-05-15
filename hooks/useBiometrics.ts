@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// NOTE: AsyncStorage is unencrypted — acceptable for Expo Go testing.
-// Replace with expo-secure-store before App Store submission.
+// Stored in iOS Keychain via expo-secure-store.
+// Hardware-encrypted, not included in device backups.
+// AsyncStorage import retained for defensive cleanup only.
 const CREDS_KEY = 'xprohub_biometric_creds';
 
 interface StoredCredentials {
@@ -17,11 +19,18 @@ export function useBiometrics() {
 
   useEffect(() => {
     async function check() {
+      // Defensive cleanup: erase any plaintext credentials that might exist
+      // in AsyncStorage from the pre-SecureStore version of this hook.
+      // Cheap no-op after the first run (removeItem on a missing key returns
+      // without error). Runs every mount intentionally — costs ~1ms and
+      // guarantees no plaintext lingers if the file ever reverts.
+      try { await AsyncStorage.removeItem(CREDS_KEY); } catch {}
+
       const hardware = await LocalAuthentication.hasHardwareAsync();
       const enrolled = await LocalAuthentication.isEnrolledAsync();
       setIsAvailable(hardware && enrolled);
 
-      const stored = await AsyncStorage.getItem(CREDS_KEY);
+      const stored = await SecureStore.getItemAsync(CREDS_KEY);
       setHasCredentials(stored !== null);
     }
     check();
@@ -37,18 +46,22 @@ export function useBiometrics() {
   }
 
   async function saveCredentials(email: string, password: string): Promise<void> {
-    await AsyncStorage.setItem(CREDS_KEY, JSON.stringify({ email, password }));
+    // SecureStore defaults are correct here: AFTER_FIRST_UNLOCK accessibility,
+    // no requireAuthentication. Biometric prompt is handled by the caller via
+    // LocalAuthentication.authenticateAsync() — adding requireAuthentication
+    // here would double-prompt.
+    await SecureStore.setItemAsync(CREDS_KEY, JSON.stringify({ email, password }));
     setHasCredentials(true);
   }
 
   async function getCredentials(): Promise<StoredCredentials | null> {
-    const stored = await AsyncStorage.getItem(CREDS_KEY);
+    const stored = await SecureStore.getItemAsync(CREDS_KEY);
     if (!stored) return null;
     return JSON.parse(stored) as StoredCredentials;
   }
 
   async function clearCredentials(): Promise<void> {
-    await AsyncStorage.removeItem(CREDS_KEY);
+    await SecureStore.deleteItemAsync(CREDS_KEY);
     setHasCredentials(false);
   }
 
