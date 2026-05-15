@@ -7,6 +7,7 @@ import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -100,17 +101,19 @@ export default function RootLayout() {
   }, [session, loading, segments]);
 
   return (
-    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
-      <StatusBar style="light" backgroundColor="#0E0E0F" />
-      <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="splash" />
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(onboarding)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="job/[id]" />
-        <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
-        <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
-      </Stack>
-    </StripeProvider>
+    <ErrorBoundary>
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
+        <StatusBar style="light" backgroundColor="#0E0E0F" />
+        <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="splash" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(onboarding)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="job/[id]" />
+          <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
+          <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
+        </Stack>
+      </StripeProvider>
+    </ErrorBoundary>
   );
 }
