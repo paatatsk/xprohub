@@ -2,7 +2,7 @@
 
 **Created:** 2026-05-14
 **Author:** Paata Tskhadiashvili + chat-Claude
-**Status:** Design complete — build deferred until after Chunks D and E ship
+**Status:** Design complete — Chunks D and E shipped, build ready
 
 ---
 
@@ -57,18 +57,135 @@ text.
 Apple Guideline 5.1.1(v) — mandatory for all apps with account
 creation. Top rejection reason for marketplace apps.
 
-Scope:
+#### Locked Decisions
+
+**Anonymize, not hard-delete.** 11 of 14 FK columns referencing
+profiles.id use NO ACTION — hard-deleting the profile row would
+violate referential integrity. Financial records (payments,
+escrow history) must be retained for Stripe compliance and
+dispute resolution. Strategy: null PII fields in profiles,
+preserve the row as a tombstone. The 3 CASCADE FKs
+(worker_skills, user_badges, notifications) never fire because
+the profile row is kept — those tables are cleaned up explicitly
+in the Edge Function.
+
+**Auth user: rotate credentials, do not delete.** The FK from
+profiles.id to auth.users(id) is ON DELETE CASCADE. Calling
+supabase.auth.admin.deleteUser() would cascade-delete the
+profile row, which would then violate NO ACTION constraints on
+11 downstream FK columns and fail. Instead: rotate email to
+`deleted-{uuid}@xprohub.invalid`, set a random password via
+admin.updateUserById(), and set banned_until to 9999-12-31.
+The auth record persists but is permanently unusable.
+
+**Money-state blocker.** Reject deletion if the user has any
+active financial obligations:
+- Jobs in status: in_progress, pending_confirmation, disputed
+- Payments with escrow_status: held
+The UI must surface a clear explanation: "You have active jobs
+or held payments. Complete or cancel them before deleting your
+account."
+
+**Stripe cleanup: capability-disable, not delete or reject.**
+- If stripe_customer_id exists: delete the Stripe Customer
+  object (stripe.customers.del). Removes saved payment methods.
+  Safe — no downstream FK implications on Stripe's side.
+- If stripe_account_id exists: deactivate the Connected
+  Account's capabilities (stripe.accounts.update with
+  capabilities.transfers.requested = false,
+  capabilities.card_payments.requested = false). Do NOT delete
+  the Connected Account — Stripe retains transfer and payout
+  history on the account object for compliance.
+
+  Note on stripe.accounts.reject(): This is the explicit Stripe
+  API for terminating a Connected Account, but we choose
+  capability-disable instead. reject() flags the account in
+  Stripe's internal fraud/compliance reporting system, which is
+  appropriate for platform-initiated enforcement (fraud, ToS
+  violation) but not for routine user-initiated deletion. The
+  account remains on Stripe's records either way — reject() just
+  adds a negative signal we have no reason to send. Documenting
+  this so the question doesn't get reopened.
+
+#### Per-table Deletion Strategy
+
+| Table | Action | Reason |
+|---|---|---|
+| auth.users | Rotate email + password, ban | CASCADE FK to profiles — cannot delete |
+| profiles | Anonymize PII, preserve row | Tombstone for FK integrity |
+| jobs (as customer) | Cancel if open; preserve completed | Financial audit trail |
+| bids (on deleted user's cancelled jobs) | Auto-decline pending | Worker Dignity — see below |
+| bids (as worker on others' jobs) | Preserve | Job history for other party |
+| chats | Preserve | Other party's conversation record |
+| messages | Preserve | Other party's conversation record |
+| payments | Preserve all | Stripe compliance, dispute window |
+| reviews (as author) | Anonymize author display; preserve text + rating | Platform trust data |
+| reviews (as subject) | Preserve | Other party's reputation record |
+| worker_skills | Delete | No downstream FK; cleanup |
+| user_badges | Delete | No downstream FK; cleanup |
+| notifications | Delete | No retention value |
+| xp_transactions | Preserve | Audit trail |
+
+**Open-bid handling (Worker Dignity).** When account deletion
+cancels a user's open jobs, all pending bids on those jobs must
+be auto-declined — workers must not be left hanging on a job
+that no longer exists. Mechanism: direct
+`UPDATE bids SET status = 'declined' WHERE job_id IN
+(cancelled job IDs) AND status = 'pending'` inside the
+delete-account Edge Function. The existing `decline_bid()`
+Postgres function cannot be reused here because it enforces
+`auth.uid() = customer_id`, which won't match in a service_role
+Edge Function context. No side effects are lost — decline_bid()
+is a pure status UPDATE with no triggers, notifications, or XP
+writes (notification support is commented as "future step" in
+the migration).
+
+#### Scope
+
 - New settings/profile screen with "Delete My Account" option
 - Confirmation flow (two-step: "Are you sure?" + final confirm)
-- New Edge Function: delete-account
-  - Delete Supabase auth user (admin API)
-  - Delete or anonymize profiles row
-  - If stripe_customer_id exists: delete Stripe Customer object
-  - If stripe_account_id exists: delete Stripe Connected Account
-  - Cascade: jobs, bids, messages, reviews authored by user
-    (decide during build: hard delete vs anonymize per table)
+- Money-state pre-check: query for blocking conditions before
+  showing final confirm
+- New Edge Function: delete-account (runs as service_role)
+  1. Money-state check (reject if active obligations exist)
+  2. Stripe cleanup (needs stripe_customer_id and
+     stripe_account_id from profiles — must run before
+     anonymization nulls them)
+  3. Cancel user's open jobs + auto-decline pending bids on them
+  4. Anonymize profiles row (null PII fields + Stripe IDs)
+  5. Rotate auth credentials + set banned_until
+  6. Clean up: delete worker_skills, user_badges, notifications
+  7. Return success
 - RLS policy: user can only trigger deletion for own account
 - Post-deletion: sign out, route to welcome screen
+
+#### Idempotency
+
+The Edge Function must be safely re-callable end-to-end if a
+previous invocation failed partway. Each step is idempotent:
+
+- **Money-state check**: read-only query, always safe.
+- **Stripe cleanup**: catch `resource_missing` on
+  customers.del (already deleted) and already-deactivated
+  errors on accounts.update (capabilities already off).
+  Continue to next step.
+- **Cancel open jobs**: UPDATE with WHERE status = 'open' —
+  re-running on already-cancelled jobs is a no-op (status !=
+  'open' means zero rows affected).
+- **Auto-decline bids**: UPDATE with WHERE status = 'pending' —
+  re-running on already-declined bids is a no-op.
+- **Anonymize profiles**: setting NULL fields to NULL is a
+  no-op by construction.
+- **Auth credential rotation**: re-rotating is safe — a new
+  random password overwrites the previous random password.
+  banned_until is set to the same fixed date each time.
+- **Cleanup deletes** (worker_skills, user_badges,
+  notifications): DELETE WHERE user_id = X on an empty table
+  deletes zero rows.
+
+If the function crashes mid-way, the user retries from the
+client. Partial state (e.g., Stripe cleaned up but profile not
+yet anonymized) resolves on the second call.
 
 Status: ⏳
 
