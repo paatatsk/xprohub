@@ -377,13 +377,28 @@ whole platform — do not bypass it.
 - Become a Worker onboarding
 - Back navigation header on all tab screens except Home (dark gold, ‹ returns to Home)
 
-### 🟡 Milestone 3 — Transactions (Steps 8–12 complete, Step 13 in progress)
+### ✅ Milestone 3 — Transactions (complete)
 - Step 8: `accept_bid()` + `decline_bid()` Postgres functions, atomic auto-decline cascade, My Jobs + Job Bids screens, end-to-end verified on iPhone
 - Step 9: My Applications worker dashboard — bid history grouped by status
 - Step 10: Real Chat UI — Supabase Realtime message thread, bubbles, send input (`job-chat.tsx`)
 - Step 11: Job lifecycle CTAs — Mark In Progress / Mark Complete on chat screen
 - Step 12: Review flow — rating + comment form, wired into chat completed state
-- Step 13: Payment flow — Chunks A (schema) and B (infrastructure) complete. Chunk C-4a (Worker Stripe Connect onboarding) complete: stripe-connect screen, useStripeStatus hook, deep link return routes, Stripe gate in apply.tsx, account.updated webhook handler, 4 Edge Functions deployed. C-4b (ID gate), C-7 (end-to-end test), and Chunks D/E/F remaining. See `docs/PROJECT_STATUS_2026-05-03.md` for detailed status.
+- Step 13: Payment flow — all chunks (A through E) complete. Full Stripe Connect pipeline: customer payment method setup, hire-and-charge, escrow hold, payout release, auto-release cron (Cloudflare Worker, 72-hour timer), dispute path, transfer.created webhook backup. 6 Edge Functions deployed, end-to-end verified on iPhone.
+
+### 🟡 Chunk G — Launch Compliance (5 of 9 complete)
+- G-1: Account deletion — design locked (anonymize-not-delete, credential rotation, money-state blocker, Stripe capability-disable, per-table strategy, idempotency spec). Implementation pending.
+- G-2: Privacy Policy link — wired on signup.tsx + account.tsx. Placeholder URL (`xprohub.com/privacy`) pending legal copy.
+- G-3: Terms of Service link — wired on signup.tsx + account.tsx. Placeholder URL (`xprohub.com/terms`) pending legal copy.
+- G-4: User reporting — not started.
+- G-5: User blocking — not started.
+- G-6: Content moderation — locked: reactive-only for v1 (report-driven via G-4, 24-hour SLA).
+- G-7: Stub screen cleanup — shipped (6 stubs unregistered + profile.tsx).
+- G-8: Privacy nutrition labels — locked: declarations finalized for App Store Connect.
+- G-9: Pre-submission checklist — not started.
+- Account screen (`account.tsx`): About (version + support email), Legal (Privacy Policy + ToS links via WebBrowser), Sign Out (clears biometric credentials), Delete Account placeholder. Gear icon entry from Home header.
+- `lib/legal.ts`: centralizes placeholder URLs and support email constant.
+- Biometric credentials migrated from AsyncStorage to expo-secure-store (iOS Keychain, hardware-encrypted). Security fix commit `3c9a331`.
+- `docs/PLATFORM_FACT_SHEET_FOR_LEGAL.md`: technical fact sheet for Privacy Policy / ToS drafting (612 lines, under Paata's review).
 
 ### Design
 - Dark Gold theme locked: bg `#0E0E0F`, gold `#C9A84C`, card `#171719`
@@ -393,10 +408,11 @@ whole platform — do not bypass it.
 
 ## What Is NOT Built Yet
 
-### 🔲 Milestone 3 — Transactions (Step 13 remaining)
-- Step 13 Chunk C-4b: ID gate (photo + skill count check) in apply.tsx — Stripe gate already wired
-- Step 13 Chunk C-7: end-to-end test (deferred to post-C-4b)
-- Step 13 Chunks D, E, F: customer payment method, payout release, payment UI polish
+### 🔲 Chunk G — Launch Compliance (remaining items)
+- G-1: Account deletion implementation (design locked, Edge Function + UI pending)
+- G-4: User reporting (table + migration + UI on 4 surfaces)
+- G-5: User blocking (table + migration + feed filtering)
+- G-9: Pre-submission checklist verification
 
 ### 🔲 Milestone 4 — Trust & Reputation (deferred)
 - Belt System UI — data exists in schema, no UI surface yet

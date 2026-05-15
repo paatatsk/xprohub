@@ -220,6 +220,24 @@ Don't add UI copy that says "We commit to Worker Dignity™" or "We never ghost.
 
 ## Trust & Safety
 
+~~**Biometric credentials stored in plaintext AsyncStorage**~~
+**Captured:** 2026-05-15 (during G-8 investigation) | **Area:** Security / on-device storage | **Severity:** Resolved 2026-05-15 (commit `3c9a331`)
+
+`hooks/useBiometrics.ts` stored the user's actual login email + plaintext
+password as a JSON string in AsyncStorage (key `xprohub_biometric_creds`).
+AsyncStorage backs to NSUserDefaults on iOS — unencrypted, accessible via
+iCloud backup extraction without device access. Tier 1 risk for a payments
+platform.
+
+**Resolved 2026-05-15 (commit `3c9a331`).** Migrated to expo-secure-store
+(iOS Keychain, hardware-encrypted, excluded from device backups). Added
+defensive `AsyncStorage.removeItem` cleanup on hook mount to erase any
+pre-fix plaintext credentials from existing devices. Documented SecureStore
+options choice (caller handles biometric prompt via LocalAuthentication;
+defaults are correct).
+
+---
+
 ~~**Customer-side ID/photo requirement for post-job**~~
 **Captured:** 2026-05-01 | **Area:** Trust & Safety — gate architecture | **Severity:** Resolved 2026-05-15 (commit `d1ab011`)
 

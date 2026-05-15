@@ -47,3 +47,6 @@ yarn-error.*
 
 # Deno
 deno.lock
+
+# Generated docs (print artifacts derived from .md source)
+docs/*.html
