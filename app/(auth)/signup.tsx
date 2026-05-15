@@ -5,9 +5,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
 import { Colors, Spacing, Radius } from '../../constants/theme';
+import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '../../lib/legal';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -114,6 +116,20 @@ export default function SignUpScreen() {
             secureTextEntry
           />
 
+          <View style={styles.legalRow}>
+            <Text style={styles.legalText}>
+              By creating an account, you agree to our{' '}
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => WebBrowser.openBrowserAsync(TERMS_OF_SERVICE_URL)}>
+                Terms of Service
+              </Text>
+              {' '}and{' '}
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => WebBrowser.openBrowserAsync(PRIVACY_POLICY_URL)}>
+                Privacy Policy
+              </Text>
+              .
+            </Text>
+          </View>
+
           <View style={styles.buttonRow}>
             <Button label="CREATE ACCOUNT" onPress={handleSignUp} loading={loading} />
           </View>
@@ -209,6 +225,20 @@ const styles = StyleSheet.create({
   switchLink: {
     color: Colors.gold,
     fontSize: 14,
+    fontWeight: '600',
+  },
+  legalRow: {
+    marginTop: Spacing.lg,
+    paddingHorizontal: Spacing.sm,
+  },
+  legalText: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: 'center',
+  },
+  legalLink: {
+    color: Colors.gold,
     fontWeight: '600',
   },
   // Email confirmation state

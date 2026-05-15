@@ -79,6 +79,13 @@ export default function HomeScreen() {
 
   const renderHeader = useCallback(() => (
     <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.gearBtn}
+        onPress={() => router.push('/(tabs)/account')}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.gearIcon}>⚙</Text>
+      </TouchableOpacity>
       <GoldenDollar size={64} />
       <Text style={styles.title}>XPROHUB</Text>
       <Text style={styles.tagline}>Real Work. Fair Pay. For Everyone.</Text>
@@ -156,7 +163,9 @@ const styles = StyleSheet.create({
   container:      { flex: 1, backgroundColor: Colors.background },
   list:           { flex: 1 },
   listContent:    { paddingBottom: 80, paddingHorizontal: 6 },
-  header:         { alignItems: 'center', paddingTop: 24, paddingBottom: 16, gap: 12, paddingHorizontal: 6 },
+  header:         { alignItems: 'center', paddingTop: 24, paddingBottom: 16, gap: 12, paddingHorizontal: 6, position: 'relative' as const },
+  gearBtn:        { position: 'absolute' as const, top: 0, right: 0, padding: 8, zIndex: 10 },
+  gearIcon:       { fontSize: 22, color: Colors.gold },
   title:          { color: Colors.gold, fontSize: 32, fontWeight: 'bold', letterSpacing: 4 },
   tagline:        { color: Colors.textSecondary, fontSize: 13 },
   actions:        { flexDirection: 'row', gap: 12, marginTop: 8, width: '100%' },
