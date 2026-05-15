@@ -261,20 +261,38 @@ Status: ⏳
 Apple Guideline 1.2 — apps must include a method for filtering
 objectionable material from being posted.
 
-Scope:
-- Decision: reactive-only (via reports from G-4) vs proactive
-  filtering (keyword/profanity filter on job posts, chat, reviews)
-- If proactive: implement server-side text filter on job INSERT
-  and message INSERT (Edge Function or Postgres trigger)
-- If reactive-only: document in App Store review notes that
-  moderation is report-driven with hello@xprohub.com response
-  within 24 hours
-- Recommendation: start reactive-only for v1 launch. Apple
-  accepts report-driven moderation for marketplace apps at low
-  volume. Proactive filtering adds complexity with diminishing
-  returns pre-scale.
+#### Locked Decision: reactive-only moderation
 
-Status: ⏳
+Moderation is report-driven via G-4, with hello@xprohub.com as
+the published contact and a 24-hour response SLA. No proactive
+keyword/profanity filtering at v1.
+
+Rationale: At pre-launch volume, proactive filtering adds
+complexity for minimal benefit. Apple accepts reactive moderation
+for marketplace apps when (a) a report mechanism exists, (b) a
+block mechanism exists, (c) a published moderation contact
+exists, (d) response time is stated in App Store review notes.
+All four are satisfied by G-4 + G-5 + G-6.
+
+#### App Store review note (for submission)
+
+XProHub uses a reactive content moderation model. Users can
+report any user, job post, chat message, or review via the
+in-app report mechanism (overflow menu on each surface). Reports
+are sent to hello@xprohub.com and reviewed within 24 hours.
+Confirmed violations result in content removal and/or user
+account termination. Users can also block other users to remove
+them from their feeds and prevent further interaction.
+
+#### Future consideration
+
+Reviews are the first candidate for proactive filtering once
+volume scales — they are public and permanent, unlike chat
+(private) and jobs (ephemeral after 7-day expiry). When review
+volume exceeds what hello@xprohub.com can review within SLA,
+add server-side text filtering on review INSERT.
+
+Status: ✅ Locked 2026-05-15 (reactive-only for v1)
 
 ### G-7: Stub screen cleanup
 
@@ -307,21 +325,40 @@ Status: ✅ Shipped 2026-05-15 (commit `7dc8112`)
 Paper work, not code. Declare data collection categories in App
 Store Connect based on audit findings.
 
-Categories to declare:
-- Contact Info: Name, Email
-- Financial Info: Payment Info (via Stripe)
-- Location: Precise Location (only if device GPS added before
-  launch; currently PostGIS is server-side only)
-- User Content: Photos, Other User Content (jobs, reviews, chat)
+#### Locked Declarations
+
+Categories to declare in App Store Connect:
+- Contact Info: Name, Email, Phone Number, Physical Address
+- Financial Info: Payment Info (via Stripe — collected and
+  processed by third party, not stored by XProHub)
+- User Content: Photos (avatars, ID), Other User Content (jobs,
+  reviews, chat messages)
 - Identifiers: User ID
-- Diagnostics: Crash Data (Expo)
+- Diagnostics: Crash Data (Expo default)
 
-Purpose: App Functionality (primary), Product Personalization
-(location matching, if applicable)
+Purpose for all: App Functionality
 
-Do NOT declare: Third-Party Advertising, Tracking
+Do NOT declare:
+- Location (PostGIS is server-side only; no device GPS access)
+- Third-Party Advertising
+- Tracking (NSPrivacyTracking = false; no cross-app tracking)
 
-Status: ⏳
+Phone Number and Physical Address corrections from G-8
+investigation 2026-05-15: profiles.phone (optional) and
+profiles.location_address/neighborhood/city/state are
+user-entered. Not "Precise Location" (no device GPS) — declared
+under Contact Info as Physical Address.
+
+#### Sentry contingency
+
+If Sentry is added pre-launch (chat-Claude priority #1
+recommendation), configure with sendDefaultPii: false and IP
+scrubbing enabled. Add "Performance Data" to Diagnostics if
+Sentry Performance is enabled. Sentry's PrivacyInfo.xcprivacy
+will need redeclaration in app.json (same pattern as Stripe).
+
+Status: ✅ Locked 2026-05-15 (declarations finalized; declare
+in App Store Connect during G-9)
 
 ### G-9: Pre-submission checklist verification
 
