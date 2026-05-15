@@ -1,6 +1,6 @@
 # XProHub — Project Status
 
-**As of:** 2026-05-14 (Chunk D complete)
+**As of:** 2026-05-15 (Chunk E complete)
 **Founder:** Paata Tskhadiashvili (paatatsk on GitHub), non-technical solo founder, NYC
 **Mission:** Real Work. Fair Pay. For Everyone. — A hub for X (various) professionals.
 
@@ -242,8 +242,22 @@ Splash → welcome → signup → login → profile setup → home → Live Mark
   - ✅ C-5 deep link return — `stripe-return.tsx` + `stripe-refresh.tsx` + `stripe-redirect` proxy
   - ✅ C-6 `account.updated` webhook handler (commit `2a8b947`)
   - ⏳ C-7 end-to-end test — deferred. C-4b complete, but C-7 can roll into Chunk D end-to-end testing rather than running in isolation.
-- 🟡 Chunk D — design complete (docs/CHUNK_D_DESIGN.md, commit `3e235ff`). Build pending.
-- ⏳ Chunks E, F — payouts, UI polish (not yet designed)
+- ✅ **Chunk D** — Customer payment method gate. All 8 steps shipped
+  and end-to-end verified on iPhone 2026-05-14 (5/5 tests PASS).
+  See docs/CHUNK_D_DESIGN.md.
+- ✅ **Chunk E** — Payout release. All 12 steps shipped and
+  end-to-end verified on iPhone 2026-05-15. Full pipeline: charge
+  at hire (E-3), payment record via webhook (E-4), release via
+  Transfer (E-5), auto-release cron (E-11), fee transparency panel,
+  pending_confirmation + disputed UI states, worker-only
+  mark_completed lock. Two bugs found and fixed during E-12:
+  webhook destination missing Chunk E events (fixed in Stripe
+  Dashboard), jobs_status_check constraint (migration 20260515000004).
+  Test 4 (card decline) deferred to a future focused decline-scenarios
+  test pass — exercises error handling already validated in code review.
+  See docs/CHUNK_E_DESIGN.md.
+- ⏳ Chunk F — payment operations polish (earnings wallet UI,
+  receipts, refund automation). Not yet designed.
 - ⏳ Chunk G — Launch Compliance (Apple App Store + Stripe). Design doc shipped 2026-05-14 (docs/CHUNK_G_COMPLIANCE_DESIGN.md). Build deferred until after Chunks D and E.
 
 ---
@@ -344,4 +358,4 @@ User has TWO sandbox accounts: `XProHub` (dashboard display name corrected — `
 
 ## Next Concrete Step
 
-C-4a complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk D COMPLETE: all 8 steps shipped and verified end-to-end on iPhone 2026-05-14 (two independent accounts, full Stripe sandbox flow, production bug caught and fixed during test). Next milestone: Chunk E (payout release) design and build.
+Chunks C, D, E complete. Tasks 1–5 complete. Task 6 partial (android.package set 2026-05-11, App Links pending Android device). Chunk E COMPLETE: all 12 steps shipped and verified end-to-end on iPhone 2026-05-15 (two test accounts, full Stripe sandbox flow including hire → charge → work → confirm → release, auto-release cron verified, dispute skip verified). Next milestone: Chunk G (Launch Compliance — account deletion, Privacy Policy, ToS, reporting, blocking, content moderation). See docs/CHUNK_G_COMPLIANCE_DESIGN.md.

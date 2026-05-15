@@ -2,7 +2,7 @@
 
 **Created:** 2026-05-15
 **Author:** Paata Tskhadiashvili + chat-Claude
-**Status:** Design doc v2 + amendments — under review
+**Status:** ✅ COMPLETE — All 12 steps shipped and end-to-end verified on iPhone 2026-05-15
 
 ---
 
@@ -198,22 +198,13 @@ Justification over alternatives:
 
 Cloudflare Worker with scheduled handler, running every 15 minutes.
 
-Calls new Supabase Edge Function `process-auto-releases` which:
-
-```sql
-SELECT p.id, p.job_id, p.worker_payout, p.stripe_payment_intent_id,
-       p.stripe_charge_id, j.worker_id, pr.stripe_account_id
-FROM payments p
-JOIN jobs j ON j.id = p.job_id
-JOIN profiles pr ON pr.id = j.worker_id
-WHERE p.escrow_status = 'held'
-  AND p.auto_release_at <= now()
-  AND p.disputed_at IS NULL
-```
-
-For each result: create Stripe Transfer (using `stripe_charge_id`
-as `source_transaction`), then call `release_payment()` to flip
-DB state. Log each release. Return summary.
+Queries Supabase PostgREST directly from the Worker for overdue
+payments (`escrow_status = 'held' AND auto_release_at <= now()
+AND disputed_at IS NULL`), then calls the `release-payment` Edge
+Function (E-5) for each with `mode: 'auto_release'`. No
+intermediate `process-auto-releases` Edge Function — the Worker
+is the orchestrator, release-payment is the executor. Simpler,
+one fewer hop, same validation and idempotency.
 
 **Why 15 minutes:** At 72 hours, a 1-hour check means the worker
 waits up to 73 hours. At 15-minute checks, worst case is 72h 15m.
@@ -639,6 +630,23 @@ Paata confirms → full cycle. Then reverse roles.
 - `source_transaction` is the single most important Stripe
   implementation detail. Without it, Transfers fail during the
   2-day settlement window.
+
+## Implementation Notes (E-12 testing)
+
+- **Webhook destination events:** The Stripe webhook endpoint must
+  subscribe to all 4 events: `setup_intent.succeeded` (D-3),
+  `payment_intent.succeeded` (E-4), `payment_intent.payment_failed`
+  (future), `transfer.created` (E-6). E-12 testing surfaced that
+  only `setup_intent.succeeded` was subscribed from Chunk D — the
+  three Chunk E events were never added during E-2/E-4/E-6 deploys.
+  Easy to miss when webhook handler code and Stripe dashboard
+  endpoint config are separate manual steps.
+- **jobs_status_check constraint:** Migration 20260515000004 added
+  `pending_confirmation` and `disputed` to the CHECK constraint on
+  `jobs.status`. E-1 missed this because the constraint lived in
+  the original schema (not in any migration we wrote). Lesson: when
+  adding new enum-like values to a column, always check for CHECK
+  constraints, not just application-level type definitions.
 
 ---
 

@@ -39,6 +39,20 @@
   Captured 2026-05-09.
   **Resolved 2026-05-15 (commit `0af9e9a`).** Inverted to fail-fast: setError + setLoading(false) + return.
 
+- **job-bids.tsx stale bid list after successful hire** — after Paata
+  hired Khatuna via hire-and-charge, Paata's view of My Jobs →
+  Applications still showed the bid as pending with Accept/Decline
+  buttons visible. Tapping Accept again triggered an Edge Function
+  error (correct DB-level rejection — bid no longer pending) but the
+  UI didn't refresh to reflect the accepted state. Surfaced during
+  E-12 Test 1. **Fix:** after successful hire-and-charge in
+  handleAccept, either refetch the bid list before navigating to
+  chat, or navigate immediately (current behavior) and ensure the
+  bids screen refetches on focus when the user returns. The
+  navigation-to-chat path works (user lands in the right place),
+  so this is a cosmetic stale-state issue on the bids screen if
+  the user navigates back. Captured 2026-05-15.
+
 ---
 
 ## Semantic Category Color System
