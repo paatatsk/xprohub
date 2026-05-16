@@ -132,6 +132,51 @@ capturing for future thinking:
 These become differentiators establishing XProHub as something other
 gig platforms aren't. Not v1 priority.
 
+### Voice-first job posting (post-launch)
+
+Idea (Paata, 2026-05-17): Reduce friction on Post a Job by accepting
+spoken input. User taps mic, speaks naturally ("I need someone to help
+move a couch next Saturday, I can pay $150"), app uses speech-to-text
++ LLM extraction to pre-fill the job form. User reviews and edits
+before posting (never auto-submit).
+
+**Strategic value:**
+- Accessibility: serves non-native English speakers, elderly users,
+  users with limited literacy or mobility/dexterity issues
+- Friction reduction: typing on mobile is high-friction; voice is
+  faster for most users
+- Platform character: "the marketplace that's actually easy to use"
+
+**Technical sketch:**
+- iOS built-in speech-to-text (no API cost for transcription)
+- LLM API for structured extraction (OpenAI/Anthropic, ~200-500
+  tokens per job, cents per job)
+- Always confirmation/edit screen before posting (accuracy > speed)
+- Text input remains equally prominent (not all users want voice)
+- Privacy Policy must disclose audio data leaves device
+
+**Honest concerns:**
+- API dependency (need graceful fallback if LLM service down)
+- Cost at scale (cents/day at v1, real money at 10K jobs/day)
+- Multi-language extraction quality varies (relevant for immigrant
+  constituency)
+
+**Build this when:** Post-NYC-test-launch. After watching real users
+struggle with the typed form, decide if voice solves a real complaint.
+Not v1.
+
+### Vocabulary: "job" vs "task"
+
+Words shape the platform. The codebase uses "job" as user-facing
+vocabulary — that was the right instinct. "Job" carries dignity;
+"task" implies mechanical labor. Internal `task_library` vocabulary is
+fine (it's the catalog from which jobs are created). The distinction
+stays:
+
+- **User-facing:** "job" (Post a Job, My Jobs, job card, job detail)
+- **Internal/schema:** "task" (task_library, task_categories,
+  task_code, job_post_tasks)
+
 ---
 
 ## 5. RISK ASSESSMENT

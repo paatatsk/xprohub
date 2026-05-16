@@ -290,6 +290,33 @@ Store submission technically but blocking responsible launch.
 
 ---
 
+**Task library audit — narrow before launch**
+**Captured:** 2026-05-17 | **Area:** Product strategy / category curation | **Severity:** Pre-launch decision
+
+Current task_library has 188 tasks across 20 categories. Strategic
+instinct (Paata, 2026-05-17): narrow and deepen rather than broaden.
+TaskRabbit/Thumbtack pursue maximum variety; the historical pattern
+across successful marketplaces (eBay, Etsy, Airbnb) is narrow-and-deep.
+Better 80 tasks with realistic density per category in NYC test launch
+than 188 with sparse coverage.
+
+Strategic frame: "Narrow and deep beats broad and sparse. A
+marketplace's value is density per category in the user's location,
+not total category count. Customers experience 'I can always find
+someone here' instead of 'let me scroll through 47 empty categories.'"
+
+**Pre-launch audit:** Review all 188 tasks. For each, ask: realistic
+chance of finding workers AND customers in NYC test launch? If sparse
+on either side, mark inactive (do not delete — soft delete preserves
+task_code reservations per CLAUDE.md conventions).
+
+**Build this when:** After Chunk G ships, before NYC test launch.
+Audit is a 1-2 hour conversation between Paata and chat-Claude.
+Implementation is bulk `UPDATE task_library SET is_active = false
+WHERE task_code IN (...)`.
+
+---
+
 ## Hybrid Matching Exploration — Milestone 4+ (with honest critique)
 
 **Captured:** 2026-04-26 (synthesized from Paata's research conversation + review with Claude)
