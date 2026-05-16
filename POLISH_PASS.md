@@ -256,6 +256,40 @@ shipped code as a prerequisite for Chunk E dispute path.
 
 ---
 
+**Tier 1 proactive content moderation filters — pre-launch commitment**
+**Captured:** 2026-05-16 | **Area:** Trust & Safety / Content Moderation | **Severity:** Pre-launch blocker
+
+G-6 locked content moderation as reactive-only for v1 (report-driven
+via G-4, 24-hour SLA). Defensible for Apple, but reactive-only is
+fragile — first abuse incident hits harder than necessary because
+nothing catches it before publication.
+
+Three cheap proactive protections to ship BEFORE NYC test launch:
+
+1. Profanity/slur word list filter on job titles, descriptions,
+   reviews, chat messages. Block submission with "Please review your
+   wording" if a match hits. Open-source word lists exist. ~50 lines
+   of code, zero ongoing maintenance.
+
+2. Rate limiting on job posts and bids. A user posting 50 jobs in 5
+   minutes is spam. Postgres function or Edge Function check. ~30
+   lines.
+
+3. Required minimum content length on job descriptions (already
+   partial — 80-char title cap exists).
+
+Deferred to Tier 2 (post-launch):
+- Image moderation API (AWS Rekognition, Google Vision)
+- LLM-based moderation on job/review text (OpenAI Moderation API is
+  free)
+- Behavioral pattern detection (new accounts posting suspiciously)
+
+**Build this when:** After Chunk G ships, before App Store submission
+OR before NYC test launch (whichever comes first). Not blocking App
+Store submission technically but blocking responsible launch.
+
+---
+
 ## Hybrid Matching Exploration — Milestone 4+ (with honest critique)
 
 **Captured:** 2026-04-26 (synthesized from Paata's research conversation + review with Claude)
