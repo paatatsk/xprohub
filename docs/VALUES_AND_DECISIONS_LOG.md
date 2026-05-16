@@ -177,6 +177,61 @@ stays:
 - **Internal/schema:** "task" (task_library, task_categories,
   task_code, job_post_tasks)
 
+### User-selectable visual themes (post-launch)
+
+Decision (Paata, 2026-05-17): Stay with current Dark Gold direction
+through Chunk G and App Store submission. Post-launch, explore
+user-selectable visual themes as a platform feature.
+
+Context: A design exploration on 2026-05-17 (file: XProHub Visual
+Directions, four directions — Chalk iconography study, Hall refined
+dark + mustard, Ledger cream/ink/brick editorial, Ticket
+black/bone/safety-orange work-order) revealed that each direction
+tells a different story about the platform's mission. All three
+"real" directions (Hall, Ledger, Ticket) aligned strongly with the
+platform's stated values; none was definitively superior.
+
+Strategic insight: Different visual directions map to different
+worker/customer constituencies the platform serves. Themes are not
+just aesthetic variety — they are another form of platform welcome.
+User opens the app, sees a theme that says "this is for me."
+
+Constituency-to-theme mapping (initial hypothesis, to be validated
+post-launch):
+- 15-year tradesperson, union worker → Ticket (work-order aesthetic,
+  native to their world)
+- Retired professional, elderly user → Ledger (broadsheet, dignified,
+  familiar)
+- Student, younger urban user → Hall or current Dark Gold (modern,
+  app-shaped)
+- Immigrant, ESL user → Ticket likely (universal work-order language)
+- Hobbyist → user's choice
+
+Architectural precedent: CLAUDE.md already references 5
+user-selectable feed card themes (Broadsheet, Western, Gold Press,
+Dispatch, Chronicle). Theme selection is not a new concept — it's an
+expansion of an existing design system pattern.
+
+Pre-launch polish opportunity (optional, between Chunk G and App
+Store submission): small refinements within Dark Gold inspired by the
+explorations — line-iconography replacing emoji on category cards
+(already noted in CLAUDE.md as "Gold Forge custom duotone icons"),
+typography hierarchy refinements, ornament restraint per Hall's
+framing. Not a redesign — minor polish. Maybe 2-3 days of focused
+work.
+
+Build this when: Post-NYC-test-launch. v1.1 or v2 timeframe. Start
+with Dark Gold + one alternative based on user feedback; add others
+over time. Each theme release is a feature signal — platform vitality.
+
+Strategic framing for the log: "The marketplace where the app looks
+like you. Everyone is welcome — the visual choice acknowledges that
+respect."
+
+Reference: Design file (XProHub Visual Directions, 2026-05-17) shows
+the four directions in detail. File is not in repo — held externally
+for future reference.
+
 ---
 
 ## 5. RISK ASSESSMENT
