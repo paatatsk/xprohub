@@ -125,6 +125,9 @@ account."
 | user_badges | Delete | No downstream FK; cleanup |
 | notifications | Delete | No retention value |
 | xp_transactions | Preserve | Audit trail |
+| user_blocks | Delete (both directions) | No retention value; anonymized user can't block or be meaningfully blocked |
+| reports (as reporter) | Preserve | Audit trail — report is a historical fact |
+| reports (as reported_user) | Preserve | Audit trail — report is a historical fact |
 
 **Open-bid handling (Worker Dignity).** When account deletion
 cancels a user's open jobs, all pending bids on those jobs must
@@ -154,7 +157,8 @@ the migration).
   3. Cancel user's open jobs + auto-decline pending bids on them
   4. Anonymize profiles row (null PII fields + Stripe IDs)
   5. Rotate auth credentials + set banned_until
-  6. Clean up: delete worker_skills, user_badges, notifications
+  6. Clean up: delete worker_skills, user_badges, notifications,
+     user_blocks (WHERE blocker_id = user OR blocked_id = user)
   7. Return success
 - RLS policy: user can only trigger deletion for own account
 - Post-deletion: sign out, route to welcome screen
@@ -255,6 +259,193 @@ Scope:
 - Unblock option in settings
 
 Status: ⏳
+
+---
+
+### G-4 + G-5 Locked Decisions (2026-05-16 design pass)
+
+Built as one unit — shared UI surface, shared schema patterns,
+shared query-filter logic. Designed together, implemented in one
+migration + one UI pass.
+
+#### Report reason taxonomy
+
+Six options: `spam`, `harassment`, `inappropriate`, `fraud`,
+`safety`, `other`. The `other` option includes an optional
+free-text `details` field. Apple Guideline 1.2 doesn't mandate
+a specific taxonomy — this covers the standard categories for
+a marketplace app.
+
+#### Report behavior decisions
+
+- **Rate limiting:** None in v1. At pre-launch volume, abuse
+  isn't realistic. Future consideration if reports are
+  weaponized.
+- **Content visibility:** Reported content stays visible during
+  review. Manual review by Paata via hello@xprohub.com. No
+  auto-hide (prevents report-to-censor abuse by bad actors).
+- **Data retention:** Reports retained indefinitely as part of
+  trust/safety audit trail.
+
+#### Block behavior decisions
+
+- **Bidirectionality:** B does NOT know they've been blocked.
+  B simply doesn't see A in feeds. No "you've been blocked"
+  notification or indicator.
+- **Scope:** Prevents NEW interactions only. Existing chat
+  history preserved (Worker Dignity — other party's
+  conversation record). Blocked user cannot: appear in
+  blocker's feeds, apply to blocker's jobs, send new messages
+  to blocker.
+- **Persistence on deletion:** user_blocks has ON DELETE CASCADE
+  on both FKs (defense-in-depth). G-1's anonymization path does
+  NOT delete the profiles row (tombstone preserved), so CASCADE
+  won't fire in practice. The G-1 Edge Function explicitly
+  deletes user_blocks rows (step 6) as part of cleanup. Both
+  directions cleared: blocks BY the user and blocks OF the user.
+- **Unblock mechanism:** "Blocked Users" section in account.tsx.
+  Lists blocked users with UNBLOCK button. Simple DELETE from
+  user_blocks.
+
+#### Schema: reports table
+
+```sql
+CREATE TABLE public.reports (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reporter_id      UUID NOT NULL REFERENCES profiles(id)
+    ON DELETE NO ACTION,
+  reported_user_id UUID NOT NULL REFERENCES profiles(id)
+    ON DELETE NO ACTION,
+  content_type     TEXT NOT NULL
+    CHECK (content_type IN ('user', 'job', 'message')),
+  content_id       UUID,
+  reason           TEXT NOT NULL
+    CHECK (reason IN ('spam', 'harassment', 'inappropriate',
+                      'fraud', 'safety', 'other')),
+  details          TEXT CHECK (length(details) <= 1000),
+  status           TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'reviewed', 'actioned',
+                      'dismissed')),
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+- FK behavior: explicit NO ACTION on both reporter_id and
+  reported_user_id. Report rows preserved indefinitely as
+  audit trail — both when reporter anonymizes and when
+  reported user anonymizes. FKs point to anonymized tombstones,
+  which is correct (the report is a historical fact; involved
+  parties' current state is irrelevant).
+- details: limited to 1000 chars to prevent DoS via massive
+  payload. Enough for a report explanation.
+
+- `content_type`: what was reported (user profile, job post,
+  chat message)
+- `content_id`: UUID of the specific job or message (NULL for
+  user-level reports)
+- `status`: admin review lifecycle (pending → reviewed →
+  actioned/dismissed)
+
+#### Schema: user_blocks table
+
+```sql
+CREATE TABLE public.user_blocks (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  blocker_id  UUID NOT NULL REFERENCES profiles(id)
+    ON DELETE CASCADE,
+  blocked_id  UUID NOT NULL REFERENCES profiles(id)
+    ON DELETE CASCADE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (blocker_id, blocked_id)
+);
+```
+
+- ON DELETE CASCADE on both FKs: when either profile is
+  deleted/anonymized, the block row is removed.
+- UNIQUE constraint prevents duplicate blocks.
+
+#### RLS policies
+
+**reports:**
+- INSERT: `auth.uid() = reporter_id` (users can only report
+  as themselves)
+- No SELECT/UPDATE/DELETE for authenticated (admin-only via
+  service_role)
+
+**user_blocks:**
+- SELECT: `auth.uid() = blocker_id` (users see only their own
+  blocks)
+- INSERT: `auth.uid() = blocker_id` (users can only block as
+  themselves)
+- DELETE: `auth.uid() = blocker_id` (users can only unblock
+  their own blocks)
+
+#### GRANT statements (Oct 2026 Data API requirement)
+
+```sql
+-- reports
+GRANT INSERT ON public.reports TO authenticated;
+GRANT ALL ON public.reports TO service_role;
+
+-- user_blocks
+GRANT SELECT, INSERT, DELETE ON public.user_blocks TO authenticated;
+GRANT ALL ON public.user_blocks TO service_role;
+```
+
+#### UI entry points — Report + Block
+
+**Report entry surfaces (3 screens):**
+
+| Screen | Entry | Report target |
+|---|---|---|
+| market.tsx (WorkerCard) | "..." overflow button on card | Report User |
+| job-detail.tsx | "..." overflow button in header area | Report Job |
+| job-chat.tsx | "..." overflow button on context strip | Report User |
+
+**Block entry surfaces (2 screens):**
+
+| Screen | Entry | Action |
+|---|---|---|
+| market.tsx (WorkerCard) | "..." overflow (same as report) | Block User |
+| job-chat.tsx | "..." overflow (same as report) | Block User |
+
+**Block management surface (1 screen):**
+
+| Screen | Entry | Action |
+|---|---|---|
+| account.tsx | "Blocked Users" section | View list, Unblock |
+
+Report on reviews deferred — no review browsing screen exists
+yet. The 3 report surfaces satisfy Apple Guideline 1.2.
+
+#### Block filtering (client-side)
+
+Block list is fetched on app mount (small — most users block
+0-5 people). Jobs Feed and Workers Feed filter out blocked
+users client-side after fetch. Reason: PostgREST doesn't
+support NOT IN (subquery) natively; client-side filtering is
+simpler and scales fine at pre-launch volume.
+
+Defer RLS-level filtering to when block lists exceed 50 entries
+(measure, don't predict).
+
+#### Edge cases
+
+- **Self-report/self-block:** UI prevents via `reporter_id !=
+  reported_user_id` / `blocker_id != blocked_id` CHECK
+  constraints in the migration.
+- **Report then block:** Report flow offers "Would you also
+  like to block this user?" after successful report submission.
+  Single interaction, two writes.
+- **Blocked user applies to job before block:** Bid persists
+  (historical record). Blocker sees the bid in My Jobs →
+  Applications but can decline it. Block prevents FUTURE
+  applications only.
+- **Both parties block each other:** Both block rows exist.
+  Neither sees the other in any feed. Chat history preserved
+  for both but no new messages can be sent.
+
+---
 
 ### G-6: Content moderation approach
 
