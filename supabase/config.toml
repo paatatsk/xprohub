@@ -466,3 +466,11 @@ verify_jwt = true
 import_map = "./functions/release-payment/deno.json"
 entrypoint = "./functions/release-payment/index.ts"
 
+[functions.delete-account]
+enabled = true
+# User-authenticated endpoint. Users delete their own account only
+# (userId from JWT, never from request body). Chunk G-1.
+verify_jwt = true
+import_map = "./functions/delete-account/deno.json"
+entrypoint = "./functions/delete-account/index.ts"
+
