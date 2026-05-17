@@ -82,7 +82,11 @@ export default function ReportScreen() {
     setSubmitting(false);
 
     if (insertErr) {
-      setSubmitError("Couldn't submit report. Tap Submit to try again.");
+      if (insertErr.code === '23514') {
+        setSubmitError("You can't report yourself.");
+      } else {
+        setSubmitError("Couldn't submit report. Tap Submit to try again.");
+      }
       return;
     }
 

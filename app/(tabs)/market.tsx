@@ -9,6 +9,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
+import { useBlockList } from '../../hooks/useBlockList';
 
 // Screen 13 — Live Market
 // Step 3B: Jobs Feed wired to Supabase
@@ -180,6 +181,7 @@ export default function MarketScreen() {
   const [activeFeed, setActiveFeed] = useState<Feed>('jobs');
   const { category_id } = useLocalSearchParams<{ category_id?: string }>();
   const { trustLevel } = useTrustLevel();
+  const { blockedIds, currentUserId, refresh: refreshBlocks } = useBlockList();
 
   // Category filter state (name resolved for display + Jobs Feed .eq())
   const [categoryName, setCategoryName] = useState<string | null>(null);
@@ -232,12 +234,16 @@ export default function MarketScreen() {
 
     const { data, error: err } = await query;
 
-    if (err) setError(err.message);
-    else setJobs(data ?? []);
+    if (err) {
+      setError(err.message);
+    } else {
+      const excluded = new Set([...blockedIds, ...(currentUserId ? [currentUserId] : [])]);
+      setJobs((data ?? []).filter(j => !excluded.has(j.customer_id)));
+    }
 
     if (isRefresh) setRefreshing(false);
     else setLoading(false);
-  }, [categoryName]);
+  }, [categoryName, blockedIds, currentUserId]);
 
   useEffect(() => { fetchJobs(); }, [fetchJobs]);
 
@@ -328,12 +334,13 @@ export default function MarketScreen() {
         }
       }
 
-      setWorkers(Array.from(workerMap.values()));
+      const excluded = new Set([...blockedIds, ...(currentUserId ? [currentUserId] : [])]);
+      setWorkers(Array.from(workerMap.values()).filter(w => !excluded.has(w.id)));
     }
 
     if (isRefresh) setWorkersRefreshing(false);
     else setWorkersLoading(false);
-  }, [category_id]);
+  }, [category_id, blockedIds, currentUserId]);
 
   useEffect(() => { fetchWorkers(); }, [fetchWorkers]);
 
@@ -488,12 +495,12 @@ export default function MarketScreen() {
                     if (error) {
                       if (error.code === '23505') {
                         // Already blocked — treat as success
-                        fetchWorkers();
+                        await refreshBlocks();
                       } else {
                         Alert.alert('Block Failed', "Couldn't block this user. Please try again.");
                       }
                     } else {
-                      fetchWorkers();
+                      await refreshBlocks();
                     }
                   }
                 },
