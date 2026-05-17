@@ -2,9 +2,10 @@
 // Screen: ACCOUNT — About, Legal, Sign Out, Delete Account
 // Entry point: gear icon on Home screen header
 
+import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
 import { Colors, Spacing, Radius } from '../../constants/theme';
@@ -16,6 +17,40 @@ export default function AccountScreen() {
   const router = useRouter();
   const { clearCredentials } = useBiometrics();
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+
+  // ── Blocked users ──────────────────────────────────────────
+  const [blockedUsers, setBlockedUsers] = useState<{ id: string; blocked_id: string; full_name: string }[]>([]);
+
+  const fetchBlockedUsers = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from('user_blocks')
+      .select('id, blocked_id, profiles!blocked_id(full_name)')
+      .eq('blocker_id', user.id)
+      .order('created_at', { ascending: false });
+    setBlockedUsers(
+      (data ?? []).map((r: any) => ({
+        id: r.id,
+        blocked_id: r.blocked_id,
+        full_name: r.profiles?.full_name ?? 'User',
+      })),
+    );
+  }, []);
+
+  useFocusEffect(useCallback(() => { fetchBlockedUsers(); }, [fetchBlockedUsers]));
+
+  async function handleUnblock(blockId: string, name: string) {
+    const { error } = await supabase
+      .from('user_blocks')
+      .delete()
+      .eq('id', blockId);
+    if (error) {
+      Alert.alert('Unblock Failed', "Couldn't unblock this user. Please try again.");
+    } else {
+      await fetchBlockedUsers();
+    }
+  }
 
   async function handleSignOut() {
     try {
@@ -82,6 +117,31 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* ── BLOCKED USERS ── */}
+        <Text style={styles.eyebrow}>BLOCKED USERS</Text>
+        <View style={styles.card}>
+          {blockedUsers.length === 0 ? (
+            <View style={styles.row}>
+              <Text style={styles.rowValue}>No blocked users</Text>
+            </View>
+          ) : (
+            blockedUsers.map((block, i) => (
+              <View key={block.id}>
+                {i > 0 && <View style={styles.divider} />}
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel} numberOfLines={1}>{block.full_name}</Text>
+                  <TouchableOpacity
+                    onPress={() => handleUnblock(block.id, block.full_name)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.unblockText}>UNBLOCK</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+
         {/* ── ACTIONS ── */}
         <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.7}>
           <Text style={styles.signOutText}>SIGN OUT</Text>
@@ -135,6 +195,13 @@ const styles = StyleSheet.create({
   rowLabel: {
     color: Colors.textPrimary,
     fontSize: 15,
+    flex: 1,
+  },
+  unblockText: {
+    color: Colors.gold,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   rowValue: {
     color: Colors.textSecondary,
