@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, ActivityIndicator, Image,
+  ScrollView, ActivityIndicator, Image, ActionSheetIOS,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -183,6 +183,35 @@ export default function JobDetailScreen() {
 
         {/* ── Posted by strip ── */}
         <View style={styles.postedByRow}>
+          {!isOwnJob && job.customer_id && (
+            <TouchableOpacity
+              style={styles.overflowBtn}
+              onPress={() => {
+                ActionSheetIOS.showActionSheetWithOptions(
+                  {
+                    title: customerName,
+                    options: ['Report Job', 'Cancel'],
+                    cancelButtonIndex: 1,
+                    userInterfaceStyle: 'dark',
+                  },
+                  (buttonIndex) => {
+                    if (buttonIndex === 0) {
+                      router.push(
+                        `/(tabs)/report?reported_user_id=${job.customer_id}` +
+                        `&content_type=job` +
+                        `&content_id=${job.id}` +
+                        `&reported_user_name=${encodeURIComponent(customerName)}` as any
+                      );
+                    }
+                  },
+                );
+              }}
+              activeOpacity={0.6}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.overflowIcon}>⋯</Text>
+            </TouchableOpacity>
+          )}
           <View style={styles.avatarWrap}>
             {customerAvatar ? (
               <Image source={{ uri: customerAvatar }} style={styles.avatar} />
@@ -329,6 +358,22 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Spacing.md,
     marginBottom: Spacing.lg,
+    position: 'relative',
+  },
+  overflowBtn: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  overflowIcon: {
+    color: Colors.textSecondary,
+    fontSize: 18,
+    letterSpacing: 2,
   },
   avatarWrap: {
     width: 44,
