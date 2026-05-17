@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, ActivityIndicator, RefreshControl, Image,
+  ActionSheetIOS, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -102,7 +103,7 @@ function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
 
 // ── Worker Card ────────────────────────────────────────────────
 
-function WorkerCard({ worker, onHire }: { worker: Worker; onHire: () => void }) {
+function WorkerCard({ worker, onHire, onOverflow }: { worker: Worker; onHire: () => void; onOverflow: () => void }) {
   const initials = worker.full_name
     .split(' ')
     .map(n => n[0])
@@ -112,6 +113,16 @@ function WorkerCard({ worker, onHire }: { worker: Worker; onHire: () => void }) 
 
   return (
     <View style={styles.card}>
+      {/* Overflow menu trigger */}
+      <TouchableOpacity
+        style={styles.overflowBtn}
+        onPress={onOverflow}
+        activeOpacity={0.6}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Text style={styles.overflowIcon}>⋯</Text>
+      </TouchableOpacity>
+
       <View style={styles.workerRow}>
         {/* Avatar */}
         <View style={styles.avatarWrap}>
@@ -449,6 +460,45 @@ export default function MarketScreen() {
                 router.push(hireDest as any);
               }
             }}
+            onOverflow={() => {
+              ActionSheetIOS.showActionSheetWithOptions(
+                {
+                  title: item.full_name,
+                  options: ['Report User', 'Block User', 'Cancel'],
+                  destructiveButtonIndex: 1,
+                  cancelButtonIndex: 2,
+                  userInterfaceStyle: 'dark',
+                },
+                async (buttonIndex) => {
+                  if (buttonIndex === 0) {
+                    router.push(
+                      `/(tabs)/report?reported_user_id=${item.id}` +
+                      `&content_type=user` +
+                      `&reported_user_name=${encodeURIComponent(item.full_name)}` as any
+                    );
+                  } else if (buttonIndex === 1) {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      Alert.alert('Session expired', 'Please sign in again.');
+                      return;
+                    }
+                    const { error } = await supabase
+                      .from('user_blocks')
+                      .insert({ blocker_id: user.id, blocked_id: item.id });
+                    if (error) {
+                      if (error.code === '23505') {
+                        // Already blocked — treat as success
+                        fetchWorkers();
+                      } else {
+                        Alert.alert('Block Failed', "Couldn't block this user. Please try again.");
+                      }
+                    } else {
+                      fetchWorkers();
+                    }
+                  }
+                },
+              );
+            }}
           />
         )}
         contentContainerStyle={workers.length === 0 ? styles.fillCenter : styles.listContent}
@@ -675,6 +725,22 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     marginBottom: Spacing.sm,
     gap: 8,
+    position: 'relative',
+  },
+  overflowBtn: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  overflowIcon: {
+    color: Colors.textSecondary,
+    fontSize: 18,
+    letterSpacing: 2,
   },
   cardHeader: {
     flexDirection: 'row',
