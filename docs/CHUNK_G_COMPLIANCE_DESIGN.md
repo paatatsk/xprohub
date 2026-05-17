@@ -392,6 +392,18 @@ GRANT SELECT, INSERT, DELETE ON public.user_blocks TO authenticated;
 GRANT ALL ON public.user_blocks TO service_role;
 ```
 
+**Note on GRANT semantics:** Supabase grants ALL privileges to
+`authenticated` and `anon` by default on new public-schema tables
+(intentional architecture — RLS is the gatekeeper). The GRANT
+statements above are not narrowing access — they are explicit
+documentation of intended use and forward-compatibility with the
+Oct 2026 Data API change. RLS policies are the actual access
+control layer for this codebase. Without a SELECT policy on
+`reports`, authenticated users cannot read reports via PostgREST
+even though they have table-level SELECT privilege. Narrow GRANTs
+as defense-in-depth would require codebase-wide REVOKE migration;
+tracked in POLISH_PASS.
+
 #### UI entry points — Report + Block
 
 **Report entry surfaces (3 screens):**

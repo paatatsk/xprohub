@@ -475,6 +475,38 @@ Conventions section pointing back to this entry.
 
 ---
 
+**Codebase-wide GRANT narrowing for defense-in-depth**
+**Captured:** 2026-05-17 | **Area:** Security hardening | **Severity:** Tier 2 (pre-production)
+
+Supabase's default privileges grant ALL standard privileges (INSERT,
+SELECT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER) to authenticated
+and anon roles on every public-schema table. Current codebase relies on
+this default — all 15+ tables have broad GRANTs, with RLS policies as
+the sole access control layer.
+
+This works correctly: PostgREST enforces RLS on every API request, so
+authenticated users can only see/modify rows allowed by RLS policies.
+SECURITY DEFINER functions handle sensitive operations with internal auth
+validation.
+
+For true defense-in-depth (two layers of access control), every table
+would need explicit REVOKE ALL + narrow re-GRANT matching the locked
+design intent. Estimated ~50 lines of SQL across one migration, touching
+every table. Requires careful testing of every read/write path to avoid
+breaking existing queries.
+
+**Build this when:** Pre-production hardening, before Series A or scaling
+beyond test mode. Not a launch blocker — RLS provides actual security.
+This is a depth-of-protection improvement, not a vulnerability fix.
+
+**Reference:** Discovered during G-4/G-5 Phase 2 verification on
+2026-05-17. The migration's narrow GRANTs (e.g., `GRANT INSERT ON
+reports TO authenticated`) were redundant against Supabase defaults —
+they added INSERT, but did not revoke the implicit
+SELECT/UPDATE/DELETE/etc.
+
+---
+
 **Supabase dashboard Edge Function editor: implicit deploy risk**
 **Captured:** 2026-05-13 | **Area:** Workflow / Edge Function deploys | **Severity:** Latent — depends on dashboard interactions
 
