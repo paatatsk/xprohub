@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   FlatList, TextInput, ActivityIndicator,
-  KeyboardAvoidingView, Platform, Alert, Linking,
+  KeyboardAvoidingView, Platform, Alert, Linking, ActionSheetIOS,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
@@ -514,11 +514,12 @@ export default function JobChatScreen() {
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const isCustomer = currentUserId === chat?.customer_id;
-  const otherParty = isCustomer ? chat?.worker : chat?.customer;
-  const otherName  = otherParty?.full_name ?? 'User';
-  const jobTitle   = chat?.job?.title ?? null;
-  const jobStatus  = chat?.job?.status ?? null;
+  const isCustomer   = currentUserId === chat?.customer_id;
+  const otherParty   = isCustomer ? chat?.worker : chat?.customer;
+  const otherName    = otherParty?.full_name ?? 'User';
+  const otherPartyId = isCustomer ? chat?.worker_id : chat?.customer_id;
+  const jobTitle     = chat?.job?.title ?? null;
+  const jobStatus    = chat?.job?.status ?? null;
 
   // ── Main JSX ──────────────────────────────────────────────────────────────
 
@@ -535,6 +536,52 @@ export default function JobChatScreen() {
           {jobTitle ? (
             <Text style={styles.contextJob} numberOfLines={1}>About: {jobTitle}</Text>
           ) : null}
+          {otherPartyId && (
+            <TouchableOpacity
+              style={styles.contextOverflowBtn}
+              onPress={() => {
+                ActionSheetIOS.showActionSheetWithOptions(
+                  {
+                    title: otherName,
+                    options: ['Report User', 'Block User', 'Cancel'],
+                    destructiveButtonIndex: 1,
+                    cancelButtonIndex: 2,
+                    userInterfaceStyle: 'dark',
+                  },
+                  async (buttonIndex) => {
+                    if (buttonIndex === 0) {
+                      router.push(
+                        `/(tabs)/report?reported_user_id=${otherPartyId}` +
+                        `&content_type=user` +
+                        `&reported_user_name=${encodeURIComponent(otherName)}` as any
+                      );
+                    } else if (buttonIndex === 1) {
+                      if (!currentUserId) {
+                        Alert.alert('Session expired', 'Please sign in again.');
+                        return;
+                      }
+                      const { error } = await supabase
+                        .from('user_blocks')
+                        .insert({ blocker_id: currentUserId, blocked_id: otherPartyId });
+                      if (error) {
+                        if (error.code === '23505') {
+                          Alert.alert('Already Blocked', 'This user is already blocked.');
+                        } else {
+                          Alert.alert('Block Failed', "Couldn't block this user. Please try again.");
+                        }
+                      } else {
+                        Alert.alert('User Blocked', `${otherName} has been blocked.`);
+                      }
+                    }
+                  },
+                );
+              }}
+              activeOpacity={0.6}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.contextOverflowIcon}>⋯</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* ── Lifecycle banners (E-7/E-8 expansion point) ── */}
@@ -861,6 +908,22 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
     backgroundColor: Colors.background,
     gap: 2,
+    position: 'relative',
+  },
+  contextOverflowBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  contextOverflowIcon: {
+    color: Colors.textSecondary,
+    fontSize: 18,
+    letterSpacing: 2,
   },
   contextName: {
     color: Colors.gold,
