@@ -383,6 +383,11 @@ Checklist:
 - [ ] EAS production build profile configured
 - [ ] Bundle ID finalized (com.paatatsk.xprohub or xprohubv3)
 - [ ] hello@xprohub.com routes to Paata's inbox
+- [ ] Stripe webhook destination subscription matches handler code:
+      verify the Stripe Dashboard endpoint subscribes to all events
+      the stripe-webhook/index.ts handler has case branches for
+      (currently 4 events). Re-verify whenever a new Stripe endpoint
+      is created (e.g., production mode).
 
 Status: ⏳
 
