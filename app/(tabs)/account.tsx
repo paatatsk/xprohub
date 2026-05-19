@@ -82,6 +82,25 @@ export default function AccountScreen() {
               );
 
               if (fnError) {
+                // supabase-js routes non-2xx responses to fnError as
+                // FunctionsHttpError. The response body (with our structured
+                // error codes) is in fnError.context, a Response-like object.
+                try {
+                  const body = await (fnError as any).context?.json?.();
+                  if (body?.error === 'active_jobs' || body?.error === 'held_payments') {
+                    Alert.alert('Active Commitments', body.message);
+                    return;
+                  }
+                  if (body?.error) {
+                    Alert.alert(
+                      'Deletion Failed',
+                      body.message ?? 'Account deletion could not be completed. Please try again or contact hello@xprohub.com.',
+                    );
+                    return;
+                  }
+                } catch {
+                  // context parsing failed — genuine network/infra error
+                }
                 Alert.alert(
                   'Connection Error',
                   "Couldn't reach our servers. Check your connection and try again.",

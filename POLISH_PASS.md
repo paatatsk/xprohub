@@ -53,6 +53,24 @@
   so this is a cosmetic stale-state issue on the bids screen if
   the user navigates back. Captured 2026-05-15.
 
+- **DELETE ACCOUNT: no loading indicator during Edge Function call** — the
+  5-10s delete-account execution shows no visual feedback after the
+  confirmation Alert dismisses. Users could panic-tap or think the app
+  froze. **Fix:** add ActivityIndicator + disabled button state while
+  isDeleting is true. The isDeleting state variable already exists
+  (commit 216fc5e) — just needs visual treatment beyond the current
+  opacity + text change which only appears on the button itself, not
+  as a full-screen or prominent indicator. Captured 2026-05-18.
+
+- **Welcome screen double-render after account deletion** — after
+  successful delete, the Welcome screen briefly renders twice (flash).
+  Likely a race between supabase.auth.signOut() triggering the auth
+  state listener in _layout.tsx and router.replace('/(onboarding)/welcome')
+  executing simultaneously. Visual glitch only, not a correctness bug.
+  **Fix:** investigate _layout.tsx auth gating — may need a guard to
+  prevent double-navigation when signOut and replace fire in the same
+  tick. Captured 2026-05-18.
+
 ---
 
 ## Semantic Category Color System
