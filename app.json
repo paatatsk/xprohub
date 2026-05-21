@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "xprohub-v3",
+    "name": "xprohub",
     "slug": "xprohub-v3",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
         "NSPhotoLibraryUsageDescription": "XProHub needs access to your photo library so you can choose a profile photo and work samples.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.paatatsk.xprohubv3",
+      "bundleIdentifier": "com.paatatsk.xprohub",
       "associatedDomains": [
         "applinks:xprohub.com"
       ],
@@ -58,7 +58,7 @@
       }
     },
     "android": {
-      "package": "com.paatatsk.xprohubv3",
+      "package": "com.paatatsk.xprohub",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

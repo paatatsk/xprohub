@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appIDs": ["67NL4S6Y9P.com.paatatsk.xprohubv3"],
+        "appIDs": ["67NL4S6Y9P.com.paatatsk.xprohub"],
         "components": [
           { "/": "/stripe-return" },
           { "/": "/stripe-refresh" }
