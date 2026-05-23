@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import { useFonts } from 'expo-font';
 import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { StripeProvider } from '@stripe/stripe-react-native';
@@ -21,7 +22,7 @@ const STRIPE_PUBLISHABLE_KEY =
   'pk_test_51TRNSu08l7Que01i7wSpWjuTyIRYdzJHv3RjJMPtQzjcCSTIMXgnscC85ZyqLnPMbEnnIW23QAgdmYuO9Sne0FFq00vCTmyxqg';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({ SpaceGrotesk_700Bold });
+  const [fontsLoaded] = useFonts({ SpaceGrotesk_700Bold, Inter_400Regular, Inter_500Medium });
   const { session, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
@@ -78,7 +79,8 @@ export default function RootLayout() {
     }
 
     // Authenticated user already at the right destination — do nothing.
-    if (inTabs || onAllowedOnboarding) return;
+    const inJob = segments[0] === 'job';
+    if (inTabs || onAllowedOnboarding || inJob) return;
 
     // Authenticated user is somewhere that isn't their final destination
     // (just signed up, coming back from welcome/login, or app cold-start).

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { Colors } from '../../../constants/theme';
 
 // Dynamic Job Detail Screen
 // Expanded view of a single job card.
