@@ -2,10 +2,6 @@
 
 export type UserRole = 'customer' | 'worker' | 'both';
 
-export type BeltLevel =
-  | 'white' | 'yellow' | 'orange' | 'green'
-  | 'blue' | 'purple' | 'brown' | 'black';
-
 export type JobStatus =
   | 'open' | 'matched' | 'in_progress' | 'pending_confirmation'
   | 'completed' | 'cancelled' | 'expired' | 'disputed';
@@ -21,7 +17,6 @@ export interface Profile {
   avatar_url?: string;
   role: UserRole;
   bio?: string;
-  belt_level: BeltLevel;
   xp_total: number;
   xp_level: number;
   level_name: string;

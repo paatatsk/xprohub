@@ -4,7 +4,7 @@ import { Colors } from '../../constants/theme';
 
 // Screen 8 — Worker Match
 // Auto-matched worker shown, one tap to confirm.
-// Match Score % from 4-factor algorithm (Location 25% / Skill 35% / Belt 20% / Behavioral 20%).
+// Match Score % from multi-factor algorithm (Location / Skill / Experience / Behavioral).
 // TODO Phase 2: pull from worker_match_scores VIEW
 
 export default function MatchScreen() {

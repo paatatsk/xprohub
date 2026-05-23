@@ -40,7 +40,6 @@ interface Worker {
   full_name: string;
   avatar_url: string | null;
   bio: string | null;
-  belt: string | null;       // belt_level — placeholder until belt system wired
   rating: number | null;     // rating_avg — updates via review trigger
   superpowers: string[];     // up to 3 is_featured task names
 }
@@ -59,11 +58,6 @@ function budgetLabel(min: number | null, max: number | null): string {
   if (min)        return `From $${min}`;
   if (max)        return `Up to $${max}`;
   return 'Budget TBD';
-}
-
-function beltLabel(belt: string | null): string {
-  if (!belt) return 'Newcomer';
-  return belt.charAt(0).toUpperCase() + belt.slice(1) + ' Belt';
 }
 
 // ── Job Card ───────────────────────────────────────────────────
@@ -154,9 +148,8 @@ function WorkerCard({ worker, onHire, onOverflow }: { worker: Worker; onHire: ()
             </View>
           )}
 
-          {/* Belt + Rating + Hire row */}
+          {/* Rating + Hire row */}
           <View style={styles.workerFooter}>
-            <Text style={styles.workerBelt}>{beltLabel(worker.belt)}</Text>
             {worker.rating != null && worker.rating > 0 ? (
               <Text style={styles.workerRating}>★ {worker.rating.toFixed(1)}</Text>
             ) : null}
@@ -284,7 +277,7 @@ export default function MarketScreen() {
         user_id,
         is_featured,
         task_library ( name ),
-        profiles ( id, full_name, avatar_url, bio, belt_level, rating_avg, created_at )
+        profiles ( id, full_name, avatar_url, bio, rating_avg, created_at )
       `)
       .order('is_featured', { ascending: false })
       .limit(300);
@@ -308,7 +301,6 @@ export default function MarketScreen() {
           full_name: string | null;
           avatar_url: string | null;
           bio: string | null;
-          belt_level: string | null;
           rating_avg: number | null;
           created_at: string;
         } | null;
@@ -321,7 +313,6 @@ export default function MarketScreen() {
             full_name: profile.full_name ?? 'Anonymous',
             avatar_url: profile.avatar_url,
             bio: profile.bio,
-            belt: profile.belt_level,
             rating: profile.rating_avg,
             superpowers: [],
           });
@@ -866,12 +857,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginTop: 6,
-  },
-  workerBelt: {
-    color: Colors.gold,
-    fontSize: 12,
-    fontWeight: 'bold',
-    flex: 1,
   },
   workerRating: {
     color: Colors.textSecondary,

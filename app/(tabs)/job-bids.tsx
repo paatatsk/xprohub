@@ -29,7 +29,6 @@ interface BidWorker {
   id: string;
   full_name: string;
   avatar_url: string | null;
-  belt_level: string | null;
 }
 
 interface BidWithWorker {
@@ -62,7 +61,7 @@ function statusColor(status: string): string {
   switch (status) {
     case 'open':        return Colors.gold;
     case 'matched':     return Colors.green;
-    case 'in_progress': return '#E5901A'; // amber
+    case 'in_progress': return Colors.amber;
     case 'completed':   return Colors.textSecondary;
     default:            return Colors.textSecondary;
   }
@@ -76,11 +75,6 @@ function statusLabel(status: string): string {
     case 'completed':   return 'COMPLETED';
     default:            return status.toUpperCase();
   }
-}
-
-function beltLabel(belt: string | null): string {
-  if (!belt || belt === 'white') return '';
-  return belt.charAt(0).toUpperCase() + belt.slice(1) + ' Belt';
 }
 
 function budgetLabel(min: number | null, max: number | null): string {
@@ -118,12 +112,10 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
     ? worker.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '?';
 
-  const belt = beltLabel(worker?.belt_level ?? null);
-
   return (
     <View style={[styles.bidCard, isDimmed && styles.bidCardDimmed]}>
 
-      {/* ── Header: avatar + name + belt + price ── */}
+      {/* ── Header: avatar + name + price ── */}
       <View style={styles.bidHeader}>
 
         {/* Avatar */}
@@ -137,14 +129,11 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
           )}
         </View>
 
-        {/* Name + belt stack */}
+        {/* Name */}
         <View style={styles.workerInfo}>
           <Text style={styles.workerName} numberOfLines={1}>
             {worker?.full_name ?? 'Unknown Worker'}
           </Text>
-          {belt ? (
-            <Text style={styles.workerBelt}>{belt}</Text>
-          ) : null}
         </View>
 
         {/* Proposed price — loudest element */}
@@ -235,7 +224,7 @@ export default function JobBidsScreen() {
     if (!job_id) return;
     const { data, error: err } = await supabase
       .from('bids')
-      .select('*, worker:profiles!worker_id(id, full_name, avatar_url, belt_level)')
+      .select('*, worker:profiles!worker_id(id, full_name, avatar_url)')
       .eq('job_id', job_id)
       .order('created_at', { ascending: false });
 
@@ -270,7 +259,7 @@ export default function JobBidsScreen() {
           .single(),
         supabase
           .from('bids')
-          .select('*, worker:profiles!worker_id(id, full_name, avatar_url, belt_level)')
+          .select('*, worker:profiles!worker_id(id, full_name, avatar_url)')
           .eq('job_id', job_id)
           .order('created_at', { ascending: false }),
       ]);
@@ -756,7 +745,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 
-  // Worker name + belt
   workerInfo: {
     flex: 1,
     gap: 2,
@@ -766,11 +754,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 0.2,
-  },
-  workerBelt: {
-    color: Colors.gold,
-    fontSize: 11,
-    fontWeight: '600',
   },
 
   // Proposed price — loudest element

@@ -13,11 +13,12 @@ export const Colors = {
   blue:           '#4A9EDB',  // Trust, verification, info
   purple:         '#9B6EE8',  // XP, growth, Royal theme
   red:            '#E05252',  // Urgent, live, alerts, cancel
+  amber:          '#E5901A',  // In-progress, soft warnings
 };
 
 export const Fonts = {
   heading: 'SpaceGrotesk_700Bold', // All headings — Space Grotesk Bold
-  body:    'Inter',                // All body text — Inter
+  body:    'Inter_400Regular',     // All body text — Inter
 };
 
 export const Spacing = {

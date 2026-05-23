@@ -40,8 +40,8 @@ function statusColor(status: string): string {
   switch (status) {
     case 'open':                  return Colors.gold;
     case 'matched':               return Colors.green;
-    case 'in_progress':           return '#E5901A'; // amber — no theme token
-    case 'pending_confirmation':  return '#E5901A';
+    case 'in_progress':           return Colors.amber;
+    case 'pending_confirmation':  return Colors.amber;
     case 'completed':             return Colors.textSecondary;
     case 'disputed':              return Colors.red;
     default:                      return Colors.textSecondary;

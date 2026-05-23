@@ -27,7 +27,6 @@ interface ApplyJob {
 
 interface WorkerProfile {
   full_name: string | null;
-  belt_level: string | null;
   avatar_url: string | null;
 }
 
@@ -94,7 +93,7 @@ export default function ApplyScreen() {
           .single(),
         supabase
           .from('profiles')
-          .select('full_name, belt_level, avatar_url')
+          .select('full_name, avatar_url')
           .eq('id', user.id)
           .single(),
         supabase
@@ -140,16 +139,12 @@ export default function ApplyScreen() {
       job.timing === 'asap'      ? 'today' :
       job.timing === 'scheduled' ? 'on your schedule' :
                                    'whenever works for you';
-    const beltLevel = workerProfile?.belt_level ?? null;
-    const beltCtx   = beltLevel && beltLevel !== 'white'
-      ? `${beltLevel.charAt(0).toUpperCase() + beltLevel.slice(1)} belt — `
-      : '';
     const task = firstTaskName ?? 'this type of job';
 
     return [
-      `Hi! I've worked on ${task} jobs before. ${beltCtx}Ready to do yours well, ${timingStr}.`,
+      `Hi! I've worked on ${task} jobs before. Ready to do yours well, ${timingStr}.`,
       `Hi! I'm available ${timingStr} for your ${task} job. I take care with details and communicate clearly.`,
-      `Interested in your ${task} job. ${beltCtx}Let me know when works for you.`,
+      `Interested in your ${task} job. Let me know when works for you.`,
     ];
   }, [job, workerProfile, firstTaskName]);
 
@@ -654,7 +649,7 @@ const styles = StyleSheet.create({
   },
   priceInput: { flex: 1 },
   budgetWarn: {
-    color: '#E5901A',   // amber — soft warning, not an error
+    color: Colors.amber,
     fontSize: 12,
     marginTop: 6,
   },

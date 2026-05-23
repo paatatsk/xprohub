@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Radius, Spacing } from '../../constants/theme';
+import { SUPPORT_EMAIL } from '../../lib/legal';
 import { supabase } from '../../lib/supabase';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -745,10 +746,10 @@ export default function JobChatScreen() {
               Contact support to resolve this concern.
             </Text>
             <TouchableOpacity
-              onPress={() => Linking.openURL('mailto:hello@xprohub.com')}
+              onPress={() => Linking.openURL(`mailto:${SUPPORT_EMAIL}`)}
               activeOpacity={0.7}
             >
-              <Text style={styles.emailLink}>hello@xprohub.com</Text>
+              <Text style={styles.emailLink}>{SUPPORT_EMAIL}</Text>
             </TouchableOpacity>
           </View>
         )}
