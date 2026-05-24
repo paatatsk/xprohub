@@ -1,23 +1,41 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Animated, Text, StyleSheet } from 'react-native';
 import { Colors } from '../constants/theme';
 
 interface Props {
   size?: number;
+  spinning?: boolean;
 }
 
-export function GoldenDollar({ size = 48 }: Props) {
+export function GoldenDollar({ size = 48, spinning = false }: Props) {
   const spin = useRef(new Animated.Value(0)).current;
+  const animRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  useEffect(() => {
-    Animated.loop(
+  const startSpin = useCallback(() => {
+    spin.setValue(0);
+    animRef.current = Animated.loop(
       Animated.timing(spin, {
         toValue: 1,
         duration: 3000,
         useNativeDriver: true,
       })
-    ).start();
-  }, []);
+    );
+    animRef.current.start();
+  }, [spin]);
+
+  const stopSpin = useCallback(() => {
+    animRef.current?.stop();
+    spin.setValue(0);
+  }, [spin]);
+
+  React.useEffect(() => {
+    if (spinning) {
+      startSpin();
+    } else {
+      stopSpin();
+    }
+    return () => stopSpin();
+  }, [spinning, startSpin, stopSpin]);
 
   const rotate = spin.interpolate({
     inputRange: [0, 1],
