@@ -89,13 +89,32 @@ These tested-and-rejected variants are listed so they don't sneak back in:
 - ❌ `4.9 ★` / star characters anywhere — binary endorsement only.
 - ❌ `Maria's a 5-star cleaner` — no quantified reputation.
 - ❌ `Get $5 off your next clean` — no upsell on receipts.
-- ❌ `Service fee` — be specific: `XProHub fee · 8%`. Always with percent.
+- ❌ `Service fee` — be specific: `XProHub fee · 10%`. Always with percent.
+
+## Nullable fallback strings
+
+| Key | Value | Style |
+|---|---|---|
+| `trace.stripePending` | `pending` | fg2 mono, lowercase |
+| `trace.payoutInitiating` | `scheduling…` | gold mono |
+| `action.endorsedFallback` | `✓ ENDORSED` | no date, gold filled |
+
+## Duration collapse spec
+
+| Minutes | Display |
+|---|---|
+| 30 | `30 MIN` |
+| 60 | `1 HR` |
+| 90 | `1 HR 30 MIN` |
+| 260 | `4 HR 20 MIN` |
 
 ## Source
 
 - Worker note (workerNote) is user-generated; never modified in the view.
   Empty/null states use `note.empty`.
-- Worker first name is computed as `fullName.split(' ')[0]`. Capitalize for
+- Worker first name is `profiles.first_name`. Capitalize for
   section labels (`FROM MARIA`), use as-typed for body.
-- Dates are formatted with the device's locale for the day-name string,
-  forced to en-US for month abbreviations, then uppercased.
+- Action description is `task_library.completion_verb_phrase` — ops-owned,
+  past-tense, per category. Falls back to "completed your {category}".
+- Dates are formatted via `lib/format.ts`, forced to en-US for month
+  abbreviations, then uppercased.

@@ -4,7 +4,7 @@
 // The big gold number is what the WORKER received.
 // See docs/RECEIPT_SPEC.md for the full brief.
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Image, Share, Alert, ActivityIndicator, Platform,
@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
+import { supabase } from '../../../lib/supabase';
 import {
   SpaceGrotesk_500Medium,
   SpaceGrotesk_600SemiBold,
@@ -33,6 +34,7 @@ import {
   IBMPlexMono_500Medium,
 } from '@expo-google-fonts/ibm-plex-mono';
 import { Colors } from '../../../constants/theme';
+import { fmtCents, fmtDateStamp, fmtDuration, fmtDayDate, fmtShortDate, toCents } from '../../../lib/format';
 import type { ReceiptData } from '../../../types/receipt';
 
 // ── Font family constants ────────────────────────────────────
@@ -53,95 +55,164 @@ const FONT = {
 // feels like ink on dark paper, not pure white on screen.
 const INK_DIM = '#d8d8d8';
 
-// ── Format helpers ───────────────────────────────────────────
+// Format helpers imported from lib/format.ts
 
-const fmtCents = (cents: number) =>
-  `$${(cents / 100).toFixed(2)}`;
+// ── Real Supabase hook ───────────────────────────────────────
+function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
+  const [data, setData] = useState<ReceiptData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const fmtDateStamp = (iso: string) => {
-  const d = new Date(iso);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-  const year = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  const tz = d.toLocaleString('en-US', { timeZoneName: 'short' }).split(' ').pop();
-  return `${day} \u00B7 ${month} \u00B7 ${year} \u00B7 ${hh}:${mm} ${tz}`;
-};
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-const fmtDuration = (mins: number) => {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return h > 0 ? `${h} HR ${m} MIN` : `${m} MIN`;
-};
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setError('Sign in required.'); setLoading(false); return; }
 
-const fmtDayDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleString('en-US', {
-    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
-  }).toUpperCase().replace(/,/g, '');
-};
+    // Parallel fetches: job + payment + tasks
+    const [jobRes, paymentRes, tasksRes] = await Promise.all([
+      supabase
+        .from('jobs')
+        .select(`
+          id, customer_id, worker_id, title, description, category,
+          neighborhood, agreed_price, completed_at, started_at,
+          customer:profiles!customer_id(id, full_name, first_name, city),
+          worker:profiles!worker_id(id, full_name, first_name, city)
+        `)
+        .eq('id', jobId)
+        .single(),
+      supabase
+        .from('payments')
+        .select('amount, platform_fee, worker_payout, stripe_charge_id, escrow_status, released_at, auto_release_at, created_at')
+        .eq('job_id', jobId)
+        .maybeSingle(),
+      supabase
+        .from('job_post_tasks')
+        .select('task_library(name, completion_verb_phrase)')
+        .eq('job_post_id', jobId),
+    ]);
 
-const fmtShortDate = (iso: string) => {
-  const d = new Date(iso);
-  const day = String(d.getDate()).padStart(2, '0');
-  const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-  const year = d.getFullYear();
-  return `${day} ${month} ${year}`;
-};
+    if (jobRes.error || !jobRes.data) {
+      setError('Job not found.');
+      setLoading(false);
+      return;
+    }
 
-// ── Stub data — matches HTML reference exactly ───────────────
-// Replace with real Supabase fetch post-v1.
-const STUB_RECEIPT: ReceiptData = {
-  jobId: 'job_0a82f4c1',
-  viewerRole: 'customer',
-  worker: {
-    id: 'w-001',
-    fullName: 'Maria Reyes',
-    firstName: 'Maria',
-    location: 'Astoria',
-  },
-  customer: {
-    id: 'c-001',
-    fullName: 'Daniel Brooks',
-    firstName: 'Daniel',
-    location: 'Brooklyn',
-  },
-  actionDescription: 'cleaned your 2-bedroom apartment',
-  durationMinutes: 260,
-  completedAt: '2026-05-22T16:17:00-04:00',
-  photos: [],
-  lineItems: [
-    { label: 'Standard cleaning', amountCents: 9000 },
-    { label: 'Bathroom deep clean', amountCents: 5000 },
-    { label: 'Travel time \u00B7 Astoria \u2192 Brooklyn', amountCents: 1500 },
-  ],
-  subtotalCents: 15500,
-  platformFeePercent: 10,
-  platformFeeCents: 1550,
-  workerPayoutCents: 13950,
-  customerChargedCents: 15500,
-  currency: 'usd',
-  workerNote: 'Thanks Daniel \u2014 appreciated the late check-in. The hallway closet was tight, took an extra pass. Plants watered.',
-  trace: {
-    jobId: 'job_0a82f4c1',
-    stripeChargeId: 'ch_7HJ2X4kp9',
-    paidAt: '2026-05-22T16:17:00-04:00',
-    payoutAvailableAt: '2026-05-24T00:00:00-04:00',
-    payoutCompleted: false,
-    currency: 'usd',
-  },
-  endorsement: 'none',
-};
+    const job = jobRes.data;
+    const payment = paymentRes.data;
+    const workerProfile = job.worker as any;
+    const customerProfile = job.customer as any;
 
-// ── Stub hook — returns hardcoded data for v1 ────────────────
-function useReceipt(_jobId: string, _role?: 'customer' | 'worker') {
-  return {
-    data: STUB_RECEIPT,
-    loading: false,
-    error: null as string | null,
-    refetch: () => {},
-  };
+    if (!workerProfile || !customerProfile) {
+      setError('Could not load job parties.');
+      setLoading(false);
+      return;
+    }
+
+    // Determine viewer role
+    const viewerRole = user.id === job.customer_id ? 'customer' : 'worker';
+
+    // Money from payments table (authoritative, in dollars → cents)
+    const customerChargedCents = toCents(payment?.amount ?? job.agreed_price);
+    const platformFeeCents = toCents(payment?.platform_fee);
+    const workerPayoutCents = toCents(payment?.worker_payout);
+    const subtotalCents = customerChargedCents;
+
+    // Derive fee percent from actual cents — never hardcode
+    const platformFeePercent = subtotalCents > 0
+      ? Math.round((platformFeeCents / subtotalCents) * 100)
+      : 0;
+
+    // ── Runtime money invariant check (log-and-render) ────
+    // Render stored values from payments verbatim (Stripe-authoritative).
+    // Log mismatches for ops — never block the screen.
+    const payoutCheck = subtotalCents - platformFeeCents;
+    if (payment && Math.abs(payoutCheck - workerPayoutCents) > 1) {
+      console.warn(
+        `[Receipt] Money invariant mismatch for job ${jobId}: ` +
+        `subtotal ${subtotalCents} - fee ${platformFeeCents} = ${payoutCheck}, ` +
+        `but stored payout is ${workerPayoutCents}`
+      );
+    }
+
+    // Build task data from join
+    const tasks: { name: string; verbPhrase: string }[] = ((tasksRes.data ?? []) as any[])
+      .map(r => ({
+        name: r.task_library?.name as string,
+        verbPhrase: r.task_library?.completion_verb_phrase as string,
+      }))
+      .filter(t => t.name);
+
+    // Single line item with full agreed price (platform bills per-job, not per-task)
+    const lineItems = tasks.length > 0
+      ? [{ label: tasks.map(t => t.name).join(' + '), amountCents: subtotalCents }]
+      : [{ label: job.title ?? job.category ?? 'Service', amountCents: subtotalCents }];
+
+    // Duration in minutes (started_at → completed_at)
+    const durationMinutes = (job.started_at && job.completed_at)
+      ? Math.round((new Date(job.completed_at).getTime() - new Date(job.started_at).getTime()) / 60000)
+      : 0;
+
+    // Names — read first_name from profiles, never split full_name
+    const workerFirst = workerProfile.first_name ?? (workerProfile.full_name ?? 'Worker').split(' ')[0];
+    const customerFirst = customerProfile.first_name ?? (customerProfile.full_name ?? 'Customer').split(' ')[0];
+
+    // Payout state
+    const payoutCompleted = payment?.escrow_status === 'released';
+    const payoutAvailableAt = payment?.auto_release_at ?? payment?.released_at ?? job.completed_at ?? new Date().toISOString();
+
+    // Action description from completion_verb_phrase (editorial register)
+    // Falls back to "completed your {category}" if no verb phrase found
+    const verbPhrase = tasks[0]?.verbPhrase;
+    const desc = verbPhrase
+      ?? `completed your ${(job.category ?? 'job').toLowerCase()}`;
+
+    const receipt: ReceiptData = {
+      jobId: job.id,
+      viewerRole,
+      worker: {
+        id: workerProfile.id,
+        fullName: workerProfile.full_name ?? 'Worker',
+        firstName: workerFirst,
+        location: workerProfile.city ?? '',
+      },
+      customer: {
+        id: customerProfile.id,
+        fullName: customerProfile.full_name ?? 'Customer',
+        firstName: customerFirst,
+        location: customerProfile.city ?? job.neighborhood ?? '',
+      },
+      actionDescription: desc,
+      durationMinutes,
+      completedAt: job.completed_at ?? new Date().toISOString(),
+      photos: [],
+      lineItems,
+      subtotalCents,
+      platformFeePercent,
+      platformFeeCents,
+      workerPayoutCents,
+      customerChargedCents,
+      currency: 'usd',
+      workerNote: null,
+      trace: {
+        jobId: job.id,
+        stripeChargeId: payment?.stripe_charge_id ?? null,
+        paidAt: payment?.created_at ?? job.completed_at ?? new Date().toISOString(),
+        payoutAvailableAt,
+        payoutCompleted,
+        currency: 'usd',
+      },
+      endorsement: 'none',
+    };
+
+    setData(receipt);
+    setLoading(false);
+  }, [jobId]);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  return { data, loading, error, refetch: fetch };
 }
 
 // ── Sub-components ───────────────────────────────────────────

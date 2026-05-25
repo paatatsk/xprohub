@@ -21,6 +21,7 @@ export default function ProfileSetupScreen() {
   const isGate = mode === 'gate';
 
   const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,10 +34,11 @@ export default function ProfileSetupScreen() {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('full_name')
+        .select('full_name, first_name')
         .eq('id', user.id)
         .single();
       if (data?.full_name) setFullName(data.full_name);
+      if (data?.first_name) setFirstName(data.first_name);
     })();
   }, [isGate]);
 
@@ -61,6 +63,10 @@ export default function ProfileSetupScreen() {
   async function handleContinue() {
     if (!fullName.trim()) {
       setError('Please enter your full name.');
+      return;
+    }
+    if (!firstName.trim()) {
+      setError('Please enter your first name — this is how workers and customers will greet you.');
       return;
     }
     if (isGate && !avatarUri) {
@@ -105,6 +111,7 @@ export default function ProfileSetupScreen() {
       .from('profiles')
       .update({
         full_name: fullName.trim(),
+        first_name: firstName.trim(),
         ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         updated_at: new Date().toISOString(),
       })
@@ -169,6 +176,19 @@ export default function ProfileSetupScreen() {
             value={fullName}
             onChangeText={setFullName}
             placeholder="Your full name"
+            placeholderTextColor={Colors.textSecondary}
+            autoCapitalize="words"
+            autoCorrect={false}
+            returnKeyType="next"
+          />
+
+          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.firstNameHint}>What should people call you?</Text>
+          <TextInput
+            style={styles.input}
+            value={firstName}
+            onChangeText={setFirstName}
+            placeholder="Your first name"
             placeholderTextColor={Colors.textSecondary}
             autoCapitalize="words"
             autoCorrect={false}
@@ -307,6 +327,11 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
+    marginBottom: Spacing.xs,
+  },
+  firstNameHint: {
+    color: Colors.textSecondary,
+    fontSize: 12,
     marginBottom: Spacing.xs,
   },
   input: {

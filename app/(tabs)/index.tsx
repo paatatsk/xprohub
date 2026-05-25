@@ -17,6 +17,7 @@ import {
   IBMPlexMono_400Regular,
 } from '@expo-google-fonts/ibm-plex-mono';
 import { Colors } from '../../constants/theme';
+import { fmtReceiptDate, fmtPrice } from '../../lib/format';
 import { supabase } from '../../lib/supabase';
 
 // ── Font constants ───────────────────────────────────────────
@@ -77,16 +78,7 @@ function iconForSlug(slug: string): string {
   return map[slug] ?? '▪';
 }
 
-function fmtReceiptDate(iso: string): string {
-  const d = new Date(iso);
-  const day = d.getDate();
-  const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-  return `${day} ${month}`;
-}
-
-function fmtPrice(dollars: number): string {
-  return `$${dollars.toFixed(2)}`;
-}
+// Format helpers imported from lib/format.ts
 
 // ── YOUR DESK ────────────────────────────────────────────────
 

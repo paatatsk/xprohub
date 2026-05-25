@@ -216,6 +216,15 @@ export default function AccountScreen() {
           <Text style={styles.signOutText}>SIGN OUT</Text>
         </TouchableOpacity>
 
+        {__DEV__ && (
+          <TouchableOpacity
+            style={{ alignSelf: 'center', marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderWidth: 1, borderColor: Colors.red, borderRadius: 6 }}
+            onPress={() => router.push('/job/80d52f08-287b-4f19-85af-0ec576dbe0dc/receipt' as any)}
+          >
+            <Text style={{ color: Colors.red, fontSize: 11, letterSpacing: 1 }}>DEV: VIEW RECEIPT (REAL DATA)</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[styles.deleteBtn, isDeleting && { opacity: 0.5 }]}
           onPress={handleDeleteAccount}
