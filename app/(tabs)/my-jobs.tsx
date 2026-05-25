@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ export default function MyJobsScreen() {
       .limit(100);
 
     if (jobErr) {
-      setError(jobErr.message);
+      setError('Couldn\u2019t load your jobs. Pull down to try again.');
       if (isRefresh) setRefreshing(false);
       else           setLoading(false);
       return;
@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   categoryText: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 11,
     fontWeight: '600',
@@ -345,10 +346,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   noBids: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
   },
   timeAgo: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
@@ -379,6 +382,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptySub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',

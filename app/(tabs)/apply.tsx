@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useStripeStatus } from '../../hooks/useStripeStatus';
 
@@ -504,6 +504,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   gateSub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -581,6 +582,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   fieldHint: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
     marginBottom: 12,
@@ -602,6 +604,7 @@ const styles = StyleSheet.create({
   },
   templateCardDim: { opacity: 0.45 },
   templateText: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 13,
     lineHeight: 19,
@@ -633,7 +636,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   inputMultiline: { minHeight: 100, textAlignVertical: 'top', paddingTop: 12 },
-  charCount:      { color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
+  charCount:      { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
 
   // Price field
   priceInputRow: {
@@ -649,6 +652,7 @@ const styles = StyleSheet.create({
   },
   priceInput: { flex: 1 },
   budgetWarn: {
+    fontFamily: Fonts.body,
     color: Colors.amber,
     fontSize: 12,
     marginTop: 6,
@@ -670,6 +674,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   submitError: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',

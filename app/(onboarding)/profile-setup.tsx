@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetupScreen() {
@@ -120,7 +120,7 @@ export default function ProfileSetupScreen() {
     setLoading(false);
 
     if (profileError) {
-      setError(profileError.message);
+      setError('Couldn\u2019t save your profile. Please try again.');
       return;
     }
 
@@ -149,7 +149,7 @@ export default function ProfileSetupScreen() {
               : 'This is how the community will know you.'}
           </Text>
 
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8} accessibilityLabel="Add profile photo" accessibilityRole="button">
             {avatarUri ? (
               <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
             ) : (
@@ -246,6 +246,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   sub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 15,
     marginBottom: Spacing.xl,
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatarHint: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 10,
     marginTop: 2,
@@ -314,6 +316,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   errorText: {
+    fontFamily: Fonts.body,
     color: '#FF6B6B',
     fontSize: 14,
     marginBottom: Spacing.md,
@@ -324,12 +327,14 @@ const styles = StyleSheet.create({
     borderColor: '#FF6B6B',
   },
   label: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: Spacing.xs,
   },
   firstNameHint: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
     marginBottom: Spacing.xs,
@@ -345,6 +350,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   hint: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     marginTop: Spacing.md,

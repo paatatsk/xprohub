@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>XProHub — Gold Forge vs. Native Emoji</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0E0E0F; color: #FFFFFF;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 56px 32px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  /* ============== MASTHEAD ============== */
+  .masthead {
+    border-bottom: 1px solid #C9A84C;
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+  .mast-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px;
+  }
+  .eyebrow {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: #C9A84C;
+  }
+  .eyebrow.muted { color: #888890; }
+  .ledger {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 400;
+    font-size: 11px; letter-spacing: 1px; color: #888890;
+    text-transform: lowercase;
+  }
+  .ledger .gold { color: #C9A84C; }
+  h1.title {
+    font-family: 'Playfair Display', serif; font-weight: 700;
+    font-size: 56px; line-height: 1; letter-spacing: -1px;
+    color: #FFFFFF;
+    margin: 0;
+  }
+  h1.title em {
+    font-style: italic; color: #888890; font-weight: 400;
+  }
+  .lede {
+    font-family: 'Playfair Display', serif; font-weight: 400;
+    font-style: italic; font-size: 19px; line-height: 1.45;
+    color: #B8B8BC; max-width: 720px;
+    margin-top: 24px;
+  }
+  .signature {
+    margin-top: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase; color: #5a5a5e;
+  }
+  .signature .sep { color: #C9A84C; margin: 0 8px; }
+
+  /* ============== SECTIONS ============== */
+  .section { margin-top: 64px; }
+  .section-num {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 11px; letter-spacing: 6px; color: #C9A84C;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 24px; letter-spacing: 0.3px; line-height: 1.2;
+    color: #FFFFFF; margin: 0 0 14px;
+  }
+  .section-body {
+    font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6;
+    color: #B8B8BC; max-width: 760px;
+  }
+  .section-body em { font-family: 'Playfair Display', serif; font-style: italic; color: #FFFFFF; }
+  .section-body .gold { color: #C9A84C; font-weight: 500; }
+
+  /* ============== DIAMOND RULE ============== */
+  .diamond-rule {
+    display: flex; align-items: center; gap: 14px;
+    color: #C9A84C; margin: 56px 0 40px;
+  }
+  .diamond-rule::before, .diamond-rule::after {
+    content: ''; flex: 1; height: 1px;
+    background: #C9A84C; opacity: 0.35;
+  }
+  .diamond-rule .glyph { font-size: 10px; color: #C9A84C; }
+
+  /* ============== WELCOME CONTINUITY STRIP ============== */
+  .continuity {
+    margin-top: 28px;
+    padding: 32px;
+    border: 1px solid #2E2E33;
+    background: #121214;
+  }
+  .continuity-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .icon-cluster {
+    display: flex; gap: 28px; align-items: center; justify-content: flex-start;
+  }
+  .icon-cluster.right { justify-content: flex-end; }
+  .icon-cluster .lbl {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: #5a5a5e;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .icon-cluster .pcol { display: flex; flex-direction: column; align-items: center; }
+  .continuity .arrow {
+    text-align: center;
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 4px; color: #888890;
+    text-transform: uppercase;
+  }
+  .continuity .precedent-label {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 3px; color: #888890;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  /* ============== COMPARISON HEADER ============== */
+  .compare-headers {
+    display: grid; grid-template-columns: 80px 1fr 1fr; gap: 24px;
+    margin-bottom: 16px; padding: 0 4px;
+  }
+  .compare-headers .h-label {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  }
+  .compare-headers .today { color: #888890; }
+  .compare-headers .forge { color: #C9A84C; }
+  .compare-headers .sub {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: #5a5a5e; letter-spacing: 0.5px;
+    text-transform: lowercase;
+    margin-top: 4px;
+  }
+
+  /* ============== COMPARISON ROWS ============== */
+  .compare-row {
+    display: grid; grid-template-columns: 80px 1fr 1fr; gap: 24px;
+    align-items: stretch;
+    padding: 14px 4px;
+    border-top: 1px solid #1f1f22;
+  }
+  .row-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: #5a5a5e; letter-spacing: 1px;
+    padding-top: 6px;
+  }
+  .row-num .slug {
+    color: #888890;
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  /* === The Home tile (radius 0, post-pixel-pass commit) === */
+  .tile {
+    background: #171719;
+    border: 1px solid #2E2E33;
+    border-radius: 0;
+    padding: 16px;
+    height: 132px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .tile .icon-slot {
+    height: 28px; display: flex; align-items: flex-start;
+  }
+  .tile .icon-slot .emoji {
+    font-size: 24px; line-height: 28px;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  }
+  .tile .t-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 13px; line-height: 1.2; letter-spacing: 0.3px;
+    color: #FFFFFF; text-transform: uppercase;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+  .tile .t-price {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 13px; color: #C9A84C;
+    font-variant-numeric: tabular-nums;
+    margin-top: 6px;
+  }
+  .tile .t-diff {
+    font-family: 'Inter', sans-serif; font-size: 11px;
+    color: #888890;
+    margin-top: 2px;
+  }
+  .tile .pro-pill {
+    position: absolute; top: 14px; right: 14px;
+    background: #C9A84C; color: #0E0E0F;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 9px; letter-spacing: 1.2px;
+    padding: 3px 8px; border-radius: 999px;
+  }
+
+  /* ============== ZOOM STRIP ============== */
+  .zoom-strip {
+    margin-top: 24px;
+    padding: 40px 24px;
+    background: #121214;
+    border: 1px solid #2E2E33;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  .zoom-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 12px 8px;
+  }
+  .zoom-cell .z-label {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: #888890;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  /* ============== STYLE LANGUAGE GRID ============== */
+  .lang-grid {
+    margin-top: 24px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid #2E2E33;
+  }
+  .lang-cell {
+    padding: 24px;
+    border-right: 1px solid #2E2E33;
+    border-bottom: 1px solid #2E2E33;
+  }
+  .lang-cell:nth-child(2n) { border-right: 0; }
+  .lang-cell:nth-last-child(-n+2) { border-bottom: 0; }
+  .lang-cell .k {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: #C9A84C;
+    margin-bottom: 8px;
+  }
+  .lang-cell .v {
+    font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5;
+    color: #FFFFFF;
+  }
+  .lang-cell .v .mono {
+    font-family: 'IBM Plex Mono', monospace; color: #C9A84C;
+    font-size: 13px;
+  }
+
+  /* ============== SCOPE TABLE ============== */
+  .scope {
+    margin-top: 24px;
+    border: 1px solid #2E2E33;
+  }
+  .scope-line {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 24px;
+    padding: 18px 24px;
+    border-bottom: 1px solid #2E2E33;
+  }
+  .scope-line:last-child { border-bottom: 0; }
+  .scope-line .k {
+    font-family: 'IBM Plex Mono', monospace;
+    color: #888890; font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding-top: 3px;
+  }
+  .scope-line .v {
+    font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.55;
+    color: #FFFFFF;
+  }
+  .scope-line .v strong { color: #C9A84C; font-weight: 600; }
+  .scope-line.recommend { background: rgba(201, 168, 76, 0.04); border-top: 1px solid #C9A84C; }
+  .scope-line.recommend .k { color: #C9A84C; }
+
+  /* ============== FOOTER ============== */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #C9A84C;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer .l {
+    font-family: 'Oswald', sans-serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 4px; color: #C9A84C;
+    text-transform: uppercase;
+  }
+  .footer .r {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: #5a5a5e; letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mast-row">
+      <span class="eyebrow">XProHub &middot; Design Reference</span>
+      <span class="ledger"><span class="gold">ref #03</span> &middot; 24 may 2026 &middot; paata + maestro</span>
+    </div>
+    <h1 class="title">Gold Forge <em>vs.</em> Native Emoji</h1>
+    <p class="lede">The icons on the left ship today. The icons on the right are what XProHub's category set could be &mdash; drawn in the same hand as the Welcome screen Lock, Star, and Bolt.</p>
+    <div class="signature">
+      Claude Design <span class="sep">&middot;</span> Day 2 <span class="sep">&middot;</span> A comparison, not a build proposal
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-num">01 &mdash; LANGUAGE</div>
+    <h2 class="section-title">A single hand, already in the app.</h2>
+    <p class="section-body">
+      Gold <span class="gold">#C9A84C</span> 1.6px stroke on a transparent ground. 20&times;20 grid. Simple geometry &mdash; no shading, no second color, no gradient. Where the icon names a heart &mdash; a paw pad, a paint blob, the rivet of a saw, the &ldquo;on&rdquo; signal of a screen &mdash; <em>one</em> filled gold dot catches the light. Pure-energy icons (the bolt) carry no catch; they are the catch. This is the vocabulary the Welcome screen has been holding for us since launch.
+    </p>
+
+    <div class="continuity">
+      <div class="precedent-label">&mdash; Already in production on Welcome &mdash;</div>
+      <div class="continuity-row">
+        <div class="icon-cluster">
+          <div class="pcol">
+            <svg viewBox="0 0 20 20" width="48" height="48" fill="none">
+              <path d="M5 9V6a5 5 0 0 1 10 0v3" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M3 9h14v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="#C9A84C" stroke-width="1.6"/>
+              <circle cx="10" cy="14" r="1.5" fill="#C9A84C"/>
+            </svg>
+            <div class="lbl">Lock<br/>protected</div>
+          </div>
+          <div class="pcol">
+            <svg viewBox="0 0 20 20" width="48" height="48" fill="none">
+              <polygon points="10,2 12.4,7.2 18,7.6 14,11.4 15.4,17 10,14 4.6,17 6,11.4 2,7.6 7.6,7.2"
+                stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <div class="lbl">Star<br/>rated</div>
+          </div>
+          <div class="pcol">
+            <svg viewBox="0 0 20 20" width="48" height="48" fill="none">
+              <path d="M11 2L4 12h7l-2 6 9-10h-7l2-6z"
+                stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <div class="lbl">Bolt<br/>fast</div>
+          </div>
+        </div>
+        <div class="icon-cluster right">
+          <div class="pcol">
+            <svg viewBox="0 0 20 20" width="48" height="48" fill="none">
+              <path d="M6.5 14C6.5 11.8 8 11 10 11C12 11 13.5 11.8 13.5 14C13.5 16.3 12 17.5 10 17.5C8 17.5 6.5 16.3 6.5 14Z"
+                stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+              <ellipse cx="4.8" cy="9" rx="1.3" ry="1.7" fill="#C9A84C"/>
+              <ellipse cx="8" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+              <ellipse cx="12" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+              <ellipse cx="15.2" cy="9" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+            </svg>
+            <div class="lbl">Paw<br/>pet care</div>
+          </div>
+          <div class="pcol">
+            <svg viewBox="0 0 20 20" width="48" height="48" fill="none">
+              <path d="M11 3C5.5 3 2.5 6 2.5 10C2.5 12.5 4 14.5 6.5 14.5C8 14.5 8 13.5 9 13C10 12.5 11 13.5 12.5 13.5C16 13.5 17.5 11 17.5 8C17.5 5 14.5 3 11 3Z"
+                stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+              <circle cx="5.5" cy="9.5" r="1.1" stroke="#C9A84C" stroke-width="1.6"/>
+              <circle cx="11" cy="6.5" r="1" fill="#C9A84C"/>
+              <circle cx="14.5" cy="8" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+              <circle cx="14" cy="11" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+            </svg>
+            <div class="lbl">Palette<br/>painting</div>
+          </div>
+        </div>
+      </div>
+      <div class="arrow" style="margin-top:24px;">&mdash; same stroke weight, same gold, same hand &mdash;</div>
+    </div>
+  </section>
+
+  <div class="diamond-rule"><span class="glyph">&#9670;</span></div>
+
+  <section>
+    <div class="section-num">02 &mdash; HEAD TO HEAD</div>
+    <h2 class="section-title">Six categories. The cards as they will ship.</h2>
+    <p class="section-body">
+      Each card here is rendered at the size and dimensions it occupies on the Home grid &mdash; square-cornered (post-pixel-pass commit), 1px border, #171719 fill, icon at 26px. The only variable between columns is the icon itself.
+    </p>
+
+    <div class="compare-headers" style="margin-top:32px;">
+      <div></div>
+      <div>
+        <div class="h-label today">Today &mdash; Native emoji</div>
+        <div class="sub">as it renders on iphone hardware</div>
+      </div>
+      <div>
+        <div class="h-label forge">Proposed &mdash; Gold Forge</div>
+        <div class="sub">stroked, gold-only, welcome hand</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">01<span class="slug">cleaning</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#129529;</span></div>
+        <div class="t-title">Home Cleaning</div>
+        <div class="t-price">$30&ndash;$300</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <path d="M15.5 3L10 9" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M7.5 9L12.5 10L12 12L7 11Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M7.3 11.6L4.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M8.5 11.9L7.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M9.7 12L9.7 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M10.9 12L12 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M12 11.9L14.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="t-title">Home Cleaning</div>
+        <div class="t-price">$30&ndash;$300</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">02<span class="slug">pet care</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#128062;</span></div>
+        <div class="t-title">Pet Care</div>
+        <div class="t-price">$15&ndash;$100</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <path d="M6.5 14C6.5 11.8 8 11 10 11C12 11 13.5 11.8 13.5 14C13.5 16.3 12 17.5 10 17.5C8 17.5 6.5 16.3 6.5 14Z"
+              stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <ellipse cx="4.8" cy="9" rx="1.3" ry="1.7" fill="#C9A84C"/>
+            <ellipse cx="8" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+            <ellipse cx="12" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+            <ellipse cx="15.2" cy="9" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="t-title">Pet Care</div>
+        <div class="t-price">$15&ndash;$100</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">03<span class="slug">electrical</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#9889;</span></div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Electrical</div>
+        <div class="t-price">$50&ndash;$500</div>
+        <div class="t-diff">Skilled</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <path d="M11 2L4 12h7l-2 6 9-10h-7l2-6z"
+              stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Electrical</div>
+        <div class="t-price">$50&ndash;$500</div>
+        <div class="t-diff">Skilled</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">04<span class="slug">painting</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#127912;</span></div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Painting</div>
+        <div class="t-price">$50&ndash;$500</div>
+        <div class="t-diff">Easy &rarr; Skilled</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <path d="M11 3C5.5 3 2.5 6 2.5 10C2.5 12.5 4 14.5 6.5 14.5C8 14.5 8 13.5 9 13C10 12.5 11 13.5 12.5 13.5C16 13.5 17.5 11 17.5 8C17.5 5 14.5 3 11 3Z"
+              stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <circle cx="5.5" cy="9.5" r="1.1" stroke="#C9A84C" stroke-width="1.6"/>
+            <circle cx="11" cy="6.5" r="1" fill="#C9A84C"/>
+            <circle cx="14.5" cy="8" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+            <circle cx="14" cy="11" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Painting</div>
+        <div class="t-price">$50&ndash;$500</div>
+        <div class="t-diff">Easy &rarr; Skilled</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">05<span class="slug">carpentry</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#129690;</span></div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Carpentry &amp; Woodwork</div>
+        <div class="t-price">$60&ndash;$500</div>
+        <div class="t-diff">Medium &rarr; Skilled</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <path d="M2.5 7.5L14 7.5L14 10L4 10Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M4 10L5 11.2L6 10L7 11.2L8 10L9 11.2L10 10L11 11.2L12 10L13 11.2L14 10"
+              stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <path d="M14 6.5H17C18.3 6.5 18.3 11 17 11H14"
+              stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="15" cy="8.75" r="0.7" fill="#C9A84C"/>
+          </svg>
+        </div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">Carpentry &amp; Woodwork</div>
+        <div class="t-price">$60&ndash;$500</div>
+        <div class="t-diff">Medium &rarr; Skilled</div>
+      </div>
+    </div>
+
+    <div class="compare-row">
+      <div class="row-num">06<span class="slug">it &amp; tech</span></div>
+      <div class="tile">
+        <div class="icon-slot"><span class="emoji">&#128187;</span></div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">IT &amp; Tech Support</div>
+        <div class="t-price">$30&ndash;$180</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+      <div class="tile">
+        <div class="icon-slot">
+          <svg viewBox="0 0 20 20" width="26" height="26" fill="none">
+            <rect x="4" y="4" width="12" height="8" rx="0.6" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M2.5 13.5L17.5 13.5L16.5 15.5L3.5 15.5Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+            <circle cx="10" cy="8" r="0.75" fill="#C9A84C"/>
+          </svg>
+        </div>
+        <div class="pro-pill">PRO</div>
+        <div class="t-title">IT &amp; Tech Support</div>
+        <div class="t-price">$30&ndash;$180</div>
+        <div class="t-diff">Easy &rarr; Medium</div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="section">
+    <div class="section-num">03 &mdash; LINE QUALITY</div>
+    <h2 class="section-title">The six at full size, no card around them.</h2>
+    <p class="section-body">
+      Same SVGs, scaled to 64px so the line is honestly evaluable. No fill, no shadow, no glow &mdash; only stroke and the single catch dot where present.
+    </p>
+    <div class="zoom-strip">
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <path d="M15.5 3L10 9" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M7.5 9L12.5 10L12 12L7 11Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M7.3 11.6L4.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8.5 11.9L7.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M9.7 12L9.7 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M10.9 12L12 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M12 11.9L14.5 17.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="z-label">Broom<br/>cleaning</div>
+      </div>
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <path d="M6.5 14C6.5 11.8 8 11 10 11C12 11 13.5 11.8 13.5 14C13.5 16.3 12 17.5 10 17.5C8 17.5 6.5 16.3 6.5 14Z"
+            stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <ellipse cx="4.8" cy="9" rx="1.3" ry="1.7" fill="#C9A84C"/>
+          <ellipse cx="8" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+          <ellipse cx="12" cy="6.5" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+          <ellipse cx="15.2" cy="9" rx="1.3" ry="1.7" stroke="#C9A84C" stroke-width="1.6"/>
+        </svg>
+        <div class="z-label">Paw<br/>pet care</div>
+      </div>
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <path d="M11 2L4 12h7l-2 6 9-10h-7l2-6z"
+            stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+        <div class="z-label">Bolt<br/>electrical</div>
+      </div>
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <path d="M11 3C5.5 3 2.5 6 2.5 10C2.5 12.5 4 14.5 6.5 14.5C8 14.5 8 13.5 9 13C10 12.5 11 13.5 12.5 13.5C16 13.5 17.5 11 17.5 8C17.5 5 14.5 3 11 3Z"
+            stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="5.5" cy="9.5" r="1.1" stroke="#C9A84C" stroke-width="1.6"/>
+          <circle cx="11" cy="6.5" r="1" fill="#C9A84C"/>
+          <circle cx="14.5" cy="8" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+          <circle cx="14" cy="11" r="0.9" stroke="#C9A84C" stroke-width="1.6"/>
+        </svg>
+        <div class="z-label">Palette<br/>painting</div>
+      </div>
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <path d="M2.5 7.5L14 7.5L14 10L4 10Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M4 10L5 11.2L6 10L7 11.2L8 10L9 11.2L10 10L11 11.2L12 10L13 11.2L14 10"
+            stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M14 6.5H17C18.3 6.5 18.3 11 17 11H14"
+            stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="15" cy="8.75" r="0.7" fill="#C9A84C"/>
+        </svg>
+        <div class="z-label">Saw<br/>carpentry</div>
+      </div>
+      <div class="zoom-cell">
+        <svg viewBox="0 0 20 20" width="64" height="64" fill="none">
+          <rect x="4" y="4" width="12" height="8" rx="0.6" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M2.5 13.5L17.5 13.5L16.5 15.5L3.5 15.5Z" stroke="#C9A84C" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="10" cy="8" r="0.75" fill="#C9A84C"/>
+        </svg>
+        <div class="z-label">Laptop<br/>it &amp; tech</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-num">04 &mdash; THE RULES</div>
+    <h2 class="section-title">What every Forge icon agrees to.</h2>
+    <p class="section-body">
+      Five rules. Not negotiable per-icon &mdash; if the rule breaks, the icon's wrong, not the rule.
+    </p>
+    <div class="lang-grid">
+      <div class="lang-cell">
+        <div class="k">Grid</div>
+        <div class="v"><span class="mono">20 &times; 20</span> viewBox. Renders at 26px on Home tiles, 24px in dense rows, 48&ndash;64px in feature contexts. No off-grid anchor points.</div>
+      </div>
+      <div class="lang-cell">
+        <div class="k">Stroke</div>
+        <div class="v"><span class="mono">1.6px</span> in <span class="mono">#C9A84C</span>. Always round caps, always round joins. No variable weight, no double stroke, no taper.</div>
+      </div>
+      <div class="lang-cell">
+        <div class="k">Fill</div>
+        <div class="v">Outline shapes are <em>always</em> transparent. Solid fill is reserved for the single catch dot &mdash; never for the icon body.</div>
+      </div>
+      <div class="lang-cell">
+        <div class="k">Catch</div>
+        <div class="v"><em>At most one</em> filled gold element per icon, placed at the object's named heart. Pure-energy objects (bolt) carry no catch. No exceptions, no two-dot icons.</div>
+      </div>
+      <div class="lang-cell">
+        <div class="k">Geometry</div>
+        <div class="v">Editorial, not illustrative. Drawn from primitives &mdash; lines, rectangles, ellipses, simple paths. No anatomy, no shading, no perspective.</div>
+      </div>
+      <div class="lang-cell">
+        <div class="k">No</div>
+        <div class="v">No second color. No emoji glyphs alongside. No shadow, no glow, no inner highlight. No filled backgrounds behind the icon. No animation on rest.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-num">05 &mdash; SCOPE</div>
+    <h2 class="section-title">Twenty icons. What it costs, where it fits.</h2>
+    <p class="section-body">
+      The honest read. Effort is a design-bandwidth question, not an engineering one &mdash; integration is swapping the <span class="gold">iconForSlug()</span> map's emoji strings for SVG component references. That's hours, not days.
+    </p>
+
+    <div class="scope">
+      <div class="scope-line">
+        <div class="k">Design work</div>
+        <div class="v"><strong>1&ndash;2 sessions.</strong> Six are drawn here; the other fourteen (Errands, Childcare, Eldercare, Moving, Tutoring, Coaching, Personal Assist, Vehicle, Handyman, Gardening, Recycling, Events, Plumbing, HVAC) land in the same language at roughly 30&ndash;40 minutes each, plus review iteration.</div>
+      </div>
+      <div class="scope-line">
+        <div class="k">Engineering</div>
+        <div class="v"><strong>Half a day.</strong> Replace the two <span style="font-family:'IBM Plex Mono',monospace;color:#C9A84C;">iconForSlug()</span> maps in <span style="font-family:'IBM Plex Mono',monospace;color:#888890;">index.tsx</span> and <span style="font-family:'IBM Plex Mono',monospace;color:#888890;">post.tsx</span> with a single component that renders the right SVG. No asset pipeline, no font loading.</div>
+      </div>
+      <div class="scope-line">
+        <div class="k">Real risk</div>
+        <div class="v"><strong>Legibility at 26px on hardware.</strong> What looks balanced in the IDE may dim on a hot iPhone screen, or in a dark room, or for users with reduced contrast settings. That's an <em>unknown</em> until we test on device.</div>
+      </div>
+      <div class="scope-line">
+        <div class="k">Smaller risk</div>
+        <div class="v">Some categories don't have an obvious geometric anchor &mdash; <em>Personal Assistance</em>, <em>Events</em>, <em>Childcare</em>. The Forge language is geometric; if we can't draw it without anatomy, the category needs renaming, not the icon needs anatomy.</div>
+      </div>
+      <div class="scope-line recommend">
+        <div class="k">Recommendation</div>
+        <div class="v">
+          <strong>v1 &mdash; conditional on a hardware test of these 6 first.</strong> Same gate Receipt earned: print these six to the device, look at them in a dark room, in sunlight, and beside the emoji version. If they hold up, commission the remaining fourteen. If even one fails legibility, log Gold Forge to v1.1 and ship v1 with the glyph swaps already committed.
+          <br/><br/>
+          <em>The lighthouse standard isn't &ldquo;ship custom icons because they're better in theory.&rdquo; It's &ldquo;ship them because the device says so.&rdquo;</em>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="l">&mdash; Claude Design &mdash; Comparison artifact &mdash; not a build proposal &mdash;</div>
+    <div class="r">ref #03 &middot; 24.05.2026</div>
+  </footer>
+
+</div>
+</body>
+</html>

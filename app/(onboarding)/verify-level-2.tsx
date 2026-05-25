@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // Level 2 Gate — shown when an Explorer taps Post a Job or Hire Directly.
@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subhead: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     lineHeight: 19,
@@ -163,6 +164,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   tileSub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     marginBottom: Spacing.md,
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
 
   // Bullets
   bullets: { gap: 6, marginBottom: Spacing.md },
-  bullet:  { color: Colors.textPrimary, fontSize: 14, lineHeight: 20 },
+  bullet:  { fontFamily: Fonts.body, color: Colors.textPrimary, fontSize: 14, lineHeight: 20 },
 
   // Starter skip button (solid gold)
   skipBtn: {
@@ -204,12 +206,14 @@ const styles = StyleSheet.create({
   btnDisabled: { opacity: 0.4 },
 
   errorText: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
   deferralNote: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     textAlign: 'center',

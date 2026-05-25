@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
-import { Colors, Spacing, Radius } from '../../constants/theme';
+import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -19,7 +19,11 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     const { error: e } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase());
     setLoading(false);
-    if (e) { setError(e.message); } else { setSent(true); }
+    if (e) {
+      setError(e.message.includes('fetch') || e.message.includes('network')
+        ? 'Couldn\u2019t connect. Please check your internet and try again.'
+        : e.message);
+    } else { setSent(true); }
   }
 
   return (
@@ -66,13 +70,14 @@ const styles = StyleSheet.create({
   safe:      { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
   title:     { color: Colors.gold, fontSize: 28, fontWeight: '800', letterSpacing: 1, marginBottom: Spacing.xs },
-  sub:       { color: Colors.textSecondary, fontSize: 15, marginBottom: Spacing.xl },
+  sub:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 15, marginBottom: Spacing.xl },
   errorText: {
+    fontFamily: Fonts.body,
     color: Colors.red, fontSize: 14, marginBottom: Spacing.md,
     backgroundColor: '#2A1515', padding: Spacing.sm,
     borderRadius: Radius.sm, borderWidth: 1, borderColor: Colors.red,
   },
-  label:     { color: Colors.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: Spacing.xs },
+  label:     { fontFamily: Fonts.body, color: Colors.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: Spacing.xs },
   input: {
     backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border,
     borderRadius: Radius.md, color: Colors.textPrimary, fontSize: 16,
@@ -80,5 +85,5 @@ const styles = StyleSheet.create({
   },
   buttonRow: { marginTop: Spacing.xl },
   backRow:   { alignItems: 'center', marginTop: Spacing.lg },
-  backText:  { color: Colors.gold, fontSize: 14 },
+  backText:  { fontFamily: Fonts.body, color: Colors.gold, fontSize: 14 },
 });

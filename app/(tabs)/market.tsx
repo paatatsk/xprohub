@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
 import { useBlockList } from '../../hooks/useBlockList';
@@ -113,6 +113,8 @@ function WorkerCard({ worker, onHire, onOverflow }: { worker: Worker; onHire: ()
         style={styles.overflowBtn}
         onPress={onOverflow}
         activeOpacity={0.6}
+        accessibilityLabel="More options"
+        accessibilityRole="button"
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
         <Text style={styles.overflowIcon}>⋯</Text>
@@ -228,7 +230,7 @@ export default function MarketScreen() {
     const { data, error: err } = await query;
 
     if (err) {
-      setError(err.message);
+      setError('Couldn\u2019t load jobs. Pull down to try again.');
     } else {
       const excluded = new Set([...blockedIds, ...(currentUserId ? [currentUserId] : [])]);
       setJobs((data ?? []).filter(j => !excluded.has(j.customer_id)));
@@ -289,7 +291,7 @@ export default function MarketScreen() {
     const { data: rows, error: err } = await query;
 
     if (err) {
-      setWorkersError(err.message);
+      setWorkersError('Couldn\u2019t load workers. Pull down to try again.');
     } else {
       // Aggregate by user_id — each worker appears once, superpowers
       // built from the first 3 is_featured rows encountered.
@@ -694,6 +696,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptySub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',
@@ -766,6 +769,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   cardDesc: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
@@ -784,6 +788,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTag: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
@@ -830,6 +835,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   workerBio: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
     lineHeight: 17,
@@ -859,6 +865,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   workerRating: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },

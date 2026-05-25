@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ── Star descriptor labels ─────────────────────────────────────────────────
@@ -380,6 +380,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   guardSub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -421,6 +422,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   jobTitle: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
   },
@@ -448,6 +450,7 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   charCount: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     textAlign: 'right',
@@ -472,6 +475,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   submitError: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 12,
     textAlign: 'center',

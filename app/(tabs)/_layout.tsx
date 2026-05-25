@@ -17,7 +17,7 @@ const headerDefaults = {
 function BackButton({ returnTo = '/(tabs)' }: { returnTo?: string }) {
   const router = useRouter();
   return (
-    <TouchableOpacity onPress={() => router.push(returnTo as any)} style={{ paddingLeft: 16 }}>
+    <TouchableOpacity onPress={() => router.push(returnTo as any)} style={{ paddingLeft: 16 }} accessibilityLabel="Go back" accessibilityRole="button">
       <Text style={{ color: Colors.gold, fontSize: 22 }}>‹</Text>
     </TouchableOpacity>
   );

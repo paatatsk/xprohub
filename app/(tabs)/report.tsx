@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ── Reason options ────────────────────────────────────────────────────────────
@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   sub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
@@ -241,6 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold + '18',
   },
   reasonText: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
   },
@@ -248,6 +250,7 @@ const styles = StyleSheet.create({
 
   // Details
   detailsLabel: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
@@ -270,6 +273,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   charCount: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     textAlign: 'right',
@@ -279,6 +283,7 @@ const styles = StyleSheet.create({
 
   // Error + submit
   submitError: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',

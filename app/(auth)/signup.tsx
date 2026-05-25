@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
-import { Colors, Spacing, Radius } from '../../constants/theme';
+import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '../../lib/legal';
 
 export default function SignUpScreen() {
@@ -41,7 +41,9 @@ export default function SignUpScreen() {
     });
     setLoading(false);
     if (authError) {
-      setError(authError.message);
+      setError(authError.message.includes('fetch') || authError.message.includes('network')
+        ? 'Couldn\u2019t connect. Please check your internet and try again.'
+        : authError.message);
     } else {
       setDone(true);
     }
@@ -179,11 +181,13 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   sub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 15,
     marginBottom: Spacing.xl,
   },
   errorText: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 14,
     marginBottom: Spacing.md,
@@ -194,6 +198,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.red,
   },
   label: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
@@ -219,10 +224,12 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   switchText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
   },
   switchLink: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 14,
     fontWeight: '600',
@@ -232,12 +239,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
   },
   legalText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     lineHeight: 18,
     textAlign: 'center',
   },
   legalLink: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontWeight: '600',
   },
@@ -254,6 +263,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   confirmedText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 15,
     textAlign: 'center',
@@ -265,6 +275,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   confirmedHint: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',

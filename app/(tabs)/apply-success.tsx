@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, BackHandler } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 
 // Apply Success — confirmation screen after bid submitted
 // Forward-only: no back navigation. Both buttons use router.replace.
@@ -99,12 +99,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subhead: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
   },
   body: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { SUPPORT_EMAIL } from '../../lib/legal';
 import { supabase } from '../../lib/supabase';
 
@@ -540,6 +540,8 @@ export default function JobChatScreen() {
           {otherPartyId && (
             <TouchableOpacity
               style={styles.contextOverflowBtn}
+              accessibilityLabel="More options"
+              accessibilityRole="button"
               onPress={() => {
                 ActionSheetIOS.showActionSheetWithOptions(
                   {
@@ -881,6 +883,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stateSub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -932,6 +935,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   contextJob: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
@@ -995,6 +999,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     fontStyle: 'italic',
@@ -1030,6 +1035,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 4,
   },
   bubbleText: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     lineHeight: 20,
@@ -1052,6 +1058,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sendErrorText: {
+    fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
     fontSize: 12,
@@ -1109,6 +1116,7 @@ const styles = StyleSheet.create({
 
   // ── Pending confirmation + dispute ──────────────────────────
   bannerCopy: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -1143,6 +1151,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   disputeCharCount: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     textAlign: 'right',
@@ -1161,6 +1170,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   disputeReasonText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     fontStyle: 'italic',
@@ -1196,10 +1206,12 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   feeLabel: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
   feeValue: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',

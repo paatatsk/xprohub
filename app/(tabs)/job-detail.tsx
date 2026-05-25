@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // Job Detail — full job info + Apply CTA
@@ -186,6 +186,8 @@ export default function JobDetailScreen() {
           {!isOwnJob && job.customer_id && (
             <TouchableOpacity
               style={styles.overflowBtn}
+              accessibilityLabel="More options"
+              accessibilityRole="button"
               onPress={() => {
                 ActionSheetIOS.showActionSheetWithOptions(
                   {
@@ -328,6 +330,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   emptySub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -406,7 +409,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-  postedByTime: { color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  postedByTime: { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
 
   // Title
   title: {
@@ -470,6 +473,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   descText: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     lineHeight: 21,
@@ -488,6 +492,7 @@ const styles = StyleSheet.create({
 
   // Details
   detailRow: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     marginBottom: 6,
@@ -515,6 +520,7 @@ const styles = StyleSheet.create({
   applyBtnText:     { color: Colors.background, fontWeight: 'bold', fontSize: 14, letterSpacing: 2 },
   applyBtnSentText: { color: Colors.green,      fontWeight: 'bold', fontSize: 14, letterSpacing: 1.5 },
   ownJobText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',

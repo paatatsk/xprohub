@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // Screen 7 — Post a Job
@@ -551,6 +551,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subhead: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     marginBottom: Spacing.lg,
@@ -595,6 +596,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   catCount: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
   },
@@ -602,6 +604,7 @@ const styles = StyleSheet.create({
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
   label: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     fontWeight: 'bold',
@@ -627,8 +630,8 @@ const styles = StyleSheet.create({
 
   // Helpers
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  charCount:  { color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
-  errorText:  { color: Colors.red, fontSize: 12, marginTop: 4 },
+  charCount:  { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
+  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 4 },
 
   // Task chips
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
@@ -644,13 +647,14 @@ const styles = StyleSheet.create({
   chipActive:      { borderColor: Colors.gold, backgroundColor: Colors.gold + '22' },
   chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
   chipNameActive:  { color: Colors.gold },
-  chipPrice:       { color: Colors.textSecondary, fontSize: 11 },
+  chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
   chipPriceActive: { color: Colors.gold, opacity: 0.8 },
 
   // Budget
   budgetRow:   { flexDirection: 'row', gap: 12 },
   budgetHalf:  { flex: 1 },
   budgetLabel: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 11,
     letterSpacing: 1,
@@ -682,7 +686,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Spacing.md,
   },
-  urgentSub:     { color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  urgentSub:     { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
   toggleTrack: {
     width: 48,
     height: 28,
@@ -719,6 +723,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   submitError: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',

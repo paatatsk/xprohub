@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
-import { Colors, Spacing, Radius } from '../../constants/theme';
+import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { useBiometrics } from '../../hooks/useBiometrics';
 
 export default function LoginScreen() {
@@ -31,7 +31,9 @@ export default function LoginScreen() {
     });
     setLoading(false);
     if (authError) {
-      setError(authError.message);
+      setError(authError.message.includes('fetch') || authError.message.includes('network')
+        ? 'Couldn\u2019t connect. Please check your internet and try again.'
+        : authError.message);
     } else if (isAvailable) {
       // Silently save credentials so Face ID works on next visit
       await saveCredentials(email.trim().toLowerCase(), password);
@@ -51,7 +53,9 @@ export default function LoginScreen() {
     setLoading(true);
     const { error: authError } = await supabase.auth.signInWithPassword(creds);
     setLoading(false);
-    if (authError) setError(authError.message);
+    if (authError) setError(authError.message.includes('fetch') || authError.message.includes('network')
+      ? 'Couldn\u2019t connect. Please check your internet and try again.'
+      : authError.message);
     // On success: _layout.tsx redirects to /(tabs)
   }
 
@@ -98,7 +102,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           {isAvailable && hasCredentials && (
-            <TouchableOpacity style={styles.faceIDButton} onPress={handleFaceID} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.faceIDButton} onPress={handleFaceID} activeOpacity={0.7} accessibilityLabel="Sign in with Face ID" accessibilityRole="button">
               <View style={styles.faceIDIcon}>
                 <View style={styles.faceIDFace} />
                 <View style={[styles.faceIDEye, styles.faceIDEyeLeft]} />
@@ -158,11 +162,13 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   sub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 15,
     marginBottom: Spacing.xl,
   },
   errorText: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 14,
     marginBottom: Spacing.md,
@@ -173,6 +179,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.red,
   },
   label: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
@@ -246,6 +253,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   forgotText: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 13,
   },
@@ -258,10 +266,12 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   switchText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
   },
   switchLink: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 14,
     fontWeight: '600',

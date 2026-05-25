@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -198,7 +198,7 @@ export default function MyApplicationsScreen() {
       .order('created_at', { ascending: false });
 
     if (bidErr) {
-      setError(bidErr.message);
+      setError('Couldn\u2019t load your applications. Pull down to try again.');
       if (isRefresh) setRefreshing(false);
       else           setLoading(false);
       return;
@@ -418,6 +418,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   categoryText: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 11,
     fontWeight: '600',
@@ -438,6 +439,7 @@ const styles = StyleSheet.create({
 
   // ── Customer line ─────────────────────────────────────────────
   customerLine: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
   },
@@ -459,6 +461,7 @@ const styles = StyleSheet.create({
 
   // ── Message ───────────────────────────────────────────────────
   message: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     lineHeight: 19,
@@ -471,6 +474,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeAgo: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
@@ -501,6 +505,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptySub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',

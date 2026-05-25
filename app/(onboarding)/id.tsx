@@ -6,7 +6,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ID (Business Card) — 4-step setup
@@ -291,7 +291,7 @@ export default function IdScreen() {
             Customers want to know who they're hiring.
           </Text>
 
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage} activeOpacity={0.8} accessibilityLabel="Add profile photo" accessibilityRole="button">
             {photoPreview ? (
               <Image source={{ uri: photoPreview }} style={styles.avatarImage} />
             ) : (
@@ -573,6 +573,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subhead: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     marginBottom: Spacing.lg,
@@ -614,7 +615,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   catNameActive:  { color: Colors.gold },
-  catCount:       { color: Colors.textSecondary, fontSize: 11 },
+  catCount:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
 
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
@@ -633,7 +634,7 @@ const styles = StyleSheet.create({
   chipActive:      { borderColor: Colors.gold, backgroundColor: Colors.gold + '22' },
   chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
   chipNameActive:  { color: Colors.gold },
-  chipPrice:       { color: Colors.textSecondary, fontSize: 11 },
+  chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
   chipPriceActive: { color: Colors.gold, opacity: 0.8 },
 
   // Superpower rows (step 4)
@@ -664,7 +665,7 @@ const styles = StyleSheet.create({
   superTaskInfo:        { flex: 1 },
   superTaskName:        { color: Colors.textPrimary, fontSize: 14, fontWeight: '600' },
   superTaskNameActive:  { color: Colors.gold },
-  superTaskPrice:       { color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  superTaskPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
 
   // Avatar (step 1)
   avatarContainer: {
@@ -725,6 +726,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   counterText: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
@@ -760,6 +762,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   errorText: {
+    fontFamily: Fonts.body,
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',

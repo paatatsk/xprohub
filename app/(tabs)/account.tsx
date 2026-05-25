@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { Colors, Spacing, Radius } from '../../constants/theme';
+import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useBiometrics } from '../../hooks/useBiometrics';
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL, SUPPORT_EMAIL } from '../../lib/legal';
@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   rowLabel: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 15,
     flex: 1,
@@ -303,10 +304,12 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   rowValue: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 15,
   },
   rowValueGold: {
+    fontFamily: Fonts.body,
     color: Colors.gold,
     fontSize: 15,
   },

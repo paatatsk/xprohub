@@ -149,7 +149,7 @@ export default function HomeScreen() {
       .select('id, name, price_min, price_max, difficulty_range, sort_order, icon_slug, tier, requires_background_check')
       .order('sort_order', { ascending: true });
     if (err) {
-      setError(err.message);
+      setError('Couldn\u2019t load categories. Pull down to try again.');
     } else {
       setCategories(data ?? []);
     }

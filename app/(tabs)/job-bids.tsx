@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { handleNextAction } from '@stripe/stripe-react-native';
 
@@ -688,6 +688,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   errorBannerText: {
+    fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
     fontSize: 13,
@@ -766,11 +767,13 @@ const styles = StyleSheet.create({
 
   // Message
   bidMessage: {
+    fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
     lineHeight: 20,
   },
   bidMessageEmpty: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 13,
     fontStyle: 'italic',
@@ -778,6 +781,7 @@ const styles = StyleSheet.create({
 
   // Submitted time
   bidTime: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
   },
@@ -894,6 +898,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptySub: {
+    fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 14,
     textAlign: 'center',

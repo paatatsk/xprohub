@@ -78,21 +78,21 @@ export default function RootLayout() {
       return;
     }
 
-    // Authenticated user already at the right destination — do nothing.
-    const inJob = segments[0] === 'job';
-    if (inTabs || onAllowedOnboarding || inJob) return;
+    // Denylist pattern: only redirect FROM screens the authenticated user
+    // shouldn't be on (auth forms, welcome). Any other route is valid —
+    // prevents the whitelist bug where new routes (job/[id], future screens)
+    // get redirected back to tabs because they weren't listed.
+    if (!inAuthGroup && !(inOnboarding && segments[1] === 'welcome')) return;
 
-    // Authenticated user is somewhere that isn't their final destination
-    // (just signed up, coming back from welcome/login, or app cold-start).
-    // Check Supabase to decide: new user → profile-setup, returning → tabs.
+    // Authenticated user is on login/signup/welcome — redirect to their
+    // real destination. Check Supabase to decide: new user → profile-setup,
+    // returning user → tabs.
     supabase
       .from('profiles')
       .select('full_name')
       .eq('id', session.user.id)
       .single()
       .then(({ data }) => {
-        // Guard: read current segments via ref — this callback is async and
-        // segments in the outer closure may be stale by the time it runs.
         if (segmentsRef.current[0] === '(tabs)') return;
         if (data?.full_name) {
           router.replace('/(tabs)');
