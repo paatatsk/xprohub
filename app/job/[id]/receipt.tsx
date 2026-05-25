@@ -70,8 +70,8 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError('Sign in required.'); setLoading(false); return; }
 
-    // Parallel fetches: job + payment + tasks
-    const [jobRes, paymentRes, tasksRes] = await Promise.all([
+    // Parallel fetches: job + payment + tasks + endorsement + concern
+    const [jobRes, paymentRes, tasksRes, endorseRes, concernRes] = await Promise.all([
       supabase
         .from('jobs')
         .select(`
@@ -91,6 +91,17 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
         .from('job_post_tasks')
         .select('task_library(name, completion_verb_phrase)')
         .eq('job_post_id', jobId),
+      supabase
+        .from('endorsements')
+        .select('id, created_at')
+        .eq('job_id', jobId)
+        .maybeSingle(),
+      supabase
+        .from('reports')
+        .select('id')
+        .eq('content_type', 'job')
+        .eq('content_id', jobId)
+        .maybeSingle(),
     ]);
 
     if (jobRes.error || !jobRes.data) {
@@ -203,7 +214,12 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
         payoutCompleted,
         currency: 'usd',
       },
-      endorsement: 'none',
+      endorsement: endorseRes.data
+        ? 'endorsed'
+        : concernRes.data
+          ? 'concern_raised'
+          : 'none',
+      endorsedAt: endorseRes.data?.created_at,
     };
 
     setData(receipt);
@@ -352,11 +368,11 @@ function TraceBlock({ data }: { data: ReceiptData }) {
 function CustomerActions({ data, onEndorse, onConcern }: {
   data: ReceiptData; onEndorse: () => void; onConcern: () => void;
 }) {
-  if (data.endorsement === 'endorsed' && data.endorsedAt) {
+  if (data.endorsement === 'endorsed') {
     return (
       <View style={s.endorsedPill}>
         <Text style={s.endorsedText}>
-          {'\u2713'} ENDORSED {'\u00B7'} {fmtShortDate(data.endorsedAt)}
+          {'\u2713'} ENDORSED{data.endorsedAt ? ` \u00B7 ${fmtShortDate(data.endorsedAt)}` : ''}
         </Text>
       </View>
     );
@@ -428,8 +444,11 @@ export default function ReceiptScreen() {
     } catch { /* user cancelled */ }
   }, [data]);
 
-  const handleEndorse = useCallback(() => {
+  const handleEndorse = useCallback(async () => {
     if (!data) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     Alert.alert(
       `Endorse ${data.worker.firstName}'s work?`,
       'This adds a confidence vote to their profile. You can still raise a concern later if needed.',
@@ -437,14 +456,30 @@ export default function ReceiptScreen() {
         { text: 'CANCEL', style: 'cancel' },
         {
           text: 'ENDORSE',
-          onPress: () => {
-            // TODO: write to endorsements table, refetch
+          onPress: async () => {
+            const { error: insertErr } = await supabase
+              .from('endorsements')
+              .insert({
+                job_id: data.jobId,
+                endorser_id: user.id,
+                worker_id: data.worker.id,
+              });
+            if (insertErr) {
+              Alert.alert(
+                'Couldn\u2019t save your endorsement',
+                'Please check your connection and try again.',
+                [{ text: 'OK' }],
+                { userInterfaceStyle: 'dark' },
+              );
+              return;
+            }
+            refetch();
           },
         },
       ],
       { userInterfaceStyle: 'dark' },
     );
-  }, [data]);
+  }, [data, refetch]);
 
   const handleConcern = useCallback(() => {
     if (!data) return;
@@ -476,6 +511,13 @@ export default function ReceiptScreen() {
           <Text style={s.errorBody}>{error || 'Please try again.'}</Text>
           <TouchableOpacity style={s.errorBtn} onPress={refetch} activeOpacity={0.85}>
             <Text style={s.errorBtnText}>TRY AGAIN</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ marginTop: 16 }}
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+          >
+            <Text style={s.errorBack}>Go back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -906,5 +948,9 @@ const s = StyleSheet.create({
   },
   errorBtnText: {
     fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 1.5, color: Colors.gold,
+  },
+  errorBack: {
+    fontFamily: FONT.inter, fontSize: 14, color: Colors.textSecondary,
+    textDecorationLine: 'underline',
   },
 });

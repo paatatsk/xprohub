@@ -219,7 +219,23 @@ export default function AccountScreen() {
         {__DEV__ && (
           <TouchableOpacity
             style={{ alignSelf: 'center', marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderWidth: 1, borderColor: Colors.red, borderRadius: 6 }}
-            onPress={() => router.push('/job/80d52f08-287b-4f19-85af-0ec576dbe0dc/receipt' as any)}
+            onPress={async () => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (!user) return;
+              const { data: job } = await supabase
+                .from('jobs')
+                .select('id')
+                .or(`customer_id.eq.${user.id},worker_id.eq.${user.id}`)
+                .eq('status', 'completed')
+                .order('completed_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+              if (job) {
+                router.push(`/job/${job.id}/receipt` as any);
+              } else {
+                Alert.alert('No completed jobs', 'Complete a job first to see the receipt.');
+              }
+            }}
           >
             <Text style={{ color: Colors.red, fontSize: 11, letterSpacing: 1 }}>DEV: VIEW RECEIPT (REAL DATA)</Text>
           </TouchableOpacity>
