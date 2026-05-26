@@ -16,19 +16,75 @@
 **See also (for full project orientation):**
 - `SESSION_HANDOUT.md` — full chat-AI orientation, working preferences, philosophy
 - `SESSION_PLAN_v2.md` — milestone roadmap and active build order
-- `POLISH_PASS.md` — deferred items and parked architectural explorations
+- `POLISH_PASS.md` — deferred items, parked explorations, v1.1 idea queue
 
 For current commit state: `git log --oneline -10`
+---
+
+## The Load-Bearing Principle
+
+XProHub is built for people who have been failed by interfaces their whole lives. The interface is what's broken, not the people.
+
+**We design for Maria first.** Maria cleans four houses a week to pay rent. English is her second language. She's been turned away from jobs she could do well because she couldn't fill out the application correctly. Daniel (customer) can survive a complicated interface. Maria cannot.
+
+Every design and engineering choice gets judged against one question: **Does this make it easier or harder for Maria?**
+
+- Icons must be recognizable in 2 seconds by a tired worker
+- Plain language outranks clever language ("Jobs I've posted" beats "My Listings")
+- Error messages get plain language at the source ("We couldn't save your photo. Try again?" beats "Upload failed: HTTP 413")
+- Empty states explain themselves ("When you apply for jobs, they'll show up here")
+- Accessibility labels are mandatory on every interactive element
+- Cognitive load matters more than tap count
+
+Approved into operating norms 2026-05-24.
+
+## Orchestra
+
+Four players, one product. Paata mediates all communication.
+
+| Role | Who | What they do |
+|---|---|---|
+| **Conductor / Founder** | Paata | Vision, product decisions, hardware verification, final calls on everything |
+| **Strategist / Reviewer** | Maestro (chat-Claude) | Strategy, framing, prompt drafting, decision architecture, honest critique |
+| **Builder** | Claude Code (terminal) | Engineering, full repo access, code reviews, builds, deploys |
+| **Designer** | Claude Design (claude.ai/design) | UI/UX mockups, design system, copy contracts, handoff packages |
+
+**Honest pushback norm**: Any player can push back on any other, including on Paata. The brief is provisional — "build something mature, not defend something half-formed."
+
+## Operating Norms
+
+- **No corners cut** on production code
+- **Hardware verification mandatory** before commit — the device tells the truth
+- **Subtractions before additions** on screen refinements
+- **One screen at a time** in the refinement queue
+- **Schema changes get migration design review** before SQL runs on Supabase
+- **Cheap exploration first** (Paata + Grok/Gemini), expensive refinement second (Claude Design)
+- **Work tiers for Claude Code**: A (fully autonomous), B (surface diff for review), C (Paata in loop at each step)
+
+## Lighthouse Standard
+
+What "lighthouse-quality" means for a screen:
+- Real data from Supabase, no stubs
+- Five-voice typography wired (Space Grotesk / Inter / Playfair / Oswald / IBM Plex Mono)
+- Maria-tested copy (plain language, no jargon, dignified)
+- Hardware-verified on iPhone in real conditions
+- Dignified empty states (no raw nulls, no "undefined", editorial fallbacks)
+- Editorial moments where they earn their place (e.g. worker name in Playfair italic on Receipt)
+- Accessibility labels on all interactive elements
+- Network errors wrapped with plain-language messages
+
+**Screens at lighthouse standard:** Receipt, Home. All others are functional but unrefined.
+
 ---
 
 ## Platform Architecture (Locked)
 
 ### Dual-Role Model
-Every user is both customer and worker. No role fork at sign-up. No permanent role assignment.
+Every user is both customer and worker. No role fork at sign-up. No permanent role assignment. The duality is the brand-layer story (Welcome, masthead, About) but NOT the UX-organizing principle for every screen. Most users live in one mode at a time.
 
 Two Stripe objects serve the two transaction directions:
 - **Stripe Express account** — for receiving payment after completing a job. Set up via `stripe-connect.tsx`.
-- **Customer payment method** — for funding escrow when posting a job. Set up in Chunk D.
+- **Customer payment method** — for funding escrow when posting a job. Set up via `payment-setup.tsx`.
 
 ### Gate Philosophy
 Gates fire at moment of action only. No persistent banners or nags.
@@ -39,19 +95,19 @@ Gates fire at moment of action only. No persistent banners or nags.
 |---|---|---|---|
 | Sign up | — | Offered, skippable | Express account offered but not required |
 | Browse Live Market | — | — | Fully open to all signed-in users |
-| Post a job | — | Customer payment method (Chunk D) | Checks payment method on file |
+| Post a job | — | Customer payment method | Checks payment method on file |
 | Apply for a job | Required: photo + >=1 skill | Required: stripe_charges_enabled | ID check fires first; both must pass |
 | Chat | — | — | Opens after hire; both parties already cleared |
-| Hire / acceptance | — | — | Triggers charge (Chunk D); both sides verified |
+| Hire / acceptance | — | — | Triggers charge; both sides verified |
 
 ### Action Continuity
-Completing a gate returns the user to exactly the screen they came from — apply form pre-populated for the specific job, post-job form with content preserved. Never drop on Home.
+Completing a gate returns the user to exactly the screen they came from. Never drop on Home.
 
 ### Hire Moment = Charge Moment
 Customer is charged at hire. Funds held in escrow. Worker confirmed paid before work begins. **Worker Dignity** — non-negotiable.
 
 ### Professional Identity (`id.tsx`)
-Photo + ≥1 skill claim = the apply-gate minimum. Belt level, certifications, work samples, bio = optional investment beyond the minimum. Not a forced wizard.
+Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category picker, task selector, superpowers (top 3 featured skills).
 
 ---
 
@@ -60,62 +116,92 @@ Photo + ≥1 skill claim = the apply-gate minimum. Belt level, certifications, w
 |---|---|
 | Framework | React Native + Expo Router + TypeScript (SDK 54) |
 | Backend | Supabase — PostgreSQL, Auth, Realtime, Storage, PostGIS |
-| Payments | Stripe Connect (escrow model, ~10% platform fee — exact rate TBD before launch) |
-| Push | Expo Push Notifications |
+| Payments | Stripe Connect (escrow model, 10% platform fee — locked) |
+| Push | Expo Push Notifications (not implemented in v1) |
 | Est. cost | $0/month until real traction |
 
 ## Design System — Dark Gold (Locked)
-The only design direction. No other aesthetic is in use.
 
+### Color Tokens
 | Token | Value | Use |
 |---|---|---|
 | Background | `#0E0E0F` | All screens — never changes |
-| Gold Accent | `#C9A84C` | CTAs, highlights, big numbers, borders |
-| Dark Card | `#171719` | All cards and surfaces |
+| Gold | `#C9A84C` | CTAs, highlights, big numbers, borders |
+| Card | `#171719` | All cards and surfaces |
 | Border | `#2E2E33` | Card borders, dividers |
 | Text Primary | `#FFFFFF` | All headings and body text |
 | Text Secondary | `#888890` | Supporting text, metadata |
-| Green | `#4CAF7A` | Success, completions, Worker mode |
+| Green | `#4CAF7A` | Success, completions |
 | Blue | `#4A9EDB` | Trust, verification, info |
-| Purple | `#9B6EE8` | XP, growth, Royal theme |
-| Red | `#E05252` | Urgent, live, alerts, cancel |
+| Purple | `#9B6EE8` | XP, growth |
+| Red | `#E05252` | Urgent, alerts, cancel |
+| Amber | `#E5901A` | In-progress, soft warnings |
 
-- **Headline font**: Space Grotesk
-- **Serif accent font**: Playfair Display
-- **Body font**: Inter
+### Five-Voice Typography System
+| Voice | Font | Use |
+|---|---|---|
+| Headings | Space Grotesk (500/600/700) | Screen titles, hero numbers (tabular figures) |
+| Body | Inter (400/500) | All body text, form inputs, descriptions |
+| Serif accent | Playfair Display (700/700 italic) | Worker names on Receipt, editorial quotes |
+| Editorial labels | Oswald (600/700) | Section labels, eyebrows, buttons (4px tracked) |
+| Ledger voice | IBM Plex Mono (400/500) | Dates, trace IDs, money metadata — the accounting register |
+
 - **Big numbers**: always gold — the loudest element on every screen
-- **Cards**: glassmorphism — frosted glass effect, gold border glow, photo/illustration fills top 50%, gradient fade into dark info panel below
-- **Icons**: Gold Forge custom duotone system — dark base + gold accent highlight, one gold light-source catch per icon. Do NOT use standard Ionicons or Material icons.
+- **Cards**: dark background (`#171719`), 1px border, square corners on category tiles (editorial register), soft corners on content cards
+- **Icons**: Currently native emoji. Gold Forge custom icon system under exploration (not shipped).
 
-**5 feed card themes** (user-selectable): Broadsheet · Western · Gold Press · Dispatch · Chronicle
+### Locked Editorial Moments
+- Worker name in Playfair italic on Receipt — reverence, not decoration
+- `completion_verb_phrase` per category — "Maria cleaned your home in Brooklyn"
+- Binary endorsement (ENDORSE THIS WORK / Raise a concern) — no star ratings
+- Reconciliation line on Receipt — "You paid $155.00 · Maria received $139.50"
+- Footer ticker — "REAL WORK · FAIR PAY · FOR EVERYONE"
 
-## 15 Production Screens (build order)
-| # | Screen | File | Status |
-|---|---|---|---|
-| 1 | Splash | `app/splash.tsx` | Built |
-| 2 | Welcome | `app/(onboarding)/welcome.tsx` | Built |
-| 3 | Sign Up | `app/(auth)/signup.tsx` | **Wired to Supabase Auth** |
-| 4 | Login | `app/(auth)/login.tsx` | Built |
-| 5 | Profile Setup | `app/(onboarding)/profile-setup.tsx` | Built |
-| 6 | Home (Category Grid) | `app/(tabs)/index.tsx` | Category Grid — 20 categories wired to live Supabase data, 2-column layout, tier badges, emoji icons, tapping category routes to Live Market filtered by that category. |
-| 7 | Post a Job | `app/(tabs)/post.tsx` | 704 lines — category-first picker, task picker, budget, timing, submit wired to DB (jobs + job_post_tasks). |
-| 8 | Worker Match | `app/(tabs)/match.tsx` | stub, ~23 lines, TODO Phase 2 |
-| 9 | Chat | `app/(tabs)/chat.tsx` | stub, ~22 lines, TODO Phase 2. Real chat is `job-chat.tsx` (784 lines). |
-| 10 | Payment / Escrow | `app/(tabs)/payment.tsx` | stub, ~23 lines, TODO Step 13 |
-| 11 | Rate / Review | `app/(tabs)/review.tsx` | 481 lines — rating + comment form, wired to Supabase. |
-| 12 | Notifications | `app/(tabs)/notifications.tsx` | stub, ~22 lines, TODO Milestone 4 |
-| 13 | Live Market | `app/(tabs)/market.tsx` | 837 lines — two-feed toggle, Jobs Feed + Workers Feed both wired to Supabase. FAB routes to Post a Job. |
-| 14 | Belt System | `app/(tabs)/belt.tsx` | stub, ~23 lines, TODO Milestone 4 |
-| 15 | Earnings / Wallet | `app/(tabs)/earnings.tsx` | stub, ~23 lines, TODO Phase 2 |
+---
 
-Home = Category Grid hub. HELP WANTED → Post a Job. START EARNING → Live Market. Category card → Live Market filtered by category_id.
+## Production Screens
 
-## Supabase — 13 Tables (Live)
-`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `notifications` · `user_badges`
+### Reachable screens (registered in tab layout or routed to)
+| Screen | File | Status |
+|---|---|---|
+| Splash | `app/splash.tsx` | Functional |
+| Welcome | `app/(onboarding)/welcome.tsx` | Functional (editorial treatment, not yet lighthouse) |
+| Sign Up | `app/(auth)/signup.tsx` | Functional — wired to Supabase Auth |
+| Login | `app/(auth)/login.tsx` | Functional — Face ID support |
+| Forgot Password | `app/(auth)/forgot-password.tsx` | Functional |
+| Profile Setup | `app/(onboarding)/profile-setup.tsx` | Functional — captures full_name + first_name + photo |
+| Worker ID Setup | `app/(onboarding)/id.tsx` | Functional — 4-step wizard (768 lines) |
+| Verify Level 2 | `app/(onboarding)/verify-level-2.tsx` | Functional — trust level gate (real verification deferred) |
+| Home | `app/(tabs)/index.tsx` | **Lighthouse** — YOUR DESK card, last receipt link, category grid |
+| Live Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed + Workers Feed (896 lines) |
+| Post a Job | `app/(tabs)/post.tsx` | Functional — category picker + form (728 lines) |
+| Job Detail | `app/(tabs)/job-detail.tsx` | Functional — full job info + apply CTA (525 lines) |
+| Apply | `app/(tabs)/apply.tsx` | Functional — templates + price + gates (679 lines) |
+| Apply Success | `app/(tabs)/apply-success.tsx` | Functional — forward-only confirmation |
+| My Jobs | `app/(tabs)/my-jobs.tsx` | Functional — customer's posted jobs |
+| My Applications | `app/(tabs)/my-applications.tsx` | Functional — worker's bid history |
+| Job Bids | `app/(tabs)/job-bids.tsx` | Functional — accept/decline + hire-and-charge |
+| Direct Hire | `app/(tabs)/direct-hire.tsx` | Functional — bypasses bidding |
+| Job Chat | `app/(tabs)/job-chat.tsx` | Functional — Realtime + lifecycle CTAs (784 lines) |
+| Review | `app/(tabs)/review.tsx` | Functional — bidirectional rating + comment |
+| Report | `app/(tabs)/report.tsx` | Functional — multi-reason + optional block |
+| Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
+| Payment Setup | `app/(tabs)/payment-setup.tsx` | Functional — Stripe PaymentSheet |
+| Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
+| Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, five-voice typography |
+
+### Unreachable stubs (files exist, not registered in tab layout)
+`chat.tsx`, `earnings.tsx`, `profile.tsx`, `notifications.tsx`, `payment.tsx`, `match.tsx` — all unregistered by G-7 stub cleanup. No user can navigate to them.
+
+Home = YOUR DESK hub. Last receipt → Receipt. Jobs I've posted → My Jobs. My applications → My Applications. Category card → Live Market filtered by category_id.
+
+## Supabase — Tables (Live)
+`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements`
 
 - `task_code` format: `CCTT` e.g. `0101` = category 01, task 01
 - `worker_skills.is_featured` = worker's top 3 "Superpowers" shown on their profile card
-- Migration file: `supabase/migrations/20260417000001_replace_skills_with_task_library.sql`
+- `profiles.first_name` = user-owned display name for receipts and greetings (added 2026-05-25)
+- `task_library.completion_verb_phrase` = ops-owned past-tense verb phrase per category (added 2026-05-25)
 - Seed file: `supabase/seed/XProHub_TaskLibrary_Seed_v1.1.sql` — deployed 2026-04-17 (20 categories · 188 tasks)
 - Realtime on: `jobs`, `messages`, `notifications`
 - Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql`
@@ -151,6 +237,7 @@ Home = Category Grid hub. HELP WANTED → Post a Job. START EARNING → Live Mar
 | est_time_max_hrs | NUMERIC | NULL = overnight or variable |
 | difficulty | TEXT | `easy` \| `medium` \| `skilled` |
 | billing_type | TEXT | `per_job` \| `per_hour` \| `per_visit_day` |
+| completion_verb_phrase | TEXT NOT NULL | Past-tense editorial phrase per category (e.g. "cleaned your home") |
 | requires_verification | BOOLEAN | Worker must pass ID verification for this task |
 | is_urgent_eligible | BOOLEAN | Appears in Urgent / Same-Day feed |
 | is_active | BOOLEAN | Soft-delete — false = hidden from app via RLS |
@@ -174,15 +261,26 @@ Home = Category Grid hub. HELP WANTED → Post a Job. START EARNING → Live Mar
 | job_post_id | UUID FK | → jobs.id ON DELETE CASCADE |
 | task_id | INTEGER FK | → task_library.id |
 
+### endorsements
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID PK | Auto |
+| job_id | UUID FK UNIQUE | → jobs.id. One endorsement per job. |
+| endorser_id | UUID FK | → profiles.id (customer) |
+| worker_id | UUID FK | → profiles.id (worker) |
+| created_at | TIMESTAMPTZ | Immutable — no UPDATE or DELETE policies |
+
 ## Key Business Rules
 
-- **Difficulty vs Urgency**: `difficulty` describes skill level only (`easy`/`medium`/`skilled`). Urgency is a separate flag (`is_urgent_eligible = true`). Never use `urgent` as a difficulty value — it was removed in v1.1.
-- **Task codes (CCTT)**: 4-character zero-padded string. First 2 = category, last 2 = task within category. e.g. `0101` = Category 01, Task 01. `2009` = Category 20, Task 09. Max 99 tasks per category.
-- **Billing types**: Three values in task_library — `per_job` (fixed), `per_hour` (hourly), `per_visit_day` (per visit/day, used for pet care). Categories use `mixed` when tasks within the category vary.
-- **Verification**: `requires_verification = true` means the worker must pass platform ID verification before offering that task. All Child Care (cat 4), Elder Care (cat 5), and Electrical (cat 15) tasks require it. Plumbing (cat 16) and most HVAC (cat 20) skilled tasks also require it.
-- **Pricing**: All `price_min`/`price_max` are in USD. Customer-facing estimates only — not hard payment caps.
-- **Soft deletes**: Never DELETE rows from `task_library`. Set `is_active = false`. RLS enforces `is_active = true` for all app reads, so it disappears automatically.
-- **Superpowers**: `worker_skills.is_featured` — max 3 per worker. These appear prominently on the worker profile card.
+- **Platform fee**: 10% flat, deducted from worker payout. Read from `payments.platform_fee` — never hardcode. Fee percent derived at render: `round((fee / subtotal) * 100)`.
+- **Endorsements**: Binary (endorse OR concern). Immutable once cast. Separate tables: `endorsements` for positive, `reports` for concerns. Mutually exclusive at UI level.
+- **Difficulty vs Urgency**: `difficulty` describes skill level only (`easy`/`medium`/`skilled`). Urgency is a separate flag (`is_urgent_eligible = true`).
+- **Task codes (CCTT)**: 4-character zero-padded string. First 2 = category, last 2 = task within category.
+- **Billing types**: `per_job` (fixed), `per_hour` (hourly), `per_visit_day` (per visit/day). Categories use `mixed` when tasks vary.
+- **Verification**: `requires_verification = true` means worker must pass ID verification.
+- **Pricing**: All `price_min`/`price_max` are in USD. Customer-facing estimates only.
+- **Soft deletes**: Never DELETE rows from `task_library`. Set `is_active = false`.
+- **Superpowers**: `worker_skills.is_featured` — max 3 per worker.
 
 ## Indexes Available
 
@@ -194,6 +292,9 @@ Home = Category Grid hub. HELP WANTED → Post a Job. START EARNING → Live Mar
 | `idx_worker_skills_user` | worker_skills | user_id | Worker profile skill lookup |
 | `idx_worker_skills_task` | worker_skills | task_id | Task → which workers offer it |
 | `idx_job_post_tasks_job` | job_post_tasks | job_post_id | Job → its required tasks |
+| `idx_payments_job` | payments | job_id | Payment lookup by job |
+| `idx_endorsements_job` | endorsements | job_id | UNIQUE — one endorsement per job |
+| `idx_endorsements_worker` | endorsements | worker_id | Worker's endorsement count |
 
 ## Common Query Patterns
 
@@ -237,6 +338,15 @@ ORDER BY category_id, task_code;
 - `20260426000001_job_lifecycle_functions.sql` — `mark_in_progress()` + `mark_completed()` SECURITY DEFINER functions.
 - `20260428000001_step13_payments_schema.sql` — Stripe columns on `profiles`, `idx_payments_job`, `create_payment_record()`, `release_payment()`, amended `mark_completed()` with payment gate.
 - `20260503000001_accept_bid_set_agreed_price.sql` — `accept_bid()` amended to set `jobs.agreed_price = v_bid.proposed_price`.
+- `20260512000001_chunk_d1_payment_setup.sql` — Customer payment method flow columns.
+- `20260515000001_chunk_e_payout_release.sql` — `confirm_completion()`, `raise_dispute()`, `stripe_charge_id`, `auto_release_at` on payments.
+- `20260515000002_release_payment_auto_release.sql` — Amended `release_payment()` for auto-release cron.
+- `20260515000003_confirm_completion_function.sql` — `confirm_completion()` SECURITY DEFINER.
+- `20260515000004_jobs_status_check.sql` — Jobs status constraint checks.
+- `20260516000001_g4_g5_reports_and_blocks.sql` — `reports` + `user_blocks` tables with RLS.
+- `20260525000001_add_first_name_to_profiles.sql` — `profiles.first_name` column + backfill from full_name.
+- `20260525000002_add_completion_verb_phrase_to_task_library.sql` — `task_library.completion_verb_phrase` with 20 locked phrases.
+- `20260525000003_endorsements_table.sql` — `endorsements` table, unique job_id index, immutable RLS.
 
 ## Development Conventions
 
@@ -246,26 +356,10 @@ ORDER BY category_id, task_code;
 - **New migrations**: Place in `supabase/migrations/` with timestamp prefix `YYYYMMDDHHMMSS_description.sql`. Always wrap in `BEGIN`/`COMMIT`.
 - **Seed updates**: Changes to task data go in `supabase/seed/`. Use `ON CONFLICT (task_code) DO NOTHING` for inserts or `DO UPDATE SET ...` for corrections.
 - **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
-- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies (safe for unauthenticated browse). `worker_skills` has public read + auth CRUD policies (migration 20260419000002). `job_post_tasks` has INSERT + SELECT policies as of migration 20260419000001.
-- **New table migrations**: Include explicit `GRANT` statements for `anon`, `authenticated`, and `service_role` (Supabase Data API change, enforced 2026-10-30 — see POLISH_PASS.md).
-
-## Belt System (Workers — opt-in, not structural)
-The Belt System is optional progression, not a structural matching requirement. Workers are not gated by belt level for job access. Belt data enriches profiles and enables future features but does not restrict platform participation.
-
-| Belt | Jobs | Min Rating | Key Unlock |
-|---|---|---|---|
-| Newcomer (White) | 0 | — | 2× XP first 5 jobs, XProHub Guarantee |
-| Yellow | 10 | 4.0★ | Higher-paying categories |
-| Orange | 30 | 4.3★ | Priority matching, Squad creation |
-| Green | 75 | 4.5★ | 30-sec head start on jobs, Gov jobs |
-| Blue | 150 | 4.7★ | Team job eligibility |
-| Brown | 300 | 4.8★ | Reduced platform commission |
-| Black | 500+ (invited) | 4.9★ | Verified badge, premium jobs |
-| Legend | 1,000+ | 4.9★ | Highest platform status |
-
-Badges (9): Never Cancels · Top Pro · Verified · Insured · Top 5% · Fast Replies · Rising Star · Money Maker · Squad Leader
-
-XP earn: job complete +50 · 5-star review +30 · on time +20 · fast response +10 · repeat customer +25 · refer worker +100
+- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies. `worker_skills` has public read + auth CRUD. `job_post_tasks` has INSERT + SELECT. `endorsements` has party-read + endorser-insert (immutable). `reports` and `user_blocks` have auth CRUD.
+- **New table migrations**: Include explicit `GRANT` statements for `anon`, `authenticated`, and `service_role` (Supabase Data API change, enforced 2026-10-30).
+- **Shared formatters**: `lib/format.ts` — fmtCents, fmtPrice, fmtDateStamp, fmtDuration, fmtDayDate, fmtShortDate, fmtReceiptDate, toCents. All dates forced to en-US locale.
+- **Support constants**: `lib/legal.ts` — PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL, SUPPORT_EMAIL.
 
 ## Progressive Profile Gates
 
@@ -275,164 +369,124 @@ XP earn: job complete +50 · 5-star review +30 · on time +20 · fast response +
 - Cannot do: apply for jobs, post jobs, message anyone, transact
 
 ### APPLY GATE (worker side — triggered when worker taps Apply on any job)
-- Required: profile photo + ≥1 skill category claimed + Stripe Express (`stripe_charges_enabled = true`)
+- Required: profile photo + >=1 skill category claimed + Stripe Express (`stripe_charges_enabled = true`)
 - ID check fires first; Stripe check second — both must pass before apply form loads
 - On gate fire: routes to `id.tsx` (profile) or `stripe-connect.tsx` (payouts); returns to the specific job on completion
-- Stripe handles all banking data — never store financial info directly
 
 ### POST GATE (customer side — triggered when customer taps Post a Job)
 - Required: customer payment method on file
-- Chunk D scope
-- Stripe handles all banking data — never store financial info directly
+- On gate fire: routes to `payment-setup.tsx`; returns to post flow on completion
 
 ### KEY RULE
-Gates fire at moment of action only. Never force payment or identity
-setup upfront. Stripe handles all banking data — never store financial
-info directly.
-
-### XPRO (Reputation Builder, optional, unlocks after first transaction)
-- Work history, references, certifications, portfolio photos, bio
-- Feeds into Belt System ranking and match score
-
-## Gate Specifications
-
-| Action | ID Gate | Stripe Gate | Notes |
-|---|---|---|---|
-| Sign up | — | Offered, skippable | Express account offered but not required |
-| Browse Live Market | — | — | Fully open to all signed-in users |
-| Post a job | — | Customer payment method (Chunk D) | Checks payment method on file |
-| Apply for a job | Required: photo + >=1 skill | Required: stripe_charges_enabled | ID check fires first; both must pass |
-| Chat | — | — | Opens after hire; both parties already cleared |
-| Hire / acceptance | — | — | Triggers charge (Chunk D); both sides verified |
-
-*(Identical to the table in CHUNK_C_DESIGN.md and the Platform Architecture section above. If they ever drift, one is wrong.)*
+Gates fire at moment of action only. Never force payment or identity setup upfront. Stripe handles all banking data — never store financial info directly.
 
 ## Matching Algorithm
-Location 25% · Skill Match 35% · Belt/Experience 20% · Behavioral 20%
-White Belt gets +15% newcomer boost for first 5 jobs ("Give Them A Chance").
+Location 25% · Skill Match 35% · Experience 20% · Behavioral 20%
 
 ## LIVE MARKET — Navigation Model (Locked)
 
-Live Market is the heartbeat of XProHub. All navigation from Home's
-top buttons and category cards routes here.
+Live Market is the heartbeat of XProHub.
 
 ### Entry points
-- HELP WANTED button → /live-market (Jobs Feed default)
-- START EARNING button → /live-market (Jobs Feed default)
-- Category card tap → /live-market?category_id=X (filtered)
+- Category card tap on Home → /live-market?category_id=X (filtered)
+- YOUR DESK links → My Jobs / My Applications
 
 ### Structure
 - Two-feed toggle: Jobs Feed (default) | Workers Feed
 - Jobs Feed = pulled from `jobs` table, sorted by recency
-- Workers Feed = pulled from `profiles` + `worker_skills`,
-  acts as a business card wall
+- Workers Feed = pulled from `profiles` + `worker_skills`, acts as a business card wall
 - Category filter powered by `task_categories` (20 rows)
 
 ### Gate triggers
 Explorer users browse freely. Gate fires only at:
-- Tap "+ Post a Job" → customer Stripe gate (Chunk D) → Post a Job flow
+- Tap "+ Post a Job" → customer payment gate → Post a Job flow
 - Tap "Apply" on job card → ID gate then Stripe gate → Apply flow
-
-(Direct Hire pathway parked in POLISH_PASS — future feature.)
-
-### Task Library as spine
-Category grid on Home and filters in Live Market both pull from
-task_categories. Worker profiles pick tasks from task_library.
-Job posts pick tasks from task_library. Matching algorithm runs
-on task_library overlap. This is the connective tissue of the
-whole platform — do not bypass it.
 
 ## Code Rules
 1. **Design system** — Dark Gold only: `#0E0E0F` bg, `#C9A84C` gold, `#171719` cards
 2. **SafeAreaView** — import from `react-native-safe-area-context` ONLY (not `react-native` — SDK 54 breaking change)
 3. **New files** — always `app/filename.tsx`, NEVER `app/app/filename.tsx` (causes Unmatched Route)
-4. **Live Market is primary nav** — Home top buttons and category cards all route to `/(tabs)/market`. Do not add new modal-based hub navigation; flat Expo Router `router.push()` is the pattern.
+4. **Live Market is primary nav** — flat Expo Router `router.push()` is the pattern
 5. **No pure white** — use background color from chosen design system
 6. **Every screen answers one question** — no feature creep per screen
 7. **No mock data in production** — connect to Supabase or gate the screen
 8. **Two core loops**: Customer = 3 taps to done · Worker = 2 taps to earn
 9. **Plan Mode** (`Shift+Tab`) before multi-file changes
 10. **Windows PowerShell** cannot handle `(tabs)` in paths — use File Explorer for those folders
-11. **app.json assets**: splash = `splash-icon.png`, Android icon = `android-icon-foreground.png`
-12. **Dual-role** — no role-specific screen patterns. Any transactional screen must work for any user regardless of which side they're acting on. No "workers-only" or "customers-only" UI.
-13. **Gate philosophy** — gates fire at moment of action only. No persistent Stripe setup banners, no persistent ID prompts, no nags. Nothing surfaces until the user takes the relevant action.
+11. **app.json assets**: splash = `splash-icon.png`, Android icon = `adaptive-icon.png`
+12. **Dual-role** — no role-specific screen patterns. Any transactional screen must work for any user regardless of which side they're acting on.
+13. **Gate philosophy** — gates fire at moment of action only. No persistent banners, no nags.
+14. **fontFamily** — always use exact export names (`Inter_400Regular`, not `Inter`). `Fonts.body` from `constants/theme.ts` resolves correctly.
+15. **Auth guard** — denylist pattern in `_layout.tsx`. Only redirect FROM auth/onboarding screens when authenticated. Any other route is valid.
 
 ## What Is Built
 
 ### ✅ Milestone 1 — Foundation & Auth (complete)
-- Supabase schema: 13 tables, RLS policies, PostGIS, Realtime on jobs/messages/notifications
-- Auth flow: signup + login wired to Supabase Auth, smart routing in `_layout.tsx`
-- Profile setup with photo upload
+- Supabase schema, RLS policies, PostGIS, Realtime on jobs/messages/notifications
+- Auth flow: signup + login + forgot-password + Face ID wired to Supabase Auth
+- Profile setup with photo upload + first_name capture
 - Welcome screen — masthead, ticker bar, Playfair Display tagline, yin-yang boxes, BUILT FOR TRUST strip
-- Progressive gates: Explorer (browse only) → gates fire at moment of action (Apply, Post, Hire). See Gate Specifications above.
-- 20 task categories with emoji icons in Supabase
-- Task Library: 188 tasks across 20 categories (seed deployed 2026-04-17)
+- Progressive gates: Explorer → gates fire at moment of action
+- 20 task categories with emoji icons, 188 tasks (seed deployed 2026-04-17)
 
-### ✅ Milestone 2 — The Live Loop (complete — 12 steps)
+### ✅ Milestone 2 — The Live Loop (complete)
 - Live Market two-feed toggle: JOBS feed + WORKERS feed, both wired to Supabase
-- Jobs Feed filtered by category_id query param passthrough from Home
-- Post a Job: category-first picker, task picker from task_library, Submit wired to DB (jobs + job_post_tasks), Level 2 Gate fires before post
-- Apply flow: Job Detail screen → smart templates + custom message + price gate + soft budget warning → apply-success screen
-- Hire Directly v2: full job form parity with Post a Job, targeted at specific worker
-- Become a Worker onboarding
-- Back navigation header on all tab screens except Home (dark gold, ‹ returns to Home)
+- Post a Job: category-first picker, task picker, submit wired to DB
+- Apply flow: Job Detail → smart templates + price + gates → apply-success
+- Hire Directly v2: full job form parity, targeted at specific worker
+- Become a Worker onboarding (4-step wizard)
+- Back navigation header on all tab screens
 
 ### ✅ Milestone 3 — Transactions (complete)
-- Step 8: `accept_bid()` + `decline_bid()` Postgres functions, atomic auto-decline cascade, My Jobs + Job Bids screens, end-to-end verified on iPhone
-- Step 9: My Applications worker dashboard — bid history grouped by status
-- Step 10: Real Chat UI — Supabase Realtime message thread, bubbles, send input (`job-chat.tsx`)
-- Step 11: Job lifecycle CTAs — Mark In Progress / Mark Complete on chat screen
-- Step 12: Review flow — rating + comment form, wired into chat completed state
-- Step 13: Payment flow — all chunks (A through E) complete. Full Stripe Connect pipeline: customer payment method setup, hire-and-charge, escrow hold, payout release, auto-release cron (Cloudflare Worker, 72-hour timer), dispute path, transfer.created webhook backup. 6 Edge Functions deployed, end-to-end verified on iPhone.
+- `accept_bid()` + `decline_bid()` with atomic auto-decline cascade
+- My Jobs + My Applications dashboards
+- Real Chat UI — Supabase Realtime message thread
+- Job lifecycle CTAs — Mark In Progress / Mark Complete / Confirm Completion
+- Review flow — bidirectional rating + comment
+- Payment flow — all chunks (A through E) complete. Full Stripe Connect pipeline: customer payment method setup, hire-and-charge, escrow hold, payout release, auto-release cron (Cloudflare Worker, 72-hour timer), dispute path, transfer.created webhook backup. 8 Edge Functions deployed.
 
-### 🟡 Chunk G — Launch Compliance (5 of 9 complete)
-- G-1: Account deletion — design locked (anonymize-not-delete, credential rotation, money-state blocker, Stripe capability-disable, per-table strategy, idempotency spec). Implementation pending.
-- G-2: Privacy Policy link — wired on signup.tsx + account.tsx. Placeholder URL (`xprohub.com/privacy`) pending legal copy.
-- G-3: Terms of Service link — wired on signup.tsx + account.tsx. Placeholder URL (`xprohub.com/terms`) pending legal copy.
-- G-4: User reporting — not started.
-- G-5: User blocking — not started.
-- G-6: Content moderation — locked: reactive-only for v1 (report-driven via G-4, 24-hour SLA).
-- G-7: Stub screen cleanup — shipped (6 stubs unregistered + profile.tsx).
-- G-8: Privacy nutrition labels — locked: declarations finalized for App Store Connect.
-- G-9: Pre-submission checklist — not started.
-- Account screen (`account.tsx`): About (version + support email), Legal (Privacy Policy + ToS links via WebBrowser), Sign Out (clears biometric credentials), Delete Account placeholder. Gear icon entry from Home header.
-- `lib/legal.ts`: centralizes placeholder URLs and support email constant.
-- Biometric credentials migrated from AsyncStorage to expo-secure-store (iOS Keychain, hardware-encrypted). Security fix commit `3c9a331`.
-- `docs/PLATFORM_FACT_SHEET_FOR_LEGAL.md`: technical fact sheet for Privacy Policy / ToS drafting (612 lines, under Paata's review).
+### ✅ Chunk G — Launch Compliance (8 of 9 complete)
+- G-1: Account deletion — Edge Function + UI, money-state blocker, verified on iPhone
+- G-2: Privacy Policy link — wired in signup.tsx + account.tsx (URL pending legal copy)
+- G-3: Terms of Service link — wired in signup.tsx + account.tsx (URL pending legal copy)
+- G-4: User reporting — tables, migration, report.tsx UI, overflow menus on market/job-detail/job-chat
+- G-5: User blocking — tables, migration, client-side feed filtering, blocked users management in account.tsx
+- G-6: Content moderation — locked: reactive-only for v1 (report-driven, 24-hour SLA)
+- G-7: Stub screen cleanup — 6 stubs unregistered from tab layout
+- G-8: Privacy nutrition labels — declarations finalized for App Store Connect
+- G-9: Pre-submission checklist — audit complete (2026-05-25), code-side items done, user-side items pending
+
+### ✅ Milestone 4 — Lighthouse Screens (Receipt + Home)
+- Receipt screen: real Supabase data (jobs + payments + profiles + tasks + endorsements), five-voice typography, worker verb phrase, binary endorsement, 10% fee from DB, runtime money invariant checks
+- Home v1 refinement: YOUR DESK card with last receipt link, category grid with square corners, Oswald section labels, SpaceGrotesk tabular prices, no dual CTAs
+- Token discipline batch: `Colors.amber` added, Belt dead code removed, hardcoded values replaced
+- Polish batch: network error UX (9 locations), fontFamily wiring (19 screens, 107 styles), accessibility labels (8 elements), auth guard denylist refactor
 
 ### Design
-- Dark Gold theme locked: bg `#0E0E0F`, gold `#C9A84C`, card `#171719`
-- Three font families: Space Grotesk (headlines), Playfair Display (serif), Inter (body)
-- 16+ screens registered in `app/(tabs)/_layout.tsx`
-- Dual-Claude workflow: chat-Claude (strategist/reviewer) + Claude Code (terminal executor)
+- Dark Gold theme locked
+- Five-voice typography system: Space Grotesk + Inter + Playfair Display + Oswald + IBM Plex Mono
+- Inter loaded globally in `_layout.tsx`; receipt-specific fonts loaded locally
+- `constants/theme.ts`: Colors, Fonts, Spacing, Radius exports
+- `lib/format.ts`: shared date/money/duration formatters
 
 ## What Is NOT Built Yet
 
-### 🔲 Chunk G — Launch Compliance (remaining items)
-- G-1: Account deletion implementation (design locked, Edge Function + UI pending)
-- G-4: User reporting (table + migration + UI on 4 surfaces)
-- G-5: User blocking (table + migration + feed filtering)
-- G-9: Pre-submission checklist verification
+### 🔲 Milestone 5 — Lighthouse Refinement (next phase)
+Each remaining screen refined to lighthouse standard before submission. Order TBD with Claude Design. See `SESSION_PLAN_v2.md` for the full queue.
 
-### 🔲 Milestone 4 — Trust & Reputation (deferred)
-- Belt System UI — data exists in schema, no UI surface yet
-- Notifications system — `notifications` table exists, not wired (see POLISH_PASS.md Worker Dignity Implementation A)
-- Background check integration — Level 2B verification flow
+### 🔲 Submission Items (user-side)
+- Privacy Policy + Terms of Service legal copy deployed to xprohub.com
+- App Store Connect metadata (screenshots, description, privacy labels)
+- Demo account for Apple reviewer
+- `hello@xprohub.com` routing verified
+- Stripe webhook event subscription verified (5 events)
 
-### 🔲 Polish Pass (deferred)
-See `POLISH_PASS.md` for the current list. Includes UX refinements,
-Worker Dignity items (Notifications + Released copy + While-You-Wait
-cards), Hybrid Matching exploration, and operational tracking items.
-`docs/STRIPE_REDIRECT_OPTIONS.md` covers the redirect proxy rework.
-
-### 🔲 Long-term (Milestone 6+)
-- Hybrid Matching exploration — instant-dispatch + market density UX (see POLISH_PASS.md)
-- Squad / Team Jobs
+### 🔲 Deferred to v1.1
+See `POLISH_PASS.md` for the full idea queue. Includes: mode-aware Home redesign, worker view of Receipt, PDF receipt export, notifications system, photo viewer modal, Gold Forge icon system, i18n infrastructure, theming variants, worker-view verb phrasing variants (current locked phrases work for customer view but read awkwardly on worker view — needs Claude Design copy contract review).
 
 ## Session Start Checklist
 - [ ] `npx expo start --clear`
 - [ ] Open EAS dev client on iPhone → scan QR
 - [ ] `git status` — check what changed last session
-- [ ] Confirm screens use `#0E0E0F` background and `#C9A84C` gold (fix any that don't)
-- [ ] State what screen/feature we're wiring today
+- [ ] State what screen/feature we're working on today
 - [ ] Connect to Supabase before building new screens

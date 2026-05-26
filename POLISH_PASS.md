@@ -828,3 +828,80 @@ accidentally went through the Workers wizard before finding
 Pages. Likely created an empty Workers subdomain. Investigate
 if it's safe to delete (probably yes, but verify doesn't break
 Pages routing).
+
+---
+
+## Receipt Polish Items (logged 2026-05-23, Claude Design pixel pass)
+
+- **TRANSACTION date format** — switch to ledger voice: `22 may 2026 · 16:17 edt`
+  (all lowercase, middle-dot separated), not locale-default mixed case
+- **PAID TO MARIA label** — drop ~1pt to let the $139.50 hero number breathe
+- **ENDORSE THIS WORK button** — 2–4px more vertical padding
+- **Empty-photo state** — refine to Claude Design's Treatment B: "No photographs
+  filed for this job. See Maria's note below." in italic Playfair, with small
+  `· FROM THE WORKER ·` signature beneath
+
+---
+
+## Home v1.1 Deferrals (logged 2026-05-24, Claude Design Home redesign)
+
+These were part of Claude Design's full mode-aware Home proposal.
+Deferred because they require backend work (mode persistence,
+geo queries, scheduling data) that isn't in v1 scope.
+
+- **Composer** — "Need help with..." free-text input for natural-language
+  job posting. Requires NLP routing into the category/task picker, or
+  reframes as a search/filter bar.
+- **Tonight card** — next scheduled confirmed job for Earning mode.
+  Requires query: bids WHERE status='accepted' joined to jobs WHERE
+  scheduled_at > now().
+- **Liquidity signal** — "3 jobs on your block · 12 in Astoria." Requires
+  PostGIS proximity queries against jobs.location + user.location.
+  Day-one fallback: single composite stat ("47 open jobs in NYC").
+- **Role switcher** — badge in top-right corner, bottom-sheet with
+  three options (Hiring / Working / Both). Requires useMode() hook
+  with persistence in AsyncStorage or profiles table.
+- **Earnings hero** — "This week: $642.60 / 4 jobs" for Earning mode.
+  Requires aggregation query on payments WHERE worker_id = me.
+
+---
+
+## Deferred to v1.1 — Full Idea Queue
+
+Parked ideas surfaced during the May 2026 build sessions. All have
+real merit. None are next.
+
+- **Mode-aware Home redesign** — composer, Tonight card, liquidity,
+  role switcher (see Home v1.1 Deferrals above)
+- **Worker view of Receipt** — copy + structure specced in
+  docs/RECEIPT_SPEC.md; needs Claude Design copy contract for
+  worker-view string overrides
+- **Worker-view verb phrasing variants** — current locked verb phrases
+  work for customer view but read awkwardly on worker view (e.g.
+  "You cared for your pet Paata's New York"). Needs Claude Design
+  copy contract review.
+- **PDF receipt export** — share sheet wants a PDF. Server-side
+  rendering (Edge Function + PDF lib) recommended for consistency.
+- **Notifications system** — `notifications` table exists in schema,
+  not wired. Push tokens via expo-notifications deferred.
+- **Photo viewer modal** — fullscreen swipe-zoom on Receipt photos
+  and job-detail photos. No implementation exists in codebase.
+- **Icon language exploration** — Gold Forge (6 drawn by Claude Design),
+  WPA two-tone (Gemini-generated set, hardware-tested), Path D soft
+  illustrative, and chalkboard/letterpress/figurative-humans directions
+  all explored during May 2026. No direction committed. Hardware test
+  at 26px is the gate. Resumes when Claude Design returns. May ship
+  as v1.1 or v1.2 depending on direction selected.
+- **Dollar Sign brand asymmetry** — mode-aware $ meaning exploration
+  (what does the Golden Dollar mean differently for hiring vs earning?)
+- **Theming infrastructure** — Hall/Ledger/Ticket aesthetic variants
+  explored early, deferred post-launch. Design tokens already
+  enable multi-theme switching.
+- **i18n infrastructure** — multi-language support. All copy currently
+  English-only. copy.md on Receipt is the start of an i18n catalog.
+- **Endorsement-accelerated payout** — if customer endorses, release
+  payout immediately instead of waiting 72hr auto-release timer.
+  Requires new Edge Function + changes to payout pipeline.
+- **Standalone worker profile page** — workers appear as cards in
+  Workers Feed but no dedicated profile page. Card shows all
+  relevant info inline; dedicated page is a v1.1 enhancement.
