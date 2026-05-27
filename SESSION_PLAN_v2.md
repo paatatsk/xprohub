@@ -19,9 +19,9 @@ can apply, customers can accept and chat with matched workers, and money can flo
 through escrow safely. All locked product architecture decisions in CLAUDE.md
 must be respected.
 
-**The Load-Bearing Principle:** We design for Maria first. Every design and
-engineering choice gets judged against: does this make it easier or harder for
-a tired worker whose English isn't fluent? See CLAUDE.md for the full principle.
+**The Load-Bearing Principle:** The interface serves the person, not the other
+way around. Every design and engineering choice gets judged against: is this
+easier for the user, or harder? See CLAUDE.md for the full principle.
 
 ---
 
@@ -81,7 +81,7 @@ Each refinement gets its own thesis matching the screen's role in the product.
 
 **Cross-cutting refinements** — these touch multiple screens, not single ones.
 Scope and direction to be set with Claude Design when he returns. Treated as
-v1 refinement work, not v1.1 polish — they affect Maria's daily experience
+v1 refinement work, not v1.1 polish — they affect daily experience for the people using this app
 and need to land before submission.
 
 1. **Back button improvement (all screens)** — current "‹" chevron lacks
@@ -91,7 +91,7 @@ and need to land before submission.
    screen. Richer menu structure needed (settings, profile, preferences,
    legal, account management). May warrant a dedicated Settings hub.
 3. **Profile / ID setup refinement** — both profile-setup.tsx and id.tsx
-   (768-line 4-step wizard) in scope. Maria-test the length, clarity,
+   (768-line 4-step wizard) in scope. Principle-test the length, clarity,
    and visual register. Elevated as priority within per-screen queue.
 4. **Live Market lighthouse refinement** — heaviest-used worker-side
    surface, deserves full lighthouse pass. Already in per-screen queue
@@ -149,7 +149,7 @@ Submission is treated as a gate rather than a milestone — it's the process of 
 - All migrations include verification queries and get design review before SQL runs
 - iPhone testing with real accounts after every step
 - Polish items NEVER block step progression — they go in POLISH_PASS.md
-- The Maria question gets asked before anything ships
+- The user question gets asked before anything ships
 
 ---
 

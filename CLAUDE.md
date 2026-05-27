@@ -23,16 +23,14 @@ For current commit state: `git log --oneline -10`
 
 ## The Load-Bearing Principle
 
-XProHub is built for people who have been failed by interfaces their whole lives. The interface is what's broken, not the people.
+The interface serves the person, not the other way around. Anyone capable of doing the work should be able to use the app without interface friction getting in the way.
 
-**We design for Maria first.** Maria cleans four houses a week to pay rent. English is her second language. She's been turned away from jobs she could do well because she couldn't fill out the application correctly. Daniel (customer) can survive a complicated interface. Maria cannot.
+Every design and engineering choice gets judged against one question: **Is this easier for the user, or harder?**
 
-Every design and engineering choice gets judged against one question: **Does this make it easier or harder for Maria?**
-
-- Icons must be recognizable in 2 seconds by a tired worker
-- Plain language outranks clever language ("Jobs I've posted" beats "My Listings")
-- Error messages get plain language at the source ("We couldn't save your photo. Try again?" beats "Upload failed: HTTP 413")
-- Empty states explain themselves ("When you apply for jobs, they'll show up here")
+- Icons must be recognizable in 2 seconds
+- Plain language outranks clever language
+- Error messages get plain language at the source
+- Empty states explain themselves
 - Accessibility labels are mandatory on every interactive element
 - Cognitive load matters more than tap count
 
@@ -66,7 +64,7 @@ Four players, one product. Paata mediates all communication.
 What "lighthouse-quality" means for a screen:
 - Real data from Supabase, no stubs
 - Five-voice typography wired (Space Grotesk / Inter / Playfair / Oswald / IBM Plex Mono)
-- Maria-tested copy (plain language, no jargon, dignified)
+- User-tested copy (plain language, no jargon, dignified)
 - Hardware-verified on iPhone in real conditions
 - Dignified empty states (no raw nulls, no "undefined", editorial fallbacks)
 - Editorial moments where they earn their place (e.g. worker name in Playfair italic on Receipt)
