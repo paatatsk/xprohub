@@ -1,177 +1,39 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  FlatList, ActivityIndicator, RefreshControl, Image,
+  FlatList, ActivityIndicator, RefreshControl,
   ActionSheetIOS, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useFonts } from 'expo-font';
+import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
+import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
+import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { strings } from '../../constants/strings';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
 import { useBlockList } from '../../hooks/useBlockList';
+import WorkerCardComponent, { type Worker } from '../../components/WorkerCard';
+import JobCardComponent, { type Job } from '../../components/JobCard';
 
-// Screen 13 — Live Market
-// Step 3B: Jobs Feed wired to Supabase
-// Step 3C: category_id URL param → Jobs Feed filter
-// Step 5:  Workers Feed wired to Supabase (profiles + worker_skills)
-//          Category filter on Workers Feed via task_library.category_id
+// Screen 13 — Live Market (Two Markets redesign)
+// Jobs Feed + Laborers Feed, both wired to Supabase
+// Card components extracted to components/JobCard.tsx + components/WorkerCard.tsx
 
 type Feed = 'jobs' | 'workers';
-
-// ── Types ──────────────────────────────────────────────────────
-
-interface Job {
-  id: string;
-  title: string;
-  description: string | null;
-  category: string | null;
-  budget_min: number | null;
-  budget_max: number | null;
-  neighborhood: string | null;
-  timing: string | null;
-  is_urgent: boolean;
-  created_at: string;
-  customer_id: string;          // needed for job-detail navigation
-}
-
-interface Worker {
-  id: string;
-  full_name: string;
-  avatar_url: string | null;
-  bio: string | null;
-  rating: number | null;     // rating_avg — updates via review trigger
-  superpowers: string[];     // up to 3 is_featured task names
-}
-
-// ── Helpers ────────────────────────────────────────────────────
-
-function timingLabel(timing: string | null): string {
-  if (timing === 'asap')      return 'ASAP';
-  if (timing === 'scheduled') return 'Scheduled';
-  if (timing === 'flexible')  return 'Flexible';
-  return '';
-}
-
-function budgetLabel(min: number | null, max: number | null): string {
-  if (min && max) return `$${min}–$${max}`;
-  if (min)        return `From $${min}`;
-  if (max)        return `Up to $${max}`;
-  return 'Budget TBD';
-}
-
-// ── Job Card ───────────────────────────────────────────────────
-
-function JobCard({ job, onPress }: { job: Job; onPress: () => void }) {
-  return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle} numberOfLines={2}>{job.title}</Text>
-        {job.is_urgent && (
-          <View style={styles.urgentBadge}>
-            <Text style={styles.urgentText}>URGENT</Text>
-          </View>
-        )}
-      </View>
-
-      {job.description ? (
-        <Text style={styles.cardDesc} numberOfLines={2}>{job.description}</Text>
-      ) : null}
-
-      <View style={styles.cardMeta}>
-        <Text style={styles.cardBudget}>{budgetLabel(job.budget_min, job.budget_max)}</Text>
-        <View style={styles.cardTags}>
-          {job.neighborhood ? (
-            <Text style={styles.cardTag}>📍 {job.neighborhood}</Text>
-          ) : null}
-          {job.timing ? (
-            <Text style={styles.cardTag}>🕐 {timingLabel(job.timing)}</Text>
-          ) : null}
-          {job.category ? (
-            <Text style={styles.cardTag}>{job.category}</Text>
-          ) : null}
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-// ── Worker Card ────────────────────────────────────────────────
-
-function WorkerCard({ worker, onHire, onOverflow }: { worker: Worker; onHire: () => void; onOverflow: () => void }) {
-  const initials = worker.full_name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-
-  return (
-    <View style={styles.card}>
-      {/* Overflow menu trigger */}
-      <TouchableOpacity
-        style={styles.overflowBtn}
-        onPress={onOverflow}
-        activeOpacity={0.6}
-        accessibilityLabel="More options"
-        accessibilityRole="button"
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Text style={styles.overflowIcon}>⋯</Text>
-      </TouchableOpacity>
-
-      <View style={styles.workerRow}>
-        {/* Avatar */}
-        <View style={styles.avatarWrap}>
-          {worker.avatar_url ? (
-            <Image source={{ uri: worker.avatar_url }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatarFallback}>
-              <Text style={styles.avatarInitials}>{initials}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Info stack */}
-        <View style={styles.workerInfo}>
-          <Text style={styles.workerName} numberOfLines={1}>{worker.full_name}</Text>
-          <Text style={styles.workerBio} numberOfLines={2}>
-            {worker.bio ?? 'Worker on XProHub'}
-          </Text>
-
-          {/* Superpower chips */}
-          {worker.superpowers.length > 0 && (
-            <View style={styles.superpowers}>
-              {worker.superpowers.map((sp, i) => (
-                <View key={i} style={styles.superChip}>
-                  <Text style={styles.superChipText} numberOfLines={1}>{sp}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Rating + Hire row */}
-          <View style={styles.workerFooter}>
-            {worker.rating != null && worker.rating > 0 ? (
-              <Text style={styles.workerRating}>★ {worker.rating.toFixed(1)}</Text>
-            ) : null}
-            <TouchableOpacity
-              style={styles.hireBtn}
-              activeOpacity={0.8}
-              onPress={onHire}
-            >
-              <Text style={styles.hireBtnText}>Hire Directly</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </View>
-  );
-}
 
 // ── Screen ─────────────────────────────────────────────────────
 
 export default function MarketScreen() {
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_700Bold_Italic,
+    Oswald_600SemiBold,
+    Oswald_700Bold,
+    IBMPlexMono_400Regular,
+    IBMPlexMono_500Medium,
+  });
   const router = useRouter();
   const [activeFeed, setActiveFeed] = useState<Feed>('jobs');
   const { category_id } = useLocalSearchParams<{ category_id?: string }>();
@@ -279,7 +141,7 @@ export default function MarketScreen() {
         user_id,
         is_featured,
         task_library ( name ),
-        profiles ( id, full_name, avatar_url, bio, rating_avg, created_at )
+        profiles ( id, full_name, avatar_url, bio, rating_avg, jobs_completed, endorsement_count, city, worker_status, today_rate_min, today_rate_max, today_radius_mi, today_skills, created_at )
       `)
       .order('is_featured', { ascending: false })
       .limit(300);
@@ -304,6 +166,14 @@ export default function MarketScreen() {
           avatar_url: string | null;
           bio: string | null;
           rating_avg: number | null;
+          jobs_completed: number | null;
+          endorsement_count: number | null;
+          city: string | null;
+          worker_status: string | null;
+          today_rate_min: number | null;
+          today_rate_max: number | null;
+          today_radius_mi: number | null;
+          today_skills: string[] | null;
           created_at: string;
         } | null;
 
@@ -317,6 +187,15 @@ export default function MarketScreen() {
             bio: profile.bio,
             rating: profile.rating_avg,
             superpowers: [],
+            worker_status: (profile.worker_status as Worker['worker_status']) ?? 'offline',
+            today_rate_min: profile.today_rate_min,
+            today_rate_max: profile.today_rate_max,
+            today_radius_mi: profile.today_radius_mi,
+            today_skills: profile.today_skills ?? [],
+            jobs_completed: profile.jobs_completed ?? 0,
+            endorsement_count: profile.endorsement_count ?? 0,
+            neighborhood: profile.city,
+            created_at: profile.created_at,
           });
         }
 
@@ -389,7 +268,7 @@ export default function MarketScreen() {
         data={jobs}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-            <JobCard
+            <JobCardComponent
               job={item}
               onPress={() => router.push(`/(tabs)/job-detail?job_id=${item.id}` as any)}
             />
@@ -430,7 +309,7 @@ export default function MarketScreen() {
       return (
         <View style={styles.centerBox}>
           <Text style={styles.emptyIconGlyph}>⚠️</Text>
-          <Text style={styles.emptyHeading}>COULDN'T LOAD WORKERS</Text>
+          <Text style={styles.emptyHeading}>COULDN'T LOAD LABORERS</Text>
           <Text style={styles.emptySub}>{workersError}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={() => fetchWorkers()}>
             <Text style={styles.retryText}>TRY AGAIN</Text>
@@ -440,15 +319,15 @@ export default function MarketScreen() {
     }
 
     const emptyLabel = categoryName
-      ? `No ${categoryName} workers yet`
-      : 'Workers joining daily — check back soon';
+      ? `No ${categoryName} laborers yet`
+      : strings['feed.empty.laborers'];
 
     return (
       <FlatList
         data={workers}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <WorkerCard
+          <WorkerCardComponent
             worker={item}
             onHire={() => {
               const hireDest =
@@ -514,7 +393,7 @@ export default function MarketScreen() {
             <View style={styles.emptyIconRing}>
               <Text style={styles.emptyIconGlyph}>👷</Text>
             </View>
-            <Text style={styles.emptyHeading}>NO WORKERS LISTED YET</Text>
+            <Text style={styles.emptyHeading}>NO LABORERS LISTED YET</Text>
             <Text style={styles.emptySub}>{emptyLabel}</Text>
           </View>
         }
@@ -545,7 +424,7 @@ export default function MarketScreen() {
           activeOpacity={0.8}
         >
           <Text style={[styles.toggleText, activeFeed === 'workers' && styles.toggleTextActive]}>
-            WORKERS
+            {strings['toggle.laborers']}
           </Text>
         </TouchableOpacity>
       </View>
@@ -715,172 +594,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
-  },
-
-  // Job card (shared base with worker card)
-  card: {
-    backgroundColor: Colors.card,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    gap: 8,
-    position: 'relative',
-  },
-  overflowBtn: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-  overflowIcon: {
-    color: Colors.textSecondary,
-    fontSize: 18,
-    letterSpacing: 2,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  cardTitle: {
-    flex: 1,
-    color: Colors.textPrimary,
-    fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  urgentBadge: {
-    backgroundColor: Colors.red,
-    borderRadius: Radius.full,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  urgentText: {
-    color: Colors.textPrimary,
-    fontSize: 9,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  cardDesc: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  cardMeta: {
-    gap: 6,
-  },
-  cardBudget: {
-    color: Colors.gold,
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  cardTags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  cardTag: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 12,
-  },
-
-  // Worker card
-  workerRow: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  avatarWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: Colors.gold,
-    overflow: 'hidden',
-    flexShrink: 0,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-  },
-  avatarFallback: {
-    width: 48,
-    height: 48,
-    backgroundColor: Colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarInitials: {
-    color: Colors.gold,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  workerInfo: {
-    flex: 1,
-    gap: 4,
-  },
-  workerName: {
-    color: Colors.textPrimary,
-    fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 0.3,
-  },
-  workerBio: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 17,
-  },
-  superpowers: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginTop: 4,
-  },
-  superChip: {
-    borderWidth: 1,
-    borderColor: Colors.gold,
-    borderRadius: Radius.full,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  superChipText: {
-    color: Colors.gold,
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  workerFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 6,
-  },
-  workerRating: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 12,
-  },
-  hireBtn: {
-    borderWidth: 1.5,
-    borderColor: Colors.gold,
-    borderRadius: Radius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  hireBtnText: {
-    color: Colors.gold,
-    fontSize: 11,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
   },
 
   // FAB

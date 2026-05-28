@@ -9,6 +9,8 @@ export const Colors = {
   border:         '#2E2E33',  // Card borders, dividers
   textPrimary:    '#FFFFFF',  // All headings and body text
   textSecondary:  '#888890',  // Supporting text, metadata
+  textTertiary:   '#555558',  // Offline status, fine separators
+  cream:          '#F5EEDC',  // Editorial accent, meta-row emphasis
   green:          '#4CAF7A',  // Success, completions, Worker mode
   blue:           '#4A9EDB',  // Trust, verification, info
   purple:         '#9B6EE8',  // XP, growth, Royal theme
@@ -17,8 +19,14 @@ export const Colors = {
 };
 
 export const Fonts = {
-  heading: 'SpaceGrotesk_700Bold', // All headings — Space Grotesk Bold
-  body:    'Inter_400Regular',     // All body text — Inter
+  heading:  'SpaceGrotesk_700Bold',            // All headings — Space Grotesk Bold
+  body:     'Inter_400Regular',                // All body text — Inter
+  bodyMed:  'Inter_500Medium',                 // Body medium weight
+  serif:    'PlayfairDisplay_700Bold_Italic',   // Serif accent — names, editorial quotes
+  display:  'Oswald_600SemiBold',              // Editorial labels, eyebrows, credential headers
+  displayB: 'Oswald_700Bold',                  // Display bold variant
+  mono:     'IBMPlexMono_400Regular',          // Ledger voice — dates, trace IDs, money metadata
+  monoMed:  'IBMPlexMono_500Medium',           // Mono medium — track records, ID numbers
 };
 
 export const Spacing = {

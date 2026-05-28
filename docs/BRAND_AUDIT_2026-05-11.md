@@ -164,3 +164,39 @@ Exploration is welcome. The current Dark Gold + editorial direction is a startin
 **For future visual direction commitment:** When Paata moves from "exploring" to "deciding," this snapshot is the diff point — what we had before the decision was made.
 
 **For new chat-Claude or Claude Code sessions doing visual work:** Read this first. It captures what's true now without making commitments.
+
+---
+
+## D. Brand Rulings (appended 2026-05-27, PR 2)
+
+### D.1 Playfair Italic — Brand Invariant
+
+Worker names render in `PlayfairDisplay_700Bold_Italic` wherever they appear:
+Receipt screen (locked editorial moment), WorkerCard credential nameplate,
+and any future worker-facing surface. This is a brand-register choice, not a
+typographic preference — italic Playfair signals *reverence for the worker*.
+Non-italic Playfair is reserved for taglines and editorial quotes (Welcome screen).
+
+### D.2 Star Ratings Banned Platform-Wide
+
+XProHub does not display star ratings on any user-facing surface. The platform
+uses binary endorsements (ENDORSE THIS WORK / Raise a concern) as the trust
+signal. `profiles.rating_avg` exists in the schema for internal analytics but
+must never be rendered to users. Star ratings create hierarchies that conflict
+with the platform's dignity-first design principle.
+
+### D.3 Per-Card Menus — Safety Actions Only, Styled to Recede
+
+Per-card overflow menus (Report User, Block User) are required for App Store
+compliance (Chunk G-4/G-5). They are NOT a general-purpose feature surface.
+
+**Current state (PR 2):** The `···` trigger lives inline in the WorkerCard's
+gold credential stripe, styled as meta text (`#1A0F00` at 0.55 opacity) rather
+than as a button. This is a deliberate visual choice — the safety action
+recedes into the credential register and does not compete with the card's
+primary content hierarchy.
+
+**Migration path (post-Milestone 5):** When a standalone worker detail view
+ships, migrate Report/Block actions to that view's overflow menu. At that point,
+remove the per-card `···` entirely — the card becomes a pure display surface
+and the detail view owns all actions. Until then, the per-card menu stays.

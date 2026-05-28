@@ -905,3 +905,9 @@ real merit. None are next.
 - **Standalone worker profile page** — workers appear as cards in
   Workers Feed but no dedicated profile page. Card shows all
   relevant info inline; dedicated page is a v1.1 enhancement.
+- **`profiles.jobs_completed` never incremented** — column declared in
+  schema with DEFAULT 0, read by WorkerCard track-record line, but no
+  trigger, RPC, or app code ever writes to it. Always returns 0.
+  Decision needed: either wire an increment into `mark_completed()` /
+  `confirm_completion()`, or remove the column + all read sites.
+  Discovered 2026-05-27 during PR 2 endorsement counter investigation.
