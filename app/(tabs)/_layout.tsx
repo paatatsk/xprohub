@@ -32,6 +32,7 @@ export default function TabLayout() {
       <Tabs.Screen name="review"        options={{ ...headerDefaults, headerShown: true, title: 'RATE & REVIEW',  headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="report"        options={{ ...headerDefaults, headerShown: true, title: 'REPORT',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="direct-hire"   options={{ ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="my-card"        options={{ ...headerDefaults, headerShown: true, title: 'MY ID CARD',     headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="account"       options={{ ...headerDefaults, headerShown: true, title: 'ACCOUNT',        headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-chat"      options={{ ...headerDefaults, headerShown: true, title: 'CHAT',           headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-detail"    options={{ ...headerDefaults, headerShown: true, title: 'JOB DETAILS',    headerLeft: () => <BackButton /> }} />

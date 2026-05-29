@@ -90,6 +90,14 @@ function YourDesk({ lastReceipt, router }: {
     <View style={s.desk}>
       <Text style={s.deskLabel}>YOUR DESK</Text>
 
+      <TouchableOpacity
+        style={s.deskRow}
+        onPress={() => router.push('/(tabs)/my-card')}
+        activeOpacity={0.7}
+      >
+        <Text style={s.deskRowTitle}>My ID Card</Text>
+      </TouchableOpacity>
+
       {lastReceipt && (
         <TouchableOpacity
           style={s.deskRow}
