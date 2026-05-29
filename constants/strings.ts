@@ -5,7 +5,7 @@
 export const strings = {
   // Market toggle
   'toggle.jobs':           'JOBS',
-  'toggle.laborers':       'LABORERS',
+  'toggle.laborers':       'TALENT',
 
   // Worker status segment
   'status.offline':        'OFFLINE',
@@ -51,7 +51,7 @@ export const strings = {
   'myCard.empty.skills':     'Tap + to add a skill from your roster.',
 
   // Empty states
-  'feed.empty.laborers':     'No laborers in your area today. Check back soon.',
+  'feed.empty.laborers':     'No talent in your area today. Check back soon.',
   'feed.empty.jobs':         'No open jobs in this category. Try ALL.',
 
   // Time-string templates

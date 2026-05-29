@@ -309,7 +309,7 @@ export default function MarketScreen() {
       return (
         <View style={styles.centerBox}>
           <Text style={styles.emptyIconGlyph}>⚠️</Text>
-          <Text style={styles.emptyHeading}>COULDN'T LOAD LABORERS</Text>
+          <Text style={styles.emptyHeading}>COULDN'T LOAD TALENT</Text>
           <Text style={styles.emptySub}>{workersError}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={() => fetchWorkers()}>
             <Text style={styles.retryText}>TRY AGAIN</Text>
@@ -319,7 +319,7 @@ export default function MarketScreen() {
     }
 
     const emptyLabel = categoryName
-      ? `No ${categoryName} laborers yet`
+      ? `No ${categoryName} talent yet`
       : strings['feed.empty.laborers'];
 
     return (
@@ -393,7 +393,7 @@ export default function MarketScreen() {
             <View style={styles.emptyIconRing}>
               <Text style={styles.emptyIconGlyph}>👷</Text>
             </View>
-            <Text style={styles.emptyHeading}>NO LABORERS LISTED YET</Text>
+            <Text style={styles.emptyHeading}>NO TALENT LISTED YET</Text>
             <Text style={styles.emptySub}>{emptyLabel}</Text>
           </View>
         }
