@@ -320,7 +320,7 @@ function RateSlider({
   return (
     <View style={s.sliderContainer}>
       <Text style={s.sliderValue}>
-        ${valueMin} \u2013 ${valueMax}
+        ${valueMin}{'\u2013'}${valueMax}
         <Text style={s.sliderUnit}> / HR</Text>
       </Text>
       <View
@@ -754,7 +754,7 @@ export default function MyCardScreen() {
   const hasSuperpowers = roster.length > 0;
   const rosterNames = useMemo(() => roster.map(r => r.name), [roster]);
   const firstName = profile?.first_name ?? profile?.full_name?.split(' ')[0] ?? null;
-  const isNewWorker = (profile?.jobs_completed ?? 0) < 10;
+  const isNewWorker = roster.length === 0;
 
   // Build preview Worker object from staged state
   const previewWorker: Worker | null = profile ? {
@@ -782,8 +782,9 @@ export default function MyCardScreen() {
   function getStatusLine(): string {
     if (publishing) return strings['myCard.line.publishing'];
     if (justPublished) return strings['myCard.line.justPublished'];
-    if (stagedStatus !== committedStatus) return strings['myCard.line.armed'];
+
     if (stagedStatus === 'available') {
+      if (committedStatus !== 'available') return strings['myCard.line.armed'];
       const skillCount = todaySkills.length || rosterNames.length;
       return strings['myCard.line.live'].replace('{n}', String(skillCount));
     }
