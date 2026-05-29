@@ -194,7 +194,7 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
   const visibleSkills = skillSource.slice(0, 3);
   const overflowCount = skillSource.length - 3;
 
-  const showNewStamp = worker.endorsement_count === 0;
+  const showNewStamp = worker.jobs_completed < 10;
 
   const cardContent = (
     <View style={[s.container, showNewStamp && s.containerWithStamp]}>
