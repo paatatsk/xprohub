@@ -1,16 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Colors, Fonts } from '../constants/theme';
 
 type StampVariant = 'urgent' | 'new';
 
 interface CornerStampProps {
   variant: StampVariant;
+  style?: StyleProp<ViewStyle>;
 }
 
-export default function CornerStamp({ variant }: CornerStampProps) {
+export default function CornerStamp({ variant, style }: CornerStampProps) {
   const isUrgent = variant === 'urgent';
   return (
-    <View style={[s.stamp, isUrgent ? s.stampUrgent : s.stampNew]}>
+    <View style={[s.stamp, isUrgent ? s.stampUrgent : s.stampNew, style]}>
       <Text style={[s.text, isUrgent ? s.textUrgent : s.textNew]}>
         {isUrgent ? 'URGENT' : 'NEW'}
       </Text>

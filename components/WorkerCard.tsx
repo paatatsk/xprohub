@@ -197,10 +197,10 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
   const showNewStamp = worker.endorsement_count === 0;
 
   const cardContent = (
-    <View style={s.container}>
+    <View style={[s.container, showNewStamp && s.containerWithStamp]}>
 
-      {/* NEW stamp for zero-endorsement workers */}
-      {showNewStamp && <CornerStamp variant="new" />}
+      {/* NEW stamp for zero-endorsement workers — positioned above the stripe */}
+      {showNewStamp && <CornerStamp variant="new" style={s.stampAboveStripe} />}
 
       {/* ── Gold credential stripe ── */}
       <View style={s.stripe}>
@@ -323,6 +323,12 @@ const s = StyleSheet.create({
     borderRadius: 14,
     overflow: 'visible',
     marginBottom: 12,
+  },
+  containerWithStamp: {
+    marginTop: 8,
+  },
+  stampAboveStripe: {
+    top: -18,
   },
 
   // Gold credential stripe
