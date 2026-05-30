@@ -88,12 +88,12 @@ export default function ProfileSetupScreen() {
     if (avatarUri) {
       const ext = avatarUri.split('.').pop() ?? 'jpg';
       const fileName = `${user.id}/avatar.${ext}`;
-      const response = await fetch(avatarUri);
-      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append('file', { uri: avatarUri, name: `avatar.${ext}`, type: `image/${ext}` } as any);
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, blob, { upsert: true, contentType: `image/${ext}` });
+        .upload(fileName, formData, { upsert: true });
 
       if (uploadError) {
         setError('Photo upload failed. Please try again.');
