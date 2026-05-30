@@ -200,3 +200,36 @@ primary content hierarchy.
 ships, migrate Report/Block actions to that view's overflow menu. At that point,
 remove the per-card `···` entirely — the card becomes a pure display surface
 and the detail view owns all actions. Until then, the per-card menu stays.
+
+### D.4 The NEW stamp — shared word, split treatment
+
+**Decision:** The word "NEW" is shared by JobCard and WorkerCard.
+The treatment is not. Solid gold fill that overhangs the card edge
+is reserved for JobCard (urgency / ephemeral). The WorkerCard "NEW"
+is a hollow gold outline tucked inside the frame (provenance / standing).
+
+**Source:** Stamp Differentiation ruling, 2026-05-29. Cross-refs:
+- JobCard stamp spec — `pr2_build_spec.md` "Corner stamp"
+- WorkerCard stamp origin — `pr2_rulings.md` Ruling 01
+
+**Threshold drift (why this differentiation exists):** Ruling 01's
+worker-stamp threshold shifted from `endorsement_count === 0` (momentary)
+to `jobs_completed < 10` (tenure band) during implementation. The shift
+made shared-treatment over-promise, which this ruling resolves.
+
+**Rule:**
+- **Word:** "NEW" on both. Never fork the lexicon (no FRESH / NEW HERE / ROOKIE).
+- **JobCard:** solid `--gold` fill, `--ink` text, `top: -1px` (overhangs),
+  radius `0 0 4 4`. Oswald 700, 8.5px, ls 2px. *(unchanged)*
+- **WorkerCard:** transparent fill, 1.5px `--gold` stroke, `--gold` text,
+  `top: 14px` (tucked inside), radius 3. Same Oswald 700 / 8.5px / ls 2px.
+- **Grammar basis:** solid gold = primary/urgent (CTA family);
+  outline gold = quiet credential (HIRE pill + avatar-ring family).
+- Disambiguation lives in `accessibilityLabel`, not visible copy.
+  No red, no desaturation, no warning caption on the worker variant —
+  early tenure is welcomed, not flagged (dignity rule).
+
+**Why this matters:** Solid urgency-gold on an unproven worker
+reads as "featured/premium" and over-promises — the customer taps in
+to 0–9 jobs and the credential under-delivers. Outline + tuck keeps the
+shared "newly arrived" meaning while removing the false desirability claim.

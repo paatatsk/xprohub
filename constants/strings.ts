@@ -22,6 +22,8 @@ export const strings = {
 
   // Card stamps
   'card.stamp.new':              'NEW',
+  'card.stamp.new.job.a11y':     'New \u2014 posted within the hour',
+  'card.stamp.new.worker.a11y':  'New to XProHub',
 
   // Track record
   'card.track.endorsedSuffix':   'endorsed',

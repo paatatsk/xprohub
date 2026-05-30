@@ -197,10 +197,15 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
   const showNewStamp = worker.jobs_completed < 10;
 
   const cardContent = (
-    <View style={[s.container, showNewStamp && s.containerWithStamp]}>
+    <View style={s.container}>
 
-      {/* NEW stamp for zero-endorsement workers — positioned above the stripe */}
-      {showNewStamp && <CornerStamp variant="new" style={s.stampAboveStripe} />}
+      {/* NEW stamp — outline treatment, tucked inside the card frame */}
+      {showNewStamp && (
+        <CornerStamp
+          variant="new-outline"
+          accessibilityLabel="New to XProHub"
+        />
+      )}
 
       {/* ── Gold credential stripe ── */}
       <View style={s.stripe}>
@@ -324,13 +329,6 @@ const s = StyleSheet.create({
     overflow: 'visible',
     marginBottom: 12,
   },
-  containerWithStamp: {
-    marginTop: 8,
-  },
-  stampAboveStripe: {
-    top: -18,
-  },
-
   // Gold credential stripe
   stripe: {
     flexDirection: 'row',

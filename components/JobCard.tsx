@@ -83,7 +83,7 @@ export default function JobCard({ job, onPress }: JobCardProps) {
     >
       {/* Corner stamp */}
       {showUrgentStamp && <CornerStamp variant="urgent" />}
-      {showNewStamp && <CornerStamp variant="new" />}
+      {showNewStamp && <CornerStamp variant="new" accessibilityLabel="New \u2014 posted within the hour" />}
 
       {/* Category divider */}
       {job.category && (
