@@ -32,6 +32,21 @@ export const strings = {
   'myCard.photo.a11y.add':       'Add your photo',
   'myCard.photo.a11y.edit':      'Change your photo',
 
+  // Bio editor (Print Shop Zone 2)
+  'myCard.bio.addBadge':         'ADD',
+  'myCard.bio.editBadge':        'EDIT',
+  'myCard.bio.sheetTitle':       'Write your headline.',
+  'myCard.bio.sheetHint':        'One line, the way you\u2019d say it on a doorstep. Customers want to know who they\u2019re hiring.',
+  'myCard.bio.placeholder':      'What should customers know? One line \u2014 your trade, your edge.',
+  'myCard.bio.cardEmpty':        'Add a line about your work',
+  'myCard.bio.counterHint':      'trade \u00b7 years \u00b7 what you do',
+  'myCard.bio.save':             'SAVE LINE',
+  'myCard.bio.cancel':           'CANCEL',
+  'myCard.bio.clampA11y':        '90 character limit reached.',
+  'myCard.bio.fieldA11y':        'Your card headline, 90 characters maximum',
+  'myCard.bio.toast':            'BIO UPDATED',
+  'myCard.bio.toastSub':         'Card reprinted \u00b7 live on the market',
+
   // Track record
   'card.track.endorsedSuffix':   'endorsed',
 

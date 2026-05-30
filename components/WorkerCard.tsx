@@ -31,6 +31,7 @@ interface WorkerCardProps {
   onPress?: () => void;
   onOverflow?: () => void;
   onPhotoPress?: () => void;
+  onBioPress?: () => void;
 }
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -176,7 +177,7 @@ function TrackRecord({ worker }: { worker: Worker }) {
 
 // ── Main Component ─────────────────────────────────────────────
 
-export default function WorkerCard({ worker, preview, onHire, onPress, onOverflow, onPhotoPress }: WorkerCardProps) {
+export default function WorkerCard({ worker, preview, onHire, onPress, onOverflow, onPhotoPress, onBioPress }: WorkerCardProps) {
   const workerId = formatWorkerId(worker.id);
   const initials = getInitials(worker.full_name);
 
@@ -282,9 +283,29 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
           </View>
 
           {/* Bio */}
-          {worker.bio ? (
-            <Text style={s.bio} numberOfLines={2}>{worker.bio}</Text>
-          ) : null}
+          {onBioPress ? (
+            <TouchableOpacity
+              style={s.bioBlock}
+              onPress={onBioPress}
+              activeOpacity={0.7}
+              accessibilityLabel="Edit your card headline"
+              accessibilityRole="button"
+            >
+              <Text
+                style={[s.bio, { marginBottom: 0 }, !worker.bio && s.bioPlaceholder]}
+                numberOfLines={2}
+              >
+                {worker.bio || 'Add a line about your work'}
+              </Text>
+              <View style={s.bioBadge}>
+                <Text style={s.bioBadgeText}>{worker.bio ? 'EDIT' : 'ADD'}</Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            worker.bio ? (
+              <Text style={s.bio} numberOfLines={2}>{worker.bio}</Text>
+            ) : null
+          )}
 
           {/* Track record */}
           <TrackRecord worker={worker} />
@@ -484,12 +505,35 @@ const s = StyleSheet.create({
     height: 7,
     borderRadius: 4,
   },
+  bioBlock: {
+    position: 'relative' as const,
+    marginBottom: 9,
+  },
   bio: {
     fontFamily: Fonts.body,
     fontSize: 11.5,
     lineHeight: 16,
     color: Colors.textSecondary,
     marginBottom: 9,
+  },
+  bioPlaceholder: {
+    fontStyle: 'italic' as const,
+    color: Colors.textTertiary,
+  },
+  bioBadge: {
+    position: 'absolute' as const,
+    bottom: 0,
+    right: 0,
+    backgroundColor: Colors.gold,
+    borderRadius: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  bioBadgeText: {
+    fontFamily: Fonts.heading,
+    fontSize: 7,
+    letterSpacing: 1,
+    color: '#1A0F00',
   },
 
   // Track record

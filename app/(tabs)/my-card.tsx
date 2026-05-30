@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Animated, Modal, Pressable,
+  ActivityIndicator, Animated, Modal, Pressable, TextInput,
   PanResponder, AccessibilityInfo, ActionSheetIOS,
   type LayoutChangeEvent,
 } from 'react-native';
@@ -732,6 +732,13 @@ export default function MyCardScreen() {
   const undoRef = useRef<UndoSnapshot | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Bio edit state (lifetime register — independent of publish bar)
+  const [showBioSheet, setShowBioSheet] = useState(false);
+  const [bioInput, setBioInput] = useState('');
+  const [showBioToast, setShowBioToast] = useState(false);
+  const previousBioRef = useRef<string | null>(null);
+  const bioUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // ── Data fetch ───────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
@@ -792,7 +799,7 @@ export default function MyCardScreen() {
     id: profile.id,
     full_name: profile.full_name ?? 'Anonymous',
     avatar_url: profile.avatar_url,
-    bio: profile.bio,
+    bio: showBioSheet ? (bioInput || null) : (profile.bio ?? null),
     rating: null,
     superpowers: todaySkills.length > 0
       ? todaySkills.slice(0, 3)
@@ -971,6 +978,53 @@ export default function MyCardScreen() {
     );
   }, []);
 
+  // ── Bio handlers (lifetime register) ──────────────────────────
+
+  const openBioSheet = useCallback(() => {
+    setBioInput(profile?.bio ?? '');
+    setShowBioSheet(true);
+  }, [profile]);
+
+  const handleBioSave = useCallback(async () => {
+    if (!profile) return;
+    const newBio = bioInput.trim() || null;
+    previousBioRef.current = profile.bio ?? null;
+
+    // Optimistic update
+    setProfile((p: any) => ({ ...p, bio: newBio }));
+    setShowBioSheet(false);
+
+    await supabase
+      .from('profiles')
+      .update({ bio: newBio })
+      .eq('id', profile.id);
+
+    setShowBioToast(true);
+    bioUndoTimerRef.current = setTimeout(() => {
+      setShowBioToast(false);
+      previousBioRef.current = null;
+    }, UNDO_WINDOW_MS);
+  }, [profile, bioInput]);
+
+  const handleBioUndo = useCallback(async () => {
+    if (!profile) return;
+    const prev = previousBioRef.current;
+    if (bioUndoTimerRef.current) clearTimeout(bioUndoTimerRef.current);
+    setShowBioToast(false);
+
+    setProfile((p: any) => ({ ...p, bio: prev }));
+    await supabase
+      .from('profiles')
+      .update({ bio: prev })
+      .eq('id', profile.id);
+    previousBioRef.current = null;
+  }, [profile]);
+
+  const handleBioCancel = useCallback(() => {
+    setShowBioSheet(false);
+    setBioInput('');
+  }, []);
+
   // ── Render ───────────────────────────────────────────────────
 
   if (loading || !fontsLoaded) {
@@ -1042,6 +1096,7 @@ export default function MyCardScreen() {
                 const dest = encodeURIComponent('/(tabs)/my-card');
                 router.push(`/(onboarding)/id?step=photo&returnTo=${dest}` as any);
               }}
+              onBioPress={openBioSheet}
             />
           </View>
         )}
@@ -1158,6 +1213,79 @@ export default function MyCardScreen() {
         categories={categories}
         allTasks={allTasks}
       />
+
+      {/* ── Bio edit sheet ── */}
+      <Modal visible={showBioSheet} transparent animationType="none">
+        <Pressable style={s.pickerScrim} onPress={handleBioCancel}>
+          <View style={s.bioSheet}>
+            <Pressable>
+              <View style={s.pickerHandle} />
+
+              <Text style={s.bioSheetTitle}>{strings['myCard.bio.sheetTitle']}</Text>
+              <Text style={s.bioSheetHint}>{strings['myCard.bio.sheetHint']}</Text>
+
+              {/* Mini-proof */}
+              <View style={s.bioProof}>
+                <Text style={s.bioProofName} numberOfLines={1}>
+                  {profile?.full_name ?? 'Anonymous'}
+                </Text>
+                <Text style={s.bioProofLine} numberOfLines={2}>
+                  {bioInput || strings['myCard.bio.cardEmpty']}
+                </Text>
+              </View>
+
+              {/* Text input */}
+              <TextInput
+                style={s.bioTextInput}
+                value={bioInput}
+                onChangeText={(text) => {
+                  if (text.length <= 90) setBioInput(text);
+                  if (text.length >= 90) {
+                    AccessibilityInfo.announceForAccessibility(strings['myCard.bio.clampA11y']);
+                  }
+                }}
+                maxLength={90}
+                placeholder={strings['myCard.bio.placeholder']}
+                placeholderTextColor={Colors.textTertiary}
+                autoFocus
+                returnKeyType="done"
+                accessibilityLabel={strings['myCard.bio.fieldA11y']}
+              />
+
+              {/* Counter + coach */}
+              <View style={s.bioCounterRow}>
+                <Text style={[s.bioCounter, bioInput.length >= 75 && { color: Colors.amber }]}>
+                  {bioInput.length}/90
+                </Text>
+                <Text style={s.bioCoach}>{strings['myCard.bio.counterHint']}</Text>
+              </View>
+
+              {/* Actions */}
+              <View style={s.bioActions}>
+                <TouchableOpacity style={s.bioCancelBtn} onPress={handleBioCancel} activeOpacity={0.7}>
+                  <Text style={s.bioCancelText}>{strings['myCard.bio.cancel']}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={s.bioSaveBtn} onPress={handleBioSave} activeOpacity={0.8}>
+                  <Text style={s.bioSaveText}>{strings['myCard.bio.save']}</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* ── Bio toast ── */}
+      {showBioToast && (
+        <View style={s.toast}>
+          <View style={s.toastContent}>
+            <Text style={s.toastTitle}>{strings['myCard.bio.toast']}</Text>
+            <Text style={s.toastSub}>{strings['myCard.bio.toastSub']}</Text>
+          </View>
+          <TouchableOpacity onPress={handleBioUndo} activeOpacity={0.7}>
+            <Text style={s.toastUndo}>{strings['myCard.toast.undo']}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -1730,6 +1858,108 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   pickerDoneText: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    letterSpacing: 1,
+    color: INK,
+  },
+
+  // ── Bio edit sheet ──
+  bioSheet: {
+    backgroundColor: Colors.background,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.lg,
+    paddingHorizontal: Spacing.md,
+  },
+  bioSheetTitle: {
+    fontFamily: Fonts.serif,
+    fontSize: 20,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  bioSheetHint: {
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.md,
+  },
+  bioProof: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: Spacing.md,
+  },
+  bioProofName: {
+    fontFamily: Fonts.serif,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  bioProofLine: {
+    fontFamily: Fonts.body,
+    fontSize: 11.5,
+    lineHeight: 16,
+    color: Colors.textSecondary,
+  },
+  bioTextInput: {
+    fontFamily: Fonts.body,
+    fontSize: 14,
+    color: Colors.textPrimary,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: Spacing.sm,
+  },
+  bioCounterRow: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    marginBottom: Spacing.lg,
+  },
+  bioCounter: {
+    fontFamily: Fonts.mono,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
+    fontVariant: ['tabular-nums'] as any,
+  },
+  bioCoach: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: Colors.textTertiary,
+  },
+  bioActions: {
+    flexDirection: 'row' as const,
+    gap: 10,
+  },
+  bioCancelBtn: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center' as const,
+  },
+  bioCancelText: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    letterSpacing: 1,
+    color: Colors.gold,
+  },
+  bioSaveBtn: {
+    flex: 1,
+    backgroundColor: Colors.gold,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center' as const,
+  },
+  bioSaveText: {
     fontFamily: Fonts.heading,
     fontSize: 13,
     letterSpacing: 1,
