@@ -52,6 +52,14 @@ logged for **v1.1+ on empirical signal** — out of scope.
 - Display-name-vs-legal-name split is **parked for v1.1**.
 - Existing daily-dial behavior is preserved.
 
+### Revision 01 — Maestro build clarifications (30-MAY-2026)
+
+Applied before Slices 2-4. Slice 1 (photo) was unblocked and in build; these three rule independently.
+
+1. **Bio handle wrap -> (d) corner-tucked.** The `EDIT`/`ADD` badge is absolutely positioned at the bottom-right corner of the bio block; the whole block is the tap target. The bio wraps identically on the self-view and the public card because the badge never participates in text layout. Inline placements (a/b/c) rejected — they reflow text and diverge self/public.
+2. **Picker reuse -> shared presentational child.** The category->task grid is factored into a shared child component; the add-skill flow is a thin parent with its **own** completion handler writing one `INSERT`. It is **not** the daily today_skills sheet with a swapped callback — that sheet's set-rewrite model must not enter the lifetime path.
+3. **Drag-reorder -> deferred to v1.1.** Slice 4 ships **toggle-feature/unfeature only**. Featured order is fixed to **insertion order** (oldest featured leftmost), which still maps to card sequence. Revisit on empirical signal (PanResponder drag carries real cost; <=3 items make ordering a weak need at launch).
+
 ---
 
 ## The Print-Shop grammar (one language, four zones)
@@ -101,6 +109,7 @@ opens a **focused proof sheet** and **commits on its own**.
 
 ### Q2 — Skill editing UX
 - **Add:** a **category -> task -> confirm** mini-flow (reuses the existing open 20-category picker as a sheet), **not** the 4-step wizard. Picks land in the roster as `pending` verification.
+- **Picker reuse (Rev 01):** the category->task grid is a **shared presentational child**; the add-skill flow wraps it with its **own** completion handler. Not the daily sheet with a swapped callback — the daily set-rewrite model stays out of the lifetime path.
 - **Remove:** behind an `EDIT` toggle in the roster group header, which reveals an `x` on each chip -> **soft confirm** (it forfeits endorsements).
 - **Confirmation register:** **none** for add/feature; **soft** for remove; **never hard**.
 - **DATA SAFETY (the flagged risk):** the unmodified wizard **wipes `worker_skills` on completion**. The my-card path must **never** reuse that completion. **Add = one `INSERT`. Remove = one `DELETE` of one row.** The existing set is never read-modify-rewritten.
@@ -108,9 +117,10 @@ opens a **focused proof sheet** and **commits on its own**.
 ### Q3 — Superpower management: solid/outline chip grammar
 - <= **3 featured**, drawn from the verified roster, living in the manager sheet's top group.
 - **Promote:** tap an outline roster chip -> fills gold, rises to the featured row. One tap, no confirm.
-- **Demote:** tap a featured chip's star (or drag it out) -> drops to an outline roster chip.
+- **Demote:** tap a featured chip's star -> it drops to an outline roster chip.
 - **At cap (3/3):** roster chips dim; soft line `3 featured max -- swap one out to add.` Never a hard error.
-- **Reorder:** a grip drags featured chips; **order = card prominence** (left-to-right). *Optional polish* — if drag is fragile on hardware, fall back to feature-order.
+- **Reorder:** **deferred to v1.1 (Rev 01).** v1 ships toggle-feature/unfeature only; featured **order = insertion order** (oldest featured leftmost), which still maps to card sequence. (Drag-and-drop carries real PanResponder cost; <=3 items make ordering a weak launch need — revisit on signal.)
+- Star here is a **featured pin**, not a rating (Ruling 01 killed the star *rating* — different word, same alphabet).
 
 ### Q4 — Bio editing: focused proof sheet
 - **Sheet, not inline.** A sentence the customer reads first deserves composure.
@@ -118,6 +128,7 @@ opens a **focused proof sheet** and **commits on its own**.
 - **Cap: 90 characters** — long enough for trade + years + promise; short enough that the card's 2-line clamp never truncates mid-word. **Warn (amber) at 75; hard clamp at 90.**
 - **Explicit `SAVE LINE`**, `CANCEL` discards. **No auto-save-on-blur.**
 - **Empty state:** card line shows italic placeholder + `ADD` handle on the self-view; the public fallback `Worker on XProHub` holds until the worker writes their own.
+- **Bio handle (Rev 01):** corner-tucked badge, absolutely positioned at bottom-right of the bio block. The whole block is the tap target. Bio wraps identically on self-view and public card because the badge never participates in text layout.
 - Writes `profiles.bio` (ships `null` today, no edit path anywhere).
 
 ### Q5 — Live preview doctrine: holds across all four zones
@@ -142,7 +153,7 @@ Two presses, by frequency and consequence:
 | Bio | LIFETIME | Sheet **SAVE LINE** | Toast 5s | `profiles.bio` |
 | Roster add | LIFETIME | Mini-flow confirm | Toast 5s | `INSERT worker_skills` |
 | Roster remove | LIFETIME | **Soft confirm** (destructive) | Confirm *is* the gate | `DELETE worker_skills` |
-| Superpowers | LIFETIME | Tap feature / drag | Toast 5s | `featured flag / order` |
+| Superpowers | LIFETIME | Tap feature / unfeature | Toast 5s | `featured flag` / order = insertion |
 
 ---
 
@@ -153,7 +164,7 @@ Two presses, by frequency and consequence:
 | **Photo** | (1) no photo — initials + `ADD` badge + hint line (2) photo on file — cropped fill + `EDIT` badge (3) in-wizard (existing) (4) returned/committed |
 | **Bio** | (1) empty — italic placeholder on card + `ADD` handle (2) filled — line + `EDIT` handle (3) editing — sheet open, mini-proof, counter `n/90` (4) warn — counter amber >=75 (5) clamp — input stops at 90 (6) committed — toast + UNDO |
 | **Roster** | (1) default — three groups (2) edit/remove mode — x revealed (3) remove confirm — destructive dialog (4) pending — hairline + italic note (sheet only) (5) add mini-flow — category->task->confirm |
-| **Superpowers** | (1) featured group (0-3) (2) promote (slot open) (3) at cap 3/3 — dim + swap line (4) reorder — grip drag (5) demote |
+| **Superpowers** | (1) featured group (0-3) (2) promote (slot open) (3) at cap 3/3 — dim + swap line (4) demote *(reorder deferred to v1.1)* |
 
 ---
 
@@ -188,7 +199,7 @@ add-skill picker. **Pending border is a solid hairline**, never CSS dashed
 - **Roster chip tap** -> toggles featured (promote/demote), respecting the 3-cap.
 - **Roster group `EDIT`** -> reveals x; x tap -> soft confirm; `REMOVE` deletes one row + toast.
 - **`+ ADD A SKILL`** -> category -> task -> confirm mini-flow; confirm inserts one `pending` row + toast.
-- **Featured grip drag** -> reorders; order writes to the featured sequence.
+- **Featured chip tap** -> unfeature (demote to roster). *(Drag-reorder deferred to v1.1; order = insertion.)*
 - **Daily dials + publish bar** -> unchanged from `MY_CARD_SPEC.md`.
 
 ---
@@ -205,6 +216,15 @@ add-skill picker. **Pending border is a solid hairline**, never CSS dashed
 
 ---
 
+## Brand Audit entry — paste into `BRAND_AUDIT_2026-05-11.md` after D.4
+
+See **section 08** of `print_shop_spec.html` for the formatted **D.5** block (principle,
+the four-word grammar, the Q1-Q6 rulings, the folded photo ruling, scope/parked
+items, and the rationale). Append verbatim and log it as the next locked decision
+in the D-series.
+
+---
+
 ## Explicit non-features
 
 - **No visual customization.** No color, font, or layout choice — content and skill selection only.
@@ -215,6 +235,7 @@ add-skill picker. **Pending border is a solid hairline**, never CSS dashed
 - **No confirmation modal except skill removal** — every other edit is press + UNDO.
 - **No `pending`/`unverified` label on the public card** — sheet-side only; endorsement count is the public trust signal.
 - **No star rating** anywhere (Ruling 01) — star is a featured pin only.
+- **No drag-reorder** in v1 (Rev 01) — featured order = insertion order.
 
 ---
 
@@ -224,11 +245,12 @@ add-skill picker. **Pending border is a solid hairline**, never CSS dashed
 - [ ] Photo badge ADD/EDIT by `avatar_url`; whole portrait tappable; routes to `/(onboarding)/id`; public card unchanged (gated on `onPhotoPress`).
 - [ ] Bio sheet: live mini-proof, counter `n/90`, amber at 75, clamp at 90, explicit SAVE, CANCEL discards.
 - [ ] Bio empty state shows italic placeholder + ADD handle on self-view.
+- [ ] Bio handle is corner-tucked (Rev 01) — absolutely positioned at bottom-right of bio block; never participates in text layout.
 - [ ] Roster sheet shows three groups; featured solid, roster outline, pending hairline+italic (sheet only).
 - [ ] **Add writes ONE `INSERT`; remove writes ONE `DELETE`; the worker_skills set is never overwritten.**
-- [ ] Add mini-flow is category->task->confirm (reuses picker), NOT the 4-step wizard.
+- [ ] Add mini-flow is category->task->confirm (shared presentational child, own completion handler — Rev 01), NOT the 4-step wizard.
 - [ ] Remove is behind EDIT mode + soft confirm naming lost endorsements; KEEP IT is default; red used only here.
-- [ ] Superpowers: tap to feature/unfeature; cap 3 with soft swap line; drag reorders; order = card prominence.
+- [ ] Superpowers: tap to feature/unfeature; cap 3 with soft swap line; **reorder deferred (order = insertion, oldest featured leftmost) — Rev 01**.
 - [ ] Daily dials + publish bar behave exactly as `MY_CARD_SPEC.md` shipped.
 - [ ] Lifetime edits commit independently with UNDO; none touch `worker_status`.
 - [ ] No emoji outside the 20 category icons; no drop shadows; no gradients beyond the stripe; no CSS dashed borders.

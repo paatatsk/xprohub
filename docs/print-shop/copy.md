@@ -70,7 +70,7 @@ export const myCardPrintShop = {
   'myCard.offers.toast.featured':   'SUPERPOWER FEATURED',
   'myCard.offers.toast.featuredSub':'{skill} now leads your card',
   'myCard.offers.toast.demoted':    'MOVED TO ROSTER',
-  'myCard.offers.toast.reordered':  'ORDER UPDATED',
+  'myCard.offers.toast.reordered':  'ORDER UPDATED',   // DEFERRED to v1.1 — not wired in v1 (no drag-reorder)
 
   // shared
   'myCard.toast.undo':            'UNDO',            // ◆ reused from daily publish toast
@@ -79,7 +79,7 @@ export const myCardPrintShop = {
 
 ## Out of scope here
 
-- **Daily-dial strings** (status segment, today's skills, rate/radius, publish bar, daily toast/empty states) belong to the existing `myCard.*` set in `MY_CARD_SPEC.md`'s `copy.md` — inherited unchanged.
+- **Daily-dial strings** (status segment, today's skills, rate/radius, publish bar, daily toast/empty states) belong to the existing `myCard.*` set in `MY_CARD_SPEC.md` / its `copy.md` — inherited unchanged.
 - **Track-line strings** (`{N} endorsed · {city} · ${rate}/hr`) belong to `WorkerCard` / the `card.*` namespace (Ruling 01), not `myCard.*`.
 - **Identity strings** (legal name, email, payout, verification) live in Account — not this surface.
 
@@ -96,7 +96,7 @@ export const myCardPrintShop = {
 - Use `\u00b7` (·) middle dots, `\u2014` (—) em-dashes, `\u2026` (…) ellipsis,
   `\u2019` (') curly apostrophes, `\u2192` (→) arrow, `\u00d7` (×) multiplication
   sign for chip remove glyphs (not the letter x), `\u2605` (★) for the featured
-  pin (not a rating), `\u283f` (⠿) for the drag grip.
+  pin (not a rating). The drag grip is **deferred to v1.1** — no reorder in v1 (see Rev 01).
 
 ## Voice spot-checks
 
