@@ -5,7 +5,7 @@ import {
   ActionSheetIOS, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
@@ -102,7 +102,7 @@ export default function MarketScreen() {
     else setLoading(false);
   }, [categoryName, blockedIds, currentUserId]);
 
-  useEffect(() => { fetchJobs(); }, [fetchJobs]);
+  useFocusEffect(useCallback(() => { fetchJobs(); }, [fetchJobs]));
 
   // ── Fetch Workers ────────────────────────────────────────────
   // RLS confirmed applied: migration 20260419000002_enable_worker_skills_rls.sql
@@ -214,7 +214,7 @@ export default function MarketScreen() {
     else setWorkersLoading(false);
   }, [category_id, blockedIds, currentUserId]);
 
-  useEffect(() => { fetchWorkers(); }, [fetchWorkers]);
+  useFocusEffect(useCallback(() => { fetchWorkers(); }, [fetchWorkers]));
 
   // ── Clear filter ─────────────────────────────────────────────
 
