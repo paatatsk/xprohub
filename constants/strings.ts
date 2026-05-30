@@ -47,6 +47,33 @@ export const strings = {
   'myCard.bio.toast':            'BIO UPDATED',
   'myCard.bio.toastSub':         'Card reprinted \u00b7 live on the market',
 
+  // Roster & superpowers (Print Shop Zone 3+4)
+  'myCard.offers.row':            '{verified} verified \u00b7 {featured} featured',
+  'myCard.offers.manage':         'MANAGE',
+  'myCard.offers.sheetTitle':     'Your workshop.',
+  'myCard.offers.sheetHint':      'Feature up to 3 on your card. Add new trades, or retire ones you no longer offer.',
+  'myCard.offers.groupFeatured':  'FEATURED ON YOUR CARD \u00b7 {n} / 3',
+  'myCard.offers.groupRoster':    'VERIFIED \u00b7 NOT FEATURED',
+  'myCard.offers.groupAdd':       'ADD TO YOUR ROSTER',
+  'myCard.offers.rosterHint':     'tap to feature \u00b7 EDIT to remove',
+  'myCard.offers.addSkill':       '+ ADD A SKILL',
+  'myCard.offers.editMode':       'EDIT',
+  'myCard.offers.pending':        'pending',
+  'myCard.offers.done':           'DONE',
+  'myCard.add.steps.category':    'CATEGORY',
+  'myCard.add.steps.task':        'TASK',
+  'myCard.add.steps.confirm':     'CONFIRM',
+  'myCard.add.confirmTitle':      'Add {skill} to your roster?',
+  'myCard.add.confirmBody':       'It\u2019ll show on your card right away. New skills start unverified \u2014 endorsements build trust over time.',
+  'myCard.add.confirmCta':        'ADD SKILL',
+  'myCard.add.toast':             'SKILL ADDED',
+  'myCard.add.toastSub':          '{skill} is on your roster \u00b7 pending verification',
+  'myCard.offers.remove.title':   'Remove {skill}?',
+  'myCard.offers.remove.body':    'This can\u2019t be undone \u2014 you\u2019d have to add it again.',
+  'myCard.offers.remove.keep':    'KEEP IT',
+  'myCard.offers.remove.confirm': 'REMOVE',
+  'myCard.offers.remove.toast':   'SKILL REMOVED',
+
   // Track record
   'card.track.endorsedSuffix':   'endorsed',
 

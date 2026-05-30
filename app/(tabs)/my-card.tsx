@@ -30,6 +30,7 @@ interface RosterSkill {
   name: string;
   taskId: number;
   categoryId: number;
+  isFeatured: boolean;
 }
 
 interface TaskCategory {
@@ -739,6 +740,18 @@ export default function MyCardScreen() {
   const previousBioRef = useRef<string | null>(null);
   const bioUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Roster management state (lifetime register)
+  const [showRosterSheet, setShowRosterSheet] = useState(false);
+  const [rosterEditMode, setRosterEditMode] = useState(false);
+  const [rosterView, setRosterView] = useState<'roster' | 'addCategory' | 'addTask' | 'addConfirm'>('roster');
+  const [addSelectedCatId, setAddSelectedCatId] = useState<number | null>(null);
+  const [addSelectedTask, setAddSelectedTask] = useState<TaskItem | null>(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<RosterSkill | null>(null);
+  const [rosterToastConfig, setRosterToastConfig] = useState<{ title: string; sub: string } | null>(null);
+  const rosterUndoRef = useRef<{ action: 'add' | 'remove'; skill: RosterSkill } | null>(null);
+  const rosterUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // ── Data fetch ───────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
@@ -776,7 +789,7 @@ export default function MyCardScreen() {
 
     const skills: RosterSkill[] = (rosterRes.data ?? []).map((r: any) => {
       const tl = r.task_library as { id: number; name: string; category_id: number } | null;
-      return { name: tl?.name ?? '', taskId: tl?.id ?? 0, categoryId: tl?.category_id ?? 0 };
+      return { name: tl?.name ?? '', taskId: tl?.id ?? 0, categoryId: tl?.category_id ?? 0, isFeatured: !!r.is_featured };
     }).filter((sk: RosterSkill) => sk.name);
     setRoster(skills);
 
@@ -1025,6 +1038,122 @@ export default function MyCardScreen() {
     setBioInput('');
   }, []);
 
+  // ── Roster handlers (lifetime register) ──────────────────────
+
+  const openRosterSheet = useCallback(() => {
+    setRosterView('roster');
+    setRosterEditMode(false);
+    setShowRosterSheet(true);
+  }, []);
+
+  const closeRosterSheet = useCallback(() => {
+    setShowRosterSheet(false);
+    setRosterEditMode(false);
+    setRosterView('roster');
+    setAddSelectedCatId(null);
+    setAddSelectedTask(null);
+    // Re-fetch to sync any changes
+    fetchData();
+  }, [fetchData]);
+
+  const handleAddSkill = useCallback(async () => {
+    if (!addSelectedTask || !profile) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const newSkill: RosterSkill = {
+      name: addSelectedTask.name,
+      taskId: addSelectedTask.id,
+      categoryId: addSelectedTask.category_id,
+      isFeatured: false,
+    };
+
+    // ONE INSERT — data safety contract
+    const { error } = await supabase
+      .from('worker_skills')
+      .insert({ user_id: user.id, task_id: addSelectedTask.id, is_featured: false });
+
+    if (error) {
+      if (error.code === '23505') {
+        // Already in roster — duplicate key
+      }
+      setRosterView('roster');
+      setAddSelectedTask(null);
+      return;
+    }
+
+    // Optimistic local update
+    setRoster(prev => [...prev, newSkill]);
+    setRosterView('roster');
+    setAddSelectedTask(null);
+
+    // Toast with undo
+    rosterUndoRef.current = { action: 'add', skill: newSkill };
+    setRosterToastConfig({
+      title: strings['myCard.add.toast'],
+      sub: strings['myCard.add.toastSub'].replace('{skill}', newSkill.name),
+    });
+    if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
+    rosterUndoTimerRef.current = setTimeout(() => {
+      setRosterToastConfig(null);
+      rosterUndoRef.current = null;
+    }, UNDO_WINDOW_MS);
+  }, [addSelectedTask, profile]);
+
+  const handleRemoveSkill = useCallback(async () => {
+    if (!removeTarget || !profile) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // ONE DELETE — data safety contract
+    await supabase
+      .from('worker_skills')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('task_id', removeTarget.taskId);
+
+    // Optimistic local update
+    setRoster(prev => prev.filter(r => r.taskId !== removeTarget.taskId));
+    setShowRemoveConfirm(false);
+    setRemoveTarget(null);
+
+    // Toast with undo
+    rosterUndoRef.current = { action: 'remove', skill: removeTarget };
+    setRosterToastConfig({
+      title: strings['myCard.offers.remove.toast'],
+      sub: removeTarget.name,
+    });
+    if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
+    rosterUndoTimerRef.current = setTimeout(() => {
+      setRosterToastConfig(null);
+      rosterUndoRef.current = null;
+    }, UNDO_WINDOW_MS);
+  }, [removeTarget, profile]);
+
+  const handleRosterUndo = useCallback(async () => {
+    const snap = rosterUndoRef.current;
+    if (!snap || !profile) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
+    setRosterToastConfig(null);
+
+    if (snap.action === 'add') {
+      // Undo add = ONE DELETE
+      await supabase.from('worker_skills').delete()
+        .eq('user_id', user.id).eq('task_id', snap.skill.taskId);
+      setRoster(prev => prev.filter(r => r.taskId !== snap.skill.taskId));
+    } else {
+      // Undo remove = ONE INSERT (restore the row)
+      await supabase.from('worker_skills').insert({
+        user_id: user.id, task_id: snap.skill.taskId, is_featured: false,
+      });
+      setRoster(prev => [...prev, snap.skill]);
+    }
+    rosterUndoRef.current = null;
+  }, [profile]);
+
   // ── Render ───────────────────────────────────────────────────
 
   if (loading || !fontsLoaded) {
@@ -1103,6 +1232,27 @@ export default function MyCardScreen() {
         {!profile?.avatar_url && (
           <Text style={s.photoHint}>{strings['myCard.photo.hint']}</Text>
         )}
+
+        {/* ── MANAGE row (lifetime) ── */}
+        <View style={s.manageRow}>
+          <View>
+            <Text style={s.eyebrow}>MY CARD {'\u00b7'} LIFETIME</Text>
+            <Text style={s.manageValue}>
+              {strings['myCard.offers.row']
+                .replace('{verified}', String(roster.length))
+                .replace('{featured}', String(roster.filter(r => r.isFeatured).length || 0))}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={s.managePill}
+            onPress={openRosterSheet}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`Manage offers and superpowers, ${roster.length} verified`}
+          >
+            <Text style={s.managePillText}>{strings['myCard.offers.manage']}</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* ── Skills editor ── */}
         <View style={s.sectionRow}>
@@ -1282,6 +1432,218 @@ export default function MyCardScreen() {
             <Text style={s.toastSub}>{strings['myCard.bio.toastSub']}</Text>
           </View>
           <TouchableOpacity onPress={handleBioUndo} activeOpacity={0.7}>
+            <Text style={s.toastUndo}>{strings['myCard.toast.undo']}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* ── Roster & Superpowers sheet ── */}
+      <Modal visible={showRosterSheet} transparent animationType="none">
+        <Pressable style={s.pickerScrim} onPress={closeRosterSheet}>
+          <View style={[s.pickerSheet, { maxHeight: '85%' }]}>
+            <Pressable>
+              <View style={s.pickerHandle} />
+
+              {rosterView === 'roster' && (
+                <>
+                  <Text style={s.pickerTitle}>{strings['myCard.offers.sheetTitle']}</Text>
+                  <Text style={s.pickerSubhead}>{strings['myCard.offers.sheetHint']}</Text>
+
+                  <ScrollView style={s.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {/* Featured group */}
+                    <View style={s.pickerGroup}>
+                      <Text style={s.pickerGroupLabel}>
+                        {strings['myCard.offers.groupFeatured'].replace('{n}', String(roster.filter(r => r.isFeatured).length))}
+                      </Text>
+                      <View style={s.chipRow}>
+                        {roster.filter(r => r.isFeatured).map(sk => (
+                          <View key={sk.taskId} style={s.rosterChipFeatured}>
+                            <Text style={s.rosterChipFeaturedText}>{sk.name}</Text>
+                          </View>
+                        ))}
+                        {roster.filter(r => r.isFeatured).length === 0 && (
+                          <Text style={s.skillsFallback}>No superpowers yet</Text>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Roster group (not featured) */}
+                    <View style={s.pickerGroup}>
+                      <View style={s.rosterGroupHeader}>
+                        <Text style={s.pickerGroupLabel}>{strings['myCard.offers.groupRoster']}</Text>
+                        <TouchableOpacity
+                          onPress={() => setRosterEditMode(prev => !prev)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={s.rosterEditToggle}>
+                            {rosterEditMode ? 'DONE' : strings['myCard.offers.editMode']}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      {!rosterEditMode && (
+                        <Text style={s.rosterHint}>{strings['myCard.offers.rosterHint']}</Text>
+                      )}
+                      <View style={s.chipRow}>
+                        {roster.filter(r => !r.isFeatured).map(sk => (
+                          <View key={sk.taskId} style={s.rosterChipOutline}>
+                            <Text style={s.rosterChipOutlineText}>{sk.name}</Text>
+                            {rosterEditMode && (
+                              <TouchableOpacity
+                                onPress={() => { setRemoveTarget(sk); setShowRemoveConfirm(true); }}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                accessibilityLabel={`Remove ${sk.name}`}
+                              >
+                                <Text style={s.rosterRemoveX}>{'\u00d7'}</Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+
+                    {/* Add to roster */}
+                    <View style={s.pickerGroup}>
+                      <Text style={s.pickerGroupLabel}>{strings['myCard.offers.groupAdd']}</Text>
+                      <TouchableOpacity
+                        style={s.addSkillBtn}
+                        onPress={() => setRosterView('addCategory')}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={s.addSkillText}>{strings['myCard.offers.addSkill']}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ height: 40 }} />
+                  </ScrollView>
+
+                  <TouchableOpacity style={s.pickerDone} onPress={closeRosterSheet} activeOpacity={0.8}>
+                    <Text style={s.pickerDoneText}>{strings['myCard.offers.done']}</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {/* Add skill — Step 1: Category */}
+              {rosterView === 'addCategory' && (
+                <>
+                  <View style={s.addFlowHeader}>
+                    <TouchableOpacity onPress={() => setRosterView('roster')}>
+                      <Text style={s.addFlowBack}>{'\u2039'} Back</Text>
+                    </TouchableOpacity>
+                    <Text style={s.addFlowStep}>{strings['myCard.add.steps.category']}</Text>
+                  </View>
+                  <ScrollView style={s.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {categories.map(cat => (
+                      <TouchableOpacity
+                        key={cat.id}
+                        style={s.pickerCatRow}
+                        onPress={() => { setAddSelectedCatId(cat.id); setRosterView('addTask'); }}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={s.pickerCatEmoji}>{iconForSlug(cat.icon_slug)}</Text>
+                        <Text style={s.pickerCatName}>{cat.name}</Text>
+                        <Text style={s.pickerCatChevron}>{'\u203a'}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <View style={{ height: 40 }} />
+                  </ScrollView>
+                </>
+              )}
+
+              {/* Add skill — Step 2: Task */}
+              {rosterView === 'addTask' && (
+                <>
+                  <View style={s.addFlowHeader}>
+                    <TouchableOpacity onPress={() => setRosterView('addCategory')}>
+                      <Text style={s.addFlowBack}>{'\u2039'} Back</Text>
+                    </TouchableOpacity>
+                    <Text style={s.addFlowStep}>{strings['myCard.add.steps.task']}</Text>
+                  </View>
+                  <ScrollView style={s.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {allTasks
+                      .filter(t => t.category_id === addSelectedCatId)
+                      .map(task => {
+                        const alreadyInRoster = roster.some(r => r.taskId === task.id);
+                        return (
+                          <TouchableOpacity
+                            key={task.id}
+                            style={[s.pickerRow, alreadyInRoster && s.pickerRowDimmed]}
+                            onPress={() => {
+                              if (!alreadyInRoster) { setAddSelectedTask(task); setRosterView('addConfirm'); }
+                            }}
+                            activeOpacity={alreadyInRoster ? 1 : 0.7}
+                          >
+                            <Text style={[s.pickerRowText, alreadyInRoster && s.pickerRowTextDimmed]}>
+                              {task.name}
+                            </Text>
+                            {alreadyInRoster && (
+                              <Text style={s.pickerCheck}>{'\u2713'}</Text>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    <View style={{ height: 40 }} />
+                  </ScrollView>
+                </>
+              )}
+
+              {/* Add skill — Step 3: Confirm */}
+              {rosterView === 'addConfirm' && addSelectedTask && (
+                <View style={s.addConfirmContent}>
+                  <Text style={s.addFlowStep}>{strings['myCard.add.steps.confirm']}</Text>
+                  <Text style={s.addConfirmTitle}>
+                    {strings['myCard.add.confirmTitle'].replace('{skill}', addSelectedTask.name)}
+                  </Text>
+                  <Text style={s.addConfirmBody}>{strings['myCard.add.confirmBody']}</Text>
+                  <View style={s.bioActions}>
+                    <TouchableOpacity
+                      style={s.bioCancelBtn}
+                      onPress={() => { setAddSelectedTask(null); setRosterView('addTask'); }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={s.bioCancelText}>{strings['myCard.bio.cancel']}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={s.bioSaveBtn} onPress={handleAddSkill} activeOpacity={0.8}>
+                      <Text style={s.bioSaveText}>{strings['myCard.add.confirmCta']}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* ── Remove confirm dialog ── */}
+      <Modal visible={showRemoveConfirm} transparent animationType="fade">
+        <View style={s.removeOverlay}>
+          <View style={s.removeDialog}>
+            <Text style={s.removeTitle}>
+              {strings['myCard.offers.remove.title'].replace('{skill}', removeTarget?.name ?? '')}
+            </Text>
+            <Text style={s.removeBody}>{strings['myCard.offers.remove.body']}</Text>
+            <View style={s.removeActions}>
+              <TouchableOpacity
+                style={s.removeKeepBtn}
+                onPress={() => { setShowRemoveConfirm(false); setRemoveTarget(null); }}
+                activeOpacity={0.7}
+              >
+                <Text style={s.removeKeepText}>{strings['myCard.offers.remove.keep']}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={s.removeConfirmBtn} onPress={handleRemoveSkill} activeOpacity={0.8}>
+                <Text style={s.removeConfirmText}>{strings['myCard.offers.remove.confirm']}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── Roster toast ── */}
+      {rosterToastConfig && (
+        <View style={s.toast}>
+          <View style={s.toastContent}>
+            <Text style={s.toastTitle}>{rosterToastConfig.title}</Text>
+            <Text style={s.toastSub}>{rosterToastConfig.sub}</Text>
+          </View>
+          <TouchableOpacity onPress={handleRosterUndo} activeOpacity={0.7}>
             <Text style={s.toastUndo}>{strings['myCard.toast.undo']}</Text>
           </TouchableOpacity>
         </View>
@@ -1964,5 +2326,187 @@ const s = StyleSheet.create({
     fontSize: 13,
     letterSpacing: 1,
     color: INK,
+  },
+
+  // ── MANAGE row ──
+  manageRow: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 10,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  manageValue: {
+    fontFamily: Fonts.mono,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  managePill: {
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: 999,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+  },
+  managePillText: {
+    fontFamily: Fonts.heading,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: Colors.gold,
+  },
+
+  // ── Roster sheet chips ──
+  rosterGroupHeader: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    marginBottom: Spacing.sm,
+  },
+  rosterEditToggle: {
+    fontFamily: Fonts.heading,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: Colors.gold,
+  },
+  rosterHint: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: Colors.textTertiary,
+    marginBottom: Spacing.sm,
+  },
+  rosterChipFeatured: {
+    backgroundColor: 'rgba(201,168,76,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  rosterChipFeaturedText: {
+    fontFamily: Fonts.heading,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: Colors.gold,
+  },
+  rosterChipOutline: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: Colors.gold,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  rosterChipOutlineText: {
+    fontFamily: Fonts.heading,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    color: Colors.gold,
+  },
+  rosterRemoveX: {
+    fontFamily: Fonts.heading,
+    fontSize: 14,
+    color: Colors.red,
+  },
+
+  // ── Add skill flow ──
+  addFlowHeader: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  addFlowBack: {
+    fontFamily: Fonts.body,
+    fontSize: 14,
+    color: Colors.gold,
+  },
+  addFlowStep: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 3,
+    color: Colors.gold,
+  },
+  addConfirmContent: {
+    padding: Spacing.md,
+    gap: Spacing.md,
+  },
+  addConfirmTitle: {
+    fontFamily: Fonts.heading,
+    fontSize: 18,
+    color: Colors.textPrimary,
+  },
+  addConfirmBody: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    lineHeight: 19,
+    color: Colors.textSecondary,
+  },
+
+  // ── Remove confirm dialog ──
+  removeOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    padding: Spacing.xl,
+  },
+  removeDialog: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: Spacing.lg,
+    width: '100%',
+    gap: Spacing.md,
+  },
+  removeTitle: {
+    fontFamily: Fonts.heading,
+    fontSize: 18,
+    color: Colors.textPrimary,
+  },
+  removeBody: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    lineHeight: 19,
+    color: Colors.textSecondary,
+  },
+  removeActions: {
+    flexDirection: 'row' as const,
+    gap: 10,
+    marginTop: Spacing.sm,
+  },
+  removeKeepBtn: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center' as const,
+  },
+  removeKeepText: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    letterSpacing: 1,
+    color: Colors.gold,
+  },
+  removeConfirmBtn: {
+    flex: 1,
+    backgroundColor: Colors.red,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center' as const,
+  },
+  removeConfirmText: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    letterSpacing: 1,
+    color: Colors.textPrimary,
   },
 });
