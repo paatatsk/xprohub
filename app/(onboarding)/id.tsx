@@ -57,8 +57,9 @@ function iconForSlug(slug: string): string {
 
 export default function IdScreen() {
   const router = useRouter();
-  const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
+  const { returnTo, step: stepParam } = useLocalSearchParams<{ returnTo?: string; step?: string }>();
   const destination = returnTo ? decodeURIComponent(returnTo) : '/(tabs)/market';
+  const photoOnly = stepParam === 'photo';
   const [step, setStep] = useState<Step>(1);
 
   // Step 1 state
@@ -273,6 +274,53 @@ export default function IdScreen() {
     router.replace(destination as any);
   };
 
+  // ── Photo-only save (step=photo mode) ──────────────────────────
+  // Uploads avatar and writes ONLY profiles.avatar_url.
+  // Does NOT touch worker_skills — preserves the roster safety contract.
+
+  const handlePhotoSave = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setSubmitError('Session expired. Please sign in again.');
+      return;
+    }
+    if (!avatarUri) {
+      // No new photo picked — just go back
+      router.replace(destination as any);
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const ext = avatarUri.split('.').pop() ?? 'jpg';
+    const fileName = `${user.id}/avatar.${ext}`;
+    const response = await fetch(avatarUri);
+    const blob = await response.blob();
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(fileName, blob, { upsert: true, contentType: `image/${ext}` });
+
+    if (uploadError) {
+      setSubmitError('Photo upload failed. Please try again.');
+      setSubmitting(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName);
+
+    await supabase
+      .from('profiles')
+      .update({ avatar_url: urlData.publicUrl, updated_at: new Date().toISOString() })
+      .eq('id', user.id);
+
+    setSubmitting(false);
+    router.replace(destination as any);
+  };
+
   // ── STEP 1 — Photo ─────────────────────────────────────────────
 
   const photoPreview = avatarUri ?? existingAvatarUrl;
@@ -285,7 +333,7 @@ export default function IdScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.eyebrow}>STEP 1 OF 4</Text>
+          <Text style={styles.eyebrow}>{photoOnly ? 'YOUR CREDENTIAL' : 'STEP 1 OF 4'}</Text>
           <Text style={styles.heading}>YOUR PHOTO</Text>
           <Text style={styles.subhead}>
             Customers want to know who they're hiring.
@@ -313,12 +361,14 @@ export default function IdScreen() {
               {photoPreview ? 'Photo added ✓' : 'Tap to add a photo'}
             </Text>
             <TouchableOpacity
-              style={[styles.continueBtn, !photoPreview && styles.continueBtnDisabled]}
-              onPress={goToStep2}
-              disabled={!photoPreview}
+              style={[styles.continueBtn, !photoPreview && styles.continueBtnDisabled, submitting && styles.continueBtnDisabled]}
+              onPress={photoOnly ? handlePhotoSave : goToStep2}
+              disabled={!photoPreview || submitting}
               activeOpacity={0.85}
             >
-              <Text style={styles.continueBtnText}>Continue →</Text>
+              <Text style={styles.continueBtnText}>
+                {photoOnly ? (submitting ? 'Saving\u2026' : 'Save Photo') : 'Continue \u2192'}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

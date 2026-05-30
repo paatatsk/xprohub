@@ -25,6 +25,13 @@ export const strings = {
   'card.stamp.new.job.a11y':     'New \u2014 posted within the hour',
   'card.stamp.new.worker.a11y':  'New to XProHub',
 
+  // Photo affordance (Print Shop Zone 1 / D.5)
+  'myCard.photo.addBadge':       'ADD',
+  'myCard.photo.editBadge':      'EDIT',
+  'myCard.photo.hint':           'Tap your photo to add one \u2014 it\u2019s the first thing customers see.',
+  'myCard.photo.a11y.add':       'Add your photo',
+  'myCard.photo.a11y.edit':      'Change your photo',
+
   // Track record
   'card.track.endorsedSuffix':   'endorsed',
 

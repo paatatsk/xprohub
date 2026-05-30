@@ -1029,14 +1029,24 @@ export default function MyCardScreen() {
         <Text style={s.statusLine}>{getStatusLine()}</Text>
 
         {/* ── Live preview ── */}
-        <Text style={s.previewLabel}>LIVE PREVIEW</Text>
+        <Text style={s.previewLabel}>LIVE PREVIEW {'\u00b7'} TAP TO EDIT</Text>
         {previewWorker && (
           <View
             style={[s.previewWrap, stagedStatus === 'offline' && { opacity: 0.5 }]}
             accessibilityLabel="Live preview of your market card"
           >
-            <WorkerCardComponent worker={previewWorker} preview />
+            <WorkerCardComponent
+              worker={previewWorker}
+              preview
+              onPhotoPress={() => {
+                const dest = encodeURIComponent('/(tabs)/my-card');
+                router.push(`/(onboarding)/id?step=photo&returnTo=${dest}` as any);
+              }}
+            />
           </View>
+        )}
+        {!profile?.avatar_url && (
+          <Text style={s.photoHint}>{strings['myCard.photo.hint']}</Text>
         )}
 
         {/* ── Skills editor ── */}
@@ -1251,6 +1261,13 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   previewWrap: {
+    marginBottom: Spacing.sm,
+  },
+  photoHint: {
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
     marginBottom: Spacing.lg,
   },
 

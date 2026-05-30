@@ -233,3 +233,42 @@ made shared-treatment over-promise, which this ruling resolves.
 reads as "featured/premium" and over-promises — the customer taps in
 to 0–9 jobs and the credential under-delivers. Outline + tuck keeps the
 shared "newly arrived" meaning while removing the false desirability claim.
+
+### D.5 The Print Shop — Photo Affordance (Zone 1)
+
+**Decision:** The worker's photo on `<WorkerCard preview />` inside
+`my-card.tsx` is tappable via an `onPhotoPress` prop. A solid gold
+corner badge reads `ADD` (no avatar) or `EDIT` (avatar on file).
+Tap routes to `/(onboarding)/id?step=photo` — a photo-only mode
+that uploads the avatar and returns without touching `worker_skills`.
+
+**Source:** Print Shop spec (2026-05-30), folding the Photo Affordance
+ruling. Cross-refs:
+- `id.tsx` `avatarEditBadge` style (visual source)
+- `PRINT_SHOP_SPEC.md` Zone 1
+
+**Rule:**
+- **Badge:** solid `--gold` pill, `--ink` text, `ADD` or `EDIT` by
+  `avatar_url` state. Tucked at the top-right corner of the portrait.
+  Font: Space Grotesk 700, 7px, ls 1. Same visual vocabulary as the
+  wizard's existing `avatarEditBadge`.
+- **Tap target:** the entire portrait area (72x88), not just the badge.
+  `accessibilityLabel` is state-aware: `"Add your photo"` / `"Change
+  your photo"`.
+- **Hint line:** below the preview, italic Inter 12, shown only when
+  `avatar_url` is null: `"Tap your photo to add one — it's the first
+  thing customers see."`
+- **Public card:** `onPhotoPress` is NOT passed on the Talent feed.
+  The portrait is a static display element for customers. No badge,
+  no tappability, no hint.
+- **Data safety:** the `step=photo` wizard mode writes ONLY
+  `profiles.avatar_url`. It never reads, modifies, or rewrites
+  `worker_skills`. The roster safety contract (one INSERT / one
+  DELETE, never set-overwrite) is preserved.
+
+**Why this matters:** Workers could previously only upload a photo
+by tripping an apply gate — no discoverable, proactive edit surface
+existed. The print-shop principle says the card is the worker's to
+compose; the photo is the first thing customers see. Making it
+tappable on the self-view closes the affordance gap without forking
+the upload logic (same wizard, same bucket, same RLS).

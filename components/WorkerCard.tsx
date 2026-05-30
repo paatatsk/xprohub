@@ -30,6 +30,7 @@ interface WorkerCardProps {
   onHire?: () => void;
   onPress?: () => void;
   onOverflow?: () => void;
+  onPhotoPress?: () => void;
 }
 
 // ── Helpers ────────────────────────────────────────────────────
@@ -175,7 +176,7 @@ function TrackRecord({ worker }: { worker: Worker }) {
 
 // ── Main Component ─────────────────────────────────────────────
 
-export default function WorkerCard({ worker, preview, onHire, onPress, onOverflow }: WorkerCardProps) {
+export default function WorkerCard({ worker, preview, onHire, onPress, onOverflow, onPhotoPress }: WorkerCardProps) {
   const workerId = formatWorkerId(worker.id);
   const initials = getInitials(worker.full_name);
 
@@ -230,19 +231,44 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
       <View style={s.bodyRow}>
 
         {/* Portrait */}
-        <View style={s.portrait}>
-          {worker.avatar_url ? (
-            <Image source={{ uri: worker.avatar_url }} style={s.portraitImage} />
-          ) : (
-            <View style={s.portraitFallback}>
-              <Text style={s.portraitInitials}>{initials}</Text>
+        {onPhotoPress ? (
+          <TouchableOpacity
+            style={s.portrait}
+            onPress={onPhotoPress}
+            activeOpacity={0.8}
+            accessibilityLabel={worker.avatar_url ? 'Change your photo' : 'Add your photo'}
+            accessibilityRole="button"
+          >
+            {worker.avatar_url ? (
+              <Image source={{ uri: worker.avatar_url }} style={s.portraitImage} />
+            ) : (
+              <View style={s.portraitFallback}>
+                <Text style={s.portraitInitials}>{initials}</Text>
+              </View>
+            )}
+            <View style={s.photoStamp}>
+              <Text style={s.photoStampText}>PHOTO</Text>
             </View>
-          )}
-          {/* PHOTO stamp */}
-          <View style={s.photoStamp}>
-            <Text style={s.photoStampText}>PHOTO</Text>
+            <View style={s.photoBadge}>
+              <Text style={s.photoBadgeText}>
+                {worker.avatar_url ? 'EDIT' : 'ADD'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <View style={s.portrait}>
+            {worker.avatar_url ? (
+              <Image source={{ uri: worker.avatar_url }} style={s.portraitImage} />
+            ) : (
+              <View style={s.portraitFallback}>
+                <Text style={s.portraitInitials}>{initials}</Text>
+              </View>
+            )}
+            <View style={s.photoStamp}>
+              <Text style={s.photoStampText}>PHOTO</Text>
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Info column */}
         <View style={s.infoCol}>
@@ -412,6 +438,21 @@ const s = StyleSheet.create({
     fontSize: 7,
     letterSpacing: 1,
     color: 'rgba(201,168,76,0.55)',
+  },
+  photoBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: Colors.gold,
+    borderRadius: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  photoBadgeText: {
+    fontFamily: Fonts.heading,
+    fontSize: 7,
+    letterSpacing: 1,
+    color: '#1A0F00',
   },
 
   // Info column
