@@ -290,7 +290,18 @@ function RateSlider({
       const thumb = Math.abs(touchX - minX) <= Math.abs(touchX - maxX) ? 'min' : 'max';
       activeRef.current = thumb;
       setActiveThumb(thumb);
-      startValRef.current = thumb === 'min' ? valMinRef.current : valMaxRef.current;
+      // Jump to touch position immediately
+      let val = snap(RATE_MIN + (touchX / tw) * (RATE_MAX - RATE_MIN), RATE_STEP, RATE_MIN, RATE_MAX);
+      if (thumb === 'min') {
+        val = Math.min(val, valMaxRef.current - RATE_STEP);
+        val = Math.max(RATE_MIN, val);
+        if (val !== valMinRef.current) onChangeMin(val);
+      } else {
+        val = Math.max(val, valMinRef.current + RATE_STEP);
+        val = Math.min(RATE_MAX, val);
+        if (val !== valMaxRef.current) onChangeMax(val);
+      }
+      startValRef.current = val;
     },
     onPanResponderMove: (_, gesture) => {
       const tw = trackWidthRef.current;
@@ -386,8 +397,16 @@ function RadiusSlider({
   const pan = useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
-    onPanResponderGrant: () => {
-      startValRef.current = valRef.current;
+    onPanResponderGrant: (e) => {
+      const touchX = e.nativeEvent.locationX;
+      const tw = trackWidthRef.current;
+      if (tw) {
+        const val = snap(RADIUS_MIN + (touchX / tw) * (RADIUS_MAX - RADIUS_MIN), RADIUS_STEP, RADIUS_MIN, RADIUS_MAX);
+        if (val !== valRef.current) onChange(val);
+        startValRef.current = val;
+      } else {
+        startValRef.current = valRef.current;
+      }
       setDragging(true);
     },
     onPanResponderMove: (_, gesture) => {

@@ -49,7 +49,7 @@ const s = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 1.5,
     borderColor: Colors.gold,
-    top: 14,
+    top: 36,
     borderRadius: 3,
     borderBottomLeftRadius: 3,
     borderBottomRightRadius: 3,
