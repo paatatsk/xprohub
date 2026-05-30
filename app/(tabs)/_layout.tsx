@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
 import { Colors } from '../../constants/theme';
 
@@ -17,8 +17,14 @@ const headerDefaults = {
 function BackButton({ returnTo = '/(tabs)' }: { returnTo?: string }) {
   const router = useRouter();
   return (
-    <TouchableOpacity onPress={() => router.push(returnTo as any)} style={{ paddingLeft: 16 }} accessibilityLabel="Go back" accessibilityRole="button">
-      <Text style={{ color: Colors.gold, fontSize: 22 }}>‹</Text>
+    <TouchableOpacity
+      onPress={() => router.push(returnTo as any)}
+      style={{ paddingLeft: 16, paddingRight: 8, paddingVertical: 8 }}
+      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      accessibilityLabel="Go back"
+      accessibilityRole="button"
+    >
+      <View style={{ width: 14, height: 14, borderLeftWidth: 2, borderBottomWidth: 2, borderColor: Colors.gold, transform: [{ rotate: '45deg' }] }} />
     </TouchableOpacity>
   );
 }

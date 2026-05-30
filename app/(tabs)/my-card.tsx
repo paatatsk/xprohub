@@ -266,6 +266,8 @@ function RateSlider({
   const [trackWidth, setTrackWidth] = useState(0);
   const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null);
   const startValRef = useRef(0);
+  const trackRef = useRef<View>(null);
+  const trackLeftRef = useRef(0);
 
   const valToX = (v: number) => ((v - RATE_MIN) / (RATE_MAX - RATE_MIN)) * trackWidth;
   const xToVal = (x: number) => snap(RATE_MIN + (x / trackWidth) * (RATE_MAX - RATE_MIN), RATE_STEP, RATE_MIN, RATE_MAX);
@@ -282,7 +284,7 @@ function RateSlider({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: (e) => {
-      const touchX = e.nativeEvent.locationX;
+      const touchX = e.nativeEvent.pageX - trackLeftRef.current;
       const tw = trackWidthRef.current;
       if (!tw) return;
       const minX = ((valMinRef.current - RATE_MIN) / (RATE_MAX - RATE_MIN)) * tw;
@@ -335,8 +337,12 @@ function RateSlider({
         <Text style={s.sliderUnit}> / HR</Text>
       </Text>
       <View
+        ref={trackRef}
         style={s.sliderTrack}
-        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+        onLayout={(e) => {
+          setTrackWidth(e.nativeEvent.layout.width);
+          trackRef.current?.measureInWindow((x) => { trackLeftRef.current = x; });
+        }}
         {...pan.panHandlers}
       >
         {/* Track background */}
@@ -393,12 +399,14 @@ function RadiusSlider({
   trackWidthRef.current = trackWidth;
   const startValRef = useRef(0);
   const [dragging, setDragging] = useState(false);
+  const trackRef = useRef<View>(null);
+  const trackLeftRef = useRef(0);
 
   const pan = useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderGrant: (e) => {
-      const touchX = e.nativeEvent.locationX;
+      const touchX = e.nativeEvent.pageX - trackLeftRef.current;
       const tw = trackWidthRef.current;
       if (tw) {
         const val = snap(RADIUS_MIN + (touchX / tw) * (RADIUS_MAX - RADIUS_MIN), RADIUS_STEP, RADIUS_MIN, RADIUS_MAX);
@@ -429,8 +437,12 @@ function RadiusSlider({
         <Text style={s.sliderUnit}> MI</Text>
       </Text>
       <View
+        ref={trackRef}
         style={s.sliderTrack}
-        onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
+        onLayout={(e) => {
+          setTrackWidth(e.nativeEvent.layout.width);
+          trackRef.current?.measureInWindow((x) => { trackLeftRef.current = x; });
+        }}
         {...pan.panHandlers}
       >
         {/* Track background */}
