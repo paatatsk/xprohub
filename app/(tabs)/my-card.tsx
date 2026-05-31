@@ -798,7 +798,7 @@ export default function MyCardScreen() {
     setLoading(false);
   }, []);
 
-  useFocusEffect(useCallback(() => { console.log('[DEBUG useFocusEffect] fired — calling fetchData'); fetchData(); }, [fetchData]));
+  useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
 
   // ── Derived state ────────────────────────────────────────────
 
@@ -1047,13 +1047,11 @@ export default function MyCardScreen() {
   }, []);
 
   const closeRosterSheet = useCallback(() => {
-    console.log('[DEBUG closeRosterSheet] ENTRY');
     setShowRosterSheet(false);
     setRosterEditMode(false);
     setRosterView('roster');
     setAddSelectedCatId(null);
     setAddSelectedTask(null);
-    console.log('[DEBUG closeRosterSheet] EXIT — all state set, no fetchData');
   }, []);
 
   const handleAddSkill = useCallback(async () => {
@@ -1106,37 +1104,23 @@ export default function MyCardScreen() {
 
   const handleRemoveSkill = useCallback(async () => {
     const target = removeTargetRef.current;
-    console.log('[DEBUG handleRemoveSkill] ENTRY, ref:', JSON.stringify(target), 'profile:', !!profile);
-    if (!target || !profile) {
-      console.log('[DEBUG handleRemoveSkill] BAILED: target or profile null');
-      return;
-    }
+    if (!target || !profile) return;
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      console.log('[DEBUG handleRemoveSkill] BAILED: no user');
-      return;
-    }
-
-    console.log('[DEBUG handleRemoveSkill] about to delete:', user.id, target.taskId);
+    if (!user) return;
 
     // ONE DELETE — data safety contract
-    const { error, data, count } = await supabase
+    const { error } = await supabase
       .from('worker_skills')
       .delete()
       .eq('user_id', user.id)
       .eq('task_id', target.taskId);
 
-    console.log('[DEBUG handleRemoveSkill] delete result:', JSON.stringify({ error, data, count }));
-
     if (error) {
-      console.error('[roster] delete failed:', error.message);
       setShowRemoveConfirm(false);
       setRemoveTarget(null);
       removeTargetRef.current = null;
-      return; // Chip stays visible — honest UI
+      return;
     }
-
-    console.log('[DEBUG handleRemoveSkill] applying optimistic update');
     // Optimistic local update (only on confirmed DB success)
     setRoster(prev => prev.filter(r => r.taskId !== target.taskId));
     setShowRemoveConfirm(false);
@@ -1191,11 +1175,6 @@ export default function MyCardScreen() {
       </SafeAreaView>
     );
   }
-
-  // DEBUG: detect render loops
-  const renderCountRef = useRef(0);
-  renderCountRef.current += 1;
-  console.log('[DEBUG render]', renderCountRef.current, 'showRosterSheet:', showRosterSheet, 'showRemoveConfirm:', showRemoveConfirm);
 
   const publishConfig = getPublishConfig();
 
@@ -1521,10 +1500,8 @@ export default function MyCardScreen() {
                             {rosterEditMode && (
                               <TouchableOpacity
                                 onPress={() => {
-                                  console.log('[DEBUG ×] tap fired, sk:', JSON.stringify(sk));
                                   setRemoveTarget(sk);
                                   removeTargetRef.current = sk;
-                                  console.log('[DEBUG ×] ref set:', JSON.stringify(removeTargetRef.current));
                                   setShowRemoveConfirm(true);
                                 }}
                                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -1552,7 +1529,7 @@ export default function MyCardScreen() {
                     <View style={{ height: 40 }} />
                   </ScrollView>
 
-                  <TouchableOpacity style={s.pickerDone} onPress={() => { console.log('[DEBUG DONE btn] tapped'); closeRosterSheet(); }} activeOpacity={0.8}>
+                  <TouchableOpacity style={s.pickerDone} onPress={closeRosterSheet} activeOpacity={0.8}>
                     <Text style={s.pickerDoneText}>{strings['myCard.offers.done']}</Text>
                   </TouchableOpacity>
                 </>
@@ -1665,7 +1642,7 @@ export default function MyCardScreen() {
               >
                 <Text style={s.removeKeepText}>{strings['myCard.offers.remove.keep']}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.removeConfirmBtn} onPress={() => { console.log('[DEBUG REMOVE btn] tapped'); handleRemoveSkill(); }} activeOpacity={0.8}>
+              <TouchableOpacity style={s.removeConfirmBtn} onPress={handleRemoveSkill} activeOpacity={0.8}>
                 <Text style={s.removeConfirmText}>{strings['myCard.offers.remove.confirm']}</Text>
               </TouchableOpacity>
             </View>
