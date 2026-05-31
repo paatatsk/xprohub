@@ -14,6 +14,8 @@ This is the single onboarding artifact for the next chat session. Read it first.
 
 **Then:** `docs/TAXONOMY_SPEC.md` — subordinate to the Doctrine. Protects the category system as core infrastructure (three-level Category→Task→Skill, the matching substrate). Tier is classification-not-gate; verification columns are reserved/unenforced.
 
+**Then:** `docs/FINANCIAL_DATA_PRINCIPLE.md` — subordinate to the Doctrine. Governs every money surface (Receipt, Desk, future financial screens). Stripe is the system of record; XProHub holds only the transaction record (amounts, fees, payouts, dates, in/out), never bank/card/routing/balance. Link to Stripe when sensitive detail is needed.
+
 The doc has four sections:
 1. **State of build threads** — what's in flight, what's queued, with commit hashes
 2. **Locked architectural commitments** — decisions that must NOT drift across sessions

@@ -15,6 +15,7 @@
 ---
 **Binding product tenet:** `docs/XPROHUB_DOCTRINE.md` — the north star. Four entries, one spine, the Placement Law. Every layout, feature, and polish decision is tested against it.
 **Core infrastructure:** `docs/TAXONOMY_SPEC.md` — the category taxonomy (Category→Task→Skill) is the matching substrate; tier is classification-not-gate; `requires_background_check`/`requires_verification` are reserved safety columns (unenforced).
+**Financial data:** `docs/FINANCIAL_DATA_PRINCIPLE.md` — XProHub stores/shows only transaction record (amounts, fees, payouts, dates, in/out), never bank/card/routing/balance; link to Stripe when sensitive detail is needed.
 
 **See also (for full project orientation):**
 - `SESSION_HANDOUT.md` — full chat-AI orientation, working preferences, philosophy
