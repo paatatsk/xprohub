@@ -12,6 +12,8 @@ This is the single onboarding artifact for the next chat session. Read it first.
 
 **Read first:** `docs/XPROHUB_DOCTRINE.md` — the binding north star. Four entries, one spine, the Placement Law. Every NAV_SPEC section, design ruling, and layout decision answers to it.
 
+**Then:** `docs/TAXONOMY_SPEC.md` — subordinate to the Doctrine. Protects the category system as core infrastructure (three-level Category→Task→Skill, the matching substrate). Tier is classification-not-gate; verification columns are reserved/unenforced.
+
 The doc has four sections:
 1. **State of build threads** — what's in flight, what's queued, with commit hashes
 2. **Locked architectural commitments** — decisions that must NOT drift across sessions

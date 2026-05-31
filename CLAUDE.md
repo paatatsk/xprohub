@@ -14,6 +14,7 @@
 
 ---
 **Binding product tenet:** `docs/XPROHUB_DOCTRINE.md` — the north star. Four entries, one spine, the Placement Law. Every layout, feature, and polish decision is tested against it.
+**Core infrastructure:** `docs/TAXONOMY_SPEC.md` — the category taxonomy (Category→Task→Skill) is the matching substrate; tier is classification-not-gate; `requires_background_check`/`requires_verification` are reserved safety columns (unenforced).
 
 **See also (for full project orientation):**
 - `SESSION_HANDOUT.md` — full chat-AI orientation, working preferences, philosophy
