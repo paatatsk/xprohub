@@ -27,6 +27,7 @@ const headerDefaults = {
 // ── Shared: hide from tab bar + hide the bar itself on this screen ─────
 const hiddenTab = {
   href: null as any,
+  tabBarButton: () => null as any,
   tabBarStyle: { display: 'none' as const },
 };
 
