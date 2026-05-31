@@ -211,6 +211,18 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ---
 
+## Known on-hardware issue at session close
+
+**Slice A — tab bar showing 12 tabs instead of 4.** Hardware reveal at session close: the `href: null` + `tabBarStyle: { display: 'none' }` pattern in Slice A's commit did NOT hide non-primary screens from the bar. Screenshot showed the bar crammed with truncated labels (HO, MA, DE, AC, PA, GE, CH, MA, PA, PR, EA, NO).
+
+**Two likely causes** (next Maestro should route an investigation pass to confirm before the fix):
+1. The Expo Router version in this codebase needs a different pattern — possibly `tabBarItemStyle: { display: 'none' }` (different from `tabBarStyle`) or `tabBarButton: () => null` on each hidden screen.
+2. Auto-routed stub files in `app/(tabs)/` (earnings.tsx, profile.tsx, notifications.tsx, chat.tsx, payment.tsx, match.tsx — flagged in Code's nav investigation as unregistered stubs from G-7 cleanup) may be getting auto-registered by Expo Router's file-based routing and leaking into the bar. Either delete them or explicitly register with hidden-tab pattern.
+
+**Fix applied in `f081b7b`:** deleted the 6 stub files + added `tabBarButton: () => null` to the hiddenTab constant. **Awaiting hardware verification** — verify on next boot that only 4 tabs show.
+
+---
+
 ## End of handoff
 
 When the next chat opens, Maestro reads this top-to-bottom, asks Paata which thread to pick up, and routes. The repo is the source of truth; this doc is the index.
