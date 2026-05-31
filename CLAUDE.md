@@ -13,6 +13,8 @@
 - Start: `npx expo start --clear` | Test: iPhone via EAS dev client
 
 ---
+**Binding product tenet:** `docs/XPROHUB_DOCTRINE.md` — the north star. Four entries, one spine, the Placement Law. Every layout, feature, and polish decision is tested against it.
+
 **See also (for full project orientation):**
 - `SESSION_HANDOUT.md` — full chat-AI orientation, working preferences, philosophy
 - `SESSION_PLAN_v2.md` — milestone roadmap and active build order

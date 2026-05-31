@@ -10,6 +10,8 @@
 
 This is the single onboarding artifact for the next chat session. Read it first. The Maestro role (chat-Claude) reads this to reconstruct state; Code reads it to know what's shipped and what's pending; future Paata reads it to remember where things stand.
 
+**Read first:** `docs/XPROHUB_DOCTRINE.md` — the binding north star. Four entries, one spine, the Placement Law. Every NAV_SPEC section, design ruling, and layout decision answers to it.
+
 The doc has four sections:
 1. **State of build threads** — what's in flight, what's queued, with commit hashes
 2. **Locked architectural commitments** — decisions that must NOT drift across sessions
