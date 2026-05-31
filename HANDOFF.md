@@ -213,13 +213,24 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ## Known on-hardware issue at session close
 
-**Slice A — tab bar showing 12 tabs instead of 4.** Hardware reveal at session close: the `href: null` + `tabBarStyle: { display: 'none' }` pattern in Slice A's commit did NOT hide non-primary screens from the bar. Screenshot showed the bar crammed with truncated labels (HO, MA, DE, AC, PA, GE, CH, MA, PA, PR, EA, NO).
+**Slice A — two non-primary screens leak into tab bar.** After multiple fix attempts:
 
-**Two likely causes** (next Maestro should route an investigation pass to confirm before the fix):
-1. The Expo Router version in this codebase needs a different pattern — possibly `tabBarItemStyle: { display: 'none' }` (different from `tabBarStyle`) or `tabBarButton: () => null` on each hidden screen.
-2. Auto-routed stub files in `app/(tabs)/` (earnings.tsx, profile.tsx, notifications.tsx, chat.tsx, payment.tsx, match.tsx — flagged in Code's nav investigation as unregistered stubs from G-7 cleanup) may be getting auto-registered by Expo Router's file-based routing and leaking into the bar. Either delete them or explicitly register with hidden-tab pattern.
+- `804bcf7` — Slice A original shipped with 12 leaked tabs
+- `f081b7b` — Deleted 6 auto-routed stub files + added `tabBarButton: () => null`
+- `eb99e06` — Removed `tabBarButton` (incompatible with `href: null`, was crashing ErrorBoundary)
 
-**Fix applied in `f081b7b`:** deleted the 6 stub files + added `tabBarButton: () => null` to the hiddenTab constant. **Awaiting hardware verification** — verify on next boot that only 4 tabs show.
+**Current hardware state (verified 2026-06-01):** App launches cleanly. Four primary tabs (HOME · MARKET · DESK · ACCOUNT) render correctly. TWO tabs still leak:
+- `PAYMEN...` (payment-setup)
+- `GET PAID` (stripe-connect)
+
+Both use the dynamic options pattern `options={({ route }) => ({ ...hiddenTab, ... })}` rather than static object spread. Hypothesis: `href: null` is not honored when `options` is a function in this Expo Router version.
+
+**Fix for next session:**
+1. Try converting payment-setup and stripe-connect to static options if dynamic isn't strictly needed.
+2. If dynamic is required (e.g., title depends on route params), find the Expo Router pattern for hiding from bar within a dynamic options function.
+3. Verify on hardware: exactly 4 tabs, no leaks.
+
+Fix this BEFORE routing Slice C.
 
 ---
 
