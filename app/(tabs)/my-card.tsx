@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Animated, Modal, Pressable, TextInput,
+  ActivityIndicator, Animated, Modal, Pressable, TextInput, Alert,
   PanResponder, AccessibilityInfo, ActionSheetIOS,
   type LayoutChangeEvent,
 } from 'react-native';
@@ -746,8 +746,6 @@ export default function MyCardScreen() {
   const [rosterView, setRosterView] = useState<'roster' | 'addCategory' | 'addTask' | 'addConfirm'>('roster');
   const [addSelectedCatId, setAddSelectedCatId] = useState<number | null>(null);
   const [addSelectedTask, setAddSelectedTask] = useState<TaskItem | null>(null);
-  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
-  const [removeTarget, setRemoveTarget] = useState<RosterSkill | null>(null);
   const [rosterToastConfig, setRosterToastConfig] = useState<{ title: string; sub: string } | null>(null);
   const rosterUndoRef = useRef<{ action: 'add' | 'remove'; skill: RosterSkill } | null>(null);
   const rosterUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1098,47 +1096,50 @@ export default function MyCardScreen() {
     }, UNDO_WINDOW_MS);
   }, [addSelectedTask, profile]);
 
-  // Belt-and-suspenders: capture removeTarget in a ref when the
-  // destructive dialog opens, so stale closure can't lose it.
-  const removeTargetRef = useRef<RosterSkill | null>(null);
+  // Remove skill — uses Alert.alert (native iOS dialog) instead of
+  // a custom Modal to avoid Modal-on-Modal stacking issues.
+  const confirmAndRemoveSkill = useCallback((target: RosterSkill) => {
+    Alert.alert(
+      strings['myCard.offers.remove.title'].replace('{skill}', target.name),
+      strings['myCard.offers.remove.body'],
+      [
+        { text: strings['myCard.offers.remove.keep'], style: 'cancel' },
+        {
+          text: strings['myCard.offers.remove.confirm'],
+          style: 'destructive',
+          onPress: async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
 
-  const handleRemoveSkill = useCallback(async () => {
-    const target = removeTargetRef.current;
-    if (!target || !profile) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+            // ONE DELETE — data safety contract
+            const { error } = await supabase
+              .from('worker_skills')
+              .delete()
+              .eq('user_id', user.id)
+              .eq('task_id', target.taskId);
 
-    // ONE DELETE — data safety contract
-    const { error } = await supabase
-      .from('worker_skills')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('task_id', target.taskId);
+            if (error) return;
 
-    if (error) {
-      setShowRemoveConfirm(false);
-      setRemoveTarget(null);
-      removeTargetRef.current = null;
-      return;
-    }
-    // Optimistic local update (only on confirmed DB success)
-    setRoster(prev => prev.filter(r => r.taskId !== target.taskId));
-    setShowRemoveConfirm(false);
-    setRemoveTarget(null);
-    removeTargetRef.current = null;
+            // Local update on confirmed DB success
+            setRoster(prev => prev.filter(r => r.taskId !== target.taskId));
 
-    // Toast with undo
-    rosterUndoRef.current = { action: 'remove', skill: target };
-    setRosterToastConfig({
-      title: strings['myCard.offers.remove.toast'],
-      sub: target.name,
-    });
-    if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
-    rosterUndoTimerRef.current = setTimeout(() => {
-      setRosterToastConfig(null);
-      rosterUndoRef.current = null;
-    }, UNDO_WINDOW_MS);
-  }, [profile]);
+            // Toast with undo
+            rosterUndoRef.current = { action: 'remove', skill: target };
+            setRosterToastConfig({
+              title: strings['myCard.offers.remove.toast'],
+              sub: target.name,
+            });
+            if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
+            rosterUndoTimerRef.current = setTimeout(() => {
+              setRosterToastConfig(null);
+              rosterUndoRef.current = null;
+            }, UNDO_WINDOW_MS);
+          },
+        },
+      ],
+      { userInterfaceStyle: 'dark' },
+    );
+  }, []);
 
   const handleRosterUndo = useCallback(async () => {
     const snap = rosterUndoRef.current;
@@ -1448,7 +1449,7 @@ export default function MyCardScreen() {
       )}
 
       {/* ── Roster & Superpowers sheet ── */}
-      <Modal visible={showRosterSheet} transparent animationType="none">
+      <Modal visible={showRosterSheet} transparent animationType="slide">
         <Pressable style={s.pickerScrim} onPress={closeRosterSheet}>
           <View style={[s.pickerSheet, { maxHeight: '85%' }]}>
             <Pressable>
@@ -1499,11 +1500,7 @@ export default function MyCardScreen() {
                             <Text style={s.rosterChipOutlineText}>{sk.name}</Text>
                             {rosterEditMode && (
                               <TouchableOpacity
-                                onPress={() => {
-                                  setRemoveTarget(sk);
-                                  removeTargetRef.current = sk;
-                                  setShowRemoveConfirm(true);
-                                }}
+                                onPress={() => confirmAndRemoveSkill(sk)}
                                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                                 accessibilityLabel={`Remove ${sk.name}`}
                               >
@@ -1626,29 +1623,7 @@ export default function MyCardScreen() {
         </Pressable>
       </Modal>
 
-      {/* ── Remove confirm dialog ── */}
-      <Modal visible={showRemoveConfirm} transparent animationType="fade">
-        <View style={s.removeOverlay}>
-          <View style={s.removeDialog}>
-            <Text style={s.removeTitle}>
-              {strings['myCard.offers.remove.title'].replace('{skill}', removeTarget?.name ?? '')}
-            </Text>
-            <Text style={s.removeBody}>{strings['myCard.offers.remove.body']}</Text>
-            <View style={s.removeActions}>
-              <TouchableOpacity
-                style={s.removeKeepBtn}
-                onPress={() => { setShowRemoveConfirm(false); setRemoveTarget(null); }}
-                activeOpacity={0.7}
-              >
-                <Text style={s.removeKeepText}>{strings['myCard.offers.remove.keep']}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={s.removeConfirmBtn} onPress={handleRemoveSkill} activeOpacity={0.8}>
-                <Text style={s.removeConfirmText}>{strings['myCard.offers.remove.confirm']}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Remove confirm uses Alert.alert — see confirmAndRemoveSkill */}
 
       {/* ── Roster toast ── */}
       {rosterToastConfig && (
@@ -2463,64 +2438,5 @@ const s = StyleSheet.create({
     color: Colors.textSecondary,
   },
 
-  // ── Remove confirm dialog ──
-  removeOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-    padding: Spacing.xl,
-  },
-  removeDialog: {
-    backgroundColor: Colors.card,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    padding: Spacing.lg,
-    width: '100%',
-    gap: Spacing.md,
-  },
-  removeTitle: {
-    fontFamily: Fonts.heading,
-    fontSize: 18,
-    color: Colors.textPrimary,
-  },
-  removeBody: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    lineHeight: 19,
-    color: Colors.textSecondary,
-  },
-  removeActions: {
-    flexDirection: 'row' as const,
-    gap: 10,
-    marginTop: Spacing.sm,
-  },
-  removeKeepBtn: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: Colors.gold,
-    borderRadius: 999,
-    paddingVertical: 12,
-    alignItems: 'center' as const,
-  },
-  removeKeepText: {
-    fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
-    color: Colors.gold,
-  },
-  removeConfirmBtn: {
-    flex: 1,
-    backgroundColor: Colors.red,
-    borderRadius: 999,
-    paddingVertical: 12,
-    alignItems: 'center' as const,
-  },
-  removeConfirmText: {
-    fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
-    color: Colors.textPrimary,
-  },
+  // Remove confirm uses Alert.alert — no custom dialog styles needed
 });
