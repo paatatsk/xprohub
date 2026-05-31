@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-01 (session close)
-**Most recent commit:** `804bcf7` — feat: Nav Slice A — four-tab navigator infrastructure
-**Status:** Mid-build on the nav restructure arc. Slice A complete. Slice C (global compose FAB) is next on Maestro routing.
+**Last updated:** 2026-06-01 (session end, second session this day)
+**Most recent commit:** `90da734` — feat: Slice B — Home as launchpad (one card, four flow-rows)
+**Status:** Nav restructure arc: Slices A + B shipped. Compose thread closed (anchored row, no float). Slice D (Desk first screen) is next.
 
 ---
 
@@ -28,26 +28,30 @@ The doc has four sections:
 
 Four-tab IA shipping in four slices: A → C → B → D. Spec at `docs/nav/NAV_SPEC.md` and `docs/nav/copy.md`. Visual reference is Design's `nav_visual_spec.html` (Design-side, not in repo).
 
-- **Slice A — Tab bar infrastructure** · `804bcf7` · **SHIPPED**
-  - Tab bar visible for the first time in project history (was globally hidden since inception). Four primary tabs (HOME · MARKET · DESK · ACCOUNT) with placeholder Unicode glyphs. 11 non-primary screens stay routable via `router.push()` but hidden from bar via `href: null + tabBarStyle: { display: 'none' }`.
-  - Implementation note (not in original spec): tab bar auto-hides when pushing to non-primary screens (a pragmatic UX call by Code). The bar reappears on back-navigation.
-  - Hardware verification pending or in-progress at session close.
+- **Slice A — Tab bar infrastructure** · `804bcf7` + fix `394c512` · **SHIPPED + VERIFIED**
+  - Tab bar visible for the first time in project history. Four primary tabs (HOME · MARKET · DESK · ACCOUNT) with placeholder Unicode glyphs. 11 non-primary screens hidden from bar via `href: null` (static options only — dynamic options don't honor href:null in Expo Router v6). 6 orphaned stub files deleted (`f081b7b`). payment-setup + stripe-connect converted to static options (`394c512`). 4 tabs verified clean on hardware.
 
-- **Slice C — Global compose `+` FAB** · **NEXT TO ROUTE**
-  - Gold pill, 52pt, bottom-right, 18pt from edge, clear of 84pt bar. Soft outer glow, no shadow.
-  - On Home + Market only. Identical position both screens for muscle memory.
-  - Tap raises `post.tsx` (existing). On publish, job lands in Desk's active list (Slice D consumes this).
-  - Spec source: `docs/nav/NAV_SPEC.md` §2.
+- **Slice C — Compose thread** · **CLOSED**
+  - The floating compose pill is dead. "Post a job" is now an anchored launchpad row on Home (Row 1 of the YOUR DESK card). Resolved across two design rulings ("One coat, three bodies" → superseded by "Home Doctrine Ruling") + founder decision, all grounded in XPROHUB_DOCTRINE.
+  - Market still has the floating ComposeFAB — see deferred item #2 below.
 
-- **Slice B — YOUR PASS rename + Home redesign** · QUEUED
-  - YOUR DESK card → YOUR PASS, routes to my-card (unchanged route, new label + visual).
-  - **Open question for Maestro before routing:** Design's Deliverable 3 mockup shows a substantial Home re-architecture beyond just the rename (greeting "Saturday morning, Daniel" + weather strip + new YOUR DESK · AT A GLANCE summary card). Code needs explicit clarification: is the full Home redesign in Slice B scope, or just the card rename? Resolve before routing.
+- **Slice B — Home as launchpad** · `90da734` · **SHIPPED**
+  - Home rebuilt per Home Doctrine Ruling: one YOUR DESK card with four flow-rows (Post a job / Edit my card with LIVE-DRAFT signal / Posts awaiting review with live bid count / Applications waiting with live open count). Gold marks initiate; role-tint marks awaiting-decision.
+  - Removed: weather/greeting header, Last receipt row (now Desk history), floating ComposeFAB (Post a job row replaces it).
+  - Category grid retained as the post on-ramp (taxonomy/matching substrate per TAXONOMY_SPEC).
+  - BRAND_AUDIT note appended (Home resolved: launchpad over dashboard).
 
-- **Slice D — Desk tab first screen** · QUEUED (heaviest)
+- **Slice D — Desk tab first screen** · QUEUED (heaviest, next to route)
   - Real Desk surface replaces the placeholder shipped in Slice A.
   - Four sections: Active (both roles) → Earnings this week → Job history with receipt links → Payout history.
   - Four new Supabase queries (merged active jobs, this-week payout aggregate, completed jobs list, released payouts list).
   - Ledger voice: IBM Plex Mono dates/amounts, gold double-rule, big gold tabular total.
+  - Note: Desk's active-job queries overlap the Home count queries — building Desk may let both be verified together (see deferred item #1).
+
+### Shipped this session (docs)
+
+- `ea75f9b` — `docs/XPROHUB_DOCTRINE.md` added (binding product north star: four entries, one spine, Placement Law). Read-first.
+- `c191c59` — `docs/TAXONOMY_SPEC.md` added (category system as core infrastructure; tier = classification-not-gate; verification columns reserved/unenforced). Subordinate to Doctrine.
 
 ### Active arc: review.tsx cleanup → Receipt symmetry
 
@@ -215,26 +219,15 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ---
 
-## Known on-hardware issue at session close
+## Deferred / open items (next session)
 
-**Slice A — two non-primary screens leak into tab bar.** After multiple fix attempts:
+1. **NON-ZERO COUNT VERIFY** — Home Row 3/4 counts verified correct in ZERO state only (this user has no open posts, no pending applications). The non-zero case (e.g. "3 BIDS" matching 3 actual pending bids) is UNVERIFIED — needs real pending test data. Watch for the dual-filter-path seam flagged in TAXONOMY_SPEC §5 (Home counts bids directly; lists may resolve differently).
 
-- `804bcf7` — Slice A original shipped with 12 leaked tabs
-- `f081b7b` — Deleted 6 auto-routed stub files + added `tabBarButton: () => null`
-- `eb99e06` — Removed `tabBarButton` (incompatible with `href: null`, was crashing ErrorBoundary)
+2. **MARKET COMPOSE REWORK** — Home's float is gone, but Market still has the floating ComposeFAB. Per the v2 ruling, Market should get a pinned "+ POST A JOB" pill in the JOBS/TALENT toggle row (carries category_id, preserves explorer gate), and the floating ComposeFAB component should then be deleted entirely once no screen references it.
 
-**Current hardware state (verified 2026-06-01):** App launches cleanly. Four primary tabs (HOME · MARKET · DESK · ACCOUNT) render correctly. TWO tabs still leak:
-- `PAYMEN...` (payment-setup)
-- `GET PAID` (stripe-connect)
+3. **NAV_SPEC §2 / VISUAL SPEC STATUS** — confirm Design's amendments actually landed in NAV_SPEC.md (§2 anchored compose, §4 Pass demotion, §5 Boundary 2) and that nav_visual_spec.html's Home/Market mocks were redrawn off the float. Design claimed these in hand-backs; verify the files.
 
-Both use the dynamic options pattern `options={({ route }) => ({ ...hiddenTab, ... })}` rather than static object spread. Hypothesis: `href: null` is not honored when `options` is a function in this Expo Router version.
-
-**Fix for next session:**
-1. Try converting payment-setup and stripe-connect to static options if dynamic isn't strictly needed.
-2. If dynamic is required (e.g., title depends on route params), find the Expo Router pattern for hiding from bar within a dynamic options function.
-3. Verify on hardware: exactly 4 tabs, no leaks.
-
-Fix this BEFORE routing Slice C.
+4. **CHILD/ELDER CARE VERIFICATION GAP** — `requires_background_check = true` on these categories, enforced by NO code (TAXONOMY_SPEC §4). Roadmap item, not a fix — put on the actual roadmap with a date when verification work is scoped.
 
 ---
 
