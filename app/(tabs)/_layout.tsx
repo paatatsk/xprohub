@@ -116,30 +116,8 @@ export default function TabLayout() {
       <Tabs.Screen name="my-jobs"         options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="my-applications" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="job-bids"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen
-        name="payment-setup"
-        options={({ route }) => ({
-          ...hiddenTab,
-          ...headerDefaults,
-          headerShown: true,
-          title: 'PAYMENT SETUP',
-          headerLeft: () => (
-            <BackButton returnTo={(route.params as any)?.returnTo ?? '/(tabs)'} />
-          ),
-        })}
-      />
-      <Tabs.Screen
-        name="stripe-connect"
-        options={({ route }) => ({
-          ...hiddenTab,
-          ...headerDefaults,
-          headerShown: true,
-          title: 'GET PAID',
-          headerLeft: () => (
-            <BackButton returnTo={(route.params as any)?.returnTo ?? '/(tabs)'} />
-          ),
-        })}
-      />
+      <Tabs.Screen name="payment-setup" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'PAYMENT SETUP', headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="stripe-connect" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'GET PAID',       headerLeft: () => <BackButton /> }} />
     </Tabs>
   );
 }
