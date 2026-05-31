@@ -1,17 +1,33 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
-import { Colors } from '../../constants/theme';
+import { Colors, Fonts } from '../../constants/theme';
 
-// Tab bar hidden — navigation happens via home screen hub, not a visible tab bar.
-// Tabs are registered here so Expo Router knows they exist.
-// Home (index) has no header. All other screens show a Dark Gold header with back button.
+// Four-tab navigator: HOME · MARKET · DESK · ACCOUNT
+// Per NAVIGATION_IA_PROPOSAL_2026-05-28.md (LOCKED) and NAV_SPEC.md §1.
+// Non-primary screens are routable via router.push() but hidden from the
+// tab bar (href: null + tabBarStyle hidden).
 
+// ── Tab icon map (swap-ready — Paata supplies finals later) ────────────
+const TAB_ICONS: Record<string, string> = {
+  index:   '\u2302',   // ⌂ Home
+  market:  '\u25C9',   // ◉ Market
+  desk:    '\u25A4',   // ▤ Desk
+  account: '\u25CB',   // ○ Account
+};
+
+// ── Shared header defaults for non-tab screens ─────────────────────────
 const headerDefaults = {
   headerStyle:         { backgroundColor: Colors.background },
   headerTintColor:     Colors.gold,
   headerTitleStyle:    { color: Colors.textPrimary, fontWeight: 'bold' as const },
   headerShadowVisible: false,
-  headerBackVisible:   false, // we supply our own back button
+  headerBackVisible:   false,
+};
+
+// ── Shared: hide from tab bar + hide the bar itself on this screen ─────
+const hiddenTab = {
+  href: null as any,
+  tabBarStyle: { display: 'none' as const },
 };
 
 function BackButton({ returnTo = '/(tabs)' }: { returnTo?: string }) {
@@ -31,25 +47,79 @@ function BackButton({ returnTo = '/(tabs)' }: { returnTo?: string }) {
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarStyle: { display: 'none' }, headerShown: false }}>
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="market"        options={{ ...headerDefaults, headerShown: true, title: 'LIVE MARKET',   headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="post"          options={{ ...headerDefaults, headerShown: true, title: 'POST A JOB',    headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="review"        options={{ ...headerDefaults, headerShown: true, title: 'RATE & REVIEW',  headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="report"        options={{ ...headerDefaults, headerShown: true, title: 'REPORT',         headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="direct-hire"   options={{ ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="my-card"        options={{ ...headerDefaults, headerShown: true, title: 'MY ID CARD',     headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="account"       options={{ ...headerDefaults, headerShown: true, title: 'ACCOUNT',        headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="job-chat"      options={{ ...headerDefaults, headerShown: true, title: 'CHAT',           headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="job-detail"    options={{ ...headerDefaults, headerShown: true, title: 'JOB DETAILS',    headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="apply"         options={{ ...headerDefaults, headerShown: true, title: 'APPLY',          headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="apply-success" options={{ ...headerDefaults, headerShown: true, title: 'SENT' }} />
-      <Tabs.Screen name="my-jobs"         options={{ ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="my-applications" options={{ ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="job-bids"        options={{ ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Colors.background,
+          borderTopWidth: 1,
+          borderTopColor: Colors.border,
+          height: 84,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: Colors.gold,
+        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarLabelStyle: {
+          fontFamily: Fonts.heading,
+          fontSize: 9,
+          letterSpacing: 1.5,
+          textTransform: 'uppercase',
+        },
+      }}
+    >
+      {/* ── PRIMARY TABS (visible in bar) ── */}
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'HOME',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.index}</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="market"
+        options={{
+          title: 'MARKET',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.market}</Text>,
+          ...headerDefaults,
+          headerShown: true,
+          headerLeft: () => <BackButton />,
+        }}
+      />
+      <Tabs.Screen
+        name="desk"
+        options={{
+          title: 'DESK',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.desk}</Text>,
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: 'ACCOUNT',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.account}</Text>,
+          ...headerDefaults,
+          headerShown: true,
+          headerLeft: () => <BackButton />,
+        }}
+      />
+
+      {/* ── NON-PRIMARY SCREENS (routable, hidden from bar) ── */}
+      <Tabs.Screen name="post"          options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'POST A JOB',    headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="review"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'RATE & REVIEW',  headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="report"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'REPORT',         headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="direct-hire"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="my-card"       options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY ID CARD',     headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="job-chat"      options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'CHAT',           headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="job-detail"    options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'JOB DETAILS',    headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="apply"         options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'APPLY',          headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="apply-success" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'SENT' }} />
+      <Tabs.Screen name="my-jobs"         options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="my-applications" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="job-bids"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'APPLICATIONS',    headerLeft: () => <BackButton /> }} />
       <Tabs.Screen
         name="payment-setup"
         options={({ route }) => ({
+          ...hiddenTab,
           ...headerDefaults,
           headerShown: true,
           title: 'PAYMENT SETUP',
@@ -61,6 +131,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="stripe-connect"
         options={({ route }) => ({
+          ...hiddenTab,
           ...headerDefaults,
           headerShown: true,
           title: 'GET PAID',
