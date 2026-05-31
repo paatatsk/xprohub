@@ -1,49 +1,494 @@
 // app/(tabs)/desk.tsx
-// Desk tab — placeholder for Slice A. Real ledger surface lands in Slice D.
-// Per NAV_SPEC.md §3: Desk = my workspace (active jobs, earnings, history, payouts).
+// Desk — the back office. Record of work, earnings, and history.
+// Per NAV_SPEC.md §3 + XPROHUB_DOCTRINE §6 + FINANCIAL_DATA_PRINCIPLE.
+// READ-ONLY — all SELECT queries, no writes.
 
-import { View, Text, StyleSheet } from 'react-native';
+import { useState, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  ActivityIndicator, RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { useFonts } from 'expo-font';
+import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
+import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
+import { Oswald_600SemiBold } from '@expo-google-fonts/oswald';
+import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
 import { Colors, Fonts, Spacing } from '../../constants/theme';
+import { supabase } from '../../lib/supabase';
+import { fmtPrice, fmtReceiptDate } from '../../lib/format';
+
+// ── Types ──────────────────────────────────────────────────────
+
+interface ActiveJob {
+  id: string;
+  title: string;
+  status: string;
+  customer_id: string;
+  worker_id: string | null;
+  agreed_price: number | null;
+  budget_min: number | null;
+  budget_max: number | null;
+  created_at: string;
+  timing: string | null;
+  bid_count?: number;
+}
+
+interface CompletedJob {
+  id: string;
+  title: string;
+  completed_at: string;
+  customer_id: string;
+  worker_id: string | null;
+  agreed_price: number | null;
+  worker_payout: number | null;
+  amount: number | null;
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+
+function editionLine(activeCount: number): string {
+  const d = new Date();
+  const weekday = d.toLocaleString('en-US', { weekday: 'short' }).toUpperCase();
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+  const year = d.getFullYear();
+  const base = `${weekday} ${day} ${month} ${year}`;
+  if (activeCount > 0) {
+    return `${base} \u00b7 ${activeCount} ACTIVE \u00b7 LEDGER OPEN`;
+  }
+  return `${base} \u00b7 LEDGER OPEN`;
+}
+
+function timeAgo(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60_000);
+  if (mins < 1) return 'JUST NOW';
+  if (mins < 60) return `${mins} MIN AGO`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} HR AGO`;
+  const days = Math.floor(hrs / 24);
+  return `${days} DAY${days > 1 ? 'S' : ''} AGO`;
+}
+
+function getMonday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return d;
+}
+
+// ── Main Screen ────────────────────────────────────────────────
 
 export default function DeskScreen() {
+  const router = useRouter();
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_700Bold_Italic,
+    SpaceGrotesk_500Medium,
+    Oswald_600SemiBold,
+    IBMPlexMono_400Regular,
+    IBMPlexMono_500Medium,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Section 1: Active jobs
+  const [activeJobs, setActiveJobs] = useState<ActiveJob[]>([]);
+
+  // Section 2: Earnings
+  const [earningsTotal, setEarningsTotal] = useState(0);
+  const [earningsCount, setEarningsCount] = useState(0);
+
+  // Section 3: Job history
+  const [history, setHistory] = useState<CompletedJob[]>([]);
+
+  // ── Fetch ────────────────────────────────────────────────────
+
+  const fetchData = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
+    setUserId(user.id);
+
+    // ── Section 1: Active jobs (both roles) ──
+    const { data: takenRows } = await supabase
+      .from('jobs')
+      .select('id, title, status, customer_id, worker_id, agreed_price, budget_min, budget_max, created_at, timing')
+      .eq('worker_id', user.id)
+      .in('status', ['matched', 'in_progress', 'pending_confirmation'])
+      .order('created_at', { ascending: false });
+
+    const { data: postedRows } = await supabase
+      .from('jobs')
+      .select('id, title, status, customer_id, worker_id, agreed_price, budget_min, budget_max, created_at, timing')
+      .eq('customer_id', user.id)
+      .eq('status', 'open')
+      .order('created_at', { ascending: false });
+
+    const taken: ActiveJob[] = (takenRows ?? []).map(j => ({ ...j, _role: 'taken' } as any));
+    const posted: ActiveJob[] = (postedRows ?? []).map(j => ({ ...j, _role: 'posted' } as any));
+
+    // Bid counts for posted jobs
+    if (posted.length > 0) {
+      const ids = posted.map(j => j.id);
+      const { data: bidRows } = await supabase
+        .from('bids')
+        .select('job_id')
+        .in('job_id', ids)
+        .eq('status', 'pending');
+      if (bidRows) {
+        const counts: Record<string, number> = {};
+        for (const b of bidRows) { counts[b.job_id] = (counts[b.job_id] ?? 0) + 1; }
+        for (const j of posted) { j.bid_count = counts[j.id] ?? 0; }
+      }
+    }
+
+    const merged = [...taken, ...posted];
+    setActiveJobs(merged);
+
+    // ── Section 2: Earnings this week ──
+    const monday = getMonday();
+    const { data: paymentRows } = await supabase
+      .from('payments')
+      .select('worker_payout')
+      .eq('worker_id', user.id)
+      .eq('escrow_status', 'released')
+      .gte('released_at', monday.toISOString());
+
+    let total = 0;
+    let count = 0;
+    if (paymentRows) {
+      for (const p of paymentRows) {
+        total += Number(p.worker_payout ?? 0);
+        count++;
+      }
+    }
+    setEarningsTotal(total);
+    setEarningsCount(count);
+
+    // ── Section 3: Job history (completed, both roles) ──
+    const { data: historyRows } = await supabase
+      .from('jobs')
+      .select(`
+        id, title, completed_at, customer_id, worker_id, agreed_price,
+        payment:payments!job_id(worker_payout, amount)
+      `)
+      .or(`customer_id.eq.${user.id},worker_id.eq.${user.id}`)
+      .eq('status', 'completed')
+      .order('completed_at', { ascending: false })
+      .limit(20);
+
+    const completedJobs: CompletedJob[] = (historyRows ?? []).map((row: any) => {
+      const payment = Array.isArray(row.payment) ? row.payment[0] : row.payment;
+      return {
+        id: row.id,
+        title: row.title,
+        completed_at: row.completed_at,
+        customer_id: row.customer_id,
+        worker_id: row.worker_id,
+        agreed_price: row.agreed_price ? Number(row.agreed_price) : null,
+        worker_payout: payment?.worker_payout ? Number(payment.worker_payout) : null,
+        amount: payment?.amount ? Number(payment.amount) : null,
+      };
+    });
+    setHistory(completedJobs);
+
+    setLoading(false);
+  }, []);
+
+  useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
+  // ── Render ───────────────────────────────────────────────────
+
+  if (loading || !fontsLoaded) {
+    return (
+      <SafeAreaView style={s.screen} edges={['top']}>
+        <View style={s.loadingCenter}>
+          <ActivityIndicator size="large" color={Colors.gold} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={s.container} edges={['top']}>
-      <View style={s.center}>
+    <SafeAreaView style={s.screen} edges={['top']}>
+      <ScrollView
+        style={s.scroll}
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
+        }
+      >
+        {/* ── Masthead ── */}
         <Text style={s.eyebrow}>DESK {'\u00b7'} YOUR WORKSPACE</Text>
         <Text style={s.title}>Your desk.</Text>
-        <Text style={s.body}>Your workspace will live here.</Text>
-      </View>
+        <Text style={s.edition}>{editionLine(activeJobs.length)}</Text>
+
+        {/* ── Section 1: Active · Both Roles ── */}
+        <Text style={s.sectionEyebrow}>ACTIVE {'\u00b7'} BOTH ROLES</Text>
+
+        {activeJobs.length === 0 ? (
+          <Text style={s.emptyLine}>Nothing active right now.</Text>
+        ) : (
+          activeJobs.map(job => {
+            const isTaken = job.worker_id === userId;
+            const price = job.agreed_price ?? job.budget_max ?? job.budget_min;
+            return (
+              <View key={job.id} style={s.activeCard}>
+                <Text style={[s.roleTag, isTaken ? s.roleTagGreen : s.roleTagAmber]}>
+                  {isTaken
+                    ? `\u25CF TAKEN \u00b7 ${job.status === 'matched' ? 'MATCHED' : job.status === 'pending_confirmation' ? 'PENDING CONFIRM' : 'IN PROGRESS'}`
+                    : `\u25C6 POSTED \u00b7 AWAITING BIDS`}
+                </Text>
+                <Text style={s.activeTitle} numberOfLines={1}>{job.title}</Text>
+                <View style={s.activeFoot}>
+                  <Text style={s.activeMeta}>
+                    {isTaken
+                      ? (job.timing ? job.timing.toUpperCase() : timeAgo(job.created_at))
+                      : `${job.bid_count ?? 0} BID${(job.bid_count ?? 0) !== 1 ? 'S' : ''} \u00b7 POSTED ${timeAgo(job.created_at)}`}
+                  </Text>
+                  {price != null && (
+                    <Text style={s.activePrice}>{fmtPrice(price)}</Text>
+                  )}
+                </View>
+              </View>
+            );
+          })
+        )}
+
+        {/* ── Section 2: Earnings · This Week ── */}
+        <Text style={s.sectionEyebrow}>EARNINGS {'\u00b7'} THIS WEEK</Text>
+
+        <View style={s.earningsCard}>
+          <Text style={s.earningsTotal}>{fmtPrice(earningsTotal)}</Text>
+          <Text style={s.earningsSub}>
+            {earningsCount} JOB{earningsCount !== 1 ? 'S' : ''} {'\u00b7'} MON{'\u2013'}SUN
+          </Text>
+        </View>
+
+        {/* ── Section 3: Job History ── */}
+        <Text style={s.sectionEyebrow}>JOB HISTORY</Text>
+
+        {history.length === 0 ? (
+          <Text style={s.emptyLine}>No completed jobs yet.</Text>
+        ) : (
+          history.map((job, i) => {
+            const isWorker = job.worker_id === userId;
+            const value = isWorker
+              ? (job.worker_payout ?? job.agreed_price ?? 0)
+              : (job.amount ?? job.agreed_price ?? 0);
+            return (
+              <View
+                key={job.id}
+                style={[s.historyRow, i < history.length - 1 && s.historyRowBorder]}
+              >
+                <Text style={s.historyDate}>
+                  {job.completed_at ? fmtReceiptDate(job.completed_at) : '\u2014'}
+                </Text>
+                <View style={s.historyDesc}>
+                  <Text style={s.historyTitle} numberOfLines={1}>{job.title}</Text>
+                  <TouchableOpacity
+                    onPress={() => router.push(`/job/${job.id}/receipt` as any)}
+                    activeOpacity={0.7}
+                    accessibilityLabel={`View receipt for ${job.title}`}
+                  >
+                    <Text style={s.historyReceipt}>{'\u25B8'} RECEIPT</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={s.historyValueCol}>
+                  <Text style={[s.historyValue, isWorker && s.historyValueEarned]}>
+                    {isWorker ? '+' : ''}{fmtPrice(value)}
+                  </Text>
+                  <Text style={[s.historyDirection, isWorker ? s.dirEarned : s.dirSpent]}>
+                    {isWorker ? 'EARNED' : 'PAID'}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        )}
+
+        <View style={{ height: 120 }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
+// ── Styles ─────────────────────────────────────────────────────
+
 const s = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
-    gap: 12,
-  },
+  screen: { flex: 1, backgroundColor: Colors.background },
+  loadingCenter: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  scroll: { flex: 1 },
+  scrollContent: { paddingHorizontal: Spacing.md, paddingTop: Spacing.md },
+
+  // Masthead
   eyebrow: {
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 4,
     color: Colors.gold,
+    marginBottom: 6,
   },
   title: {
     fontFamily: Fonts.serif,
-    fontSize: 28,
+    fontSize: 30,
+    color: Colors.textPrimary,
+    marginBottom: 6,
+  },
+  edition: {
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    letterSpacing: 1.5,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    marginBottom: Spacing.lg,
+  },
+
+  // Section eyebrows
+  sectionEyebrow: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 3,
+    color: Colors.gold,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+
+  // Empty
+  emptyLine: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: Colors.textTertiary,
+    fontStyle: 'italic',
+    marginBottom: Spacing.sm,
+  },
+
+  // Active cards
+  activeCard: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: Spacing.sm,
+    gap: 6,
+  },
+  roleTag: {
+    fontFamily: Fonts.displayB,
+    fontSize: 8.5,
+    letterSpacing: 2,
+  },
+  roleTagGreen: { color: Colors.green },
+  roleTagAmber: { color: Colors.amber },
+  activeTitle: {
+    fontFamily: Fonts.bodyMed,
+    fontSize: 14,
     color: Colors.textPrimary,
   },
-  body: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
+  activeFoot: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  activeMeta: {
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
+  activePrice: {
+    fontFamily: Fonts.heading,
+    fontSize: 14,
+    color: Colors.gold,
+    fontVariant: ['tabular-nums'],
+  },
+
+  // Earnings
+  earningsCard: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  earningsTotal: {
+    fontFamily: Fonts.heading,
+    fontSize: 38,
+    color: Colors.gold,
+    fontVariant: ['tabular-nums'],
+    marginBottom: 4,
+  },
+  earningsSub: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 2,
+    color: Colors.textSecondary,
+  },
+
+  // Job history
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 11,
+    gap: 8,
+  },
+  historyRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  historyDate: {
+    fontFamily: Fonts.mono,
+    fontSize: 9.5,
+    color: Colors.textSecondary,
+    width: 58,
+    letterSpacing: 0.5,
+  },
+  historyDesc: {
+    flex: 1,
+    gap: 3,
+  },
+  historyTitle: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: Colors.textPrimary,
+  },
+  historyReceipt: {
+    fontFamily: Fonts.display,
+    fontSize: 8.5,
+    letterSpacing: 1.5,
+    color: Colors.gold,
+  },
+  historyValueCol: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  historyValue: {
+    fontFamily: Fonts.heading,
+    fontSize: 13.5,
+    color: Colors.gold,
+    fontVariant: ['tabular-nums'],
+  },
+  historyValueEarned: {
+    color: Colors.green,
+  },
+  historyDirection: {
+    fontFamily: Fonts.mono,
+    fontSize: 8,
+    letterSpacing: 1,
+  },
+  dirEarned: { color: Colors.green },
+  dirSpent: { color: Colors.textSecondary },
 });
