@@ -747,7 +747,7 @@ export default function MyCardScreen() {
   const [addSelectedCatId, setAddSelectedCatId] = useState<number | null>(null);
   const [addSelectedTask, setAddSelectedTask] = useState<TaskItem | null>(null);
   const [rosterToastConfig, setRosterToastConfig] = useState<{ title: string; sub: string } | null>(null);
-  const rosterUndoRef = useRef<{ action: 'add' | 'remove'; skill: RosterSkill } | null>(null);
+  const rosterUndoRef = useRef<{ action: 'add' | 'remove' | 'feature' | 'unfeature'; skill: RosterSkill } | null>(null);
   const rosterUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Data fetch ───────────────────────────────────────────────
@@ -1141,6 +1141,45 @@ export default function MyCardScreen() {
     );
   }, []);
 
+  // Feature/unfeature toggle — ONE UPDATE per tap
+  const toggleFeatured = useCallback(async (skill: RosterSkill) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const newValue = !skill.isFeatured;
+
+    // Cap guard: don't promote if already at 3
+    if (newValue && roster.filter(r => r.isFeatured).length >= 3) return;
+
+    const { error } = await supabase
+      .from('worker_skills')
+      .update({ is_featured: newValue })
+      .eq('user_id', user.id)
+      .eq('task_id', skill.taskId);
+
+    if (error) return;
+
+    // Optimistic local update on confirmed DB success
+    setRoster(prev => prev.map(r =>
+      r.taskId === skill.taskId ? { ...r, isFeatured: newValue } : r
+    ));
+
+    // Toast with undo
+    rosterUndoRef.current = {
+      action: newValue ? 'feature' : 'unfeature',
+      skill: { ...skill, isFeatured: !newValue },
+    };
+    setRosterToastConfig({
+      title: newValue ? strings['myCard.offers.toast.featured'] : strings['myCard.offers.toast.demoted'],
+      sub: newValue ? strings['myCard.offers.toast.featuredSub'].replace('{skill}', skill.name) : skill.name,
+    });
+    if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
+    rosterUndoTimerRef.current = setTimeout(() => {
+      setRosterToastConfig(null);
+      rosterUndoRef.current = null;
+    }, UNDO_WINDOW_MS);
+  }, [roster]);
+
   const handleRosterUndo = useCallback(async () => {
     const snap = rosterUndoRef.current;
     if (!snap || !profile) return;
@@ -1155,12 +1194,22 @@ export default function MyCardScreen() {
       await supabase.from('worker_skills').delete()
         .eq('user_id', user.id).eq('task_id', snap.skill.taskId);
       setRoster(prev => prev.filter(r => r.taskId !== snap.skill.taskId));
-    } else {
+    } else if (snap.action === 'remove') {
       // Undo remove = ONE INSERT (restore the row)
       await supabase.from('worker_skills').insert({
         user_id: user.id, task_id: snap.skill.taskId, is_featured: false,
       });
       setRoster(prev => [...prev, snap.skill]);
+    } else {
+      // Undo feature/unfeature = ONE UPDATE flipping is_featured back
+      const revertValue = snap.action === 'feature' ? false : true;
+      await supabase.from('worker_skills')
+        .update({ is_featured: revertValue })
+        .eq('user_id', user.id)
+        .eq('task_id', snap.skill.taskId);
+      setRoster(prev => prev.map(r =>
+        r.taskId === snap.skill.taskId ? { ...r, isFeatured: revertValue } : r
+      ));
     }
     rosterUndoRef.current = null;
   }, [profile]);
@@ -1468,9 +1517,15 @@ export default function MyCardScreen() {
                       </Text>
                       <View style={s.chipRow}>
                         {roster.filter(r => r.isFeatured).map(sk => (
-                          <View key={sk.taskId} style={s.rosterChipFeatured}>
+                          <TouchableOpacity
+                            key={sk.taskId}
+                            style={s.rosterChipFeatured}
+                            onPress={() => toggleFeatured(sk)}
+                            activeOpacity={0.7}
+                            accessibilityLabel={`${sk.name}, featured. Double-tap to unfeature.`}
+                          >
                             <Text style={s.rosterChipFeaturedText}>{sk.name}</Text>
-                          </View>
+                          </TouchableOpacity>
                         ))}
                         {roster.filter(r => r.isFeatured).length === 0 && (
                           <Text style={s.skillsFallback}>No superpowers yet</Text>
@@ -1494,22 +1549,40 @@ export default function MyCardScreen() {
                       {!rosterEditMode && (
                         <Text style={s.rosterHint}>{strings['myCard.offers.rosterHint']}</Text>
                       )}
-                      <View style={s.chipRow}>
-                        {roster.filter(r => !r.isFeatured).map(sk => (
-                          <View key={sk.taskId} style={s.rosterChipOutline}>
-                            <Text style={s.rosterChipOutlineText}>{sk.name}</Text>
-                            {rosterEditMode && (
-                              <TouchableOpacity
-                                onPress={() => confirmAndRemoveSkill(sk)}
-                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                                accessibilityLabel={`Remove ${sk.name}`}
-                              >
-                                <Text style={s.rosterRemoveX}>{'\u00d7'}</Text>
-                              </TouchableOpacity>
+                      {(() => {
+                        const featuredCount = roster.filter(r => r.isFeatured).length;
+                        const atCap = featuredCount >= 3;
+                        return (
+                          <>
+                            <View style={s.chipRow}>
+                              {roster.filter(r => !r.isFeatured).map(sk => (
+                                <TouchableOpacity
+                                  key={sk.taskId}
+                                  style={[s.rosterChipOutline, !rosterEditMode && atCap && { opacity: 0.4 }]}
+                                  onPress={() => {
+                                    if (rosterEditMode) confirmAndRemoveSkill(sk);
+                                    else if (!atCap) toggleFeatured(sk);
+                                  }}
+                                  activeOpacity={rosterEditMode || !atCap ? 0.7 : 1}
+                                  accessibilityLabel={
+                                    rosterEditMode
+                                      ? `Remove ${sk.name}`
+                                      : `${sk.name}, not featured${atCap ? '' : ', double-tap to feature'}`
+                                  }
+                                >
+                                  <Text style={s.rosterChipOutlineText}>{sk.name}</Text>
+                                  {rosterEditMode && (
+                                    <Text style={s.rosterRemoveX}>{'\u00d7'}</Text>
+                                  )}
+                                </TouchableOpacity>
+                              ))}
+                            </View>
+                            {atCap && !rosterEditMode && (
+                              <Text style={s.capLine}>{strings['myCard.offers.capLine']}</Text>
                             )}
-                          </View>
-                        ))}
-                      </View>
+                          </>
+                        );
+                      })()}
                     </View>
 
                     {/* Add to roster */}
@@ -2401,6 +2474,13 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 14,
     color: Colors.red,
+  },
+  capLine: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: Colors.amber,
+    fontStyle: 'italic' as const,
+    marginTop: Spacing.sm,
   },
 
   // ── Add skill flow ──

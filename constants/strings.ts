@@ -74,6 +74,12 @@ export const strings = {
   'myCard.offers.remove.confirm': 'REMOVE',
   'myCard.offers.remove.toast':   'SKILL REMOVED',
 
+  // Superpower feature/unfeature (Print Shop Slice 4)
+  'myCard.offers.capLine':            '3 of 3 featured \u2014 unfeature one to swap.',
+  'myCard.offers.toast.featured':     'SUPERPOWER FEATURED',
+  'myCard.offers.toast.featuredSub':  '{skill} now leads your card',
+  'myCard.offers.toast.demoted':      'MOVED TO ROSTER',
+
   // Track record
   'card.track.endorsedSuffix':   'endorsed',
 
