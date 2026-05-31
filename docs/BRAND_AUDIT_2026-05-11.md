@@ -234,41 +234,69 @@ reads as "featured/premium" and over-promises — the customer taps in
 to 0–9 jobs and the credential under-delivers. Outline + tuck keeps the
 shared "newly arrived" meaning while removing the false desirability claim.
 
-### D.5 The Print Shop — Photo Affordance (Zone 1)
+### D.5 The Print Shop — Edit Affordances (All Four Zones)
 
-**Decision:** The worker's photo on `<WorkerCard preview />` inside
-`my-card.tsx` is tappable via an `onPhotoPress` prop. A solid gold
-corner badge reads `ADD` (no avatar) or `EDIT` (avatar on file).
-Tap routes to `/(onboarding)/id?step=photo` — a photo-only mode
-that uploads the avatar and returns without touching `worker_skills`.
+**Decision:** The worker's credential on `my-card.tsx` is editable
+across four lifetime zones — **photo, bio, roster, superpowers** —
+each speaking the same four-word grammar. Daily dials (status,
+today_skills, rate, radius) remain inline with the atomic publish
+bar. Lifetime fields commit independently with their own UNDO and
+never touch `worker_status`.
 
-**Source:** Print Shop spec (2026-05-30), folding the Photo Affordance
-ruling. Cross-refs:
-- `id.tsx` `avatarEditBadge` style (visual source)
-- `PRINT_SHOP_SPEC.md` Zone 1
+**Source:** Print Shop spec Rev 01 (2026-05-30), shipped across
+Slices 1-4. Cross-refs:
+- `PRINT_SHOP_SPEC.md` — binding spec
+- `docs/print-shop/copy.md` — authoritative `myCard.*` strings
 
-**Rule:**
-- **Badge:** solid `--gold` pill, `--ink` text, `ADD` or `EDIT` by
-  `avatar_url` state. Tucked at the top-right corner of the portrait.
-  Font: Space Grotesk 700, 7px, ls 1. Same visual vocabulary as the
-  wizard's existing `avatarEditBadge`.
-- **Tap target:** the entire portrait area (72x88), not just the badge.
-  `accessibilityLabel` is state-aware: `"Add your photo"` / `"Change
-  your photo"`.
-- **Hint line:** below the preview, italic Inter 12, shown only when
-  `avatar_url` is null: `"Tap your photo to add one — it's the first
-  thing customers see."`
-- **Public card:** `onPhotoPress` is NOT passed on the Talent feed.
-  The portrait is a static display element for customers. No badge,
-  no tappability, no hint.
-- **Data safety:** the `step=photo` wizard mode writes ONLY
-  `profiles.avatar_url`. It never reads, modifies, or rewrites
-  `worker_skills`. The roster safety contract (one INSERT / one
-  DELETE, never set-overwrite) is preserved.
+**The four-word grammar:**
 
-**Why this matters:** Workers could previously only upload a photo
-by tripping an apply gate — no discoverable, proactive edit surface
-existed. The print-shop principle says the card is the worker's to
-compose; the photo is the first thing customers see. Making it
-tappable on the self-view closes the affordance gap without forking
-the upload logic (same wizard, same bucket, same RLS).
+| Word | Form | Used on |
+|---|---|---|
+| **HANDLE** | Solid `--gold` pill, `--ink` text, state-aware `ADD`/`EDIT` | Photo, bio |
+| **DOOR** | Gold outline `MANAGE` pill in a section row | Roster + superpowers |
+| **STATE** | Solid gold = featured, outline gold = roster | Skill chips in the proof sheet |
+| **COMMIT** | Press + brief UNDO; soft confirm only for destructive remove | All lifetime edits |
+
+**Zone rules:**
+
+- **Photo (Zone 1):** `onPhotoPress` prop on WorkerCard. Corner badge
+  `ADD`/`EDIT` by `avatar_url` state. Routes to `/(onboarding)/id?step=photo`
+  (photo-only wizard mode — writes only `profiles.avatar_url`, never
+  touches `worker_skills`). Public card unchanged.
+- **Bio (Zone 2):** `onBioPress` prop on WorkerCard. Corner-tucked
+  badge at bottom-right of bio block (Rev 01: never participates in
+  text layout). Opens proof sheet with live mini-proof, 90-char clamp,
+  amber warn at 75, explicit SAVE LINE / CANCEL. Writes only
+  `profiles.bio`.
+- **Roster (Zone 3):** MANAGE row opens Roster & Superpowers proof
+  sheet. Add skill: category -> task -> confirm mini-flow, ONE INSERT
+  to `worker_skills`. Remove skill: EDIT mode + native `Alert.alert`
+  confirm (iOS), ONE DELETE from `worker_skills`. Each action is
+  single-row; never read-modify-rewrite.
+- **Superpowers (Zone 4):** Tap roster chip to feature (promote), tap
+  featured chip to unfeature (demote). ONE UPDATE to
+  `worker_skills.is_featured` per tap. Cap 3 with visual disable +
+  amber cap line. Drag-reorder deferred to v1.1; featured order =
+  insertion order.
+
+**Data-safety contract (non-negotiable):**
+- Add = ONE INSERT. Remove = ONE DELETE. Feature/unfeature = ONE UPDATE.
+- Never batch upsert, never read-modify-rewrite `worker_skills`.
+- Lifetime edits never touch `worker_status`, `today_skills`,
+  `today_rate_*`, `today_radius_mi`, or `avatar_url` (except Zone 1).
+- The daily today_skills picker's set-rewrite model stays out of the
+  lifetime path (structural boundary per Rev 01).
+
+**Deferred items (v1.1):**
+- Drag-reorder for superpowers (PanResponder cost; <=3 items makes
+  ordering a weak launch need)
+- Custom destructive dialog for remove (currently native Alert.alert;
+  custom Modal caused iOS responder chain issues — revisit with
+  non-Modal approach)
+
+**Why this matters:** The print-shop principle says the card is the
+worker's to compose. Before the Print Shop arc, workers could only
+set up their credential through onboarding gates — no proactive edit
+surface existed. The four-zone system gives workers direct authorship
+of their commercial presentation while maintaining brand consistency
+(content-only customization, never visual treatment).

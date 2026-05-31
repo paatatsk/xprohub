@@ -27,6 +27,33 @@ implementation are Code's call — the Skills section states the UX contract Cod
 
 ---
 
+## Implementation Status (updated 2026-05-31)
+
+All four slices shipped and hardware-verified.
+
+| Slice | Zone | Status | Key commits |
+|---|---|---|---|
+| Slice 1 | Photo | Shipped | `8460bb2` + fixes `8d9e2c4`, `193b3b6`, `ef8e232` |
+| Slice 2 | Bio | Shipped | `2e7bd9b` |
+| Slice 3 | Roster (add/remove) | Shipped | `11f6d1f` + fixes `d10abc1`, `1542356`, `a20746d` |
+| Slice 4 | Superpowers | Shipped | `043934f` |
+
+**Implementation choices documented:**
+- Remove confirm uses native `Alert.alert` instead of custom destructive
+  dialog (Slice 3). Two stacked transparent Modals caused iOS responder
+  chain issues — `Alert.alert` eliminated the problem. Custom dialog is
+  a polish task for future revisit with a non-Modal approach.
+- Drag-reorder for superpowers deferred to v1.1 per Rev 01 ruling.
+  Featured order = insertion order (oldest featured leftmost).
+- Add-skill picker is a parallel implementation (not extracted shared
+  component). The architectural boundary (daily set-rewrite model stays
+  out of the lifetime path) is enforced by separate code paths with
+  separate completion handlers.
+- Endorsements are per-job (not per-skill), so the remove confirm body
+  uses the zero-endorsement copy variant for all cases.
+
+---
+
 ## The reframed principle (locked by Paata)
 
 XProHub splits **identity** from **presentation**:
