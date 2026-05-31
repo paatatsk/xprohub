@@ -1052,9 +1052,11 @@ export default function MyCardScreen() {
     setRosterView('roster');
     setAddSelectedCatId(null);
     setAddSelectedTask(null);
-    // Re-fetch to sync any changes
-    fetchData();
-  }, [fetchData]);
+    // No fetchData() here — optimistic state from add/remove handlers
+    // is the source of truth. useFocusEffect handles refresh on next
+    // screen focus. Avoids 11 cascading state updates (render storm)
+    // and preserves unsaved daily dial edits.
+  }, []);
 
   const handleAddSkill = useCallback(async () => {
     if (!addSelectedTask || !profile) return;
@@ -1100,35 +1102,49 @@ export default function MyCardScreen() {
     }, UNDO_WINDOW_MS);
   }, [addSelectedTask, profile]);
 
+  // Belt-and-suspenders: capture removeTarget in a ref when the
+  // destructive dialog opens, so stale closure can't lose it.
+  const removeTargetRef = useRef<RosterSkill | null>(null);
+
   const handleRemoveSkill = useCallback(async () => {
-    if (!removeTarget || !profile) return;
+    const target = removeTargetRef.current;
+    if (!target || !profile) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
     // ONE DELETE — data safety contract
-    await supabase
+    const { error } = await supabase
       .from('worker_skills')
       .delete()
       .eq('user_id', user.id)
-      .eq('task_id', removeTarget.taskId);
+      .eq('task_id', target.taskId);
 
-    // Optimistic local update
-    setRoster(prev => prev.filter(r => r.taskId !== removeTarget.taskId));
+    if (error) {
+      console.error('[roster] delete failed:', error.message);
+      setShowRemoveConfirm(false);
+      setRemoveTarget(null);
+      removeTargetRef.current = null;
+      return; // Chip stays visible — honest UI
+    }
+
+    // Optimistic local update (only on confirmed DB success)
+    setRoster(prev => prev.filter(r => r.taskId !== target.taskId));
     setShowRemoveConfirm(false);
     setRemoveTarget(null);
+    removeTargetRef.current = null;
 
     // Toast with undo
-    rosterUndoRef.current = { action: 'remove', skill: removeTarget };
+    rosterUndoRef.current = { action: 'remove', skill: target };
     setRosterToastConfig({
       title: strings['myCard.offers.remove.toast'],
-      sub: removeTarget.name,
+      sub: target.name,
     });
     if (rosterUndoTimerRef.current) clearTimeout(rosterUndoTimerRef.current);
     rosterUndoTimerRef.current = setTimeout(() => {
       setRosterToastConfig(null);
       rosterUndoRef.current = null;
     }, UNDO_WINDOW_MS);
-  }, [removeTarget, profile]);
+  }, [profile]);
 
   const handleRosterUndo = useCallback(async () => {
     const snap = rosterUndoRef.current;
@@ -1489,7 +1505,7 @@ export default function MyCardScreen() {
                             <Text style={s.rosterChipOutlineText}>{sk.name}</Text>
                             {rosterEditMode && (
                               <TouchableOpacity
-                                onPress={() => { setRemoveTarget(sk); setShowRemoveConfirm(true); }}
+                                onPress={() => { setRemoveTarget(sk); removeTargetRef.current = sk; setShowRemoveConfirm(true); }}
                                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                                 accessibilityLabel={`Remove ${sk.name}`}
                               >
