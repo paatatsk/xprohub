@@ -300,3 +300,22 @@ set up their credential through onboarding gates — no proactive edit
 surface existed. The four-zone system gives workers direct authorship
 of their commercial presentation while maintaining brand consistency
 (content-only customization, never visual treatment).
+
+### Home resolved: LAUNCHPAD over dashboard (Doctrine, 2026-05-31)
+
+docs/XPROHUB_DOCTRINE.md (ea75f9b) resolved the Home collision: Home
+is a LAUNCHPAD into the flow, not a status dashboard to admire.
+Superseded from the nav visual spec's dashboard Home:
+- Weather + greeting header — CUT (ambient; fails the Placement Law).
+- YOUR PASS showcase — DEMOTED to one "Edit my card" launchpad row;
+  the full credential lives on my-card.tsx.
+- "$642 this week" earnings glance — CUT (Doctrine bars the showcase;
+  the tense rule puts money on Desk).
+- Last receipt — MOVED to Desk history.
+Home is now one card: Post a job (initiate/customer) / Edit my card
+(initiate/worker) / Posts awaiting my review (in-flow/customer) /
+Applications I'm waiting on (in-flow/worker). Four entries, one spine.
+The category grid REMAINS on Home as the post on-ramp — it is the
+taxonomy/matching substrate (see TAXONOMY_SPEC.md), not a
+browse-the-catalogue surface. Source: Home Doctrine Ruling, 2026-05-31,
+as amended by Paata's taxonomy ruling same day.

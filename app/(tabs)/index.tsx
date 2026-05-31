@@ -1,33 +1,22 @@
 // app/(tabs)/index.tsx
-// Home — "An honest table of contents."
-// Five-voice typography: Space Grotesk / Inter / Playfair / Oswald / IBM Plex Mono
+// Home — The launchpad. Fastest route into whichever flow you're starting.
+// Per XPROHUB_DOCTRINE §6: "Home is a launchpad, not a dashboard to admire.
+// It links into the flow; it does not render full lists or earnings showcases."
 
-import { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
+import { useState, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, TouchableOpacity,
+  FlatList, RefreshControl, ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useFonts } from 'expo-font';
-import {
-  SpaceGrotesk_500Medium,
-} from '@expo-google-fonts/space-grotesk';
-import {
-  Oswald_600SemiBold,
-} from '@expo-google-fonts/oswald';
-import {
-  IBMPlexMono_400Regular,
-} from '@expo-google-fonts/ibm-plex-mono';
-import { Colors } from '../../constants/theme';
-import { fmtReceiptDate, fmtPrice } from '../../lib/format';
+import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
+import { Oswald_600SemiBold } from '@expo-google-fonts/oswald';
+import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono';
+import { Colors, Fonts, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
-
-// ── Font constants ───────────────────────────────────────────
-const FONT = {
-  spaceGrotesk: 'SpaceGrotesk_500Medium',
-  oswald:       'Oswald_600SemiBold',
-  mono:         'IBMPlexMono_400Regular',
-  inter:        'Inter_400Regular',   // loaded globally in _layout.tsx
-  interMed:     'Inter_500Medium',    // loaded globally in _layout.tsx
-};
+import { useTrustLevel } from '../../hooks/useTrustLevel';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -43,178 +32,205 @@ interface Category {
   requires_background_check: boolean;
 }
 
-interface LastReceipt {
-  jobId: string;
-  otherPartyName: string;
-  completedAt: string;    // ISO 8601
-  agreedPrice: number;    // dollars, not cents
-}
-
 // ── Helpers ──────────────────────────────────────────────────
 
 function iconForSlug(slug: string): string {
   const map: Record<string, string> = {
-    'home-cleaning':      '🧹',
-    'errands-delivery':   '📦',
-    'pet-care':           '🐕',
-    'child-care':         '👶',
-    'elder-care':         '🧓',
-    'moving-labor':       '🚚',
-    'tutoring':           '📚',
-    'coaching':           '🏆',
-    'personal-asst':      '🗂️',
-    'vehicle-care':       '🚗',
-    'handyman':           '🔨',
-    'gardening':          '🌿',
-    'trash-recycling':    '♻️',
-    'events':             '🎉',
-    'electrical':         '⚡',
-    'plumbing':           '🔧',
-    'painting':           '🎨',
-    'carpentry':          '🪚',
-    'it-tech':            '💻',
-    'hvac':               '❄️',
+    'home-cleaning': '\uD83E\uDDF9', 'errands-delivery': '\uD83D\uDCE6',
+    'pet-care': '\uD83D\uDC15', 'child-care': '\uD83D\uDC76',
+    'elder-care': '\uD83E\uDDD3', 'moving-labor': '\uD83D\uDE9A',
+    'tutoring': '\uD83D\uDCDA', 'coaching': '\uD83C\uDFC6',
+    'personal-asst': '\uD83D\uDDC2\uFE0F', 'vehicle-care': '\uD83D\uDE97',
+    'handyman': '\uD83D\uDD28', 'gardening': '\uD83C\uDF3F',
+    'trash-recycling': '\u267B\uFE0F', 'events': '\uD83C\uDF89',
+    'electrical': '\u26A1', 'plumbing': '\uD83D\uDD27',
+    'painting': '\uD83C\uDFA8', 'carpentry': '\uD83E\uDE9A',
+    'it-tech': '\uD83D\uDCBB', 'hvac': '\u2744\uFE0F',
   };
-  return map[slug] ?? '▪';
+  return map[slug] ?? '\u25AA';
 }
 
-// Format helpers imported from lib/format.ts
+// ── Launchpad Card ───────────────────────────────────────────
 
-// ── YOUR DESK ────────────────────────────────────────────────
-
-function YourDesk({ lastReceipt, router }: {
-  lastReceipt: LastReceipt | null;
+function LaunchpadCard({
+  router, trustLevel, workerStatus, pendingBids, openApplications,
+}: {
   router: ReturnType<typeof useRouter>;
+  trustLevel: string | null;
+  workerStatus: string;
+  pendingBids: number;
+  openApplications: number;
 }) {
+  const isLive = workerStatus === 'available';
+
   return (
-    <View style={s.desk}>
-      <Text style={s.deskLabel}>YOUR DESK</Text>
+    <View style={s.card}>
+      <Text style={s.cardLabel}>YOUR DESK</Text>
 
+      {/* Row 1 — Post a job [INITIATE] */}
       <TouchableOpacity
-        style={s.deskRow}
+        style={s.row}
+        activeOpacity={0.7}
+        onPress={() => {
+          const dest = '/(tabs)/post';
+          if (trustLevel === 'explorer') {
+            router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(dest)}` as any);
+          } else {
+            router.push(dest as any);
+          }
+        }}
+        accessibilityLabel="Post a job"
+        accessibilityRole="button"
+      >
+        <Text style={s.rowLeadGold}>+</Text>
+        <Text style={s.rowLabel}>Post a job</Text>
+      </TouchableOpacity>
+
+      {/* Row 2 — Edit my card [INITIATE] */}
+      <TouchableOpacity
+        style={s.row}
+        activeOpacity={0.7}
         onPress={() => router.push('/(tabs)/my-card')}
-        activeOpacity={0.7}
+        accessibilityLabel="Edit my card"
+        accessibilityRole="button"
       >
-        <Text style={s.deskRowTitle}>My ID Card</Text>
-      </TouchableOpacity>
-
-      {lastReceipt && (
-        <TouchableOpacity
-          style={s.deskRow}
-          onPress={() => router.push(`/job/${lastReceipt.jobId}/receipt` as any)}
-          activeOpacity={0.7}
-        >
-          <Text style={s.deskRowTitle}>Last receipt</Text>
-          <Text style={s.deskRowTease}>
-            {lastReceipt.otherPartyName.split(' ')[0].toUpperCase()}
-            {' \u00B7 '}
-            {fmtReceiptDate(lastReceipt.completedAt)}
-            {' \u00B7 '}
-            {fmtPrice(lastReceipt.agreedPrice)}
+        <Text style={s.rowLeadGold}>{'\u25B8'}</Text>
+        <Text style={s.rowLabel}>Edit my card</Text>
+        <View style={s.rowRight}>
+          <View style={[s.statusDot, isLive ? s.statusLive : s.statusDraft]} />
+          <Text style={[s.statusText, isLive ? s.statusLiveText : s.statusDraftText]}>
+            {isLive ? 'LIVE' : 'DRAFT'}
           </Text>
-        </TouchableOpacity>
-      )}
-
-      <TouchableOpacity
-        style={s.deskRow}
-        onPress={() => router.push('/(tabs)/my-jobs')}
-        activeOpacity={0.7}
-      >
-        <Text style={s.deskRowTitle}>Jobs I've posted</Text>
+          <Text style={s.chevron}>{'\u203A'}</Text>
+        </View>
       </TouchableOpacity>
 
+      {/* Row 3 — Posts awaiting my review [IN-FLOW] */}
       <TouchableOpacity
-        style={s.deskRowLast}
-        onPress={() => router.push('/(tabs)/my-applications')}
+        style={s.row}
         activeOpacity={0.7}
+        onPress={() => router.push('/(tabs)/my-jobs')}
+        accessibilityLabel={`Posts awaiting my review, ${pendingBids} bids`}
+        accessibilityRole="button"
       >
-        <Text style={s.deskRowTitle}>My applications</Text>
+        <Text style={s.rowLeadAmber}>{'\u25C6'}</Text>
+        <Text style={s.rowLabel}>Posts awaiting my review</Text>
+        <View style={s.rowRight}>
+          {pendingBids > 0 && (
+            <Text style={s.countAmber}>{pendingBids} {pendingBids === 1 ? 'BID' : 'BIDS'}</Text>
+          )}
+          <Text style={s.chevron}>{'\u203A'}</Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* Row 4 — Applications I'm waiting on [IN-FLOW] */}
+      <TouchableOpacity
+        style={s.rowLast}
+        activeOpacity={0.7}
+        onPress={() => router.push('/(tabs)/my-applications')}
+        accessibilityLabel={`Applications I'm waiting on, ${openApplications} open`}
+        accessibilityRole="button"
+      >
+        <Text style={s.rowLeadGreen}>{'\u25CF'}</Text>
+        <Text style={s.rowLabel}>Applications I{'\u2019'}m waiting on</Text>
+        <View style={s.rowRight}>
+          {openApplications > 0 && (
+            <Text style={s.countGreen}>{openApplications} OPEN</Text>
+          )}
+          <Text style={s.chevron}>{'\u203A'}</Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
 }
 
-// ── Main screen ──────────────────────────────────────────────
+// ── Main Screen ──────────────────────────────────────────────
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastReceipt, setLastReceipt] = useState<LastReceipt | null>(null);
-
+  const { trustLevel } = useTrustLevel();
   const [fontsLoaded] = useFonts({
     SpaceGrotesk_500Medium,
     Oswald_600SemiBold,
     IBMPlexMono_400Regular,
   });
 
-  // ── Fetch categories ─────────────────────────────────────
-  const fetchCategories = useCallback(async () => {
-    const { data, error: err } = await supabase
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Live counts for launchpad rows
+  const [workerStatus, setWorkerStatus] = useState('offline');
+  const [pendingBids, setPendingBids] = useState(0);
+  const [openApplications, setOpenApplications] = useState(0);
+
+  // ── Fetch all data ─────────────────────────────────────────
+
+  const fetchData = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Categories (always)
+    const { data: catData } = await supabase
       .from('task_categories')
       .select('id, name, price_min, price_max, difficulty_range, sort_order, icon_slug, tier, requires_background_check')
       .order('sort_order', { ascending: true });
-    if (err) {
-      setError('Couldn\u2019t load categories. Pull down to try again.');
-    } else {
-      setCategories(data ?? []);
-    }
-  }, []);
+    setCategories(catData ?? []);
 
-  // ── Fetch last receipt (Row 1) ────────────────────────────
-  const fetchLastReceipt = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) { setLoading(false); return; }
 
-    const { data } = await supabase
+    // Worker status (for Row 2 publish signal)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('worker_status')
+      .eq('id', user.id)
+      .single();
+    setWorkerStatus(profile?.worker_status ?? 'offline');
+
+    // Pending bids count (Row 3): total bids on my open posts
+    const { data: myOpenJobs } = await supabase
       .from('jobs')
-      .select(`
-        id, customer_id, worker_id, completed_at, agreed_price,
-        customer:profiles!customer_id(full_name),
-        worker:profiles!worker_id(full_name)
-      `)
-      .or(`customer_id.eq.${user.id},worker_id.eq.${user.id}`)
-      .eq('status', 'completed')
-      .order('completed_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (data && data.completed_at && data.agreed_price != null) {
-      const isCustomer = user.id === data.customer_id;
-      const otherParty = isCustomer
-        ? (data.worker as any)?.full_name
-        : (data.customer as any)?.full_name;
-
-      setLastReceipt({
-        jobId: data.id,
-        otherPartyName: otherParty ?? 'Worker',
-        completedAt: data.completed_at,
-        agreedPrice: Number(data.agreed_price),
-      });
+      .select('id')
+      .eq('customer_id', user.id)
+      .eq('status', 'open');
+    if (myOpenJobs && myOpenJobs.length > 0) {
+      const jobIds = myOpenJobs.map(j => j.id);
+      const { count } = await supabase
+        .from('bids')
+        .select('id', { count: 'exact', head: true })
+        .in('job_id', jobIds)
+        .eq('status', 'pending');
+      setPendingBids(count ?? 0);
+    } else {
+      setPendingBids(0);
     }
+
+    // Open applications count (Row 4): my pending bids
+    const { count: appCount } = await supabase
+      .from('bids')
+      .select('id', { count: 'exact', head: true })
+      .eq('worker_id', user.id)
+      .eq('status', 'pending');
+    setOpenApplications(appCount ?? 0);
+
+    setLoading(false);
   }, []);
 
-  // ── Initial load ──────────────────────────────────────────
-  useEffect(() => {
-    Promise.all([fetchCategories(), fetchLastReceipt()]).then(() => {
-      setLoading(false);
-    });
-  }, [fetchCategories, fetchLastReceipt]);
+  useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
 
-  // ── Pull-to-refresh ───────────────────────────────────────
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([fetchCategories(), fetchLastReceipt()]);
+    await fetchData();
     setRefreshing(false);
-  }, [fetchCategories, fetchLastReceipt]);
+  }, [fetchData]);
 
-  // ── Header ────────────────────────────────────────────────
+  // ── Header ─────────────────────────────────────────────────
+
   const renderHeader = useCallback(() => (
     <View style={s.header}>
-      <View style={s.wordmarkStrip}>
-        <Text style={s.title}>XPROHUB</Text>
+      {/* Masthead: wordmark + gear */}
+      <View style={s.masthead}>
+        <Text style={s.wordmark}>XPROHUB</Text>
         <TouchableOpacity
           onPress={() => router.push('/(tabs)/account')}
           activeOpacity={0.7}
@@ -225,42 +241,45 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <YourDesk lastReceipt={lastReceipt} router={router} />
+      {/* Launchpad card */}
+      <LaunchpadCard
+        router={router}
+        trustLevel={trustLevel}
+        workerStatus={workerStatus}
+        pendingBids={pendingBids}
+        openApplications={openApplications}
+      />
 
       <Text style={s.sectionLabel}>CATEGORIES</Text>
     </View>
-  ), [router, lastReceipt]);
+  ), [router, trustLevel, workerStatus, pendingBids, openApplications]);
 
-  // ── Empty / loading ───────────────────────────────────────
-  const renderEmpty = useCallback(() => {
-    if (loading) {
-      return <Text style={s.loadingText}>Loading categories...</Text>;
-    }
-    if (error) {
-      return <Text style={s.errorText}>{error}</Text>;
-    }
-    return null;
-  }, [loading, error]);
+  // ── Category card ──────────────────────────────────────────
 
-  // ── Category card ─────────────────────────────────────────
   const renderItem = useCallback(({ item }: { item: Category }) => (
     <TouchableOpacity
-      style={s.card}
+      style={s.catCard}
       onPress={() => router.push(`/(tabs)/market?category_id=${item.id}`)}
     >
-      <View style={s.cardTop}>
-        <Text style={s.cardIcon}>{iconForSlug(item.icon_slug)}</Text>
+      <View style={s.catTop}>
+        <Text style={s.catIcon}>{iconForSlug(item.icon_slug)}</Text>
         {item.tier === 2 && (
-          <View style={s.tierBadgePro}>
-            <Text style={s.tierTextPro}>PRO</Text>
+          <View style={s.tierBadge}>
+            <Text style={s.tierText}>PRO</Text>
           </View>
         )}
       </View>
-      <Text style={s.cardName}>{item.name.toUpperCase()}</Text>
-      <Text style={s.cardPrice}>${item.price_min}–${item.price_max}</Text>
-      <Text style={s.cardDifficulty}>{item.difficulty_range}</Text>
+      <Text style={s.catName}>{item.name.toUpperCase()}</Text>
+      <Text style={s.catPrice}>${item.price_min}{'\u2013'}${item.price_max}</Text>
+      <Text style={s.catDiff}>{item.difficulty_range}</Text>
     </TouchableOpacity>
   ), [router]);
+
+  const renderEmpty = useCallback(() => {
+    if (loading) return <ActivityIndicator color={Colors.gold} style={{ marginTop: 32 }} />;
+    if (error) return <Text style={s.errorText}>{error}</Text>;
+    return null;
+  }, [loading, error]);
 
   return (
     <SafeAreaView style={s.container}>
@@ -274,13 +293,10 @@ export default function HomeScreen() {
         contentContainerStyle={s.listContent}
         style={s.list}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Colors.gold}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
         }
       />
+
     </SafeAreaView>
   );
 }
@@ -288,83 +304,194 @@ export default function HomeScreen() {
 // ── Styles ───────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container:   { flex: 1, backgroundColor: Colors.background },
-  list:        { flex: 1 },
-  listContent: { paddingBottom: 40, paddingHorizontal: 6 },
+  container: { flex: 1, backgroundColor: Colors.background },
+  list: { flex: 1 },
+  listContent: { paddingBottom: 160, paddingHorizontal: 6 },
 
-  // Header
-  header:       { paddingTop: 16, paddingBottom: 16, gap: 12, paddingHorizontal: 6 },
-  wordmarkStrip: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+  // Masthead
+  header: { paddingTop: 16, paddingBottom: 16, gap: 12, paddingHorizontal: 6 },
+  masthead: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 2,
   },
+  wordmark: {
+    color: Colors.gold,
+    fontSize: 28,
+    fontFamily: Fonts.heading,
+    letterSpacing: 4,
+  },
   gearIcon: { fontSize: 22, color: Colors.gold },
-  title:    { color: Colors.gold, fontSize: 28, fontFamily: FONT.spaceGrotesk, letterSpacing: 4 },
 
-  // YOUR DESK
-  desk: {
-    width: '100%', marginTop: 12,
-    borderWidth: 1, borderColor: Colors.border, borderRadius: 4,
+  // Launchpad card
+  card: {
+    width: '100%',
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 4,
     backgroundColor: Colors.card,
   },
-  deskLabel: {
-    fontFamily: FONT.oswald, fontSize: 10, letterSpacing: 4,
-    color: Colors.textSecondary, textTransform: 'uppercase',
-    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10,
+  cardLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 4,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
   },
-  deskRow: {
-    paddingHorizontal: 16, paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    gap: 10,
   },
-  deskRowLast: {
-    paddingHorizontal: 16, paddingVertical: 12,
+  rowLast: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
   },
-  deskRowTitle: {
-    fontFamily: FONT.interMed, fontSize: 14, color: Colors.textPrimary,
+  rowLeadGold: {
+    fontFamily: Fonts.heading,
+    fontSize: 16,
+    color: Colors.gold,
+    width: 18,
+    textAlign: 'center',
   },
-  deskRowTease: {
-    fontFamily: FONT.mono, fontSize: 10, letterSpacing: 1.5,
-    color: Colors.gold, marginTop: 4, textTransform: 'uppercase',
+  rowLeadAmber: {
+    fontFamily: Fonts.heading,
+    fontSize: 12,
+    color: Colors.amber,
+    width: 18,
+    textAlign: 'center',
+  },
+  rowLeadGreen: {
+    fontFamily: Fonts.heading,
+    fontSize: 12,
+    color: Colors.green,
+    width: 18,
+    textAlign: 'center',
+  },
+  rowLabel: {
+    fontFamily: Fonts.bodyMed,
+    fontSize: 14,
+    color: Colors.textPrimary,
+    flex: 1,
+  },
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  chevron: {
+    fontFamily: Fonts.body,
+    fontSize: 16,
+    color: Colors.textTertiary,
+  },
+
+  // Publish state signal (Row 2)
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusLive: { backgroundColor: Colors.green },
+  statusDraft: { backgroundColor: Colors.amber },
+  statusText: {
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    letterSpacing: 1,
+  },
+  statusLiveText: { color: Colors.green },
+  statusDraftText: { color: Colors.amber },
+
+  // Live counts
+  countAmber: {
+    fontFamily: Fonts.monoMed,
+    fontSize: 9,
+    letterSpacing: 1,
+    color: Colors.amber,
+  },
+  countGreen: {
+    fontFamily: Fonts.monoMed,
+    fontSize: 9,
+    letterSpacing: 1,
+    color: Colors.green,
   },
 
   // Section
   sectionLabel: {
-    fontFamily: FONT.oswald, fontSize: 10, letterSpacing: 4,
-    color: Colors.textSecondary, textTransform: 'uppercase',
-    marginTop: 20, alignSelf: 'flex-start',
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 4,
+    color: Colors.textSecondary,
+    textTransform: 'uppercase',
+    marginTop: 20,
+    alignSelf: 'flex-start',
   },
 
   // Category cards
-  card: {
-    flex: 1, backgroundColor: Colors.card,
-    borderWidth: 1, borderColor: Colors.border,
-    borderRadius: 0, padding: 16, margin: 6,
+  catCard: {
+    flex: 1,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 0,
+    padding: 16,
+    margin: 6,
   },
-  cardTop: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-start', marginBottom: 8,
+  catTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  cardIcon:  { fontSize: 26 },
-  tierBadgePro: {
-    backgroundColor: Colors.gold, borderRadius: 999,
-    paddingHorizontal: 7, paddingVertical: 2, justifyContent: 'center',
+  catIcon: { fontSize: 26 },
+  tierBadge: {
+    backgroundColor: Colors.gold,
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    justifyContent: 'center',
   },
-  tierTextPro: {
-    color: Colors.background, fontSize: 9, fontWeight: '800',
+  tierText: {
+    color: Colors.background,
+    fontSize: 9,
+    fontWeight: '800',
   },
-  cardName: {
-    color: Colors.textPrimary, fontFamily: FONT.interMed,
-    fontSize: 13, marginBottom: 6,
+  catName: {
+    color: Colors.textPrimary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    marginBottom: 6,
   },
-  cardPrice: {
-    color: Colors.gold, fontFamily: FONT.spaceGrotesk,
-    fontSize: 12, marginBottom: 4, fontVariant: ['tabular-nums'],
+  catPrice: {
+    color: Colors.gold,
+    fontFamily: Fonts.heading,
+    fontSize: 12,
+    marginBottom: 4,
+    fontVariant: ['tabular-nums'],
   },
-  cardDifficulty: {
-    color: Colors.textSecondary, fontFamily: FONT.inter, fontSize: 11,
+  catDiff: {
+    color: Colors.textSecondary,
+    fontFamily: Fonts.body,
+    fontSize: 11,
   },
 
-  // Loading / error
-  loadingText: { color: Colors.gold, fontSize: 14, textAlign: 'center', marginTop: 32 },
-  errorText:   { color: Colors.red, fontSize: 13, textAlign: 'center', marginTop: 32, paddingHorizontal: 24 },
+  // Error
+  errorText: {
+    color: Colors.red,
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 32,
+    paddingHorizontal: 24,
+  },
 });
