@@ -33,6 +33,8 @@ interface ActiveJob {
   created_at: string;
   timing: string | null;
   bid_count?: number;
+  _role: 'taken' | 'posted' | 'applied';
+  _bidPrice?: number | null;
 }
 
 interface CompletedJob {
@@ -129,8 +131,8 @@ export default function DeskScreen() {
       .eq('status', 'open')
       .order('created_at', { ascending: false });
 
-    const taken: ActiveJob[] = (takenRows ?? []).map(j => ({ ...j, _role: 'taken' } as any));
-    const posted: ActiveJob[] = (postedRows ?? []).map(j => ({ ...j, _role: 'posted' } as any));
+    const taken: ActiveJob[] = (takenRows ?? []).map(j => ({ ...j, _role: 'taken' as const }));
+    const posted: ActiveJob[] = (postedRows ?? []).map(j => ({ ...j, _role: 'posted' as const }));
 
     // Bid counts for posted jobs
     if (posted.length > 0) {
@@ -147,7 +149,35 @@ export default function DeskScreen() {
       }
     }
 
-    const merged = [...taken, ...posted];
+    // APPLIED — worker's pending bids (awaiting decision)
+    const { data: appliedRows } = await supabase
+      .from('bids')
+      .select(`
+        id, proposed_price, created_at,
+        job:jobs!job_id(id, title, status, customer_id, worker_id, agreed_price, budget_min, budget_max, timing)
+      `)
+      .eq('worker_id', user.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+
+    const applied: ActiveJob[] = (appliedRows ?? [])
+      .filter((b: any) => b.job)
+      .map((b: any) => ({
+        id: b.job.id,
+        title: b.job.title,
+        status: b.job.status,
+        customer_id: b.job.customer_id,
+        worker_id: b.job.worker_id,
+        agreed_price: b.job.agreed_price ? Number(b.job.agreed_price) : null,
+        budget_min: b.job.budget_min ? Number(b.job.budget_min) : null,
+        budget_max: b.job.budget_max ? Number(b.job.budget_max) : null,
+        created_at: b.created_at,
+        timing: b.job.timing,
+        _role: 'applied' as const,
+        _bidPrice: b.proposed_price ? Number(b.proposed_price) : null,
+      }));
+
+    const merged = [...taken, ...posted, ...applied];
     setActiveJobs(merged);
 
     // ── Section 2: Earnings this week ──
@@ -242,27 +272,60 @@ export default function DeskScreen() {
           <Text style={s.emptyLine}>Nothing active right now.</Text>
         ) : (
           activeJobs.map(job => {
-            const isTaken = job.worker_id === userId;
-            const price = job.agreed_price ?? job.budget_max ?? job.budget_min;
+            const role = job._role;
+            const price = role === 'applied'
+              ? (job._bidPrice ?? job.agreed_price ?? job.budget_max ?? job.budget_min)
+              : (job.agreed_price ?? job.budget_max ?? job.budget_min);
+
+            const tagStyle = role === 'taken' ? s.roleTagGreen
+              : role === 'posted' ? s.roleTagAmber
+              : s.roleTagBlue;
+
+            const tagText = role === 'taken'
+              ? `\u25CF TAKEN \u00b7 ${job.status === 'matched' ? 'MATCHED' : job.status === 'pending_confirmation' ? 'PENDING CONFIRM' : 'IN PROGRESS'}`
+              : role === 'posted'
+              ? `\u25C6 POSTED \u00b7 AWAITING BIDS`
+              : `\u25CF APPLIED \u00b7 AWAITING DECISION`;
+
+            const metaText = role === 'taken'
+              ? (job.timing ? job.timing.toUpperCase() : timeAgo(job.created_at))
+              : role === 'posted'
+              ? `${job.bid_count ?? 0} BID${(job.bid_count ?? 0) !== 1 ? 'S' : ''} \u00b7 POSTED ${timeAgo(job.created_at)}`
+              : `APPLIED ${timeAgo(job.created_at)}`;
+
+            const handlePress = async () => {
+              if (role === 'posted') {
+                router.push(`/(tabs)/job-bids?job_id=${job.id}` as any);
+              } else if (role === 'taken') {
+                const { data: chatRow } = await supabase
+                  .from('chats')
+                  .select('id')
+                  .eq('job_id', job.id)
+                  .maybeSingle();
+                if (chatRow?.id) {
+                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+                }
+              } else {
+                router.push(`/(tabs)/job-detail?job_id=${job.id}` as any);
+              }
+            };
+
             return (
-              <View key={job.id} style={s.activeCard}>
-                <Text style={[s.roleTag, isTaken ? s.roleTagGreen : s.roleTagAmber]}>
-                  {isTaken
-                    ? `\u25CF TAKEN \u00b7 ${job.status === 'matched' ? 'MATCHED' : job.status === 'pending_confirmation' ? 'PENDING CONFIRM' : 'IN PROGRESS'}`
-                    : `\u25C6 POSTED \u00b7 AWAITING BIDS`}
-                </Text>
+              <TouchableOpacity
+                key={`${role}-${job.id}`}
+                style={s.activeCard}
+                onPress={handlePress}
+                activeOpacity={0.7}
+              >
+                <Text style={[s.roleTag, tagStyle]}>{tagText}</Text>
                 <Text style={s.activeTitle} numberOfLines={1}>{job.title}</Text>
                 <View style={s.activeFoot}>
-                  <Text style={s.activeMeta}>
-                    {isTaken
-                      ? (job.timing ? job.timing.toUpperCase() : timeAgo(job.created_at))
-                      : `${job.bid_count ?? 0} BID${(job.bid_count ?? 0) !== 1 ? 'S' : ''} \u00b7 POSTED ${timeAgo(job.created_at)}`}
-                  </Text>
+                  <Text style={s.activeMeta}>{metaText}</Text>
                   {price != null && (
                     <Text style={s.activePrice}>{fmtPrice(price)}</Text>
                   )}
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         )}
@@ -392,6 +455,7 @@ const s = StyleSheet.create({
   },
   roleTagGreen: { color: Colors.green },
   roleTagAmber: { color: Colors.amber },
+  roleTagBlue: { color: Colors.blue },
   activeTitle: {
     fontFamily: Fonts.bodyMed,
     fontSize: 14,
