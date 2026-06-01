@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Image, ActionSheetIOS,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -68,7 +68,7 @@ export default function JobDetailScreen() {
   const [hasExistingBid, setHasExistingBid] = useState(false);
   const [currentUserId, setCurrentUserId]   = useState<string | null>(null);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     if (!job_id) {
       setError('No job specified.');
       setLoading(false);
@@ -129,7 +129,7 @@ export default function JobDetailScreen() {
       setHasExistingBid(!!((bidRes as any).data));
       setLoading(false);
     })();
-  }, [job_id]);
+  }, [job_id]));
 
   // ── Loading ────────────────────────────────────────────────────
 
