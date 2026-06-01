@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-01 (session end, second session this day)
-**Most recent commit:** `90da734` — feat: Slice B — Home as launchpad (one card, four flow-rows)
-**Status:** Nav restructure arc: Slices A + B shipped. Compose thread closed (anchored row, no float). Slice D (Desk first screen) is next.
+**Last updated:** 2026-06-01 (session end, third session this day)
+**Most recent commit:** `c0d8040` — fix: job-detail re-checks bid status on focus
+**Status:** Nav restructure arc COMPLETE (A + B + D shipped; C resolved as compose thread closed). Desk is the control panel; Home is the launchpad; both wire into dedicated screens.
 
 ---
 
@@ -26,34 +26,27 @@ The doc has four sections:
 
 ## 1. State of build threads
 
-### Active arc: Nav restructure
+### Closed arc: Nav restructure — COMPLETE
 
-Four-tab IA shipping in four slices: A → C → B → D. Spec at `docs/nav/NAV_SPEC.md` and `docs/nav/copy.md`. Visual reference is Design's `nav_visual_spec.html` (Design-side, not in repo).
+Four-tab IA shipped across slices A → B → D (C resolved as compose thread closed). Spec at `docs/nav/NAV_SPEC.md`.
 
-- **Slice A — Tab bar infrastructure** · `804bcf7` + fix `394c512` · **SHIPPED + VERIFIED**
-  - Tab bar visible for the first time in project history. Four primary tabs (HOME · MARKET · DESK · ACCOUNT) with placeholder Unicode glyphs. 11 non-primary screens hidden from bar via `href: null` (static options only — dynamic options don't honor href:null in Expo Router v6). 6 orphaned stub files deleted (`f081b7b`). payment-setup + stripe-connect converted to static options (`394c512`). 4 tabs verified clean on hardware.
-
-- **Slice C — Compose thread** · **CLOSED**
-  - The floating compose pill is dead. "Post a job" is now an anchored launchpad row on Home (Row 1 of the YOUR DESK card). Resolved across two design rulings ("One coat, three bodies" → superseded by "Home Doctrine Ruling") + founder decision, all grounded in XPROHUB_DOCTRINE.
-  - Market still has the floating ComposeFAB — see deferred item #2 below.
-
+- **Slice A — Tab bar infrastructure** · `804bcf7` + fix `394c512` · **SHIPPED**
+- **Slice C — Compose thread** · **CLOSED** (anchored row on Home; Market still has floating ComposeFAB — see deferred #2)
 - **Slice B — Home as launchpad** · `90da734` · **SHIPPED**
-  - Home rebuilt per Home Doctrine Ruling: one YOUR DESK card with four flow-rows (Post a job / Edit my card with LIVE-DRAFT signal / Posts awaiting review with live bid count / Applications waiting with live open count). Gold marks initiate; role-tint marks awaiting-decision.
-  - Removed: weather/greeting header, Last receipt row (now Desk history), floating ComposeFAB (Post a job row replaces it).
-  - Category grid retained as the post on-ramp (taxonomy/matching substrate per TAXONOMY_SPEC).
-  - BRAND_AUDIT note appended (Home resolved: launchpad over dashboard).
-
-- **Slice D — Desk tab first screen** · QUEUED (heaviest, next to route)
-  - Real Desk surface replaces the placeholder shipped in Slice A.
-  - Four sections: Active (both roles) → Earnings this week → Job history with receipt links → Payout history.
-  - Four new Supabase queries (merged active jobs, this-week payout aggregate, completed jobs list, released payouts list).
-  - Ledger voice: IBM Plex Mono dates/amounts, gold double-rule, big gold tabular total.
-  - Note: Desk's active-job queries overlap the Home count queries — building Desk may let both be verified together (see deferred item #1).
+- **Slice D — Desk first screen** · `e39fee1` · **SHIPPED**
+  - Three sections: Active · Both Roles (TAKEN green + POSTED amber + APPLIED blue), Earnings · This Week (gold hero), Job History (both roles, RECEIPT links). No Payout History (FINANCIAL_DATA_PRINCIPLE). No mode badge (Doctrine §2).
+- **Desk Active: APPLIED state + tappable cards** · `b328dd8` · **SHIPPED**
+  - All three in-flight states tappable: POSTED→job-bids, TAKEN→job-chat, APPLIED→job-detail.
+- **job-detail focus fix** · `c0d8040` · **SHIPPED**
+  - useEffect→useFocusEffect so bid-check re-runs on screen reuse (stale APPLY button fix).
 
 ### Shipped this session (docs)
 
-- `ea75f9b` — `docs/XPROHUB_DOCTRINE.md` added (binding product north star: four entries, one spine, Placement Law). Read-first.
-- `c191c59` — `docs/TAXONOMY_SPEC.md` added (category system as core infrastructure; tier = classification-not-gate; verification columns reserved/unenforced). Subordinate to Doctrine.
+- `ea75f9b` — `docs/XPROHUB_DOCTRINE.md` (binding north star). Read-first.
+- `c191c59` — `docs/TAXONOMY_SPEC.md` (category system as core infrastructure). Subordinate to Doctrine.
+- `d7d434e` — `docs/FINANCIAL_DATA_PRINCIPLE.md` (Stripe = system of record; XProHub = transaction record only). Subordinate to Doctrine.
+
+**Spec stack (read-first, in order):** XPROHUB_DOCTRINE → TAXONOMY_SPEC → FINANCIAL_DATA_PRINCIPLE.
 
 ### Active arc: review.tsx cleanup → Receipt symmetry
 
@@ -223,13 +216,13 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ## Deferred / open items (next session)
 
-1. **NON-ZERO COUNT VERIFY** — Home Row 3/4 counts verified correct in ZERO state only (this user has no open posts, no pending applications). The non-zero case (e.g. "3 BIDS" matching 3 actual pending bids) is UNVERIFIED — needs real pending test data. Watch for the dual-filter-path seam flagged in TAXONOMY_SPEC §5 (Home counts bids directly; lists may resolve differently).
+1. **NON-ZERO COUNT VERIFY** — Home Row 3/4 counts now cross-checkable against Desk Active (both populated). Active states verified rendering; broader count-vs-list match still worth a pass with more test data.
 
-2. **MARKET COMPOSE REWORK** — Home's float is gone, but Market still has the floating ComposeFAB. Per the v2 ruling, Market should get a pinned "+ POST A JOB" pill in the JOBS/TALENT toggle row (carries category_id, preserves explorer gate), and the floating ComposeFAB component should then be deleted entirely once no screen references it.
+2. **MARKET COMPOSE REWORK** — Market still has the floating ComposeFAB. Should become a pinned "+ POST A JOB" pill in the JOBS/TALENT toggle row (carries category_id, preserves explorer gate), then delete the ComposeFAB component once unused.
 
-3. **NAV_SPEC §2 / VISUAL SPEC STATUS** — confirm Design's amendments actually landed in NAV_SPEC.md (§2 anchored compose, §4 Pass demotion, §5 Boundary 2) and that nav_visual_spec.html's Home/Market mocks were redrawn off the float. Design claimed these in hand-backs; verify the files.
+3. **NAV_SPEC §3 REVISION** — spec still lists Payout History + mode badge, both cut. Design-side update so spec matches shipped Desk.
 
-4. **CHILD/ELDER CARE VERIFICATION GAP** — `requires_background_check = true` on these categories, enforced by NO code (TAXONOMY_SPEC §4). Roadmap item, not a fix — put on the actual roadmap with a date when verification work is scoped.
+4. **CHILD/ELDER CARE VERIFICATION GAP** — `requires_background_check = true` on these categories, enforced by NO code (TAXONOMY_SPEC §4). Roadmap item.
 
 ---
 
