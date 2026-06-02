@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-01 (session end, third session this day)
-**Most recent commit:** `c0d8040` — fix: job-detail re-checks bid status on focus
-**Status:** Nav restructure arc COMPLETE (A + B + D shipped; C resolved as compose thread closed). Desk is the control panel; Home is the launchpad; both wire into dedicated screens.
+**Last updated:** 2026-06-02 (session end)
+**Most recent commit:** `e7b30ee` — feat: Market anchored post bar (replaces floating ComposeFAB)
+**Status:** Nav restructure arc COMPLETE. Compose thread FULLY CLOSED — Home = anchored launchpad row, Market = anchored bar, no floating compose anywhere, ComposeFAB component deleted.
 
 ---
 
@@ -31,7 +31,10 @@ The doc has four sections:
 Four-tab IA shipped across slices A → B → D (C resolved as compose thread closed). Spec at `docs/nav/NAV_SPEC.md`.
 
 - **Slice A — Tab bar infrastructure** · `804bcf7` + fix `394c512` · **SHIPPED**
-- **Slice C — Compose thread** · **CLOSED** (anchored row on Home; Market still has floating ComposeFAB — see deferred #2)
+- **Slice C — Compose thread** · **FULLY CLOSED**
+  - Home: anchored "Post a job" launchpad row (Slice B).
+  - Market: anchored "+ POST A JOB" bar in sticky chrome (`e7b30ee`). Floating ComposeFAB deleted.
+  - No floating compose anywhere in the app.
 - **Slice B — Home as launchpad** · `90da734` · **SHIPPED**
 - **Slice D — Desk first screen** · `e39fee1` · **SHIPPED**
   - Three sections: Active · Both Roles (TAKEN green + POSTED amber + APPLIED blue), Earnings · This Week (gold hero), Job History (both roles, RECEIPT links). No Payout History (FINANCIAL_DATA_PRINCIPLE). No mode badge (Doctrine §2).
@@ -216,9 +219,9 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ## Deferred / open items (next session)
 
-1. **NON-ZERO COUNT VERIFY** — Home Row 3/4 counts now cross-checkable against Desk Active (both populated). Active states verified rendering; broader count-vs-list match still worth a pass with more test data.
+1. **DESIGN HAND-BACKS** — confirm Design landed NAV_SPEC §2 Market sub-block rewrite (toggle-row pill → anchored bar) and bannered the v2 ruling as superseded-in-part (Market half). Spec should match shipped.
 
-2. **MARKET COMPOSE REWORK** — Market still has the floating ComposeFAB. Should become a pinned "+ POST A JOB" pill in the JOBS/TALENT toggle row (carries category_id, preserves explorer gate), then delete the ComposeFAB component once unused.
+2. **WORKERS/TALENT LABEL DRIFT** — market.tsx labels the second feed via `strings['toggle.laborers']` which renders "TALENT" on device (already relabeled in strings.ts). Verify on hardware that the label reads TALENT, not WORKERS. If so, this item is closed.
 
 3. **NAV_SPEC §3 REVISION** — spec still lists Payout History + mode badge, both cut. Design-side update so spec matches shipped Desk.
 
