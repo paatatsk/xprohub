@@ -429,32 +429,32 @@ export default function MarketScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* ── Anchored post bar (both feeds) ── */}
+      <TouchableOpacity
+        style={styles.postBar}
+        activeOpacity={0.85}
+        onPress={() => {
+          const dest = category_id
+            ? `/(tabs)/post?category_id=${category_id}`
+            : '/(tabs)/post';
+          if (trustLevel === 'explorer') {
+            router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(dest)}` as any);
+          } else {
+            router.push(dest as any);
+          }
+        }}
+        accessibilityLabel="Post a job"
+        accessibilityRole="button"
+      >
+        <Text style={styles.postBarText}>+ POST A JOB</Text>
+      </TouchableOpacity>
+
       {/* ── Category filter strip — both feeds ── */}
       {renderFilterStrip()}
 
       {/* ── Feeds ── */}
       {activeFeed === 'jobs'    && renderJobsContent()}
       {activeFeed === 'workers' && renderWorkersContent()}
-
-      {/* ── FAB — Jobs feed only ── */}
-      {activeFeed === 'jobs' && (
-        <TouchableOpacity
-          style={styles.fab}
-          activeOpacity={0.85}
-          onPress={() => {
-            const fabDestination = category_id
-              ? `/(tabs)/post?category_id=${category_id}`
-              : '/(tabs)/post';
-            if (trustLevel === 'explorer') {
-              router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(fabDestination)}` as any);
-            } else {
-              router.push(fabDestination as any);
-            }
-          }}
-        >
-          <Text style={styles.fabText}>+ POST A JOB</Text>
-        </TouchableOpacity>
-      )}
 
     </SafeAreaView>
   );
@@ -596,20 +596,22 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
 
-  // FAB
-  fab: {
-    position: 'absolute',
-    bottom: 28,
-    right: 20,
+  // Anchored post bar
+  postBar: {
     backgroundColor: Colors.gold,
     borderRadius: Radius.full,
-    paddingVertical: 14,
-    paddingHorizontal: 22,
+    paddingVertical: 12,
+    marginHorizontal: Spacing.md,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 44,
   },
-  fabText: {
-    color: Colors.background,
-    fontWeight: 'bold',
+  postBarText: {
+    fontFamily: Fonts.heading,
     fontSize: 13,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    color: Colors.background,
   },
 });
