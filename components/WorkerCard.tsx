@@ -11,7 +11,6 @@ export interface Worker {
   full_name: string;
   avatar_url: string | null;
   bio: string | null;
-  rating: number | null;
   superpowers: string[];
   worker_status: 'offline' | 'available' | 'booked';
   today_rate_min: number | null;

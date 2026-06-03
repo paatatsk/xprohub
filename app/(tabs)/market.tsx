@@ -142,7 +142,7 @@ export default function MarketScreen() {
         user_id,
         is_featured,
         task_library ( name ),
-        profiles ( id, full_name, avatar_url, bio, rating_avg, jobs_completed, endorsement_count, city, worker_status, today_rate_min, today_rate_max, today_radius_mi, today_skills, created_at )
+        profiles ( id, full_name, avatar_url, bio, jobs_completed, endorsement_count, city, worker_status, today_rate_min, today_rate_max, today_radius_mi, today_skills, created_at )
       `)
       .order('is_featured', { ascending: false })
       .limit(300);
@@ -166,7 +166,6 @@ export default function MarketScreen() {
           full_name: string | null;
           avatar_url: string | null;
           bio: string | null;
-          rating_avg: number | null;
           jobs_completed: number | null;
           endorsement_count: number | null;
           city: string | null;
@@ -186,7 +185,6 @@ export default function MarketScreen() {
             full_name: profile.full_name ?? 'Anonymous',
             avatar_url: profile.avatar_url,
             bio: profile.bio,
-            rating: profile.rating_avg,
             superpowers: [],
             worker_status: (profile.worker_status as Worker['worker_status']) ?? 'offline',
             today_rate_min: profile.today_rate_min,

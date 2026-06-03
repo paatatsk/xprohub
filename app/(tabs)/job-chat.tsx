@@ -113,7 +113,6 @@ export default function JobChatScreen() {
   const [sendError,     setSendError]     = useState<string | null>(null);
   const [actionLoading,   setActionLoading]   = useState(false);
   const [actionError,     setActionError]     = useState<string | null>(null);
-  const [userHasReviewed, setUserHasReviewed] = useState(false);
   const [payment,         setPayment]         = useState<PaymentRow | null>(null);
   const [disputeMode,     setDisputeMode]     = useState(false);
   const [disputeText,     setDisputeText]     = useState('');
@@ -180,43 +179,9 @@ export default function JobChatScreen() {
       }
       // If msgErr: show empty list — non-fatal, Realtime will still work
 
-      // Step 5 — check if current user has already reviewed this job
-      const jobId = (chatData as any).job_id as string | undefined;
-      if (jobId) {
-        const { data: existingReview } = await supabase
-          .from('reviews')
-          .select('id')
-          .eq('job_id', jobId)
-          .eq('reviewer_id', user.id)
-          .maybeSingle();
-
-        if (existingReview) {
-          setUserHasReviewed(true);
-        }
-      }
-
       setLoading(false);
     })();
   }, [chat_id]);
-
-  // Re-check review status when screen regains focus (fixes stale state
-  // after submitting a review and navigating back — POLISH_PASS #2)
-  useFocusEffect(
-    useCallback(() => {
-      if (!chat?.job?.id || !currentUserId) return;
-
-      (async () => {
-        const { data } = await supabase
-          .from('reviews')
-          .select('id')
-          .eq('job_id', chat.job!.id)
-          .eq('reviewer_id', currentUserId)
-          .maybeSingle();
-
-        setUserHasReviewed(!!data);
-      })();
-    }, [chat?.job?.id, currentUserId])
-  );
 
   // ── Payment data (fee panel + timer) ──────────────────────────────────────
 
@@ -388,23 +353,10 @@ export default function JobChatScreen() {
     );
   }, [chat, refetchJobStatus]);
 
-  const handleLeaveReview = useCallback(() => {
-    if (!chat?.job?.id || !currentUserId) return;
-    const revieweeId   = currentUserId === chat.customer_id
-      ? chat.worker_id
-      : chat.customer_id;
-    const revieweeName = currentUserId === chat.customer_id
-      ? chat.worker?.full_name ?? ''
-      : chat.customer?.full_name ?? '';
-    const jobTitle = chat.job.title ?? '';
-
-    router.push(
-      `/(tabs)/review?job_id=${chat.job.id}` +
-      `&reviewee_id=${revieweeId}` +
-      `&reviewee_name=${encodeURIComponent(revieweeName)}` +
-      `&job_title=${encodeURIComponent(jobTitle)}` as any
-    );
-  }, [chat, currentUserId, router]);
+  const handleViewReceipt = useCallback(() => {
+    if (!chat?.job?.id) return;
+    router.push(`/job/${chat.job.id}/receipt` as any);
+  }, [chat, router]);
 
   const handleConfirmCompletion = useCallback(async () => {
     if (!chat?.job?.id) return;
@@ -718,19 +670,13 @@ export default function JobChatScreen() {
 
         {jobStatus === 'completed' && (
           <View style={styles.lifecycleBanner}>
-            {userHasReviewed ? (
-              <View style={styles.lifecycleStaticBadgeCompleted}>
-                <Text style={styles.lifecycleStaticText}>✓ REVIEW SUBMITTED</Text>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.lifecycleBtn}
-                onPress={handleLeaveReview}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.lifecycleBtnText}>LEAVE A REVIEW</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              style={styles.lifecycleBtn}
+              onPress={handleViewReceipt}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.lifecycleBtnText}>VIEW RECEIPT</Text>
+            </TouchableOpacity>
           </View>
         )}
 

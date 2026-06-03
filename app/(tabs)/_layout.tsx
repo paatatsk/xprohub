@@ -105,7 +105,6 @@ export default function TabLayout() {
 
       {/* ── NON-PRIMARY SCREENS (routable, hidden from bar) ── */}
       <Tabs.Screen name="post"          options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'POST A JOB',    headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="review"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'RATE & REVIEW',  headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="report"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'REPORT',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="direct-hire"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="my-card"       options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY ID CARD',     headerLeft: () => <BackButton /> }} />

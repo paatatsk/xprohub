@@ -812,7 +812,6 @@ export default function MyCardScreen() {
     full_name: profile.full_name ?? 'Anonymous',
     avatar_url: profile.avatar_url,
     bio: showBioSheet ? (bioInput || null) : (profile.bio ?? null),
-    rating: null,
     superpowers: todaySkills.length > 0
       ? todaySkills.slice(0, 3)
       : rosterNames.slice(0, 3),

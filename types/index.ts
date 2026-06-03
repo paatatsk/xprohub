@@ -20,7 +20,6 @@ export interface Profile {
   xp_total: number;
   xp_level: number;
   level_name: string;
-  rating_avg: number;
   jobs_completed: number;
   jobs_posted: number;
   total_earned: number;
