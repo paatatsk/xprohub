@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-02 (session end)
-**Most recent commit:** `e7b30ee` — feat: Market anchored post bar (replaces floating ComposeFAB)
-**Status:** Nav restructure arc COMPLETE. Compose thread FULLY CLOSED — Home = anchored launchpad row, Market = anchored bar, no floating compose anywhere, ComposeFAB component deleted.
+**Last updated:** 2026-06-03 (session end)
+**Most recent commit:** `b024669` — docs: seal Ruling 01 — endorse-only decision record
+**Status:** Nav restructure COMPLETE. Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned.
 
 ---
 
@@ -47,24 +47,25 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - **job-detail focus fix** · `c0d8040` · **SHIPPED**
   - useEffect→useFocusEffect so bid-check re-runs on screen reuse (stale APPLY button fix).
 
-### Shipped this session (docs)
+### Shipped this session (code + docs)
 
-- `ea75f9b` — `docs/XPROHUB_DOCTRINE.md` (binding north star). Read-first.
-- `c191c59` — `docs/TAXONOMY_SPEC.md` (category system as core infrastructure). Subordinate to Doctrine.
-- `d7d434e` — `docs/FINANCIAL_DATA_PRINCIPLE.md` (Stripe = system of record; XProHub = transaction record only). Subordinate to Doctrine.
+- `e7b30ee` — Market anchored post bar (replaces floating ComposeFAB). Compose thread fully closed.
+- `3219167` — Child/Elder Care excluded from v1 (safety). Migration + is_active filter on all 5 category queries.
+- `3bd5b96` — Removed 5 orphaned files (HomeBeacon, GoldenDollar, TaskCard, useJobs, useIsWorker).
+- `9f5fb71` — Removed 5-star review system (Ruling 01). Deleted review.tsx, reviews table, rating_avg + trigger, dead rating fields. job-chat CTA → VIEW RECEIPT. ~500 net lines deleted.
+- `b024669` — Sealed Ruling 01 decision record (RULING_01_ENDORSE_ONLY.md).
 
-**Spec stack (read-first, in order):** XPROHUB_DOCTRINE → TAXONOMY_SPEC → FINANCIAL_DATA_PRINCIPLE.
+### Shipped earlier sessions (docs — spec stack)
 
-### Active arc: review.tsx cleanup → Receipt symmetry
+- `ea75f9b` — XPROHUB_DOCTRINE.md (binding north star)
+- `c191c59` — TAXONOMY_SPEC.md (category system as core infrastructure)
+- `d7d434e` — FINANCIAL_DATA_PRINCIPLE.md (Stripe = system of record)
 
-Ruling 01 compliance gap. Design's ruling landed. Code's investigation report complete. **Build not yet routed.**
+**Spec stack (read-first, in order):** XPROHUB_DOCTRINE → TAXONOMY_SPEC → FINANCIAL_DATA_PRINCIPLE → RULING_01_ENDORSE_ONLY → SAFETY_SPEC_EXCLUDED_CATEGORIES.
 
-- **Ruling files to commit first:** Design delivered `review_surface_ruling.html` + `RULING.md`. These need to be saved to `docs/review/` before build begins. (Confirm whether already committed — check git log for `review_surface_ruling` or similar.)
-- **Cleanup order per Code's investigation:**
-  1. UI first — rewire `job-chat.tsx` LEAVE A REVIEW CTA to VIEW RECEIPT, remove review.tsx + its Tabs.Screen entry from `_layout.tsx`
-  2. Dead-data cleanup — remove `rating_avg` from `market.tsx` query, from Worker type's `rating` field, from `types/index.ts`
-  3. Migration last — drop `after_review_insert` trigger, drop `update_profile_rating()` function, drop `reviews` table, drop `profiles.rating_avg` column
-- **Design's flags:** grep `rating_avg` repo-wide before column drop (final safety sweep); schema design = unique-per-(job, endorser, direction) endorsements with terminal "✓ ENDORSED · {date}" gold-filled state on Receipt load.
+### Closed arc: review.tsx cleanup → DONE
+
+Star review system fully removed at `9f5fb71`. Migration `20260603000001` applied. Ruling 01 sealed at `b024669`. Endorse/concern on Receipt is the single feedback path. No star screen, table, trigger, or field remains in code or DB.
 
 ### Closed arc: Print Shop
 
@@ -223,11 +224,10 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ## Deferred / open items (next session)
 
-1. **DESIGN HAND-BACKS** — confirm Design landed NAV_SPEC §2 Market sub-block rewrite (toggle-row pill → anchored bar) and bannered the v2 ruling as superseded-in-part (Market half). Spec should match shipped.
-
-2. **WORKERS/TALENT LABEL DRIFT** — market.tsx labels the second feed via `strings['toggle.laborers']` which renders "TALENT" on device (already relabeled in strings.ts). Verify on hardware that the label reads TALENT, not WORKERS. If so, this item is closed.
-
-3. **NAV_SPEC §3 REVISION** — spec still lists Payout History + mode badge, both cut. Design-side update so spec matches shipped Desk.
+1. **DESIGN HAND-BACKS** — NAV_SPEC §2 (Market anchored bar) + §3 (Desk no Payout History) still stale vs shipped; Design to land.
+2. **WORKERS/TALENT LABEL DRIFT** — verify TALENT reads correctly on device (likely already fixed via strings.ts).
+3. **TEST DATA** — one test job under old Child/Elder Care categories. Harmless (hidden by deactivation). Clean up at next test-data reset.
+4. **POLISH_PASS_QUEUE REFRESH** — several items now resolved (Market compose, Child/Elder exclusion, star removal). Queue doc needs a pass.
 
 4. **CHILD/ELDER CARE VERIFICATION GAP** — `requires_background_check = true` on these categories, enforced by NO code (TAXONOMY_SPEC §4). Roadmap item.
 
