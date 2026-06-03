@@ -16,6 +16,7 @@
 **Binding product tenet:** `docs/XPROHUB_DOCTRINE.md` — the north star. Four entries, one spine, the Placement Law. Every layout, feature, and polish decision is tested against it.
 **Core infrastructure:** `docs/TAXONOMY_SPEC.md` — the category taxonomy (Category→Task→Skill) is the matching substrate; tier is classification-not-gate; `requires_background_check`/`requires_verification` are reserved safety columns (unenforced).
 **Financial data:** `docs/FINANCIAL_DATA_PRINCIPLE.md` — XProHub stores/shows only transaction record (amounts, fees, payouts, dates, in/out), never bank/card/routing/balance; link to Stripe when sensitive detail is needed.
+**Quality signal:** `docs/RULING_01_ENDORSE_ONLY.md` — binary endorse/concern only, no star ratings anywhere. Star system removed; do not reintroduce.
 **Safety exclusion:** `docs/SAFETY_SPEC_EXCLUDED_CATEGORIES.md` — Child Care + Elder Care excluded from v1; is_active = false; must not re-enable without identity verification + background checks + manual vetting per the spec.
 
 **See also (for full project orientation):**

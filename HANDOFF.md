@@ -16,6 +16,8 @@ This is the single onboarding artifact for the next chat session. Read it first.
 
 **Then:** `docs/FINANCIAL_DATA_PRINCIPLE.md` — subordinate to the Doctrine. Governs every money surface (Receipt, Desk, future financial screens). Stripe is the system of record; XProHub holds only the transaction record (amounts, fees, payouts, dates, in/out), never bank/card/routing/balance. Link to Stripe when sensitive detail is needed.
 
+**Then:** `docs/RULING_01_ENDORSE_ONLY.md` — Ruling 01: endorse-only, no stars. Star system removed `9f5fb71`. Do not reintroduce stars without reading the record.
+
 **Then:** `docs/SAFETY_SPEC_EXCLUDED_CATEGORIES.md` — Child/Elder Care excluded from v1 (safety). Must not be re-enabled without the verification path in the spec (identity + background check + manual vetting).
 
 The doc has four sections:
