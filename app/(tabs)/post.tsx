@@ -106,6 +106,7 @@ export default function PostScreen() {
     supabase
       .from('task_categories')
       .select('id, name, icon_slug')
+      .eq('is_active', true)
       .order('sort_order', { ascending: true })
       .then(({ data }) => {
         setCategories(data ?? []);

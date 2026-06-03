@@ -174,6 +174,7 @@ export default function HomeScreen() {
     const { data: catData } = await supabase
       .from('task_categories')
       .select('id, name, price_min, price_max, difficulty_range, sort_order, icon_slug, tier, requires_background_check')
+      .eq('is_active', true)
       .order('sort_order', { ascending: true });
     setCategories(catData ?? []);
 

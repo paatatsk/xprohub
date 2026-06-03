@@ -765,6 +765,7 @@ export default function MyCardScreen() {
       supabase
         .from('task_categories')
         .select('id, name, icon_slug, sort_order')
+        .eq('is_active', true)
         .order('sort_order'),
       supabase
         .from('task_library')

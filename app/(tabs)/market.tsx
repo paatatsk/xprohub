@@ -65,6 +65,7 @@ export default function MarketScreen() {
       .from('task_categories')
       .select('name')
       .eq('id', Number(category_id))
+      .eq('is_active', true)
       .single()
       .then(({ data }) => {
         setCategoryName(data?.name ?? null);
