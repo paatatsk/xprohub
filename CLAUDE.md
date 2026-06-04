@@ -18,6 +18,7 @@
 **Financial data:** `docs/FINANCIAL_DATA_PRINCIPLE.md` — XProHub stores/shows only transaction record (amounts, fees, payouts, dates, in/out), never bank/card/routing/balance; link to Stripe when sensitive detail is needed.
 **Quality signal:** `docs/RULING_01_ENDORSE_ONLY.md` — binary endorse/concern only, no star ratings anywhere. Star system removed; do not reintroduce.
 **Safety exclusion:** `docs/SAFETY_SPEC_EXCLUDED_CATEGORIES.md` — Child Care + Elder Care excluded from v1; is_active = false; must not re-enable without identity verification + background checks + manual vetting per the spec.
+**Dormant schema:** belt_level / XP / badges tables exist in the DB but are UNUSED dead schema (no app code). Not a live feature, not a committed roadmap. Do not assume a belt/gamification system exists.
 
 **See also (for full project orientation):**
 - `SESSION_HANDOUT.md` — full chat-AI orientation, working preferences, philosophy
