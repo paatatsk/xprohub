@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-03 (session end)
-**Most recent commit:** `b024669` — docs: seal Ruling 01 — endorse-only decision record
-**Status:** Nav restructure COMPLETE. Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned.
+**Last updated:** 2026-06-04 (session end)
+**Most recent commit:** `17fcbee` — docs: reconcile NAV_SPEC with shipped code
+**Status:** Nav restructure COMPLETE. All specs reconciled with shipped code. Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented.
 
 ---
 
@@ -54,6 +54,8 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - `3bd5b96` — Removed 5 orphaned files (HomeBeacon, GoldenDollar, TaskCard, useJobs, useIsWorker).
 - `9f5fb71` — Removed 5-star review system (Ruling 01). Deleted review.tsx, reviews table, rating_avg + trigger, dead rating fields. job-chat CTA → VIEW RECEIPT. ~500 net lines deleted.
 - `b024669` — Sealed Ruling 01 decision record (RULING_01_ENDORSE_ONLY.md).
+- `c6cb170` — Documented dormant belt/XP/badges schema as unused (CLAUDE.md pointer).
+- `17fcbee` — Reconciled NAV_SPEC.md with shipped code (removed 4 stale concepts: floating FAB, Payout History, YOUR PASS, mode badge; updated Active to 3 role states, checklist marked shipped).
 
 ### Shipped earlier sessions (docs — spec stack)
 
@@ -224,12 +226,10 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 ## Deferred / open items (next session)
 
-1. **DESIGN HAND-BACKS** — NAV_SPEC §2 (Market anchored bar) + §3 (Desk no Payout History) still stale vs shipped; Design to land.
-2. **WORKERS/TALENT LABEL DRIFT** — verify TALENT reads correctly on device (likely already fixed via strings.ts).
-3. **TEST DATA** — one test job under old Child/Elder Care categories. Harmless (hidden by deactivation). Clean up at next test-data reset.
-4. **POLISH_PASS_QUEUE REFRESH** — several items now resolved (Market compose, Child/Elder exclusion, star removal). Queue doc needs a pass.
-
-4. **CHILD/ELDER CARE VERIFICATION GAP** — `requires_background_check = true` on these categories, enforced by NO code (TAXONOMY_SPEC §4). Roadmap item.
+1. **WORKERS/TALENT LABEL DRIFT** — verify TALENT reads correctly on device (likely already fixed via strings.ts).
+2. **TEST DATA** — one test job under old Child/Elder Care categories. Harmless (hidden by deactivation). Clean up at next test-data reset.
+3. **POLISH_PASS_QUEUE REFRESH** — several items now resolved (Market compose, Child/Elder exclusion, star removal, NAV_SPEC reconciliation). Queue doc needs a pass.
+4. **DORMANT SCHEMA** — belt_level/XP/badges tables: documented as unused, no app code. Not urgent but a cleanup candidate if DB trimming is scoped.
 
 ---
 
