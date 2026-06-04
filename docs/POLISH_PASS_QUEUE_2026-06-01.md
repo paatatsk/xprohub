@@ -1,25 +1,8 @@
 # Polish Pass Queue — Deferred Refinements
 
-**Created:** 2026-06-01
-**Status:** OPEN — items revisit when polish session opens (post-nav-restructure).
+**Created:** 2026-06-01 · **Last refreshed:** 2026-06-04
+**Status:** OPEN — items revisit when polish session opens.
 **Author:** Maestro, capturing items surfaced during the Print Shop build (PR 3 → Print Shop arc) and earlier sessions.
-
----
-
-## Audit findings — Ruling 01 compliance gap
-
-### Star rating in chat
-**Status:** REPORTED, not yet investigated.
-
-Paata observed that star ratings are still present in the chat/post-job-completion flow somewhere. Ruling 01 banned star ratings platform-wide as the customer-facing trust signal. WorkerCard and JobCard were audited and corrected, but the chat/post-completion surface was missed.
-
-To do:
-1. Investigate where in the codebase star-rating UI still appears (likely `app/(tabs)/job-chat.tsx`, `app/(tabs)/review.tsx`, possibly `receipt.tsx`'s feedback section).
-2. Identify whether it's one surface or multiple.
-3. Replace with the binary endorse/raise-concern pattern locked in Ruling 01.
-4. Document the corrected scope in Brand Audit (extend Ruling 01 entry).
-
-Paata may have a screenshot or specific location reference to share that narrows the investigation.
 
 ---
 
@@ -69,9 +52,15 @@ Already parked in Print Shop Rev 01 + Slice 4 commit. PanResponder drag-and-drop
 
 ---
 
-## Account tab placeholder
+## Resolved (shipped — removed from the active queue)
 
-Currently `account.tsx` exists as a settings/legal/sign-out screen. Will be absorbed into the Account tab when nav restructure ships. Not part of the polish pass — part of the nav restructure work.
+| Item | Resolved by | Date |
+|---|---|---|
+| Star rating in chat / Ruling 01 gap | review.tsx deleted, star system fully removed (`9f5fb71`). Ruling 01 sealed (`b024669`). job-chat CTA → VIEW RECEIPT. | 2026-06-03 |
+| Account tab placeholder | Account ships as peer tab (nav Slice A, `804bcf7`). `account.tsx` is the Account tab destination. | 2026-06-01 |
+| Market compose rework | Anchored "+ POST A JOB" bar in Market sticky chrome (`e7b30ee`). Floating ComposeFAB deleted. | 2026-06-02 |
+| Child/Elder Care exclusion | Soft-deactivated (is_active=false), SAFETY_SPEC landed (`3219167`). | 2026-06-02 |
+| NAV_SPEC reconciliation | Spec matched to shipped code — removed floating FAB, Payout History, YOUR PASS, mode badge (`17fcbee`). | 2026-06-04 |
 
 ---
 
