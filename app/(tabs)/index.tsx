@@ -229,17 +229,9 @@ export default function HomeScreen() {
 
   const renderHeader = useCallback(() => (
     <View style={s.header}>
-      {/* Masthead: wordmark + gear */}
+      {/* Masthead: wordmark only (Account reached via tab bar) */}
       <View style={s.masthead}>
         <Text style={s.wordmark}>XPROHUB</Text>
-        <TouchableOpacity
-          onPress={() => router.push('/(tabs)/account')}
-          activeOpacity={0.7}
-          accessibilityLabel="Settings"
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Text style={s.gearIcon}>{'\u2699'}</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Launchpad card */}
@@ -323,7 +315,6 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     letterSpacing: 4,
   },
-  gearIcon: { fontSize: 22, color: Colors.gold },
 
   // Launchpad card
   card: {

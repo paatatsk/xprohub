@@ -216,31 +216,6 @@ export default function AccountScreen() {
           <Text style={styles.signOutText}>SIGN OUT</Text>
         </TouchableOpacity>
 
-        {__DEV__ && (
-          <TouchableOpacity
-            style={{ alignSelf: 'center', marginTop: 16, paddingVertical: 10, paddingHorizontal: 24, borderWidth: 1, borderColor: Colors.red, borderRadius: 6 }}
-            onPress={async () => {
-              const { data: { user } } = await supabase.auth.getUser();
-              if (!user) return;
-              const { data: job } = await supabase
-                .from('jobs')
-                .select('id')
-                .or(`customer_id.eq.${user.id},worker_id.eq.${user.id}`)
-                .eq('status', 'completed')
-                .order('completed_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
-              if (job) {
-                router.push(`/job/${job.id}/receipt` as any);
-              } else {
-                Alert.alert('No completed jobs', 'Complete a job first to see the receipt.');
-              }
-            }}
-          >
-            <Text style={{ color: Colors.red, fontSize: 11, letterSpacing: 1 }}>DEV: VIEW RECEIPT (REAL DATA)</Text>
-          </TouchableOpacity>
-        )}
-
         <TouchableOpacity
           style={[styles.deleteBtn, isDeleting && { opacity: 0.5 }]}
           onPress={handleDeleteAccount}
