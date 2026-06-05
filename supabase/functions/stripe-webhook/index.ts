@@ -309,10 +309,24 @@ Deno.serve(async (req: Request): Promise<Response> => {
         break
       }
 
-      case 'payment_intent.payment_failed':
-        // Chunk D — Payment attempt failed; notify customer, handle job state.
-        console.log('[stripe-webhook] payment_intent.payment_failed — handler wired in Chunk D')
+      case 'payment_intent.payment_failed': {
+        // Payment attempt failed (e.g. 3DS verification timeout/failure).
+        // NO state change — the client already handles this synchronously
+        // (job stays open, bid stays pending, customer can retry).
+        // This handler provides ops observability only.
+        const failedPi = event.data.object as Stripe.PaymentIntent
+        const failJobId = failedPi.metadata?.job_id ?? 'unknown'
+        const failBidId = failedPi.metadata?.bid_id ?? 'unknown'
+        const failReason = failedPi.last_payment_error?.message ?? 'unknown'
+        const failCode = failedPi.last_payment_error?.decline_code ?? failedPi.last_payment_error?.code ?? 'none'
+
+        console.log(
+          `[stripe-webhook] payment_intent.payment_failed for ${failedPi.id}: ` +
+          `job=${failJobId}, bid=${failBidId}, reason="${failReason}", code=${failCode}. ` +
+          `No state change — client handled synchronously.`
+        )
         break
+      }
 
       case 'transfer.created': {
         // Chunk E — Idempotent backup for release-payment Edge Function (E-5).
