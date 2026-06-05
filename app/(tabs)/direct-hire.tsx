@@ -159,52 +159,32 @@ export default function DirectHireScreen() {
     // First chat message: description if provided, else fall back to title
     const firstMessage = description.trim() || title.trim();
 
-    // 1. INSERT job (status = matched — pre-targeted, not visible in Live Market)
-    const { data: newJob, error: jobErr } = await supabase
-      .from('jobs')
-      .insert({
-        customer_id:  user.id,
-        worker_id,
-        title:        title.trim(),
-        description:  description.trim() || null,
-        category:     categoryForJob,
-        status:       'matched',
-        budget_min:   budgetMin ? parseFloat(budgetMin) : null,
-        budget_max:   budgetMax ? parseFloat(budgetMax) : null,
-        neighborhood: neighborhood.trim(),
-        timing,
-        is_urgent:    isUrgent,
-      })
-      .select('id')
-      .single();
+    // 1. Atomic job + tasks creation (status = matched — pre-targeted, not in Live Market)
+    const { data: jobId, error: rpcErr } = await supabase.rpc('create_job_with_tasks', {
+      p_title:        title.trim(),
+      p_description:  description.trim() || null,
+      p_category:     categoryForJob,
+      p_budget_min:   budgetMin ? parseFloat(budgetMin) : null,
+      p_budget_max:   budgetMax ? parseFloat(budgetMax) : null,
+      p_neighborhood: neighborhood.trim(),
+      p_timing:       timing,
+      p_is_urgent:    isUrgent,
+      p_task_ids:     Array.from(selectedTaskIds),
+      p_worker_id:    worker_id,
+      p_status:       'matched',
+    });
 
-    if (jobErr || !newJob) {
-      setSubmitError(jobErr?.message ?? 'Failed to create job. Please try again.');
+    if (rpcErr || !jobId) {
+      setSubmitError('Something went wrong creating this job. Please try again.');
       setSubmitting(false);
       return;
     }
 
-    // 2. INSERT job_post_tasks (one row per selected skill)
-    const taskRows = Array.from(selectedTaskIds).map(task_id => ({
-      job_post_id: newJob.id,
-      task_id,
-    }));
-
-    const { error: taskErr } = await supabase
-      .from('job_post_tasks')
-      .insert(taskRows);
-
-    if (taskErr) {
-      setSubmitError('Job created but task link failed. Contact support if this persists.');
-      setSubmitting(false);
-      return;
-    }
-
-    // 3. INSERT chat
+    // 2. INSERT chat
     const { data: newChat, error: chatErr } = await supabase
       .from('chats')
       .insert({
-        job_id:          newJob.id,
+        job_id:          jobId,
         customer_id:     user.id,
         worker_id,
         last_message:    firstMessage,

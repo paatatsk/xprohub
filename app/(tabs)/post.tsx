@@ -246,39 +246,21 @@ export default function PostScreen() {
     setSubmitting(true);
     setSubmitError(null);
 
-    const { data: newJob, error: jobErr } = await supabase
-      .from('jobs')
-      .insert({
-        customer_id:  user.id,
-        title:        title.trim(),
-        description:  description.trim() || null,
-        category:     categoryName ?? null,
-        budget_min:   budgetMin ? parseFloat(budgetMin) : null,
-        budget_max:   budgetMax ? parseFloat(budgetMax) : null,
-        neighborhood: neighborhood.trim(),
-        timing,
-        is_urgent:    isUrgent,
-      })
-      .select('id')
-      .single();
+    // Atomic job + tasks creation — no orphaned taskless jobs possible
+    const { data: jobId, error: rpcErr } = await supabase.rpc('create_job_with_tasks', {
+      p_title:        title.trim(),
+      p_description:  description.trim() || null,
+      p_category:     categoryName ?? null,
+      p_budget_min:   budgetMin ? parseFloat(budgetMin) : null,
+      p_budget_max:   budgetMax ? parseFloat(budgetMax) : null,
+      p_neighborhood: neighborhood.trim(),
+      p_timing:       timing,
+      p_is_urgent:    isUrgent,
+      p_task_ids:     Array.from(selectedTaskIds),
+    });
 
-    if (jobErr || !newJob) {
-      setSubmitError(jobErr?.message ?? 'Failed to post job. Please try again.');
-      setSubmitting(false);
-      return;
-    }
-
-    const taskRows = Array.from(selectedTaskIds).map(task_id => ({
-      job_post_id: newJob.id,
-      task_id,
-    }));
-
-    const { error: tasksErr } = await supabase
-      .from('job_post_tasks')
-      .insert(taskRows);
-
-    if (tasksErr) {
-      setSubmitError('Job posted, but tasks failed to save. Contact support if this persists.');
+    if (rpcErr || !jobId) {
+      setSubmitError('Something went wrong posting your job. Please try again.');
       setSubmitting(false);
       return;
     }
