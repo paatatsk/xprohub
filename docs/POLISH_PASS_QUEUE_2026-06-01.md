@@ -61,6 +61,11 @@ Already parked in Print Shop Rev 01 + Slice 4 commit. PanResponder drag-and-drop
 | Market compose rework | Anchored "+ POST A JOB" bar in Market sticky chrome (`e7b30ee`). Floating ComposeFAB deleted. | 2026-06-02 |
 | Child/Elder Care exclusion | Soft-deactivated (is_active=false), SAFETY_SPEC landed (`3219167`). | 2026-06-02 |
 | NAV_SPEC reconciliation | Spec matched to shipped code — removed floating FAB, Payout History, YOUR PASS, mode badge (`17fcbee`). | 2026-06-04 |
+| Webhook payment_intent.payment_failed | Structured logging implemented (`6b72fc5`). No state change needed — client handles 3DS failure synchronously. | 2026-06-04 |
+| Atomic job creation | `create_job_with_tasks` SECURITY DEFINER RPC (`2d94758`). Taskless jobs structurally impossible. | 2026-06-04 |
+| Empty-state string fallbacks | Defensive `??` fallbacks on market.tsx string references (`0903e91`). | 2026-06-04 |
+| Release-payment console.error (job-chat ~388) | INVESTIGATED and CONSCIOUSLY SKIPPED. Auto-release cron + transfer.created webhook fully cover the path. Money never lost/stuck. Edge Function logs server-side. Client console.error is noise but harmless. | 2026-06-04 |
+| Test-data cleanup | 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain. | 2026-06-04 |
 
 ---
 

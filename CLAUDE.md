@@ -188,26 +188,22 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Job Bids | `app/(tabs)/job-bids.tsx` | Functional — accept/decline + hire-and-charge |
 | Direct Hire | `app/(tabs)/direct-hire.tsx` | Functional — bypasses bidding |
 | Job Chat | `app/(tabs)/job-chat.tsx` | Functional — Realtime + lifecycle CTAs (784 lines) |
-| Review | `app/(tabs)/review.tsx` | Functional — bidirectional rating + comment |
 | Report | `app/(tabs)/report.tsx` | Functional — multi-reason + optional block |
 | Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
 | Payment Setup | `app/(tabs)/payment-setup.tsx` | Functional — Stripe PaymentSheet |
 | Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
 | Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, five-voice typography |
 
-### Unreachable stubs (files exist, not registered in tab layout)
-`chat.tsx`, `earnings.tsx`, `profile.tsx`, `notifications.tsx`, `payment.tsx`, `match.tsx` — all unregistered by G-7 stub cleanup. No user can navigate to them.
-
-Home = YOUR DESK hub. Last receipt → Receipt. Jobs I've posted → My Jobs. My applications → My Applications. Category card → Live Market filtered by category_id.
+Home = YOUR DESK launchpad (four flow-rows: Post a job / Edit my card / Posts awaiting review / Applications waiting). Category grid below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 
 ## Supabase — Tables (Live)
-`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `reviews` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements`
+`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements`
 
 - `task_code` format: `CCTT` e.g. `0101` = category 01, task 01
 - `worker_skills.is_featured` = worker's top 3 "Superpowers" shown on their profile card
 - `profiles.first_name` = user-owned display name for receipts and greetings (added 2026-05-25)
 - `task_library.completion_verb_phrase` = ops-owned past-tense verb phrase per category (added 2026-05-25)
-- Seed file: `supabase/seed/XProHub_TaskLibrary_Seed_v1.1.sql` — deployed 2026-04-17 (20 categories · 188 tasks)
+- Seed file: `supabase/seed/XProHub_TaskLibrary_Seed_v1.1.sql` — deployed 2026-04-17 (20 categories · 188 tasks in seed; 18 categories / 171 tasks active; Child Care + Elder Care deactivated for safety per SAFETY_SPEC)
 - Realtime on: `jobs`, `messages`, `notifications`
 - Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql`
 
@@ -447,7 +443,7 @@ Explorer users browse freely. Gate fires only at:
 - My Jobs + My Applications dashboards
 - Real Chat UI — Supabase Realtime message thread
 - Job lifecycle CTAs — Mark In Progress / Mark Complete / Confirm Completion
-- Review flow — bidirectional rating + comment
+- Endorsement flow — binary endorse/concern on Receipt (star review system removed per Ruling 01)
 - Payment flow — all chunks (A through E) complete. Full Stripe Connect pipeline: customer payment method setup, hire-and-charge, escrow hold, payout release, auto-release cron (Cloudflare Worker, 72-hour timer), dispute path, transfer.created webhook backup. 8 Edge Functions deployed.
 
 ### ✅ Chunk G — Launch Compliance (8 of 9 complete)

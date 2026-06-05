@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-04 (session end)
-**Most recent commit:** `17fcbee` — docs: reconcile NAV_SPEC with shipped code
-**Status:** Nav restructure COMPLETE. All specs reconciled with shipped code. Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented.
+**Last updated:** 2026-06-04 (session end, pre-submission audit complete)
+**Most recent commit:** `0903e91` — fix(market): defensive fallback for empty-state strings
+**Status:** Nav restructure COMPLETE. Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented.
 
 ---
 
@@ -47,7 +47,13 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - **job-detail focus fix** · `c0d8040` · **SHIPPED**
   - useEffect→useFocusEffect so bid-check re-runs on screen reuse (stale APPLY button fix).
 
-### Shipped this session (code + docs)
+### Shipped this session (pre-submission audit fixes)
+
+- `6b72fc5` — Structured logging for `payment_intent.payment_failed` webhook (ops observability, no state change — client handles 3DS failure synchronously).
+- `2d94758` — Atomic `create_job_with_tasks` SECURITY DEFINER RPC. post.tsx + direct-hire.tsx now use one RPC; taskless jobs structurally impossible. Migration `20260604000001`.
+- `0903e91` — Defensive `??` fallbacks for empty-state strings in market.tsx.
+
+### Shipped earlier (code + docs)
 
 - `e7b30ee` — Market anchored post bar (replaces floating ComposeFAB). Compose thread fully closed.
 - `3219167` — Child/Elder Care excluded from v1 (safety). Migration + is_active filter on all 5 category queries.
@@ -55,7 +61,7 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - `9f5fb71` — Removed 5-star review system (Ruling 01). Deleted review.tsx, reviews table, rating_avg + trigger, dead rating fields. job-chat CTA → VIEW RECEIPT. ~500 net lines deleted.
 - `b024669` — Sealed Ruling 01 decision record (RULING_01_ENDORSE_ONLY.md).
 - `c6cb170` — Documented dormant belt/XP/badges schema as unused (CLAUDE.md pointer).
-- `17fcbee` — Reconciled NAV_SPEC.md with shipped code (removed 4 stale concepts: floating FAB, Payout History, YOUR PASS, mode badge; updated Active to 3 role states, checklist marked shipped).
+- `17fcbee` — Reconciled NAV_SPEC.md with shipped code.
 
 ### Shipped earlier sessions (docs — spec stack)
 
@@ -104,12 +110,14 @@ Each lifetime edit operation is exactly ONE INSERT, UPDATE, or DELETE. Never rea
 
 Current implementation: parallel-implemented pickers (daily today_skills and lifetime add-skill each have their own picker copy). Flagged for post-launch refactor to a shared presentational child + thin parent pattern, but acceptable for v1.
 
+Job creation is atomic: `create_job_with_tasks` SECURITY DEFINER RPC (migration `20260604000001`) inserts the job + task links in one transaction. A taskless job is structurally impossible.
+
 ### Ruling 01 — Binary endorse/concern pattern
 
 - No star ratings anywhere. Receipt's ENDORSE THIS WORK + quiet "raise a concern" link is the locked vocabulary.
 - Endorsements unique per (job, endorser, direction). One job = one endorse moment per direction. No undo, no re-endorse.
 - Post-endorse terminal state: gold-filled "✓ ENDORSED · {date}" rendered on Receipt load. The screen is a persistent artifact.
-- review.tsx surface being eliminated entirely; customer→worker endorse + new worker→customer endorse both live on Receipt.
+- review.tsx was eliminated at `9f5fb71`; customer→worker endorse + worker→customer endorse both live on Receipt.
 
 ### Receipt is the brand lighthouse
 
@@ -119,8 +127,8 @@ Worker payout = hero number. Platform fee = visible line item (3% Stripe + 7% op
 
 - HOME (present tense) · MARKET (the platform) · DESK (past tense + money) · ACCOUNT (identity + config)
 - Separated by tense, not topic — makes location predictable.
-- Desk is peer, not nested. Posting is action (global +), not place.
-- YOUR DESK card → YOUR PASS rename. "Desk" now unambiguous (tab only).
+- Desk is peer, not nested. Posting is action (anchored rows/bars), not a tab or a float.
+- YOUR DESK card is the launchpad (flow-rows: Post a job / Edit my card / Posts awaiting / Applications). No rename to YOUR PASS (never built).
 - Account tab interior intentionally OUT OF SCOPE until identity-edit features become an active build thread.
 
 ### profiles.worker_status — NOT NULL, default 'offline'
@@ -151,10 +159,9 @@ Prioritized. Open polish doc at `docs/POLISH_PASS_QUEUE_2026-06-01.md` for the f
 
 ### Higher priority
 
-1. **review.tsx cleanup** — full Ruling 01 compliance closure. Design ruling landed, Code investigation complete, build not yet routed. Next active thread after nav restructure ships (or in parallel if energy allows).
-2. **NEW stamp threshold drift documentation** — Ruling 01 originally pinned NEW to `endorsement_count === 0`; what shipped is `jobs_completed < 10`. Formally document the drift in Ruling 01 Brand Audit entry (~5 min).
-3. **Native Alert → custom destructive dialog** in Slice 3 remove flow. Functionally works, visually off-brand. Replace `Alert.alert` with custom Modal matching Print Shop spec destructive register.
-4. **Strings inlining cleanup** — accessibility labels from earlier slices are literal strings; should pull from `constants/strings.ts`.
+1. **NEW stamp threshold drift documentation** — Ruling 01 originally pinned NEW to `endorsement_count === 0`; what shipped is `jobs_completed < 10`. Formally document the drift in Ruling 01 Brand Audit entry (~5 min).
+2. **Native Alert → custom destructive dialog** in Slice 3 remove flow. Functionally works, visually off-brand. Replace `Alert.alert` with custom Modal matching Print Shop spec destructive register.
+3. **Strings inlining cleanup** — accessibility labels from earlier slices are literal strings; should pull from `constants/strings.ts`.
 
 ### Lower priority
 
@@ -217,19 +224,28 @@ These have been hard-won. Honor them or rediscover them painfully.
 
 The brand has a house spec voice now. Editorial format with: Oswald eyebrow → Playfair italic title → italic Playfair lede → ornate rules → numbered annotations → WAS/IS tables → LOCKED stamps → FIN signoff. Print Shop, NEW stamp, nav, and review.tsx rulings all conform. New rulings should match.
 
+### Supabase SQL Editor gotchas
+
+- **Dollar-quoted function bodies** (`$$...$$`) silently no-op inside an explicit `BEGIN;...COMMIT;` block in the SQL Editor. Run the bare `CREATE OR REPLACE FUNCTION` without the wrapper.
+- **The SQL Editor does NOT hold a transaction open across separate "Run" clicks** — a `BEGIN;` in one run and `COMMIT;` in another does nothing. Run mutations as a single block (the editor's implicit transaction makes it all-or-nothing) and verify in a separate run.
+
 ### When the orchestra hits trouble
 
-- Three rounds of fix-without-diagnose loops yesterday cost us hours. The discipline is: ALWAYS gather empirical evidence (logs, Supabase counts, hardware reproduction) BEFORE proposing the fix. Two diagnostic checks save three wrong-fix rounds.
-- When a session is dragging, call it. Yesterday's stop-and-resume-with-fresh-energy let Slice 3 actually close.
+- Three rounds of fix-without-diagnose loops cost us hours on Slice 3. The discipline is: ALWAYS gather empirical evidence (logs, Supabase counts, hardware reproduction) BEFORE proposing the fix. Two diagnostic checks save three wrong-fix rounds.
+- When a session is dragging, call it. Stop-and-resume-with-fresh-energy let Slice 3 actually close.
 
 ---
 
 ## Deferred / open items (next session)
 
-1. **WORKERS/TALENT LABEL DRIFT** — verify TALENT reads correctly on device (likely already fixed via strings.ts).
-2. **TEST DATA** — one test job under old Child/Elder Care categories. Harmless (hidden by deactivation). Clean up at next test-data reset.
-3. **POLISH_PASS_QUEUE REFRESH** — several items now resolved (Market compose, Child/Elder exclusion, star removal, NAV_SPEC reconciliation). Queue doc needs a pass.
-4. **DORMANT SCHEMA** — belt_level/XP/badges tables: documented as unused, no app code. Not urgent but a cleanup candidate if DB trimming is scoped.
+1. **RELEASE-PAYMENT CONSOLE.ERROR (job-chat.tsx ~388)** — INVESTIGATED and CONSCIOUSLY SKIPPED. The 72hr auto-release cron + transfer.created webhook backup fully cover this path. Money is never lost or stuck. The Edge Function already logs failures server-side. The client-side console.error is noise but harmless. Do NOT re-flag in future audits.
+2. **DORMANT SCHEMA** — belt_level/XP/badges tables: documented as unused, no app code. Not urgent but a cleanup candidate if DB trimming is scoped.
+
+### Closed this session
+
+- WORKERS/TALENT label drift — confirmed TALENT renders correctly (strings.ts verified 06-04).
+- Test data cleanup — 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain.
+- Polish queue refreshed — 5 new resolved items added (webhook logging, atomic RPC, string fallbacks, release-payment skip, test-data cleanup).
 
 ---
 
