@@ -319,7 +319,7 @@ export default function MarketScreen() {
 
     const emptyLabel = categoryName
       ? `No ${categoryName} talent yet`
-      : strings['feed.empty.laborers'];
+      : (strings['feed.empty.laborers'] ?? 'No talent in your area right now.');
 
     return (
       <FlatList
@@ -423,7 +423,7 @@ export default function MarketScreen() {
           activeOpacity={0.8}
         >
           <Text style={[styles.toggleText, activeFeed === 'workers' && styles.toggleTextActive]}>
-            {strings['toggle.laborers']}
+            {strings['toggle.laborers'] ?? 'TALENT'}
           </Text>
         </TouchableOpacity>
       </View>
