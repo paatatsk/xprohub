@@ -95,8 +95,8 @@ export default function MarketScreen() {
     if (err) {
       setError('Couldn\u2019t load jobs. Pull down to try again.');
     } else {
-      const excluded = new Set([...blockedIds, ...(currentUserId ? [currentUserId] : [])]);
-      setJobs((data ?? []).filter(j => !excluded.has(j.customer_id)));
+      const blocked = new Set(blockedIds);
+      setJobs((data ?? []).filter(j => !blocked.has(j.customer_id)));
     }
 
     if (isRefresh) setRefreshing(false);
@@ -205,8 +205,8 @@ export default function MarketScreen() {
         }
       }
 
-      const excluded = new Set([...blockedIds, ...(currentUserId ? [currentUserId] : [])]);
-      setWorkers(Array.from(workerMap.values()).filter(w => !excluded.has(w.id)));
+      const blocked = new Set(blockedIds);
+      setWorkers(Array.from(workerMap.values()).filter(w => !blocked.has(w.id)));
     }
 
     if (isRefresh) setWorkersRefreshing(false);
@@ -266,12 +266,20 @@ export default function MarketScreen() {
       <FlatList
         data={jobs}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          const isOwnPost = !!currentUserId && item.customer_id === currentUserId;
+          return (
             <JobCardComponent
               job={item}
-              onPress={() => router.push(`/(tabs)/job-detail?job_id=${item.id}` as any)}
+              isOwnPost={isOwnPost}
+              onPress={() => router.push(
+                isOwnPost
+                  ? `/(tabs)/job-bids?job_id=${item.id}` as any
+                  : `/(tabs)/job-detail?job_id=${item.id}` as any
+              )}
             />
-          )}
+          );
+        }}
         contentContainerStyle={jobs.length === 0 ? styles.fillCenter : styles.listContent}
         refreshControl={
           <RefreshControl
@@ -325,60 +333,67 @@ export default function MarketScreen() {
       <FlatList
         data={workers}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <WorkerCardComponent
-            worker={item}
-            onHire={() => {
-              const hireDest =
-                `/(tabs)/direct-hire?worker_id=${item.id}` +
-                `&worker_name=${encodeURIComponent(item.full_name)}`;
-              if (trustLevel === 'explorer') {
-                router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(hireDest)}` as any);
-              } else {
-                router.push(hireDest as any);
-              }
-            }}
-            onOverflow={() => {
-              ActionSheetIOS.showActionSheetWithOptions(
-                {
-                  title: item.full_name,
-                  options: ['Report User', 'Block User', 'Cancel'],
-                  destructiveButtonIndex: 1,
-                  cancelButtonIndex: 2,
-                  userInterfaceStyle: 'dark',
-                },
-                async (buttonIndex) => {
-                  if (buttonIndex === 0) {
-                    router.push(
-                      `/(tabs)/report?reported_user_id=${item.id}` +
-                      `&content_type=user` +
-                      `&reported_user_name=${encodeURIComponent(item.full_name)}` as any
-                    );
-                  } else if (buttonIndex === 1) {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) {
-                      Alert.alert('Session expired', 'Please sign in again.');
-                      return;
-                    }
-                    const { error } = await supabase
-                      .from('user_blocks')
-                      .insert({ blocker_id: user.id, blocked_id: item.id });
-                    if (error) {
-                      if (error.code === '23505') {
-                        // Already blocked — treat as success
-                        await refreshBlocks();
+        renderItem={({ item }) => {
+          const isSelf = !!currentUserId && item.id === currentUserId;
+          return (
+            <WorkerCardComponent
+              worker={item}
+              {...(isSelf
+                ? { onEdit: () => router.push('/(tabs)/my-card' as any) }
+                : {
+                    onHire: () => {
+                      const hireDest =
+                        `/(tabs)/direct-hire?worker_id=${item.id}` +
+                        `&worker_name=${encodeURIComponent(item.full_name)}`;
+                      if (trustLevel === 'explorer') {
+                        router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(hireDest)}` as any);
                       } else {
-                        Alert.alert('Block Failed', "Couldn't block this user. Please try again.");
+                        router.push(hireDest as any);
                       }
-                    } else {
-                      await refreshBlocks();
-                    }
+                    },
+                    onOverflow: () => {
+                      ActionSheetIOS.showActionSheetWithOptions(
+                        {
+                          title: item.full_name,
+                          options: ['Report User', 'Block User', 'Cancel'],
+                          destructiveButtonIndex: 1,
+                          cancelButtonIndex: 2,
+                          userInterfaceStyle: 'dark',
+                        },
+                        async (buttonIndex) => {
+                          if (buttonIndex === 0) {
+                            router.push(
+                              `/(tabs)/report?reported_user_id=${item.id}` +
+                              `&content_type=user` +
+                              `&reported_user_name=${encodeURIComponent(item.full_name)}` as any
+                            );
+                          } else if (buttonIndex === 1) {
+                            const { data: { user } } = await supabase.auth.getUser();
+                            if (!user) {
+                              Alert.alert('Session expired', 'Please sign in again.');
+                              return;
+                            }
+                            const { error } = await supabase
+                              .from('user_blocks')
+                              .insert({ blocker_id: user.id, blocked_id: item.id });
+                            if (error) {
+                              if (error.code === '23505') {
+                                await refreshBlocks();
+                              } else {
+                                Alert.alert('Block Failed', "Couldn't block this user. Please try again.");
+                              }
+                            } else {
+                              await refreshBlocks();
+                            }
+                          }
+                        },
+                      );
+                    },
                   }
-                },
-              );
-            }}
-          />
-        )}
+              )}
+            />
+          );
+        }}
         contentContainerStyle={workers.length === 0 ? styles.fillCenter : styles.listContent}
         refreshControl={
           <RefreshControl

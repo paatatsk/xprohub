@@ -20,6 +20,7 @@ export interface Job {
 
 interface JobCardProps {
   job: Job;
+  isOwnPost?: boolean;
   onPress: () => void;
 }
 
@@ -66,7 +67,7 @@ function isNewPost(dateStr: string): boolean {
 
 // ── Main Component ─────────────────────────────────────────────
 
-export default function JobCard({ job, onPress }: JobCardProps) {
+export default function JobCard({ job, isOwnPost, onPress }: JobCardProps) {
   const showUrgentStamp = job.is_urgent;
   const showNewStamp = !showUrgentStamp && isNewPost(job.created_at);
 
@@ -92,6 +93,11 @@ export default function JobCard({ job, onPress }: JobCardProps) {
           <Text style={s.categoryLabel}>{job.category.toUpperCase()}</Text>
           <View style={s.categoryLine} />
         </View>
+      )}
+
+      {/* Own-post eyebrow */}
+      {isOwnPost && (
+        <Text style={s.ownPostTag} accessibilityLabel="Your post">YOUR POST</Text>
       )}
 
       {/* Title */}
@@ -169,6 +175,15 @@ const s = StyleSheet.create({
     letterSpacing: 3,
     color: Colors.gold,
     paddingHorizontal: 10,
+  },
+
+  // Own-post eyebrow
+  ownPostTag: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 2.5,
+    color: Colors.gold,
+    marginBottom: 6,
   },
 
   // Title

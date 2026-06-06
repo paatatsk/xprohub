@@ -57,6 +57,9 @@ export default function DirectHireScreen() {
   const [timing, setTiming]             = useState<Timing>('flexible');
   const [isUrgent, setIsUrgent]         = useState(false);
 
+  // Self-hire guard
+  const [isSelfHire, setIsSelfHire] = useState(false);
+
   // UI state
   const [errors, setErrors]           = useState<FormErrors>({});
   const [submitting, setSubmitting]   = useState(false);
@@ -96,6 +99,15 @@ export default function DirectHireScreen() {
         setSkills(mapped);
       }
       setDataLoading(false);
+    });
+  }, [worker_id]);
+
+  // ── Self-hire detection ────────────────────────────────────────
+
+  useEffect(() => {
+    if (!worker_id) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user && user.id === worker_id) setIsSelfHire(true);
     });
   }, [worker_id]);
 
@@ -227,6 +239,31 @@ export default function DirectHireScreen() {
   const initials         = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   const superpowers      = skills.filter(s => s.is_featured).slice(0, 3);
   const isSubmitDisabled = submitting || selectedTaskIds.size === 0;
+
+  // ── Guard: self-hire ───────────────────────────────────────────
+
+  if (isSelfHire) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.center}>
+          <Text style={{ fontSize: 36, marginBottom: 16 }}>🚧</Text>
+          <Text style={[styles.label, { fontSize: 16, textAlign: 'center', letterSpacing: 2 }]}>
+            CAN'T HIRE YOURSELF
+          </Text>
+          <Text style={{ fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 14, textAlign: 'center', marginTop: 8 }}>
+            You can't create a job targeting yourself.
+          </Text>
+          <TouchableOpacity
+            style={[styles.submitBtn, { marginTop: 24, backgroundColor: 'transparent', borderWidth: 1.5, borderColor: Colors.gold }]}
+            onPress={() => router.back()}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.submitText, { color: Colors.gold }]}>GO BACK</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // ── Loading ───────────────────────────────────────────────────
 

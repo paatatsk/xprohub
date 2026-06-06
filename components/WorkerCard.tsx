@@ -27,6 +27,7 @@ interface WorkerCardProps {
   worker: Worker;
   preview?: boolean;
   onHire?: () => void;
+  onEdit?: () => void;
   onPress?: () => void;
   onOverflow?: () => void;
   onPhotoPress?: () => void;
@@ -176,7 +177,7 @@ function TrackRecord({ worker }: { worker: Worker }) {
 
 // ── Main Component ─────────────────────────────────────────────
 
-export default function WorkerCard({ worker, preview, onHire, onPress, onOverflow, onPhotoPress, onBioPress }: WorkerCardProps) {
+export default function WorkerCard({ worker, preview, onHire, onEdit, onPress, onOverflow, onPhotoPress, onBioPress }: WorkerCardProps) {
   const workerId = formatWorkerId(worker.id);
   const initials = getInitials(worker.full_name);
 
@@ -210,7 +211,7 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
 
       {/* ── Gold credential stripe ── */}
       <View style={s.stripe}>
-        <Text style={s.stripeLeft}>XPROHUB {'\u00b7'} WORKER PASS</Text>
+        <Text style={s.stripeLeft}>XPROHUB {'\u00b7'} WORKER PASS{onEdit ? ' \u00b7 YOU' : ''}</Text>
         <View style={s.stripeRightRow}>
           <Text style={s.stripeRight}>No. {workerId}</Text>
           {!preview && onOverflow && (
@@ -333,7 +334,17 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
             {formatIssuedDate(worker.created_at)}
           </Text>
 
-          {onHire && (
+          {onEdit ? (
+            <TouchableOpacity
+              style={s.hireBtn}
+              activeOpacity={0.8}
+              onPress={onEdit}
+              accessibilityLabel="Edit your card"
+              accessibilityRole="button"
+            >
+              <Text style={s.hireBtnText}>EDIT CARD</Text>
+            </TouchableOpacity>
+          ) : onHire ? (
             <TouchableOpacity
               style={s.hireBtn}
               activeOpacity={0.8}
@@ -343,7 +354,7 @@ export default function WorkerCard({ worker, preview, onHire, onPress, onOverflo
             >
               <Text style={s.hireBtnText}>{strings['card.action.hire']}</Text>
             </TouchableOpacity>
-          )}
+          ) : null}
         </View>
       )}
     </View>
