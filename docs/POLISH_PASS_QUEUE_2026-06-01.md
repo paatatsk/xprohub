@@ -34,10 +34,6 @@ To do: extend Ruling 01's Brand Audit entry to acknowledge the threshold drift f
 
 ---
 
-## Self-view in market
-
-Already parked at `docs/SELF_VIEW_IN_MARKET_PROPOSAL_2026-05-31.md`. Will revisit after nav restructure ships. Reference here for completeness — not duplicating the proposal.
-
 ---
 
 ## Visual Customization Canvas (V1.1+ exploration)
@@ -66,6 +62,7 @@ Already parked in Print Shop Rev 01 + Slice 4 commit. PanResponder drag-and-drop
 | Empty-state string fallbacks | Defensive `??` fallbacks on market.tsx string references (`0903e91`). | 2026-06-04 |
 | Release-payment console.error (job-chat ~388) | INVESTIGATED and CONSCIOUSLY SKIPPED. Auto-release cron + transfer.created webhook fully cover the path. Money never lost/stuck. Edge Function logs server-side. Client console.error is noise but harmless. | 2026-06-04 |
 | Test-data cleanup | 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain. | 2026-06-04 |
+| Self-view in market | Both Talent + Jobs feeds show self with markers + swapped affordances (`d01dbae`). Proposal marked SHIPPED. | 2026-06-06 |
 
 ---
 

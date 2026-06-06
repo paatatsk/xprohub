@@ -171,18 +171,18 @@ Creates meaningful progression — earning belts unlocks real throughput.
 
 **Captured:** 2026-05-01 | **Area:** Product — navigation model | **Severity:** Future feature
 
-Workers Feed currently shows worker business cards. The Direct Hire
+Workers Feed shows worker business cards. The Direct Hire
 flow (`direct-hire.tsx`) exists with full job form parity to Post a Job,
-targeted at a specific worker. However, there is no production navigation
-path that connects browsing a worker card to initiating a Direct Hire.
+targeted at a specific worker. The WorkerCard HIRE button in the Talent
+feed routes to `/(tabs)/direct-hire?worker_id=...` — this navigation
+path is live and hardware-verified.
 
-This is parked as a future feature. The current flow (Post a Job → workers
-apply via Live Market) is the MVP path. Direct Hire adds a customer-initiated
-alternative that bypasses the public job listing. Design and gate integration
-(customer payment method required) are deferred to a future milestone.
+Remaining work: further refinement of the Direct Hire experience
+(e.g., customer payment gate integration, UX polish) is deferred to a
+future milestone.
 
-**Build this when:** After Chunk D (customer payment method) lands and the
-core marketplace loop has real usage data.
+**Build this when:** When the core marketplace loop has real usage data
+and Direct Hire refinement becomes a priority.
 
 ---
 

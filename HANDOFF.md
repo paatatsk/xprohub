@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-04 (session end, pre-submission audit complete)
-**Most recent commit:** `0903e91` — fix(market): defensive fallback for empty-state strings
-**Status:** Nav restructure COMPLETE. Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented.
+**Last updated:** 2026-06-06 (self-view in Live Market shipped, gear/DEV cleanup shipped)
+**Most recent commit:** `d01dbae` — feat(market): self-view in Live Market — see your own card and posts
+**Status:** Nav restructure COMPLETE. Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -47,8 +47,10 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - **job-detail focus fix** · `c0d8040` · **SHIPPED**
   - useEffect→useFocusEffect so bid-check re-runs on screen reuse (stale APPLY button fix).
 
-### Shipped this session (pre-submission audit fixes)
+### Shipped this session
 
+- `d01dbae` — Self-view in Live Market. Workers see own ID Card in Talent feed (credential stripe "· YOU", HIRE→EDIT CARD → my-card) and own job posts in Jobs feed (gold "YOUR POST" eyebrow, tap → job-bids). Self-exclusion removed from both feeds; blocked-user filtering preserved. Independent self-hire guard added to direct-hire.tsx. No mode concept — self-view always-on; natural sort, no pinning. Component-only change.
+- `09156bd` — Removed redundant Home gear icon (Account tab is always visible) + dead `__DEV__` "VIEW RECEIPT" button from Account (Receipt now reachable via Desk + Home last-receipt link).
 - `6b72fc5` — Structured logging for `payment_intent.payment_failed` webhook (ops observability, no state change — client handles 3DS failure synchronously).
 - `2d94758` — Atomic `create_job_with_tasks` SECURITY DEFINER RPC. post.tsx + direct-hire.tsx now use one RPC; taskless jobs structurally impossible. Migration `20260604000001`.
 - `0903e91` — Defensive `??` fallbacks for empty-state strings in market.tsx.
@@ -177,7 +179,6 @@ Prioritized. Open polish doc at `docs/POLISH_PASS_QUEUE_2026-06-01.md` for the f
 
 ### Pending Design rulings
 
-11. **Self-view in market** (post-nav) — `docs/SELF_VIEW_IN_MARKET_PROPOSAL_2026-05-31.md`. Four open Design questions documented. Workers see themselves in Talent feed with "(you)" marker; HIRE → EDIT swap.
 12. **Account tab interior** — when identity edits (legal name, payout destination, verification) become an active build thread.
 
 ### Operational items
@@ -240,9 +241,12 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 
 1. **RELEASE-PAYMENT CONSOLE.ERROR (job-chat.tsx ~388)** — INVESTIGATED and CONSCIOUSLY SKIPPED. The 72hr auto-release cron + transfer.created webhook backup fully cover this path. Money is never lost or stuck. The Edge Function already logs failures server-side. The client-side console.error is noise but harmless. Do NOT re-flag in future audits.
 2. **DORMANT SCHEMA** — belt_level/XP/badges tables: documented as unused, no app code. Not urgent but a cleanup candidate if DB trimming is scoped.
+3. **In-Account settings gear (v1.1)** — a settings gear inside the Account screen opening a Settings/Privacy sub-screen. Sound future idea but deferred. **Trigger:** add only when Account grows enough items to need sub-navigation (~8 flat items today; when it outgrows a single scroll, it's time).
 
 ### Closed this session
 
+- **Self-view in market** — SHIPPED (`d01dbae`). Proposal `docs/SELF_VIEW_IN_MARKET_PROPOSAL_2026-05-31.md` marked SHIPPED. All 4 open Design questions resolved: (1) natural sort, no pinning; (2) HIRE→EDIT CARD pill → my-card; (3) "· YOU" on credential stripe + "YOUR POST" gold Oswald eyebrow; (4) customer-vs-worker mode MOOT — no mode concept exists, self-view always-on.
+- **Redundant Home gear icon + DEV receipt button** — removed (`09156bd`). Gear was redundant with always-visible Account tab; DEV button was scaffolding from before Desk existed.
 - WORKERS/TALENT label drift — confirmed TALENT renders correctly (strings.ts verified 06-04).
 - Test data cleanup — 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain.
 - Polish queue refreshed — 5 new resolved items added (webhook logging, atomic RPC, string fallbacks, release-payment skip, test-data cleanup).

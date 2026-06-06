@@ -1,7 +1,7 @@
-# Self-View in Live Market — Proposal (Parked)
+# Self-View in Live Market — Proposal (SHIPPED)
 
 **Date:** 2026-05-31
-**Status:** PARKED — revisit after Print Shop Slices 2-4 ship.
+**Status:** SHIPPED — `d01dbae`, 2026-06-06. Position C implemented for both Talent + Jobs feeds.
 **Author:** Maestro, surfaced from Paata's product instinct during Slice 1 hardware verification.
 
 ---
@@ -65,9 +65,28 @@ Estimated cost when ready: small Design conversation (~30 min for the four rulin
 
 ---
 
-## Implementation notes (for future Code session)
+## How the four questions resolved (2026-06-06)
 
-- The auth.uid() filter in market.tsx is the single behavioral knob. Remove it for "show self," keep it for "hide self."
-- The WorkerCard component already accepts an onHire prop. The self-view variant passes onEdit instead (routes to my-card).
-- TypeScript: add a viewMode prop to WorkerCard (`'public' | 'self' | 'preview'`) so the call site can deliberately request the right affordance set rather than inferring from prop presence.
-- Hardware verification: sign in as a worker with skills, open Talent, find self at expected sort position. Tap EDIT — opens my-card. Confirm no HIRE button visible on self.
+All four Design questions resolved during implementation. No separate Design ruling needed — decisions made jointly by Paata + Code based on investigation findings.
+
+1. **Sort position:** Natural sort position, no pinning. The worker sees their card next to actual competitors, not floating above the fray. Original recommendation followed.
+
+2. **HIRE button replacement:** Option (b) — HIRE replaced with EDIT CARD pill (same Oswald button register, same styling). Routes to `/(tabs)/my-card`. No overflow `···` menu on self-view card.
+
+3. **Visual differentiation:** Two markers, one per feed:
+   - **Talent feed (WorkerCard):** "· YOU" appended to the existing credential stripe ("XPROHUB · WORKER PASS · YOU"). Same Oswald/gold treatment. Subtle — the EDIT CARD button is the primary signal.
+   - **Jobs feed (JobCard):** "YOUR POST" gold Oswald eyebrow between category divider and title, matching the card's existing label furniture.
+
+4. **Customer mode behavior:** MOOT. No mode concept exists in the app (confirmed by investigation — no `customer_mode`, `worker_mode`, `activeMode`, or `userMode` anywhere in codebase). Self-view is always-on for everyone. A worker browsing competition sees themselves (useful). A customer who also has skills sees themselves in Talent (harmless — EDIT CARD button makes it obvious). Revisit only if a mode system is ever built.
+
+Additionally: an independent self-hire guard was added to `direct-hire.tsx` as a backstop, blocking the `worker_id === auth.uid()` case even if the UI button swap ever regresses. Render sequence is safe — loading state masks the async auth check window.
+
+---
+
+## Implementation notes (shipped at `d01dbae`)
+
+- The `excluded` Set in market.tsx was split: `blockedIds` still filters, but `currentUserId` is no longer excluded. Self is handled by the affordance swap, not by exclusion.
+- The `onEdit` prop was added to WorkerCard instead of the originally proposed `viewMode` prop — simpler, same result. When `onEdit` is present, the stripe shows "· YOU" and the footer renders EDIT CARD. When absent, standard HIRE behavior.
+- JobCard received an `isOwnPost` boolean prop for the "YOUR POST" eyebrow + route swap (card tap → `job-bids` instead of `job-detail`).
+- No RLS, query, or migration changes — component + client-filter work only.
+- Hardware verified on iPhone: own card in Talent, own post in Jobs, blocked users still filtered, other users' cards unchanged.
