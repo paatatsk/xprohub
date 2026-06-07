@@ -105,16 +105,16 @@ function LaunchpadCard({
         </View>
       </TouchableOpacity>
 
-      {/* Row 3 — Posts awaiting my review [IN-FLOW] */}
+      {/* Row 3 — My posts [IN-FLOW] */}
       <TouchableOpacity
         style={s.row}
         activeOpacity={0.7}
         onPress={() => router.push('/(tabs)/my-jobs')}
-        accessibilityLabel={`Posts awaiting my review, ${pendingBids} bids`}
+        accessibilityLabel={`My posts, ${pendingBids} bids`}
         accessibilityRole="button"
       >
         <Text style={s.rowLeadAmber}>{'\u25C6'}</Text>
-        <Text style={s.rowLabel}>Posts awaiting my review</Text>
+        <Text style={s.rowLabel}>My posts</Text>
         <View style={s.rowRight}>
           {pendingBids > 0 && (
             <Text style={s.countAmber}>{pendingBids} {pendingBids === 1 ? 'BID' : 'BIDS'}</Text>
@@ -123,16 +123,16 @@ function LaunchpadCard({
         </View>
       </TouchableOpacity>
 
-      {/* Row 4 — Applications I'm waiting on [IN-FLOW] */}
+      {/* Row 4 — My applications [IN-FLOW] */}
       <TouchableOpacity
         style={s.rowLast}
         activeOpacity={0.7}
         onPress={() => router.push('/(tabs)/my-applications')}
-        accessibilityLabel={`Applications I'm waiting on, ${openApplications} open`}
+        accessibilityLabel={`My applications, ${openApplications} open`}
         accessibilityRole="button"
       >
         <Text style={s.rowLeadGreen}>{'\u25CF'}</Text>
-        <Text style={s.rowLabel}>Applications I{'\u2019'}m waiting on</Text>
+        <Text style={s.rowLabel}>My applications</Text>
         <View style={s.rowRight}>
           {openApplications > 0 && (
             <Text style={s.countGreen}>{openApplications} OPEN</Text>
