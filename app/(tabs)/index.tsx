@@ -35,6 +35,14 @@ interface Category {
   requires_background_check: boolean;
 }
 
+type ListItem =
+  | { type: 'masthead' }
+  | { type: 'desk' }
+  | { type: 'categories-label' }
+  | { type: 'category'; data: Category; catIndex: number }
+  | { type: 'endcap'; count: number }
+  | { type: 'empty' };
+
 // ── Helpers ──────────────────────────────────────────────────
 
 function iconForSlug(slug: string): string {
@@ -273,116 +281,139 @@ export default function HomeScreen() {
     weekday: 'short', day: '2-digit', month: 'short',
   }).toUpperCase().replace(/,/g, '');
 
-  // ── Header ─────────────────────────────────────────────────
+  // ── Heterogeneous list data ────────────────────────────────
 
-  const renderHeader = useCallback(() => {
-    const isZero = openJobCount === 0;
+  const listData: ListItem[] = [
+    { type: 'masthead' },                          // index 0 — scrolls away
+    { type: 'desk' },                              // index 1 — STICKY
+    { type: 'categories-label' },                  // index 2 — scrolls under
+    ...categories.map((cat, i) => ({
+      type: 'category' as const, data: cat, catIndex: i,
+    })),
+    ...(categories.length > 0
+      ? [{ type: 'endcap' as const, count: categories.length }]
+      : loading || error
+        ? [{ type: 'empty' as const }]
+        : []),
+  ];
 
-    return (
-      <View style={s.header}>
-        {/* Masthead */}
-        <View style={s.masthead}>
-          {/* Top row — wordmark + live count */}
-          <View style={s.mastheadTop}>
-            <Text style={s.wordmark}>XPROHUB</Text>
-            <View style={[s.chip, isZero && s.chipDim]}>
-              <View style={[s.chipDot, isZero && s.chipDotDim]} />
-              {isZero ? (
-                <Text style={s.chipZeroLabel}>NO OPEN JOBS YET</Text>
-              ) : (
-                <>
-                  <Text style={s.chipCount}>{openJobCount}</Text>
-                  <Text style={s.chipLabel}>
-                    {openJobCount === 1 ? 'JOB OPEN NOW' : 'JOBS OPEN NOW'}
-                  </Text>
-                </>
+  const keyExtractor = useCallback((item: ListItem, index: number) => {
+    switch (item.type) {
+      case 'masthead': return '__masthead';
+      case 'desk': return '__desk';
+      case 'categories-label': return '__label';
+      case 'endcap': return '__endcap';
+      case 'empty': return '__empty';
+      case 'category': return item.data.id.toString();
+    }
+  }, []);
+
+  // ── Render dispatcher ──────────────────────────────────────
+
+  const renderItem = useCallback(({ item }: { item: ListItem }) => {
+    switch (item.type) {
+
+      // ── Masthead (scrolls away) ──
+      case 'masthead': {
+        const isZero = openJobCount === 0;
+        return (
+          <View style={s.masthead}>
+            <View style={s.mastheadTop}>
+              <Text style={s.wordmark}>XPROHUB</Text>
+              <View style={[s.chip, isZero && s.chipDim]}>
+                <View style={[s.chipDot, isZero && s.chipDotDim]} />
+                {isZero ? (
+                  <Text style={s.chipZeroLabel}>NO OPEN JOBS YET</Text>
+                ) : (
+                  <>
+                    <Text style={s.chipCount}>{openJobCount}</Text>
+                    <Text style={s.chipLabel}>
+                      {openJobCount === 1 ? 'JOB OPEN NOW' : 'JOBS OPEN NOW'}
+                    </Text>
+                  </>
+                )}
+              </View>
+            </View>
+            {firstName ? (
+              <Text style={s.greeting}>
+                {greeting},{' '}
+                <Text style={s.greetingName}>{firstName}.</Text>
+              </Text>
+            ) : (
+              <Text style={s.greeting}>Good {greeting.toLowerCase()}.</Text>
+            )}
+            <Text style={s.dateLine}>{dateLabel}</Text>
+          </View>
+        );
+      }
+
+      // ── YOUR DESK (sticky) ──
+      case 'desk':
+        return (
+          <View style={s.deskWrapper}>
+            <LaunchpadCard
+              router={router}
+              trustLevel={trustLevel}
+              workerStatus={workerStatus}
+              pendingBids={pendingBids}
+              openApplications={openApplications}
+            />
+          </View>
+        );
+
+      // ── CATEGORIES label ──
+      case 'categories-label':
+        return <Text style={s.sectionLabel}>CATEGORIES</Text>;
+
+      // ── Category row ──
+      case 'category':
+        return (
+          <TouchableOpacity
+            style={[s.catRow, item.catIndex > 0 && s.catRowDivider]}
+            activeOpacity={0.7}
+            onPress={() => router.push(`/(tabs)/market?category_id=${item.data.id}`)}
+            accessibilityLabel={`${item.data.name}, ${item.data.difficulty_range}, $${item.data.price_min} to $${item.data.price_max}`}
+            accessibilityRole="button"
+          >
+            <Text style={s.catEmoji}>{iconForSlug(item.data.icon_slug)}</Text>
+            <View style={s.catTextBlock}>
+              <Text style={s.catName} numberOfLines={1}>{item.data.name.toUpperCase()}</Text>
+              <Text style={s.catDiff}>{item.data.difficulty_range.toUpperCase()}</Text>
+            </View>
+            <View style={s.catRightBlock}>
+              <Text style={s.catPrice}>${item.data.price_min}{'\u2013'}${item.data.price_max}</Text>
+              {item.data.tier === 2 && (
+                <View style={s.proBadge}>
+                  <Text style={s.proText}>PRO</Text>
+                </View>
               )}
             </View>
-          </View>
+          </TouchableOpacity>
+        );
 
-          {/* Greeting */}
-          {firstName ? (
-            <Text style={s.greeting}>
-              {greeting},{' '}
-              <Text style={s.greetingName}>{firstName}.</Text>
-            </Text>
-          ) : (
-            <Text style={s.greeting}>Good {greeting.toLowerCase()}.</Text>
-          )}
+      // ── End cap ──
+      case 'endcap':
+        return (
+          <Text style={s.endCap}>
+            {item.count} CATEGORIES {'\u00B7'} END OF LIST
+          </Text>
+        );
 
-          {/* Date line */}
-          <Text style={s.dateLine}>{dateLabel}</Text>
-        </View>
-
-        {/* Launchpad card */}
-        <LaunchpadCard
-          router={router}
-          trustLevel={trustLevel}
-          workerStatus={workerStatus}
-          pendingBids={pendingBids}
-          openApplications={openApplications}
-        />
-
-        <Text style={s.sectionLabel}>CATEGORIES</Text>
-      </View>
-    );
-  }, [router, trustLevel, workerStatus, pendingBids, openApplications, openJobCount, firstName, greeting, dateLabel]);
-
-  // ── Category row (compact, single-column) ──────────────────
-
-  const renderItem = useCallback(({ item, index }: { item: Category; index: number }) => (
-    <TouchableOpacity
-      style={[s.catRow, index > 0 && s.catRowDivider]}
-      activeOpacity={0.7}
-      onPress={() => router.push(`/(tabs)/market?category_id=${item.id}`)}
-      accessibilityLabel={`${item.name}, ${item.difficulty_range}, $${item.price_min} to $${item.price_max}`}
-      accessibilityRole="button"
-    >
-      {/* Col 1 — emoji */}
-      <Text style={s.catEmoji}>{iconForSlug(item.icon_slug)}</Text>
-
-      {/* Col 2 — name + difficulty */}
-      <View style={s.catTextBlock}>
-        <Text style={s.catName} numberOfLines={1}>{item.name.toUpperCase()}</Text>
-        <Text style={s.catDiff}>{item.difficulty_range.toUpperCase()}</Text>
-      </View>
-
-      {/* Col 3 — price + PRO */}
-      <View style={s.catRightBlock}>
-        <Text style={s.catPrice}>${item.price_min}{'\u2013'}${item.price_max}</Text>
-        {item.tier === 2 && (
-          <View style={s.proBadge}>
-            <Text style={s.proText}>PRO</Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  ), [router]);
-
-  const renderEmpty = useCallback(() => {
-    if (loading) return <ActivityIndicator color={Colors.gold} style={{ marginTop: 32 }} />;
-    if (error) return <Text style={s.errorText}>{error}</Text>;
-    return null;
-  }, [loading, error]);
-
-  const renderFooter = useCallback(() => {
-    if (categories.length === 0) return null;
-    return (
-      <Text style={s.endCap}>
-        {categories.length} CATEGORIES {'\u00B7'} END OF LIST
-      </Text>
-    );
-  }, [categories.length]);
+      // ── Empty state (loading / error) ──
+      case 'empty':
+        if (loading) return <ActivityIndicator color={Colors.gold} style={{ marginTop: 32 }} />;
+        if (error) return <Text style={s.errorText}>{error}</Text>;
+        return null;
+    }
+  }, [router, trustLevel, workerStatus, pendingBids, openApplications, openJobCount, firstName, greeting, dateLabel, loading, error]);
 
   return (
     <SafeAreaView style={s.container}>
       <FlatList
-        data={categories}
-        keyExtractor={(item) => item.id.toString()}
+        data={listData}
+        keyExtractor={keyExtractor}
         renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
+        stickyHeaderIndices={[1]}
         contentContainerStyle={s.listContent}
         style={s.list}
         refreshControl={
@@ -400,8 +431,12 @@ const s = StyleSheet.create({
   list: { flex: 1 },
   listContent: { paddingBottom: 160 },
 
-  // Header wrapper
-  header: { paddingBottom: 16, gap: 12 },
+  // Desk wrapper (sticky item — opaque background masks content scrolling under)
+  deskWrapper: {
+    backgroundColor: Colors.background,
+    paddingTop: 4,
+    paddingBottom: 14,
+  },
 
   // Masthead
   masthead: {
