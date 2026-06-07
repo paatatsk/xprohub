@@ -11,8 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
-import { Oswald_600SemiBold } from '@expo-google-fonts/oswald';
+import { SpaceGrotesk_500Medium, SpaceGrotesk_600SemiBold } from '@expo-google-fonts/space-grotesk';
+import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
+import { Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono';
 import { Colors, Fonts, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
@@ -151,7 +152,10 @@ export default function HomeScreen() {
   const { trustLevel } = useTrustLevel();
   const [fontsLoaded] = useFonts({
     SpaceGrotesk_500Medium,
+    SpaceGrotesk_600SemiBold,
     Oswald_600SemiBold,
+    Oswald_700Bold,
+    Inter_600SemiBold,
     IBMPlexMono_400Regular,
   });
 
@@ -247,24 +251,34 @@ export default function HomeScreen() {
     </View>
   ), [router, trustLevel, workerStatus, pendingBids, openApplications]);
 
-  // ── Category card ──────────────────────────────────────────
+  // ── Category row (compact, single-column) ──────────────────
 
-  const renderItem = useCallback(({ item }: { item: Category }) => (
+  const renderItem = useCallback(({ item, index }: { item: Category; index: number }) => (
     <TouchableOpacity
-      style={s.catCard}
+      style={[s.catRow, index > 0 && s.catRowDivider]}
+      activeOpacity={0.7}
       onPress={() => router.push(`/(tabs)/market?category_id=${item.id}`)}
+      accessibilityLabel={`${item.name}, ${item.difficulty_range}, $${item.price_min} to $${item.price_max}`}
+      accessibilityRole="button"
     >
-      <View style={s.catTop}>
-        <Text style={s.catIcon}>{iconForSlug(item.icon_slug)}</Text>
+      {/* Col 1 — emoji */}
+      <Text style={s.catEmoji}>{iconForSlug(item.icon_slug)}</Text>
+
+      {/* Col 2 — name + difficulty */}
+      <View style={s.catTextBlock}>
+        <Text style={s.catName} numberOfLines={1}>{item.name.toUpperCase()}</Text>
+        <Text style={s.catDiff}>{item.difficulty_range.toUpperCase()}</Text>
+      </View>
+
+      {/* Col 3 — price + PRO */}
+      <View style={s.catRightBlock}>
+        <Text style={s.catPrice}>${item.price_min}{'\u2013'}${item.price_max}</Text>
         {item.tier === 2 && (
-          <View style={s.tierBadge}>
-            <Text style={s.tierText}>PRO</Text>
+          <View style={s.proBadge}>
+            <Text style={s.proText}>PRO</Text>
           </View>
         )}
       </View>
-      <Text style={s.catName}>{item.name.toUpperCase()}</Text>
-      <Text style={s.catPrice}>${item.price_min}{'\u2013'}${item.price_max}</Text>
-      <Text style={s.catDiff}>{item.difficulty_range}</Text>
     </TouchableOpacity>
   ), [router]);
 
@@ -274,22 +288,30 @@ export default function HomeScreen() {
     return null;
   }, [loading, error]);
 
+  const renderFooter = useCallback(() => {
+    if (categories.length === 0) return null;
+    return (
+      <Text style={s.endCap}>
+        {categories.length} CATEGORIES {'\u00B7'} END OF LIST
+      </Text>
+    );
+  }, [categories.length]);
+
   return (
     <SafeAreaView style={s.container}>
       <FlatList
         data={categories}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
         contentContainerStyle={s.listContent}
         style={s.list}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
         }
       />
-
     </SafeAreaView>
   );
 }
@@ -430,52 +452,76 @@ const s = StyleSheet.create({
     alignSelf: 'flex-start',
   },
 
-  // Category cards
-  catCard: {
-    flex: 1,
-    backgroundColor: Colors.card,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 0,
-    padding: 16,
-    margin: 6,
-  },
-  catTop: {
+  // Category rows (compact, single-column)
+  catRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    minHeight: 60,
+    paddingVertical: 10,
+    paddingHorizontal: 22,
+    gap: 13,
   },
-  catIcon: { fontSize: 26 },
-  tierBadge: {
-    backgroundColor: Colors.gold,
-    borderRadius: 999,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    justifyContent: 'center',
+  catRowDivider: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
-  tierText: {
-    color: Colors.background,
-    fontSize: 9,
-    fontWeight: '800',
+  catEmoji: {
+    fontSize: 23,
+    width: 30,
+    textAlign: 'center',
+  },
+  catTextBlock: {
+    flex: 1,
+    gap: 3,
   },
   catName: {
     color: Colors.textPrimary,
-    fontFamily: Fonts.bodyMed,
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 13,
-    marginBottom: 6,
-  },
-  catPrice: {
-    color: Colors.gold,
-    fontFamily: Fonts.heading,
-    fontSize: 12,
-    marginBottom: 4,
-    fontVariant: ['tabular-nums'],
+    letterSpacing: 0.4,
   },
   catDiff: {
     color: Colors.textSecondary,
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.mono,
+    fontSize: 9.5,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  catRightBlock: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  catPrice: {
+    color: Colors.gold,
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    fontSize: 14,
+    letterSpacing: -0.2,
+    fontVariant: ['tabular-nums'],
+  },
+  proBadge: {
+    backgroundColor: Colors.gold,
+    borderRadius: 0,
+    paddingHorizontal: 6,
+    paddingTop: 2,
+    paddingBottom: 1,
+  },
+  proText: {
+    color: '#1A0F00',
+    fontFamily: Fonts.displayB,
+    fontSize: 8.5,
+    letterSpacing: 1.5,
+  },
+
+  // End cap
+  endCap: {
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    letterSpacing: 2,
+    color: Colors.textTertiary,
+    textAlign: 'center',
+    height: 40,
+    lineHeight: 40,
+    marginTop: 8,
   },
 
   // Error
