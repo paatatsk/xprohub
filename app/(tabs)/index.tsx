@@ -80,7 +80,7 @@ function LaunchpadCard({
 
       {/* Row 1 — Post a job [INITIATE] */}
       <TouchableOpacity
-        style={s.row}
+        style={s.rowFirst}
         activeOpacity={0.7}
         onPress={() => {
           const dest = '/(tabs)/post';
@@ -136,7 +136,7 @@ function LaunchpadCard({
 
       {/* Row 4 — My applications [IN-FLOW] */}
       <TouchableOpacity
-        style={s.rowLast}
+        style={s.row}
         activeOpacity={0.7}
         onPress={() => router.push('/(tabs)/my-applications')}
         accessibilityLabel={`My applications, ${openApplications} open`}
@@ -522,11 +522,10 @@ const s = StyleSheet.create({
 
   // Launchpad card
   card: {
-    marginTop: 12,
     marginHorizontal: 18,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 4,
+    borderRadius: 12,
     backgroundColor: Colors.card,
   },
   cardLabel: {
@@ -535,25 +534,27 @@ const s = StyleSheet.create({
     letterSpacing: 4,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
-    paddingHorizontal: 16,
-    paddingTop: 14,
+    paddingHorizontal: 14,
+    paddingTop: 12,
     paddingBottom: 10,
+  },
+  rowFirst: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    gap: 13,
+    minHeight: 44,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    gap: 10,
-  },
-  rowLast: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    gap: 13,
+    minHeight: 44,
   },
   rowLeadGold: {
     fontFamily: Fonts.heading,
