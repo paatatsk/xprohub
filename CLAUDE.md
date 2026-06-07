@@ -177,7 +177,7 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Profile Setup | `app/(onboarding)/profile-setup.tsx` | Functional — captures full_name + first_name + photo |
 | Worker ID Setup | `app/(onboarding)/id.tsx` | Functional — 4-step wizard (768 lines) |
 | Verify Level 2 | `app/(onboarding)/verify-level-2.tsx` | Functional — trust level gate (real verification deferred) |
-| Home | `app/(tabs)/index.tsx` | **Lighthouse** — YOUR DESK card, last receipt link, category grid |
+| Home | `app/(tabs)/index.tsx` | **Lighthouse** — greeting masthead, live job-count, sticky YOUR DESK card, single-column category list |
 | Live Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed + Workers Feed (896 lines) |
 | Post a Job | `app/(tabs)/post.tsx` | Functional — category picker + form (728 lines) |
 | Job Detail | `app/(tabs)/job-detail.tsx` | Functional — full job info + apply CTA (525 lines) |
@@ -194,7 +194,7 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
 | Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, five-voice typography |
 
-Home = YOUR DESK launchpad (four flow-rows: Post a job / Edit my card / Posts awaiting review / Applications waiting). Category grid below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
+Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 
 ## Supabase — Tables (Live)
 `profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements`
@@ -389,7 +389,7 @@ Location 25% · Skill Match 35% · Experience 20% · Behavioral 20%
 Live Market is the heartbeat of XProHub.
 
 ### Entry points
-- Category card tap on Home → /live-market?category_id=X (filtered)
+- Category row tap on Home → /(tabs)/market?category_id=X (filtered)
 - YOUR DESK links → My Jobs / My Applications
 
 ### Structure
@@ -472,8 +472,11 @@ Explorer users browse freely. Gate fires only at:
 
 ## What Is NOT Built Yet
 
-### 🔲 Milestone 5 — Lighthouse Refinement (next phase)
+### 🟡 Milestone 5 — Lighthouse Refinement (in progress)
 Each remaining screen refined to lighthouse standard before submission. Order TBD with Claude Design. See `SESSION_PLAN_v2.md` for the full queue.
+
+**Shipped:**
+- Home restructure (`401ff06`, 2026-06-07): single-column compact category rows, greeting masthead with real first_name + device-clock greeting + live open-job count ("JOBS OPEN NOW"), sticky-pin scroll model (YOUR DESK as sole sticky element, masthead scrolls away), YOUR DESK style refinements (12px radius, top-border dividers, 44px tap targets). Spec §6 gold pin-glow + hairline was prototyped and removed by Paata's preference — pinned desk uses plain border.
 
 ### 🔲 Submission Items (user-side)
 - Privacy Policy + Terms of Service legal copy deployed to xprohub.com

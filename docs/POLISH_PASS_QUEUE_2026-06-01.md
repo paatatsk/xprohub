@@ -1,6 +1,6 @@
 # Polish Pass Queue — Deferred Refinements
 
-**Created:** 2026-06-01 · **Last refreshed:** 2026-06-04
+**Created:** 2026-06-01 · **Last refreshed:** 2026-06-07
 **Status:** OPEN — items revisit when polish session opens.
 **Author:** Maestro, capturing items surfaced during the Print Shop build (PR 3 → Print Shop arc) and earlier sessions.
 
@@ -63,6 +63,7 @@ Already parked in Print Shop Rev 01 + Slice 4 commit. PanResponder drag-and-drop
 | Release-payment console.error (job-chat ~388) | INVESTIGATED and CONSCIOUSLY SKIPPED. Auto-release cron + transfer.created webhook fully cover the path. Money never lost/stuck. Edge Function logs server-side. Client console.error is noise but harmless. | 2026-06-04 |
 | Test-data cleanup | 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain. | 2026-06-04 |
 | Self-view in market | Both Talent + Jobs feeds show self with markers + swapped affordances (`d01dbae`). Proposal marked SHIPPED. | 2026-06-06 |
+| Home restructure | Single-column compact category rows, greeting masthead with live job-count, sticky-pin scroll model, YOUR DESK style refinements (`401ff06`). Spec §6 gold pin-glow prototyped and removed by Paata's preference — pinned desk uses plain border. | 2026-06-07 |
 
 ---
 

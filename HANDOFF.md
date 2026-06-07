@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-06 (self-view in Live Market shipped, gear/DEV cleanup shipped)
-**Most recent commit:** `d01dbae` — feat(market): self-view in Live Market — see your own card and posts
-**Status:** Nav restructure COMPLETE. Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-07 (Home restructure shipped — 4 slices)
+**Most recent commit:** `401ff06` — feat(home): YOUR DESK style refinements (restructure slice 4)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED (single-column categories, greeting masthead, sticky YOUR DESK, §6 glow removed by preference). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -49,6 +49,12 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 
 ### Shipped this session
 
+- **Home restructure (4 slices)** — per HOME_RESTRUCTURE_SPEC, Claude Design's binding build spec:
+  - `f831ba8` — Renamed YOUR DESK flow-rows: "Posts awaiting my review" → "My posts", "Applications I'm waiting on" → "My applications". Sentence case to match existing rows.
+  - `b6c1eee` — Slice 1: replaced 2-up category grid with single-column compact rows (emoji + uppercase name + mono difficulty + gold tabular price + PRO on tier-2). Added end-cap footer with real category count.
+  - `deb9823` — Slice 2: masthead redesign. XPROHUB wordmark + live-count chip (real open-jobs count, own posts + blocked users excluded, "JOBS OPEN NOW" label, singular/zero-state). Greeting with real `profiles.first_name` in Playfair italic gold + device-clock time bucket. Mono date line. No weather (no source).
+  - `b00094b` — Slice 3: heterogeneous single-column FlatList. Masthead scrolls away; YOUR DESK is the sole sticky element (`stickyHeaderIndices={[1]}`). Opaque deskWrapper masks content scrolling underneath. Fixed array structure so sticky index is stable across auth state.
+  - `401ff06` — Slice 4: YOUR DESK style refinements (12px corner radius, 12/14 inner padding, top-border row dividers, 44px tap targets). **§6 deviation:** the spec's gold pin-glow + hairline (border glow + gold shadow + gradient hairline on pin) was built, tested on device across two tuning rounds, and REMOVED at Paata's preference — the glow competed with desk row labels. The shipped pinned state uses the plain `--border`. The sticky-pin behavior itself (§1 scroll model) shipped exactly as specced; only the glow decoration was dropped. This is a deliberate product decision, not a bug or oversight.
 - `d01dbae` — Self-view in Live Market. Workers see own ID Card in Talent feed (credential stripe "· YOU", HIRE→EDIT CARD → my-card) and own job posts in Jobs feed (gold "YOUR POST" eyebrow, tap → job-bids). Self-exclusion removed from both feeds; blocked-user filtering preserved. Independent self-hire guard added to direct-hire.tsx. No mode concept — self-view always-on; natural sort, no pinning. Component-only change.
 - `09156bd` — Removed redundant Home gear icon (Account tab is always visible) + dead `__DEV__` "VIEW RECEIPT" button from Account (Receipt now reachable via Desk + Home last-receipt link).
 - `6b72fc5` — Structured logging for `payment_intent.payment_failed` webhook (ops observability, no state change — client handles 3DS failure synchronously).
@@ -130,7 +136,7 @@ Worker payout = hero number. Platform fee = visible line item (3% Stripe + 7% op
 - HOME (present tense) · MARKET (the platform) · DESK (past tense + money) · ACCOUNT (identity + config)
 - Separated by tense, not topic — makes location predictable.
 - Desk is peer, not nested. Posting is action (anchored rows/bars), not a tab or a float.
-- YOUR DESK card is the launchpad (flow-rows: Post a job / Edit my card / Posts awaiting / Applications). No rename to YOUR PASS (never built).
+- YOUR DESK card is the launchpad (flow-rows: Post a job / Edit my card / My posts / My applications). Sticky-pinned; masthead with greeting + live job-count scrolls away above it. No rename to YOUR PASS (never built).
 - Account tab interior intentionally OUT OF SCOPE until identity-edit features become an active build thread.
 
 ### profiles.worker_status — NOT NULL, default 'offline'
