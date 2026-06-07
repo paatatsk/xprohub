@@ -15,9 +15,11 @@ import { SpaceGrotesk_500Medium, SpaceGrotesk_600SemiBold } from '@expo-google-f
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono';
+import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { Colors, Fonts, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
+import { useBlockList } from '../../hooks/useBlockList';
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -157,12 +159,19 @@ export default function HomeScreen() {
     Oswald_700Bold,
     Inter_600SemiBold,
     IBMPlexMono_400Regular,
+    PlayfairDisplay_700Bold_Italic,
   });
+
+  const { blockedIds } = useBlockList();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Masthead data
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [openJobCount, setOpenJobCount] = useState(0);
 
   // Live counts for launchpad rows
   const [workerStatus, setWorkerStatus] = useState('offline');
@@ -182,15 +191,37 @@ export default function HomeScreen() {
       .order('sort_order', { ascending: true });
     setCategories(catData ?? []);
 
+    // Live job count — open jobs, excluding own posts + blocked users
+    if (user) {
+      let jobCountQuery = supabase
+        .from('jobs')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'open')
+        .neq('customer_id', user.id);
+      if (blockedIds.length > 0) {
+        jobCountQuery = jobCountQuery.not('customer_id', 'in', `(${blockedIds.join(',')})`);
+      }
+      const { count: jc } = await jobCountQuery;
+      setOpenJobCount(jc ?? 0);
+    } else {
+      // Unauthenticated: count all open jobs
+      const { count: jc } = await supabase
+        .from('jobs')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'open');
+      setOpenJobCount(jc ?? 0);
+    }
+
     if (!user) { setLoading(false); return; }
 
-    // Worker status (for Row 2 publish signal)
+    // Profile data (worker status + first name for greeting)
     const { data: profile } = await supabase
       .from('profiles')
-      .select('worker_status')
+      .select('worker_status, first_name')
       .eq('id', user.id)
       .single();
     setWorkerStatus(profile?.worker_status ?? 'offline');
+    setFirstName(profile?.first_name ?? null);
 
     // Pending bids count (Row 3): total bids on my open posts
     const { data: myOpenJobs } = await supabase
@@ -219,7 +250,7 @@ export default function HomeScreen() {
     setOpenApplications(appCount ?? 0);
 
     setLoading(false);
-  }, []);
+  }, [blockedIds]);
 
   useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
 
@@ -229,27 +260,73 @@ export default function HomeScreen() {
     setRefreshing(false);
   }, [fetchData]);
 
+  // ── Greeting + date helpers ─────────────────────────────────
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h >= 5 && h < 12) return 'Morning';
+    if (h >= 12 && h < 17) return 'Afternoon';
+    return 'Evening';
+  })();
+
+  const dateLabel = new Date().toLocaleDateString('en-US', {
+    weekday: 'short', day: '2-digit', month: 'short',
+  }).toUpperCase().replace(/,/g, '');
+
   // ── Header ─────────────────────────────────────────────────
 
-  const renderHeader = useCallback(() => (
-    <View style={s.header}>
-      {/* Masthead: wordmark only (Account reached via tab bar) */}
-      <View style={s.masthead}>
-        <Text style={s.wordmark}>XPROHUB</Text>
+  const renderHeader = useCallback(() => {
+    const isZero = openJobCount === 0;
+
+    return (
+      <View style={s.header}>
+        {/* Masthead */}
+        <View style={s.masthead}>
+          {/* Top row — wordmark + live count */}
+          <View style={s.mastheadTop}>
+            <Text style={s.wordmark}>XPROHUB</Text>
+            <View style={[s.chip, isZero && s.chipDim]}>
+              <View style={[s.chipDot, isZero && s.chipDotDim]} />
+              {isZero ? (
+                <Text style={s.chipZeroLabel}>NO OPEN JOBS YET</Text>
+              ) : (
+                <>
+                  <Text style={s.chipCount}>{openJobCount}</Text>
+                  <Text style={s.chipLabel}>
+                    {openJobCount === 1 ? 'JOB OPEN NOW' : 'JOBS OPEN NOW'}
+                  </Text>
+                </>
+              )}
+            </View>
+          </View>
+
+          {/* Greeting */}
+          {firstName ? (
+            <Text style={s.greeting}>
+              {greeting},{' '}
+              <Text style={s.greetingName}>{firstName}.</Text>
+            </Text>
+          ) : (
+            <Text style={s.greeting}>Good {greeting.toLowerCase()}.</Text>
+          )}
+
+          {/* Date line */}
+          <Text style={s.dateLine}>{dateLabel}</Text>
+        </View>
+
+        {/* Launchpad card */}
+        <LaunchpadCard
+          router={router}
+          trustLevel={trustLevel}
+          workerStatus={workerStatus}
+          pendingBids={pendingBids}
+          openApplications={openApplications}
+        />
+
+        <Text style={s.sectionLabel}>CATEGORIES</Text>
       </View>
-
-      {/* Launchpad card */}
-      <LaunchpadCard
-        router={router}
-        trustLevel={trustLevel}
-        workerStatus={workerStatus}
-        pendingBids={pendingBids}
-        openApplications={openApplications}
-      />
-
-      <Text style={s.sectionLabel}>CATEGORIES</Text>
-    </View>
-  ), [router, trustLevel, workerStatus, pendingBids, openApplications]);
+    );
+  }, [router, trustLevel, workerStatus, pendingBids, openApplications, openJobCount, firstName, greeting, dateLabel]);
 
   // ── Category row (compact, single-column) ──────────────────
 
@@ -321,27 +398,97 @@ export default function HomeScreen() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   list: { flex: 1 },
-  listContent: { paddingBottom: 160, paddingHorizontal: 6 },
+  listContent: { paddingBottom: 160 },
+
+  // Header wrapper
+  header: { paddingBottom: 16, gap: 12 },
 
   // Masthead
-  header: { paddingTop: 16, paddingBottom: 16, gap: 12, paddingHorizontal: 6 },
   masthead: {
+    paddingTop: 6,
+    paddingHorizontal: 22,
+    paddingBottom: 18,
+  },
+  mastheadTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 2,
+    marginBottom: 20,
   },
   wordmark: {
     color: Colors.gold,
-    fontSize: 28,
+    fontSize: 13,
     fontFamily: Fonts.heading,
     letterSpacing: 4,
   },
 
+  // Live-count chip
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
+    gap: 6,
+  },
+  chipDim: {},
+  chipDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.green,
+    top: -1, // baseline alignment nudge
+  },
+  chipDotDim: {
+    backgroundColor: Colors.textTertiary,
+  },
+  chipCount: {
+    fontFamily: 'SpaceGrotesk_600SemiBold',
+    fontSize: 12,
+    color: Colors.gold,
+    fontVariant: ['tabular-nums'],
+  },
+  chipLabel: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
+  },
+  chipZeroLabel: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
+  },
+
+  // Greeting
+  greeting: {
+    fontFamily: 'SpaceGrotesk_500Medium',
+    fontSize: 30,
+    letterSpacing: -0.6,
+    lineHeight: 32,
+    color: Colors.textPrimary,
+  },
+  greetingName: {
+    fontFamily: Fonts.serif,
+    color: Colors.gold,
+  },
+
+  // Date line
+  dateLine: {
+    fontFamily: Fonts.mono,
+    fontSize: 10.5,
+    letterSpacing: 1,
+    color: Colors.textSecondary,
+    marginTop: 9,
+  },
+
   // Launchpad card
   card: {
-    width: '100%',
     marginTop: 12,
+    marginHorizontal: 18,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 4,
@@ -445,11 +592,12 @@ const s = StyleSheet.create({
   sectionLabel: {
     fontFamily: Fonts.display,
     fontSize: 10,
-    letterSpacing: 4,
-    color: Colors.textSecondary,
+    letterSpacing: 5,
+    color: Colors.gold,
     textTransform: 'uppercase',
-    marginTop: 20,
-    alignSelf: 'flex-start',
+    paddingTop: 6,
+    paddingBottom: 14,
+    paddingHorizontal: 22,
   },
 
   // Category rows (compact, single-column)
