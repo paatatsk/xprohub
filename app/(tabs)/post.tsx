@@ -337,9 +337,14 @@ export default function PostScreen() {
             onPress={handleBackToCategories}
             activeOpacity={0.7}
           >
-            <Text style={styles.backLinkText}>← Change category</Text>
+            <Text style={styles.backLinkText}>{'\u2190'} Change category</Text>
           </TouchableOpacity>
         )}
+
+        {/* ════════════════════════════════════════════════════════
+            SECTION 1 — DESCRIBE YOUR JOB
+           ════════════════════════════════════════════════════════ */}
+        <Text style={styles.sectionLabel}>DESCRIBE YOUR JOB</Text>
 
         {/* ── Title ── */}
         <View style={styles.fieldGroup}>
@@ -362,6 +367,8 @@ export default function PostScreen() {
           </View>
         </View>
 
+        {/* ── Photo slot (Slice B) ── */}
+
         {/* ── Description ── */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>
@@ -382,37 +389,55 @@ export default function PostScreen() {
           </Text>
         </View>
 
-        {/* ── Task chips ── */}
-        <View style={styles.fieldGroup}>
-          <Text style={styles.label}>
-            TASKS <Text style={styles.required}>*</Text>
-          </Text>
-          {tasksLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ marginVertical: 12 }} />
-          ) : (
-            <View style={styles.chipWrap}>
-              {tasks.map(task => {
-                const active = selectedTaskIds.has(task.id);
-                return (
-                  <TouchableOpacity
-                    key={task.id}
-                    style={[styles.chip, active && styles.chipActive]}
-                    onPress={() => { toggleTask(task.id); clearError('tasks'); }}
-                    activeOpacity={0.75}
-                  >
-                    <Text style={[styles.chipName, active && styles.chipNameActive]}>
-                      {task.name}
-                    </Text>
-                    <Text style={[styles.chipPrice, active && styles.chipPriceActive]}>
-                      ${task.price_min}–${task.price_max}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-          {errors.tasks && <Text style={styles.errorText}>{errors.tasks}</Text>}
-        </View>
+        {/* ── Section divider ── */}
+        <View style={styles.sectionDivider} />
+
+        {/* ════════════════════════════════════════════════════════
+            SECTION 2 — SELECT TASKS
+           ════════════════════════════════════════════════════════ */}
+        <Text style={styles.sectionLabel}>SELECT TASKS</Text>
+
+        {tasksLoading ? (
+          <ActivityIndicator color={Colors.gold} style={{ marginVertical: 12 }} />
+        ) : (
+          <View style={styles.taskBox}>
+            {tasks.map((task, i) => {
+              const active = selectedTaskIds.has(task.id);
+              return (
+                <TouchableOpacity
+                  key={task.id}
+                  style={[styles.taskRow, i > 0 && styles.taskRowDivider]}
+                  onPress={() => { toggleTask(task.id); clearError('tasks'); }}
+                  activeOpacity={0.75}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: active }}
+                >
+                  <View style={[styles.checkbox, active && styles.checkboxActive]}>
+                    {active && <Text style={styles.checkmark}>{'\u2713'}</Text>}
+                  </View>
+                  <Text style={[styles.taskName, active && styles.taskNameActive]} numberOfLines={1}>
+                    {task.name}
+                  </Text>
+                  <Text style={[styles.taskPrice, active && styles.taskPriceActive]}>
+                    ${task.price_min}{'\u2013'}${task.price_max}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+        <Text style={[styles.taskCount, selectedTaskIds.size > 0 && styles.taskCountActive]}>
+          {selectedTaskIds.size} {selectedTaskIds.size === 1 ? 'task' : 'tasks'} selected
+        </Text>
+        {errors.tasks && <Text style={styles.errorText}>{errors.tasks}</Text>}
+
+        {/* ── Section divider ── */}
+        <View style={styles.sectionDivider} />
+
+        {/* ════════════════════════════════════════════════════════
+            SECTION 3 — DETAILS
+           ════════════════════════════════════════════════════════ */}
+        <Text style={styles.sectionLabel}>DETAILS</Text>
 
         {/* ── Budget ── */}
         <View style={styles.fieldGroup}>
@@ -523,35 +548,48 @@ export default function PostScreen() {
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: Colors.background },
   scroll:        { flex: 1 },
-  scrollContent: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scrollContent: { padding: 20, paddingBottom: 80 },
 
   // Heading
   heading: {
+    fontFamily: Fonts.heading,
     color: Colors.gold,
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 34,
     letterSpacing: 2,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subhead: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
-    marginBottom: Spacing.lg,
+    fontSize: 14,
+    marginBottom: 12,
   },
 
   // Back link
   backLink: {
-    marginBottom: Spacing.md,
-    marginTop: -8,
+    marginBottom: 20,
   },
   backLinkText: {
     color: Colors.gold,
+    fontFamily: Fonts.bodyMed,
     fontSize: 13,
-    fontWeight: '600',
   },
 
-  // Category grid
+  // Section structure
+  sectionLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 4,
+    color: Colors.textSecondary,
+    marginBottom: 16,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: 24,
+  },
+
+  // Category grid (categories view)
   catGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -585,7 +623,7 @@ const styles = StyleSheet.create({
   },
 
   // Field group
-  fieldGroup: { marginBottom: Spacing.lg },
+  fieldGroup: { marginBottom: 20 },
   label: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
@@ -604,8 +642,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
+    fontFamily: Fonts.body,
     fontSize: 15,
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: 14,
     paddingVertical: 12,
   },
   inputMultiline: { minHeight: 90, textAlignVertical: 'top', paddingTop: 12 },
@@ -613,33 +652,84 @@ const styles = StyleSheet.create({
 
   // Helpers
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  charCount:  { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
-  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 4 },
+  charCount:  { fontFamily: Fonts.mono, color: Colors.textSecondary, fontSize: 10, marginTop: 4 },
+  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 6 },
 
-  // Task chips
-  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },
-  chip: {
+  // Task selector (contained box)
+  taskBox: {
+    backgroundColor: Colors.card,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: Radius.sm,
-    backgroundColor: Colors.card,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 2,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
-  chipActive:      { borderColor: Colors.gold, backgroundColor: Colors.gold + '22' },
-  chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
-  chipNameActive:  { color: Colors.gold },
-  chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
-  chipPriceActive: { color: Colors.gold, opacity: 0.8 },
+  taskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    gap: 12,
+    minHeight: 48,
+  },
+  taskRowDivider: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxActive: {
+    borderColor: Colors.gold,
+    backgroundColor: Colors.gold,
+  },
+  checkmark: {
+    color: Colors.background,
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginTop: -1,
+  },
+  taskName: {
+    flex: 1,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textPrimary,
+  },
+  taskNameActive: {
+    color: Colors.gold,
+  },
+  taskPrice: {
+    fontFamily: Fonts.mono,
+    fontSize: 11,
+    color: Colors.textSecondary,
+    letterSpacing: 0.3,
+  },
+  taskPriceActive: {
+    color: Colors.gold,
+  },
+  taskCount: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    color: Colors.textSecondary,
+    marginTop: 8,
+  },
+  taskCountActive: {
+    color: Colors.gold,
+  },
 
   // Budget
   budgetRow:   { flexDirection: 'row', gap: 12 },
   budgetHalf:  { flex: 1 },
   budgetLabel: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.mono,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 10,
     letterSpacing: 1,
     marginBottom: 6,
   },
@@ -655,7 +745,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timingBtnActive:  { borderColor: Colors.gold, backgroundColor: Colors.gold },
-  timingText:       { color: Colors.textSecondary, fontSize: 12, fontWeight: 'bold' },
+  timingText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 12 },
   timingTextActive: { color: Colors.background },
 
   // Urgent toggle
@@ -669,7 +759,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Spacing.md,
   },
-  urgentSub:     { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  urgentSub: { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
   toggleTrack: {
     width: 48,
     height: 28,
@@ -696,12 +786,12 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: Spacing.sm,
+    marginTop: 12,
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
     color: Colors.background,
-    fontWeight: 'bold',
+    fontFamily: Fonts.heading,
     fontSize: 15,
     letterSpacing: 2,
   },
