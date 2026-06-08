@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  TextInput, ScrollView, ActivityIndicator,
+  TextInput, ScrollView, ActivityIndicator, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
+import { uploadJobPhoto } from '../../lib/photos';
 
 // Screen 7 — Post a Job
 // Step 4-FIX-2: Category-first task picker for HELP WANTED path.
@@ -94,6 +96,9 @@ export default function PostScreen() {
   const [timing, setTiming]             = useState<Timing>('flexible');
   const [isUrgent, setIsUrgent]         = useState(false);
 
+  // Photos — local URIs selected before job creation (uploaded after RPC)
+  const [photoUris, setPhotoUris] = useState<string[]>([]);
+
   // Track whether the user has manually edited each auto-filled field.
   // Once edited, auto-fill stops updating that field — user input always wins.
   const titleEdited       = useRef(false);
@@ -180,6 +185,32 @@ export default function PostScreen() {
     setTasksLoading(false);
   }, []);
 
+  // ── Photo picker ───────────────────────────────────────────────────────
+  const pickPhoto = useCallback(async () => {
+    if (photoUris.length >= 3) return;
+
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      setSubmitError('Photo library permission is needed to add photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.75,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setPhotoUris(prev => [...prev, result.assets[0].uri]);
+    }
+  }, [photoUris.length]);
+
+  const removePhoto = useCallback((index: number) => {
+    setPhotoUris(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
   // ── Auto-fill from selected tasks ──────────────────────────────────────
   const autoFillFromTasks = useCallback((taskIds: Set<number>) => {
     const selected = tasks.filter(t => taskIds.has(t.id));
@@ -234,6 +265,7 @@ export default function PostScreen() {
     setNeighborhood('');
     setTiming('flexible');
     setIsUrgent(false);
+    setPhotoUris([]);
     setErrors({});
     setSubmitting(false);
     setSubmitError(null);
@@ -258,6 +290,7 @@ export default function PostScreen() {
     setDescription('');
     setBudgetMin('');
     setBudgetMax('');
+    setPhotoUris([]);
     titleEdited.current = false;
     descriptionEdited.current = false;
     budgetEdited.current = false;
@@ -344,6 +377,26 @@ export default function PostScreen() {
       setSubmitError('Something went wrong posting your job. Please try again.');
       setSubmitting(false);
       return;
+    }
+
+    // Upload photos (non-blocking — job is already created)
+    if (photoUris.length > 0) {
+      const userId = user.id;
+      for (let i = 0; i < photoUris.length; i++) {
+        try {
+          const { url } = await uploadJobPhoto(jobId, 'listing', photoUris[i]);
+          await supabase.from('job_photos').insert({
+            job_id: jobId,
+            url,
+            photo_type: 'listing',
+            uploaded_by: userId,
+            sort_order: i,
+          });
+        } catch (err: any) {
+          // Photo upload failed — log for diagnosis but don't block the post
+          console.error(`[post] Photo ${i + 1} upload failed:`, err?.message ?? err);
+        }
+      }
     }
 
     setSubmitting(false);
@@ -449,7 +502,43 @@ export default function PostScreen() {
           </View>
         </View>
 
-        {/* ── Photo slot (Slice B) ── */}
+        {/* ── Photos (optional, up to 3) ── */}
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>
+            PHOTO <Text style={styles.optional}>(optional — helps workers respond faster)</Text>
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.photoRow}
+          >
+            {photoUris.map((uri, i) => (
+              <View key={uri} style={styles.photoThumb}>
+                <Image source={{ uri }} style={styles.photoImg} />
+                <TouchableOpacity
+                  style={styles.photoRemove}
+                  onPress={() => removePhoto(i)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  accessibilityLabel={`Remove photo ${i + 1}`}
+                >
+                  <Text style={styles.photoRemoveText}>{'\u2715'}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+            {photoUris.length < 3 && (
+              <TouchableOpacity
+                style={styles.photoAdd}
+                onPress={pickPhoto}
+                activeOpacity={0.7}
+                accessibilityLabel="Add photo"
+                accessibilityRole="button"
+              >
+                <Text style={styles.photoAddIcon}>+</Text>
+                <Text style={styles.photoAddLabel}>ADD{'\n'}PHOTO</Text>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        </View>
 
         {/* ── Description ── */}
         <View style={styles.fieldGroup}>
@@ -731,6 +820,63 @@ const styles = StyleSheet.create({
   },
   inputMultiline: { minHeight: 90, textAlignVertical: 'top', paddingTop: 12 },
   inputError:     { borderColor: Colors.red },
+
+  // Photo picker
+  photoRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  photoThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  photoImg: {
+    width: 80,
+    height: 80,
+  },
+  photoRemove: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoRemoveText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  photoAdd: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  photoAddIcon: {
+    fontFamily: Fonts.heading,
+    fontSize: 22,
+    color: Colors.gold,
+    marginTop: -2,
+  },
+  photoAddLabel: {
+    fontFamily: Fonts.mono,
+    fontSize: 8,
+    letterSpacing: 1,
+    color: Colors.gold,
+    textAlign: 'center',
+  },
 
   // Helpers
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
