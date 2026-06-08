@@ -71,7 +71,7 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
     if (!user) { setError('Sign in required.'); setLoading(false); return; }
 
     // Parallel fetches: job + payment + tasks + endorsement + concern
-    const [jobRes, paymentRes, tasksRes, endorseRes, concernRes] = await Promise.all([
+    const [jobRes, paymentRes, tasksRes, endorseRes, concernRes, photosRes] = await Promise.all([
       supabase
         .from('jobs')
         .select(`
@@ -102,6 +102,13 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
         .eq('content_type', 'job')
         .eq('content_id', jobId)
         .maybeSingle(),
+      supabase
+        .from('job_photos')
+        .select('url, created_at, caption')
+        .eq('job_id', jobId)
+        .eq('photo_type', 'after')
+        .order('created_at', { ascending: false })
+        .limit(1),
     ]);
 
     if (jobRes.error || !jobRes.data) {
@@ -197,7 +204,11 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
       actionDescription: desc,
       durationMinutes,
       completedAt: job.completed_at ?? new Date().toISOString(),
-      photos: [],
+      photos: ((photosRes.data ?? []) as any[]).map(p => ({
+        url: p.url as string,
+        capturedAt: p.created_at as string,
+        caption: (p.caption as string) ?? undefined,
+      })),
       lineItems,
       subtotalCents,
       platformFeePercent,
@@ -265,7 +276,6 @@ function LineItem({ label, amountCents, muted = false, signed = false }: {
 
 function HeroPhoto({ data }: { data: ReceiptData }) {
   const hero = data.photos[0];
-  const total = data.photos.length;
   const workerFirst = data.worker.firstName;
 
   if (!hero) {
@@ -283,35 +293,16 @@ function HeroPhoto({ data }: { data: ReceiptData }) {
   }
 
   return (
-    <>
-      <View style={s.photoHero}>
-        <Image source={{ uri: hero.url }} style={s.photoImg} />
-        <View style={s.photoInnerBorder} />
-        <Text style={s.photoStamp}>AFTER</Text>
-        <Text style={s.photoMeta}>
-          1 / {total} {'\u00B7'} {new Date(hero.capturedAt).toLocaleString('en-US', {
-            hour: '2-digit', minute: '2-digit', hour12: false,
-          })}
-        </Text>
-      </View>
-
-      {total > 1 && (
-        <View style={s.thumbStrip}>
-          {data.photos.slice(0, 4).map((p, i) => (
-            <View key={i} style={[s.thumb, i === 0 && s.thumbActive]}>
-              <Image source={{ uri: p.url }} style={s.thumbImg} />
-            </View>
-          ))}
-          {total > 4 && (
-            <Text style={s.thumbMore}>+{total - 4}</Text>
-          )}
-        </View>
-      )}
-
-      <Text style={s.photoUploadedHint}>
-        {workerFirst} uploaded {total} {total === 1 ? 'image' : 'images'}
+    <View style={s.photoHero}>
+      <Image source={{ uri: hero.url }} style={s.photoImg} />
+      <View style={s.photoInnerBorder} />
+      <Text style={s.photoStamp}>AFTER</Text>
+      <Text style={s.photoMeta}>
+        {new Date(hero.capturedAt).toLocaleString('en-US', {
+          hour: '2-digit', minute: '2-digit', hour12: false,
+        })}
       </Text>
-    </>
+    </View>
   );
 }
 
@@ -746,26 +737,6 @@ const s = StyleSheet.create({
   photoPlaceholderBody: {
     fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
   },
-  photoUploadedHint: {
-    fontFamily: FONT.mono, fontSize: 9, color: '#555558',
-    letterSpacing: 1, marginTop: 8,
-  },
-
-  // Thumbnail strip
-  thumbStrip: {
-    flexDirection: 'row', gap: 6, marginTop: 6, alignItems: 'center',
-  },
-  thumb: {
-    flex: 1, height: 56, borderRadius: 2,
-    borderWidth: 1, borderColor: Colors.border, overflow: 'hidden',
-  },
-  thumbActive: { borderColor: Colors.gold },
-  thumbImg:    { width: '100%', height: '100%' },
-  thumbMore: {
-    fontFamily: FONT.mono, fontSize: 10, color: Colors.gold,
-    marginLeft: 4,
-  },
-
   // Worker block
   workerBlock: { marginTop: 36 },
   workerName: {
