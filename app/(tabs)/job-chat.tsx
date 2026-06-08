@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { SUPPORT_EMAIL } from '../../lib/legal';
 import { supabase } from '../../lib/supabase';
+import { uploadJobPhoto, type PhotoType } from '../../lib/photos';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -117,6 +119,11 @@ export default function JobChatScreen() {
   const [disputeMode,     setDisputeMode]     = useState(false);
   const [disputeText,     setDisputeText]     = useState('');
 
+  // Evidence photo state
+  const [photoPickerOpen, setPhotoPickerOpen] = useState(false); // shows BEFORE/AFTER choice
+  const [photoUploading,  setPhotoUploading]  = useState(false);
+  const [evidenceCount,   setEvidenceCount]   = useState(0);
+
   // ── Initial load ──────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -198,6 +205,59 @@ export default function JobChatScreen() {
   useEffect(() => { fetchPayment(); }, [fetchPayment]);
 
   useFocusEffect(useCallback(() => { fetchPayment(); }, [fetchPayment]));
+
+  // ── Evidence photo count ──────────────────────────────────────────────────
+
+  const fetchEvidenceCount = useCallback(async () => {
+    if (!chat?.job?.id) return;
+    const { count } = await supabase
+      .from('job_photos')
+      .select('id', { count: 'exact', head: true })
+      .eq('job_id', chat.job.id)
+      .in('photo_type', ['before', 'after']);
+    setEvidenceCount(count ?? 0);
+  }, [chat?.job?.id]);
+
+  useEffect(() => { fetchEvidenceCount(); }, [fetchEvidenceCount]);
+
+  // ── Evidence photo upload ────────────────────────────────────────────────
+
+  const handleEvidencePhoto = useCallback(async (photoType: PhotoType) => {
+    setPhotoPickerOpen(false);
+    if (!chat?.job?.id || !currentUserId) return;
+
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      setActionError('Photo library permission is needed to add photos.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.75,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    setPhotoUploading(true);
+    try {
+      const { url } = await uploadJobPhoto(chat.job.id, photoType, result.assets[0].uri);
+      await supabase.from('job_photos').insert({
+        job_id: chat.job.id,
+        url,
+        photo_type: photoType,
+        uploaded_by: currentUserId,
+        sort_order: evidenceCount,
+      });
+      setEvidenceCount(prev => prev + 1);
+    } catch (err: any) {
+      console.error(`[job-chat] Evidence photo upload failed:`, err?.message ?? err);
+      setActionError(`Photo upload failed: ${err?.message ?? 'Unknown error'}`);
+    }
+    setPhotoUploading(false);
+  }, [chat?.job?.id, currentUserId, evidenceCount]);
 
   // ── Realtime subscription ─────────────────────────────────────────────────
 
@@ -762,8 +822,54 @@ export default function JobChatScreen() {
           </View>
         ) : null}
 
+        {/* ── BEFORE/AFTER type picker (inline above composer) ── */}
+        {photoPickerOpen && (
+          <View style={styles.photoTypePicker}>
+            <Text style={styles.photoTypeLabel}>ADD EVIDENCE PHOTO</Text>
+            <View style={styles.photoTypeBtnRow}>
+              <TouchableOpacity
+                style={styles.photoTypeBtn}
+                onPress={() => handleEvidencePhoto('before')}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.photoTypeBtnText}>BEFORE</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.photoTypeBtn, styles.photoTypeBtnAfter]}
+                onPress={() => handleEvidencePhoto('after')}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.photoTypeBtnText, styles.photoTypeBtnAfterText]}>AFTER</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={() => setPhotoPickerOpen(false)} activeOpacity={0.7}>
+              <Text style={styles.photoTypeCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* ── Composer ── */}
         <View style={styles.composer}>
+          {/* Camera button — worker only, in_progress or pending_confirmation, under cap */}
+          {!isCustomer && (jobStatus === 'in_progress' || jobStatus === 'pending_confirmation') && evidenceCount < 10 && !photoUploading && (
+            <TouchableOpacity
+              style={styles.cameraBtn}
+              onPress={() => setPhotoPickerOpen(p => !p)}
+              activeOpacity={0.7}
+              accessibilityLabel="Add evidence photo"
+              accessibilityRole="button"
+            >
+              <Text style={styles.cameraBtnIcon}>{'\uD83D\uDCF7'}</Text>
+            </TouchableOpacity>
+          )}
+          {photoUploading && (
+            <View style={styles.cameraBtn}>
+              <ActivityIndicator size="small" color={Colors.gold} />
+            </View>
+          )}
+          {!isCustomer && (jobStatus === 'in_progress' || jobStatus === 'pending_confirmation') && evidenceCount >= 10 && (
+            <Text style={styles.photoCapNote}>Limit{'\n'}reached</Text>
+          )}
           <TextInput
             style={styles.composerInput}
             value={composerText}
@@ -782,7 +888,7 @@ export default function JobChatScreen() {
           >
             {sending
               ? <ActivityIndicator size="small" color={Colors.background} />
-              : <Text style={styles.sendBtnText}>↑</Text>
+              : <Text style={styles.sendBtnText}>{'\u2191'}</Text>
             }
           </TouchableOpacity>
         </View>
@@ -1058,6 +1164,69 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 24,
+  },
+
+  // ── Evidence photo picker ──────────────────────────────────────
+  cameraBtn: {
+    width: 40,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  cameraBtnIcon: {
+    fontSize: 22,
+  },
+  photoCapNote: {
+    fontFamily: Fonts.mono,
+    fontSize: 8,
+    color: Colors.textTertiary,
+    textAlign: 'center',
+    width: 40,
+    lineHeight: 11,
+  },
+  photoTypePicker: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+    gap: 10,
+  },
+  photoTypeLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 2,
+    color: Colors.textSecondary,
+  },
+  photoTypeBtnRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  photoTypeBtn: {
+    borderWidth: 1.5,
+    borderColor: Colors.textSecondary,
+    borderRadius: Radius.full,
+    paddingVertical: 10,
+    paddingHorizontal: 28,
+  },
+  photoTypeBtnText: {
+    fontFamily: Fonts.heading,
+    fontSize: 13,
+    letterSpacing: 1,
+    color: Colors.textSecondary,
+  },
+  photoTypeBtnAfter: {
+    borderColor: Colors.green,
+  },
+  photoTypeBtnAfterText: {
+    color: Colors.green,
+  },
+  photoTypeCancelText: {
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    color: Colors.textTertiary,
   },
 
   // ── Pending confirmation + dispute ──────────────────────────
