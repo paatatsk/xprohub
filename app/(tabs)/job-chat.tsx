@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity,
+  View, Text, StyleSheet, TouchableOpacity, Image,
   FlatList, TextInput, ActivityIndicator,
   KeyboardAvoidingView, Platform, Alert, Linking, ActionSheetIOS,
 } from 'react-native';
@@ -50,6 +50,18 @@ interface PaymentRow {
   disputed_at: string | null;
   dispute_reason: string | null;
 }
+
+interface EvidencePhoto {
+  id: string;
+  url: string;
+  photo_type: 'before' | 'after';
+  uploaded_by: string;
+  created_at: string;
+}
+
+type TimelineItem =
+  | { kind: 'message'; data: Message }
+  | { kind: 'photo'; data: EvidencePhoto };
 
 // ── Time formatter ─────────────────────────────────────────────────────────
 
@@ -103,7 +115,7 @@ function MessageBubble({ message, isOutgoing }: MessageBubbleProps) {
 export default function JobChatScreen() {
   const router                    = useRouter();
   const { chat_id }               = useLocalSearchParams<{ chat_id: string }>();
-  const listRef                   = useRef<FlatList<Message>>(null);
+  const listRef                   = useRef<FlatList<TimelineItem>>(null);
 
   const [loading,       setLoading]       = useState(true);
   const [loadError,     setLoadError]     = useState<string | null>(null);
@@ -123,6 +135,7 @@ export default function JobChatScreen() {
   const [photoPickerOpen, setPhotoPickerOpen] = useState(false); // shows BEFORE/AFTER choice
   const [photoUploading,  setPhotoUploading]  = useState(false);
   const [evidenceCount,   setEvidenceCount]   = useState(0);
+  const [evidencePhotos,  setEvidencePhotos]  = useState<EvidencePhoto[]>([]);
 
   // ── Initial load ──────────────────────────────────────────────────────────
 
@@ -206,19 +219,22 @@ export default function JobChatScreen() {
 
   useFocusEffect(useCallback(() => { fetchPayment(); }, [fetchPayment]));
 
-  // ── Evidence photo count ──────────────────────────────────────────────────
+  // ── Evidence photos (fetch list + derive count) ──────────────────────────
 
-  const fetchEvidenceCount = useCallback(async () => {
+  const fetchEvidencePhotos = useCallback(async () => {
     if (!chat?.job?.id) return;
-    const { count } = await supabase
+    const { data } = await supabase
       .from('job_photos')
-      .select('id', { count: 'exact', head: true })
+      .select('id, url, photo_type, uploaded_by, created_at')
       .eq('job_id', chat.job.id)
-      .in('photo_type', ['before', 'after']);
-    setEvidenceCount(count ?? 0);
+      .in('photo_type', ['before', 'after'])
+      .order('created_at', { ascending: true });
+    const photos = (data ?? []) as EvidencePhoto[];
+    setEvidencePhotos(photos);
+    setEvidenceCount(photos.length);
   }, [chat?.job?.id]);
 
-  useEffect(() => { fetchEvidenceCount(); }, [fetchEvidenceCount]);
+  useEffect(() => { fetchEvidencePhotos(); }, [fetchEvidencePhotos]);
 
   // ── Evidence photo upload ────────────────────────────────────────────────
 
@@ -251,13 +267,13 @@ export default function JobChatScreen() {
         uploaded_by: currentUserId,
         sort_order: evidenceCount,
       });
-      setEvidenceCount(prev => prev + 1);
+      await fetchEvidencePhotos();
     } catch (err: any) {
       console.error(`[job-chat] Evidence photo upload failed:`, err?.message ?? err);
       setActionError(`Photo upload failed: ${err?.message ?? 'Unknown error'}`);
     }
     setPhotoUploading(false);
-  }, [chat?.job?.id, currentUserId, evidenceCount]);
+  }, [chat?.job?.id, currentUserId, evidenceCount, fetchEvidencePhotos]);
 
   // ── Realtime subscription ─────────────────────────────────────────────────
 
@@ -534,6 +550,19 @@ export default function JobChatScreen() {
   const jobTitle     = chat?.job?.title ?? null;
   const jobStatus    = chat?.job?.status ?? null;
 
+  // Worker display name for photo attribution
+  const workerFirstName = (chat?.worker?.full_name ?? 'Worker').split(' ')[0];
+
+  // ── Merge messages + evidence photos into a timeline ─────────────────────
+  const timeline: TimelineItem[] = [
+    ...messages.map(m => ({ kind: 'message' as const, data: m })),
+    ...evidencePhotos.map(p => ({ kind: 'photo' as const, data: p })),
+  ].sort((a, b) => {
+    const ta = new Date(a.data.created_at).getTime();
+    const tb = new Date(b.data.created_at).getTime();
+    return ta - tb;
+  });
+
   // ── Main JSX ──────────────────────────────────────────────────────────────
 
   return (
@@ -792,18 +821,38 @@ export default function JobChatScreen() {
           </View>
         )}
 
-        {/* ── Messages list ── */}
+        {/* ── Messages + evidence photos timeline ── */}
         <FlatList
           ref={listRef}
-          data={[...messages].reverse()}
-          keyExtractor={(item) => item.id}
+          data={[...timeline].reverse()}
+          keyExtractor={(item) => item.kind === 'message' ? `msg_${item.data.id}` : `photo_${item.data.id}`}
           inverted
-          renderItem={({ item }) => (
-            <MessageBubble
-              message={item}
-              isOutgoing={item.sender_id === currentUserId}
-            />
-          )}
+          renderItem={({ item }) => {
+            if (item.kind === 'photo') {
+              const p = item.data;
+              const isAfter = p.photo_type === 'after';
+              return (
+                <View style={styles.photoCard}>
+                  <View style={styles.photoCardHeader}>
+                    <Text style={[styles.photoCardLabel, isAfter && styles.photoCardLabelAfter]}>
+                      {isAfter ? 'AFTER' : 'BEFORE'}
+                    </Text>
+                    <Text style={styles.photoCardTime}>{formatMessageTime(p.created_at)}</Text>
+                  </View>
+                  <Image source={{ uri: p.url }} style={styles.photoCardImage} />
+                  <Text style={styles.photoCardAttribution}>
+                    Added by {workerFirstName}
+                  </Text>
+                </View>
+              );
+            }
+            return (
+              <MessageBubble
+                message={item.data}
+                isOutgoing={item.data.sender_id === currentUserId}
+              />
+            );
+          }}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyWrap}>
@@ -1164,6 +1213,49 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 24,
+  },
+
+  // ── Evidence photo cards (in-thread) ───────────────────────────
+  photoCard: {
+    marginHorizontal: 4,
+    marginVertical: 8,
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    overflow: 'hidden',
+    padding: 12,
+    gap: 8,
+  },
+  photoCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+  },
+  photoCardLabel: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.5,
+    color: Colors.textSecondary,
+  },
+  photoCardLabelAfter: {
+    color: Colors.green,
+  },
+  photoCardTime: {
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    color: Colors.textTertiary,
+  },
+  photoCardImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    resizeMode: 'cover',
+  },
+  photoCardAttribution: {
+    fontFamily: Fonts.body,
+    fontSize: 11,
+    color: Colors.textSecondary,
   },
 
   // ── Evidence photo picker ──────────────────────────────────────
