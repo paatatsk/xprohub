@@ -192,7 +192,7 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
 | Payment Setup | `app/(tabs)/payment-setup.tsx` | Functional — Stripe PaymentSheet |
 | Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
-| Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, five-voice typography |
+| Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, after-photo, five-voice typography |
 
 Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 
@@ -487,7 +487,8 @@ Each remaining screen refined to lighthouse standard before submission. Order TB
 **Shipped:**
 - Home restructure (`401ff06`, 2026-06-07): single-column compact category rows, greeting masthead with real first_name + device-clock greeting + live open-job count ("JOBS OPEN NOW"), sticky-pin scroll model (YOUR DESK as sole sticky element, masthead scrolls away), YOUR DESK style refinements (12px radius, top-border dividers, 44px tap targets). Spec §6 gold pin-glow + hairline was prototyped and removed by Paata's preference — pinned desk uses plain border.
 - Photo system Stage 1 (`343608c`, 2026-06-08): customer listing photos end-to-end. Foundation: `job_photos` table + `lib/photos.ts` upload helper + `job-photos` public bucket (manual). Post-a-Job restructured into 3 clear sections with smart auto-fill from selected tasks + photo picker (up to 3 listing photos, 4:3, optional). Listing photos display on job cards as 140px cover banners; cards without photos render cleanly with no placeholder. Cards more pronounced (title 19px, budget 24px).
-- Photo system Stage 2 (`dd2eb2d`, 2026-06-08): worker before/after evidence photos in the chat thread. Camera affordance in composer (worker only, in_progress + pending_confirmation, explicit BEFORE/AFTER type choice, soft cap 10). Photos render as full-width evidence cards interleaved in the timeline (BEFORE neutral / AFTER green, "Added by {worker}"). A planned evidence summary in the confirm banner (Slice C) was designed and dropped — the thread photos already serve as evidence beside the confirm buttons. Completion flow and payment RPCs untouched. Stage 3 (Receipt photos — UI built, query unwired) not started.
+- Photo system Stage 2 (`dd2eb2d`, 2026-06-08): worker before/after evidence photos in the chat thread. Camera affordance in composer (worker only, in_progress + pending_confirmation, explicit BEFORE/AFTER type choice, soft cap 10). Photos render as full-width evidence cards interleaved in the timeline (BEFORE neutral / AFTER green, "Added by {worker}"). A planned evidence summary in the confirm banner (Slice C) was designed and dropped — the thread photos already serve as evidence beside the confirm buttons. Completion flow and payment RPCs untouched.
+- Photo system Stage 3 (`cac3371`, 2026-06-08): after-photo on the Receipt as a calm visual reminder. The latest after-photo (job_photos, photo_type='after', most recent) wired to HeroPhoto; gallery cruft removed (thumbnail strip, photo counter, upload hint). Receipt shows exactly one photo as a memory anchor — deliberately not a before/after pair (evidence lives in the chat thread, Stage 2). Empty state preserved for jobs with no after-photo. **Photo system COMPLETE.**
 
 ### 🔲 Submission Items (user-side)
 - Privacy Policy + Terms of Service legal copy deployed to xprohub.com

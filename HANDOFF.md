@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-08 (Photo system Stage 2 shipped — 2 slices, Slice C dropped)
-**Most recent commit:** `dd2eb2d` — feat(chat): render before/after photo cards in thread (photo stage 2, slice B)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system Stage 1 SHIPPED (customer listing photos). Photo system Stage 2 SHIPPED (worker before/after evidence photos in chat). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-08 (Photo system COMPLETE — all 3 stages shipped)
+**Most recent commit:** `cac3371` — feat(receipt): after-photo as a visual reminder on the receipt (photo stage 3)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -49,6 +49,8 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 
 ### Shipped this session
 
+- **Photo system Stage 3 — after-photo on Receipt (completes the photo system)**:
+  - `cac3371` — Wire the Receipt's HeroPhoto to the job's latest after-photo (job_photos, photo_type='after', most recent `created_at`). Shown as a single calm image in the existing hero treatment with the AFTER stamp. Gallery cruft removed (thumbnail strip, photo counter, upload hint). **Conceptual decision:** the Receipt photo is deliberately ONE after-photo as a memory anchor/keepsake — not a before/after pair. Evidence lives in the chat thread (Stage 2). The before/after pair was considered and rejected as too much for the lighthouse. Empty state preserved for jobs with no after-photo. **Photo system is now COMPLETE across all 3 stages.**
 - **Photo system Stage 2 — worker before/after evidence (2 slices, Slice C dropped)**:
   - `fd3f2d9` — Slice A: camera affordance in the chat composer (worker only, visible during `in_progress` + `pending_confirmation`). Explicit BEFORE/AFTER type choice via inline picker. Uploads via `uploadJobPhoto` + inserts `job_photos` rows. Soft cap of 10 evidence photos per job. Non-blocking, optional — completion flow and payment RPCs untouched.
   - `dd2eb2d` — Slice B: before/after photos render as full-width evidence cards in the chat timeline, interleaved with messages by `created_at`. BEFORE label (neutral/secondary), AFTER label (green). "Added by {worker}" attribution. Both parties see them. No schema change to `messages` — photos are fetched from `job_photos` and merged client-side.
@@ -201,7 +203,7 @@ Prioritized. Open polish doc at `docs/POLISH_PASS_QUEUE_2026-06-01.md` for the f
 
 13. Supabase Pro plan upgrade (Leaked Password Protection).
 14. Worker classification legal review.
-15. Job photos — **Stage 1 DONE** (listing photos: post + upload + card display). **Stage 2 DONE** (worker before/after evidence: upload in chat composer + photo cards in thread). **Stage 3 NOT started** (photos on Receipt — UI already built in receipt.tsx HeroPhoto component, needs query wired to job_photos).
+15. Job photos — **COMPLETE** (all 3 stages shipped). Stage 1: listing photos (post + card display). Stage 2: worker before/after evidence (chat upload + thread cards). Stage 3: after-photo on Receipt (latest after-photo as a calm memory anchor — deliberately not a before/after pair; evidence lives in chat).
 16. Worker orientation arc (post-launch retention feature).
 
 ---
@@ -268,7 +270,8 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 - Polish queue refreshed — 5 new resolved items added (webhook logging, atomic RPC, string fallbacks, release-payment skip, test-data cleanup).
 - **Home restructure** — SHIPPED (`401ff06`, 4 slices). Single-column categories, greeting masthead with live job-count, sticky YOUR DESK, style refinements. §6 glow removed by preference.
 - **Photo system Stage 1** — SHIPPED (`343608c`, foundation + 4 slices). Customer listing photos: job_photos table, job-photos bucket (manual), photo picker on Post-a-Job (up to 3), listing photos on job cards.
-- **Photo system Stage 2** — SHIPPED (`dd2eb2d`, 2 slices, Slice C dropped). Worker before/after evidence: upload in chat composer + photo cards in thread. Confirm-banner evidence summary deliberately dropped (redundant). Stage 3 not started.
+- **Photo system Stage 2** — SHIPPED (`dd2eb2d`, 2 slices, Slice C dropped). Worker before/after evidence: upload in chat composer + photo cards in thread. Confirm-banner evidence summary deliberately dropped (redundant).
+- **Photo system Stage 3** — SHIPPED (`cac3371`). After-photo on Receipt as memory anchor. Photo system COMPLETE.
 
 ---
 
