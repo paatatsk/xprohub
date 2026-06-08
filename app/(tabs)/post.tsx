@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   TextInput, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -94,6 +94,12 @@ export default function PostScreen() {
   const [timing, setTiming]             = useState<Timing>('flexible');
   const [isUrgent, setIsUrgent]         = useState(false);
 
+  // Track whether the user has manually edited each auto-filled field.
+  // Once edited, auto-fill stops updating that field — user input always wins.
+  const titleEdited       = useRef(false);
+  const descriptionEdited = useRef(false);
+  const budgetEdited      = useRef(false);
+
   // UI state
   const [errors, setErrors]           = useState<FormErrors>({});
   const [submitting, setSubmitting]   = useState(false);
@@ -174,6 +180,73 @@ export default function PostScreen() {
     setTasksLoading(false);
   }, []);
 
+  // ── Auto-fill from selected tasks ──────────────────────────────────────
+  const autoFillFromTasks = useCallback((taskIds: Set<number>) => {
+    const selected = tasks.filter(t => taskIds.has(t.id));
+
+    // Title — generate readable name from selected tasks
+    if (!titleEdited.current) {
+      if (selected.length === 0) {
+        setTitle('');
+      } else if (selected.length <= 2) {
+        setTitle(selected.map(t => t.name).join(' & '));
+      } else {
+        setTitle(`${selected[0].name}, ${selected[1].name} +${selected.length - 2} more`);
+      }
+    }
+
+    // Description — scaffold from task names
+    if (!descriptionEdited.current) {
+      if (selected.length === 0) {
+        setDescription('');
+      } else {
+        setDescription(`Looking for help with: ${selected.map(t => t.name).join(', ')}.`);
+      }
+    }
+
+    // Budget — sum of price ranges
+    if (!budgetEdited.current) {
+      if (selected.length === 0) {
+        setBudgetMin('');
+        setBudgetMax('');
+      } else {
+        const sumMin = selected.reduce((s, t) => s + t.price_min, 0);
+        const sumMax = selected.reduce((s, t) => s + t.price_max, 0);
+        setBudgetMin(String(sumMin));
+        setBudgetMax(String(sumMax));
+      }
+    }
+  }, [tasks]);
+
+  // ── Reset form to clean slate ─────────────────────────────────────────
+  const resetForm = useCallback(() => {
+    setViewMode(catId ? 'tasks' : 'categories');
+    setSelectedTaskIds(new Set());
+    if (!catId) {
+      setTasks([]);
+      setCategoryName(null);
+      setCategorySlug(null);
+    }
+    setTitle('');
+    setDescription('');
+    setBudgetMin('');
+    setBudgetMax('');
+    setNeighborhood('');
+    setTiming('flexible');
+    setIsUrgent(false);
+    setErrors({});
+    setSubmitting(false);
+    setSubmitError(null);
+    titleEdited.current = false;
+    descriptionEdited.current = false;
+    budgetEdited.current = false;
+  }, [catId]);
+
+  // Reset on blur (leaving the screen) — returning always starts fresh
+  useFocusEffect(useCallback(() => {
+    return () => { resetForm(); };
+  }, [resetForm]));
+
   // ── Back to categories (HELP WANTED path only — no catId) ──────────────
   const handleBackToCategories = useCallback(() => {
     setSelectedTaskIds(new Set());
@@ -181,15 +254,23 @@ export default function PostScreen() {
     setCategoryName(null);
     setCategorySlug(null);
     setViewMode('categories');
+    setTitle('');
+    setDescription('');
+    setBudgetMin('');
+    setBudgetMax('');
+    titleEdited.current = false;
+    descriptionEdited.current = false;
+    budgetEdited.current = false;
   }, []);
 
   const toggleTask = useCallback((id: number) => {
     setSelectedTaskIds(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
+      autoFillFromTasks(next);
       return next;
     });
-  }, []);
+  }, [autoFillFromTasks]);
 
   const clearError = (key: keyof FormErrors) =>
     setErrors(e => ({ ...e, [key]: undefined }));
@@ -266,6 +347,7 @@ export default function PostScreen() {
     }
 
     setSubmitting(false);
+    resetForm();
     router.replace('/(tabs)/market');
   };
 
@@ -356,7 +438,7 @@ export default function PostScreen() {
             placeholder="e.g. Deep clean 2BR apartment"
             placeholderTextColor={Colors.textSecondary}
             value={title}
-            onChangeText={t => { setTitle(t.slice(0, 80)); clearError('title'); }}
+            onChangeText={t => { titleEdited.current = true; setTitle(t.slice(0, 80)); clearError('title'); }}
             maxLength={80}
           />
           <View style={styles.rowBetween}>
@@ -379,7 +461,7 @@ export default function PostScreen() {
             placeholder="Any extra details or special requirements..."
             placeholderTextColor={Colors.textSecondary}
             value={description}
-            onChangeText={t => setDescription(t.slice(0, 500))}
+            onChangeText={t => { descriptionEdited.current = true; setDescription(t.slice(0, 500)); }}
             multiline
             numberOfLines={3}
             maxLength={500}
@@ -452,7 +534,7 @@ export default function PostScreen() {
                 placeholder="0"
                 placeholderTextColor={Colors.textSecondary}
                 value={budgetMin}
-                onChangeText={t => { setBudgetMin(t); clearError('budget'); }}
+                onChangeText={t => { budgetEdited.current = true; setBudgetMin(t); clearError('budget'); }}
                 keyboardType="numeric"
               />
             </View>
@@ -463,7 +545,7 @@ export default function PostScreen() {
                 placeholder="0"
                 placeholderTextColor={Colors.textSecondary}
                 value={budgetMax}
-                onChangeText={t => { setBudgetMax(t); clearError('budget'); }}
+                onChangeText={t => { budgetEdited.current = true; setBudgetMax(t); clearError('budget'); }}
                 keyboardType="numeric"
               />
             </View>
