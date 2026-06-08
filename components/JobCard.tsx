@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Colors, Fonts, Radius } from '../constants/theme';
 import CornerStamp from './CornerStamp';
 
@@ -16,6 +16,7 @@ export interface Job {
   is_urgent: boolean;
   created_at: string;
   customer_id: string;
+  photo_url?: string | null;
 }
 
 interface JobCardProps {
@@ -70,90 +71,143 @@ function isNewPost(dateStr: string): boolean {
 export default function JobCard({ job, isOwnPost, onPress }: JobCardProps) {
   const showUrgentStamp = job.is_urgent;
   const showNewStamp = !showUrgentStamp && isNewPost(job.created_at);
+  const hasPhoto = !!job.photo_url;
 
   return (
-    <TouchableOpacity
-      style={[
-        s.container,
-        showUrgentStamp && s.containerUrgent,
-      ]}
-      onPress={onPress}
-      activeOpacity={0.85}
-      accessibilityLabel={`Job: ${job.title}`}
-      accessibilityRole="button"
-    >
-      {/* Corner stamp */}
+    <View style={s.outer}>
+      {/* Corner stamp — outside the clipped container so it's never cut */}
       {showUrgentStamp && <CornerStamp variant="urgent" />}
       {showNewStamp && <CornerStamp variant="new" accessibilityLabel="New \u2014 posted within the hour" />}
 
-      {/* Category divider */}
-      {job.category && (
-        <View style={s.categoryRow}>
-          <View style={s.categoryLine} />
-          <Text style={s.categoryLabel}>{job.category.toUpperCase()}</Text>
-          <View style={s.categoryLine} />
+      <TouchableOpacity
+        style={[
+          s.container,
+          showUrgentStamp && s.containerUrgent,
+        ]}
+        onPress={onPress}
+        activeOpacity={0.85}
+        accessibilityLabel={`Job: ${job.title}`}
+        accessibilityRole="button"
+      >
+        {/* Photo banner (only when a listing photo exists) */}
+      {hasPhoto && (
+        <View style={s.photoBanner}>
+          <Image source={{ uri: job.photo_url! }} style={s.photoImage} />
+          {/* Overlay badges on the photo */}
+          {isOwnPost && (
+            <View style={s.photoBadge}>
+              <Text style={s.photoBadgeText}>YOUR POST</Text>
+            </View>
+          )}
         </View>
       )}
 
-      {/* Own-post eyebrow */}
-      {isOwnPost && (
-        <Text style={s.ownPostTag} accessibilityLabel="Your post">YOUR POST</Text>
-      )}
-
-      {/* Title */}
-      <Text style={s.title} numberOfLines={2}>{job.title}</Text>
-
-      {/* Description */}
-      {job.description && (
-        <Text style={s.description} numberOfLines={2}>{job.description}</Text>
-      )}
-
-      {/* Budget headline */}
-      <View style={s.budgetRow}>
-        <Text style={s.budgetNumber}>{budgetLabel(job.budget_min, job.budget_max)}</Text>
-        {job.timing && (
-          <Text style={s.budgetUnit}>{timingUnit(job.timing)}</Text>
+      {/* Card body */}
+      <View style={s.body}>
+        {/* Category divider */}
+        {job.category && (
+          <View style={s.categoryRow}>
+            <View style={s.categoryLine} />
+            <Text style={s.categoryLabel}>{job.category.toUpperCase()}</Text>
+            <View style={s.categoryLine} />
+          </View>
         )}
-      </View>
 
-      {/* Meta footer */}
-      <View style={s.metaFooter}>
-        {job.neighborhood && (
+        {/* Own-post eyebrow (no-photo cards only — photo cards show it on the banner) */}
+        {isOwnPost && !hasPhoto && (
+          <Text style={s.ownPostTag} accessibilityLabel="Your post">YOUR POST</Text>
+        )}
+
+        {/* Title */}
+        <Text style={s.title} numberOfLines={2}>{job.title}</Text>
+
+        {/* Description */}
+        {job.description && (
+          <Text style={s.description} numberOfLines={2}>{job.description}</Text>
+        )}
+
+        {/* Budget headline */}
+        <View style={s.budgetRow}>
+          <Text style={s.budgetNumber}>{budgetLabel(job.budget_min, job.budget_max)}</Text>
+          {job.timing && (
+            <Text style={s.budgetUnit}>{timingUnit(job.timing)}</Text>
+          )}
+        </View>
+
+        {/* Meta footer */}
+        <View style={s.metaFooter}>
+          {job.neighborhood && (
+            <Text style={s.metaItem}>
+              {'\ud83d\udccd'} <Text style={s.metaAccent}>{job.neighborhood}</Text>
+            </Text>
+          )}
+          {job.neighborhood && job.timing && <Text style={s.metaSep}>{'\u00b7'}</Text>}
+          {job.timing && (
+            <Text style={s.metaItem}>
+              {'\ud83d\udd50'} <Text style={s.metaAccent}>{timingLabel(job.timing)}</Text>
+            </Text>
+          )}
+          {(job.neighborhood || job.timing) && <Text style={s.metaSep}>{'\u00b7'}</Text>}
           <Text style={s.metaItem}>
-            {'\ud83d\udccd'} <Text style={s.metaAccent}>{job.neighborhood}</Text>
+            posted <Text style={s.metaAccent}>{timeAgo(job.created_at)}</Text>
           </Text>
-        )}
-        {job.neighborhood && job.timing && <Text style={s.metaSep}>{'\u00b7'}</Text>}
-        {job.timing && (
-          <Text style={s.metaItem}>
-            {'\ud83d\udd50'} <Text style={s.metaAccent}>{timingLabel(job.timing)}</Text>
-          </Text>
-        )}
-        {(job.neighborhood || job.timing) && <Text style={s.metaSep}>{'\u00b7'}</Text>}
-        <Text style={s.metaItem}>
-          posted <Text style={s.metaAccent}>{timeAgo(job.created_at)}</Text>
-        </Text>
+        </View>
       </View>
     </TouchableOpacity>
+    </View>
   );
 }
 
 // ── Styles ─────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
+  outer: {
+    position: 'relative',
+    marginBottom: 14,
+    overflow: 'visible',
+  },
   container: {
     backgroundColor: Colors.card,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 12,
-    padding: 18,
-    paddingBottom: 16,
-    marginBottom: 12,
-    position: 'relative',
-    overflow: 'visible',
+    overflow: 'hidden',
   },
   containerUrgent: {
     borderColor: Colors.red,
+  },
+
+  // Photo banner (conditional — only renders when photo_url exists)
+  photoBanner: {
+    width: '100%',
+    height: 140,
+    position: 'relative',
+  },
+  photoImage: {
+    width: '100%',
+    height: 140,
+    resizeMode: 'cover',
+  },
+  photoBadge: {
+    position: 'absolute',
+    bottom: 10,
+    left: 12,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  photoBadgeText: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 2.5,
+    color: Colors.gold,
+  },
+
+  // Card body
+  body: {
+    padding: 20,
+    paddingBottom: 16,
   },
 
   // Corner stamp — see components/CornerStamp.tsx
@@ -162,7 +216,7 @@ const s = StyleSheet.create({
   categoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   categoryLine: {
     flex: 1,
@@ -177,7 +231,7 @@ const s = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
-  // Own-post eyebrow
+  // Own-post eyebrow (no-photo cards)
   ownPostTag: {
     fontFamily: Fonts.display,
     fontSize: 9,
@@ -186,11 +240,11 @@ const s = StyleSheet.create({
     marginBottom: 6,
   },
 
-  // Title
+  // Title — more pronounced
   title: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
-    lineHeight: 21,
+    fontSize: 19,
+    lineHeight: 25,
     color: Colors.textPrimary,
     paddingRight: 8,
     marginBottom: 8,
@@ -199,8 +253,8 @@ const s = StyleSheet.create({
   // Description
   description: {
     fontFamily: Fonts.body,
-    fontSize: 12.5,
-    lineHeight: 19,
+    fontSize: 13,
+    lineHeight: 20,
     color: Colors.textSecondary,
     marginBottom: 14,
   },
@@ -210,11 +264,11 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 6,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   budgetNumber: {
     fontFamily: Fonts.heading,
-    fontSize: 22,
+    fontSize: 24,
     letterSpacing: 0.5,
     color: Colors.gold,
   },
@@ -234,7 +288,7 @@ const s = StyleSheet.create({
     gap: 6,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    paddingTop: 11,
+    paddingTop: 12,
   },
   metaItem: {
     fontFamily: Fonts.body,

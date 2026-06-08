@@ -96,7 +96,28 @@ export default function MarketScreen() {
       setError('Couldn\u2019t load jobs. Pull down to try again.');
     } else {
       const blocked = new Set(blockedIds);
-      setJobs((data ?? []).filter(j => !blocked.has(j.customer_id)));
+      const filteredJobs = (data ?? []).filter(j => !blocked.has(j.customer_id));
+
+      // Fetch first listing photo for each job (batch query)
+      if (filteredJobs.length > 0) {
+        const jobIds = filteredJobs.map(j => j.id);
+        const { data: photos } = await supabase
+          .from('job_photos')
+          .select('job_id, url')
+          .in('job_id', jobIds)
+          .eq('photo_type', 'listing')
+          .order('sort_order', { ascending: true });
+
+        // Build a map: job_id → first photo URL
+        const photoMap = new Map<string, string>();
+        for (const p of photos ?? []) {
+          if (!photoMap.has(p.job_id)) photoMap.set(p.job_id, p.url);
+        }
+
+        setJobs(filteredJobs.map(j => ({ ...j, photo_url: photoMap.get(j.id) ?? null })));
+      } else {
+        setJobs([]);
+      }
     }
 
     if (isRefresh) setRefreshing(false);
