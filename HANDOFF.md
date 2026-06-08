@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-07 (Home restructure shipped — 4 slices)
-**Most recent commit:** `401ff06` — feat(home): YOUR DESK style refinements (restructure slice 4)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED (single-column categories, greeting masthead, sticky YOUR DESK, §6 glow removed by preference). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-08 (Photo system Stage 1 shipped — foundation + 4 slices)
+**Most recent commit:** `343608c` — feat(market): listing photos on job cards + more pronounced cards (photo stage 1, slice C)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system Stage 1 SHIPPED (customer listing photos: post + upload + card display). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -49,6 +49,12 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 
 ### Shipped this session
 
+- **Photo system Stage 1 — customer listing photos (foundation + 4 slices)**:
+  - `9071c16` — Foundation: `job_photos` table (party-scoped immutable RLS, indexed on job_id + (job_id, photo_type)) + `lib/photos.ts` `uploadJobPhoto` helper. Migration `20260607000001`. **CRITICAL — manual dashboard state not in migrations:** the `job-photos` Supabase Storage bucket (Public) and its Storage INSERT policy (authenticated, bucket_id = 'job-photos') were both created manually in the dashboard. Without them, photo uploads fail with "new row violates row-level security policy." A fresh Supabase project rebuild MUST recreate both.
+  - `a1acd5b` — Slice A: Post-a-Job form restructured into 3 clear visual sections (Describe Your Job / Select Tasks / Details) with dividers and section labels. Task selector replaced: wrapped chips → contained card with full-width checkbox rows. Heading enlarged (28→34px).
+  - `2a5b496` — Smart-form: auto-fill title, description, and budget from selected tasks. Per-field tracking — auto-fill stops the moment the user edits that field (typed input always wins). Form resets to clean slate on leave + after successful post.
+  - `ccb4a3b` — Slice B: photo picker in the Describe Your Job section. Up to 3 listing photos via expo-image-picker (4:3, quality 0.75). Photos upload to job-photos bucket after job creation via `uploadJobPhoto`, then insert `job_photos` rows (photo_type='listing'). Non-blocking — job posts regardless of photo success.
+  - `343608c` — Slice C: listing photos display on job cards in the Live Market feed. First listing photo batch-fetched from `job_photos` and shown as a 140px cover banner. Cards without photos render cleanly with no placeholder. Title enlarged (16→19px), budget enlarged (22→24px). Corner stamp decoupled to overflow-visible outer wrapper.
 - **Home restructure (4 slices)** — per HOME_RESTRUCTURE_SPEC, Claude Design's binding build spec:
   - `f831ba8` — Renamed YOUR DESK flow-rows: "Posts awaiting my review" → "My posts", "Applications I'm waiting on" → "My applications". Sentence case to match existing rows.
   - `b6c1eee` — Slice 1: replaced 2-up category grid with single-column compact rows (emoji + uppercase name + mono difficulty + gold tabular price + PRO on tier-2). Added end-cap footer with real category count.
@@ -191,7 +197,7 @@ Prioritized. Open polish doc at `docs/POLISH_PASS_QUEUE_2026-06-01.md` for the f
 
 13. Supabase Pro plan upgrade (Leaked Password Protection).
 14. Worker classification legal review.
-15. Job evidence photos — schema/bucket scaffold exists, no upload UI wired.
+15. Job photos — **Stage 1 DONE** (job_photos table live, job-photos bucket live, listing photos upload + display on cards). **Stage 2 NOT started** (worker before/after evidence photos in the completion flow). **Stage 3 NOT started** (photos on Receipt — UI already built in receipt.tsx HeroPhoto component, needs query wired to job_photos).
 16. Worker orientation arc (post-launch retention feature).
 
 ---
@@ -256,6 +262,8 @@ The brand has a house spec voice now. Editorial format with: Oswald eyebrow → 
 - WORKERS/TALENT label drift — confirmed TALENT renders correctly (strings.ts verified 06-04).
 - Test data cleanup — 8 test jobs deleted via SQL Editor (jobs 28 → 20). No stale Child/Elder Care test jobs remain.
 - Polish queue refreshed — 5 new resolved items added (webhook logging, atomic RPC, string fallbacks, release-payment skip, test-data cleanup).
+- **Home restructure** — SHIPPED (`401ff06`, 4 slices). Single-column categories, greeting masthead with live job-count, sticky YOUR DESK, style refinements. §6 glow removed by preference.
+- **Photo system Stage 1** — SHIPPED (`343608c`, foundation + 4 slices). Customer listing photos: job_photos table, job-photos bucket (manual), photo picker on Post-a-Job (up to 3), listing photos on job cards. Stages 2-3 not started.
 
 ---
 

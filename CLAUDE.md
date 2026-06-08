@@ -178,8 +178,8 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Worker ID Setup | `app/(onboarding)/id.tsx` | Functional — 4-step wizard (768 lines) |
 | Verify Level 2 | `app/(onboarding)/verify-level-2.tsx` | Functional — trust level gate (real verification deferred) |
 | Home | `app/(tabs)/index.tsx` | **Lighthouse** — greeting masthead, live job-count, sticky YOUR DESK card, single-column category list |
-| Live Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed + Workers Feed (896 lines) |
-| Post a Job | `app/(tabs)/post.tsx` | Functional — category picker + form (728 lines) |
+| Live Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed (listing photos on cards) + Workers Feed |
+| Post a Job | `app/(tabs)/post.tsx` | Functional — 3-section form, smart auto-fill, photo picker (up to 3 listing photos) |
 | Job Detail | `app/(tabs)/job-detail.tsx` | Functional — full job info + apply CTA (525 lines) |
 | Apply | `app/(tabs)/apply.tsx` | Functional — templates + price + gates (679 lines) |
 | Apply Success | `app/(tabs)/apply-success.tsx` | Functional — forward-only confirmation |
@@ -197,7 +197,7 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 
 ## Supabase — Tables (Live)
-`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements`
+`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements` · `job_photos`
 
 - `task_code` format: `CCTT` e.g. `0101` = category 01, task 01
 - `worker_skills.is_featured` = worker's top 3 "Superpowers" shown on their profile card
@@ -205,6 +205,14 @@ Home = greeting masthead (real first_name + device clock + live open-job count) 
 - `task_library.completion_verb_phrase` = ops-owned past-tense verb phrase per category (added 2026-05-25)
 - Seed file: `supabase/seed/XProHub_TaskLibrary_Seed_v1.1.sql` — deployed 2026-04-17 (20 categories · 188 tasks in seed; 18 categories / 171 tasks active; Child Care + Elder Care deactivated for safety per SAFETY_SPEC)
 - Realtime on: `jobs`, `messages`, `notifications`
+
+### Storage Buckets (Manual — created in Supabase dashboard, NOT by migrations)
+| Bucket | Access | Purpose | Notes |
+|---|---|---|---|
+| `avatars` | Public | Profile photos | Used since project setup. Upload path: `{user_id}/avatar.{ext}` |
+| `job-photos` | Public | Job listing + evidence photos | Created 2026-06-07. **Requires a Storage INSERT policy** (authenticated, bucket_id = 'job-photos'). Without it, uploads fail with "new row violates row-level security policy". Upload path: `{job_id}/{photo_type}_{timestamp}.{ext}` |
+
+Both buckets must be recreated manually if rebuilding against a fresh Supabase project.
 - Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql`
 
 ## Database Schema — Core Tables
@@ -348,6 +356,7 @@ ORDER BY category_id, task_code;
 - `20260525000001_add_first_name_to_profiles.sql` — `profiles.first_name` column + backfill from full_name.
 - `20260525000002_add_completion_verb_phrase_to_task_library.sql` — `task_library.completion_verb_phrase` with 20 locked phrases.
 - `20260525000003_endorsements_table.sql` — `endorsements` table, unique job_id index, immutable RLS.
+- `20260607000001_job_photos_table.sql` — `job_photos` table (party-scoped RLS, immutable). NOTE: the `job-photos` Storage bucket and its INSERT policy are created manually in the dashboard, NOT by this migration.
 
 ## Development Conventions
 
@@ -477,6 +486,7 @@ Each remaining screen refined to lighthouse standard before submission. Order TB
 
 **Shipped:**
 - Home restructure (`401ff06`, 2026-06-07): single-column compact category rows, greeting masthead with real first_name + device-clock greeting + live open-job count ("JOBS OPEN NOW"), sticky-pin scroll model (YOUR DESK as sole sticky element, masthead scrolls away), YOUR DESK style refinements (12px radius, top-border dividers, 44px tap targets). Spec §6 gold pin-glow + hairline was prototyped and removed by Paata's preference — pinned desk uses plain border.
+- Photo system Stage 1 (`343608c`, 2026-06-08): customer listing photos end-to-end. Foundation: `job_photos` table + `lib/photos.ts` upload helper + `job-photos` public bucket (manual). Post-a-Job restructured into 3 clear sections with smart auto-fill from selected tasks + photo picker (up to 3 listing photos, 4:3, optional). Listing photos display on job cards as 140px cover banners; cards without photos render cleanly with no placeholder. Cards more pronounced (title 19px, budget 24px). Stages 2 (worker before/after evidence) and 3 (Receipt photos — UI built, query unwired) not started.
 
 ### 🔲 Submission Items (user-side)
 - Privacy Policy + Terms of Service legal copy deployed to xprohub.com
