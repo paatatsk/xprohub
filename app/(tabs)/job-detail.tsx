@@ -1,12 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Image, ActionSheetIOS,
+  FlatList, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // Job Detail — full job info + Apply CTA
 // Params: job_id (uuid)
@@ -67,6 +70,8 @@ export default function JobDetailScreen() {
   const [taskNames, setTaskNames]           = useState<string[]>([]);
   const [hasExistingBid, setHasExistingBid] = useState(false);
   const [currentUserId, setCurrentUserId]   = useState<string | null>(null);
+  const [photos, setPhotos]                 = useState<{ url: string }[]>([]);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   useFocusEffect(useCallback(() => {
     if (!job_id) {
@@ -94,8 +99,8 @@ export default function JobDetailScreen() {
 
       setJob(jobData);
 
-      // 2 — Parallel: customer profile + tasks + existing bid
-      const [profileRes, tasksRes, bidRes] = await Promise.all([
+      // 2 — Parallel: customer profile + tasks + existing bid + listing photos
+      const [profileRes, tasksRes, bidRes, photosRes] = await Promise.all([
         jobData.customer_id
           ? supabase
               .from('profiles')
@@ -117,6 +122,13 @@ export default function JobDetailScreen() {
               .eq('worker_id', user.id)
               .maybeSingle()
           : Promise.resolve({ data: null, error: null }),
+
+        supabase
+          .from('job_photos')
+          .select('url')
+          .eq('job_id', job_id)
+          .eq('photo_type', 'listing')
+          .order('sort_order', { ascending: true }),
       ]);
 
       setCustomer((profileRes as any).data ?? null);
@@ -127,6 +139,8 @@ export default function JobDetailScreen() {
       setTaskNames(names);
 
       setHasExistingBid(!!((bidRes as any).data));
+      setPhotos(((photosRes as any).data ?? []) as { url: string }[]);
+      setActivePhotoIndex(0);
       setLoading(false);
     })();
   }, [job_id]));
@@ -180,6 +194,40 @@ export default function JobDetailScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+
+        {/* ── Listing photos ── */}
+        {photos.length > 0 && (
+          <View style={styles.photoSection}>
+            <FlatList
+              data={photos}
+              keyExtractor={(_, i) => `photo_${i}`}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(e) => {
+                const idx = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+                setActivePhotoIndex(idx);
+              }}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item.url }}
+                  style={styles.photoImage}
+                  accessibilityLabel="Job listing photo"
+                />
+              )}
+            />
+            {photos.length > 1 && (
+              <View style={styles.photoDots}>
+                {photos.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[styles.photoDot, i === activePhotoIndex && styles.photoDotActive]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
 
         {/* ── Posted by strip ── */}
         <View style={styles.postedByRow}>
@@ -319,6 +367,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 16,
     padding: Spacing.xl,
+  },
+
+  // Listing photos
+  photoSection: {
+    marginHorizontal: -Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  photoImage: {
+    width: SCREEN_WIDTH,
+    height: 220,
+    resizeMode: 'cover',
+  },
+  photoDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 10,
+  },
+  photoDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.border,
+  },
+  photoDotActive: {
+    backgroundColor: Colors.gold,
   },
 
   // Error / empty states
