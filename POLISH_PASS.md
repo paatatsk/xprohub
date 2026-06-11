@@ -53,6 +53,13 @@
   so this is a cosmetic stale-state issue on the bids screen if
   the user navigates back. Captured 2026-05-15.
 
+- **Edit job post (deferred to v1.1+)** — Owner-side editing of a live
+  job is deliberately NOT in v1. Editing after bids exist breaks the
+  contract workers applied to. Proposed rule when scoped: editable until
+  first bid, frozen after (or photos/description editable, budget/tasks
+  frozen). Needs its own design ruling + update RPC. Current workaround:
+  cancel and repost. Captured 2026-06-10.
+
 - **DELETE ACCOUNT: no loading indicator during Edge Function call** — the
   5-10s delete-account execution shows no visual feedback after the
   confirmation Alert dismisses. Users could panic-tap or think the app

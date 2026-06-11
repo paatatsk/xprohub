@@ -534,9 +534,18 @@ export default function JobBidsScreen() {
         showsVerticalScrollIndicator={false}
       >
 
-        {/* ── Job context strip ── */}
-        <View style={styles.contextCard}>
-          <Text style={styles.contextEyebrow}>APPLICATIONS FOR</Text>
+        {/* ── Job context strip (tappable → job detail) ── */}
+        <TouchableOpacity
+          style={styles.contextCard}
+          activeOpacity={0.8}
+          onPress={() => router.push(`/(tabs)/job-detail?job_id=${job!.id}` as any)}
+          accessibilityLabel="View your job post"
+          accessibilityRole="button"
+        >
+          <View style={styles.contextTopRow}>
+            <Text style={styles.contextEyebrow}>APPLICATIONS FOR</Text>
+            <Text style={styles.contextViewHint}>VIEW POST {'\u203A'}</Text>
+          </View>
           <Text style={styles.contextTitle} numberOfLines={2}>{job!.title}</Text>
           <View style={styles.contextMeta}>
             {budgetStr ? (
@@ -551,7 +560,7 @@ export default function JobBidsScreen() {
               <Text style={[styles.statusPillText, { color: jobColor }]}>{jobLabel}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* ── Action error banner ── */}
         {actionError ? (
@@ -625,11 +634,22 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: Spacing.sm,
   },
+  contextTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   contextEyebrow: {
     color: Colors.gold,
     fontSize: 10,
     fontWeight: 'bold',
     letterSpacing: 2,
+  },
+  contextViewHint: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 1.5,
+    color: Colors.textSecondary,
   },
   contextTitle: {
     color: Colors.textPrimary,
