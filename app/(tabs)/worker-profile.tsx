@@ -6,11 +6,14 @@ import { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Image,
+  FlatList, Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -68,6 +71,8 @@ export default function WorkerProfileScreen() {
   const [error, setError]                 = useState<string | null>(null);
   const [profile, setProfile]             = useState<WorkerProfile | null>(null);
   const [skills, setSkills]               = useState<SkillRow[]>([]);
+  const [portfolioPhotos, setPortfolioPhotos] = useState<{ url: string }[]>([]);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useFocusEffect(useCallback(() => {
@@ -99,11 +104,22 @@ export default function WorkerProfileScreen() {
 
       setProfile(prof as WorkerProfile);
 
-      // 2 — Skills (worker_skills → task_library)
-      const { data: skillData } = await supabase
-        .from('worker_skills')
-        .select('is_featured, task_library ( name, price_min, price_max )')
-        .eq('user_id', worker_id);
+      // 2 — Skills + portfolio (parallel)
+      const [skillRes, portfolioRes] = await Promise.all([
+        supabase
+          .from('worker_skills')
+          .select('is_featured, task_library ( name, price_min, price_max )')
+          .eq('user_id', worker_id),
+        supabase
+          .from('worker_portfolio')
+          .select('url')
+          .eq('user_id', worker_id)
+          .eq('type', 'photo')
+          .order('sort_order')
+          .order('created_at'),
+      ]);
+
+      const skillData = skillRes.data;
 
       const rows: SkillRow[] = ((skillData ?? []) as any[]).map(r => ({
         name: r.task_library?.name ?? '',
@@ -119,6 +135,8 @@ export default function WorkerProfileScreen() {
       });
 
       setSkills(rows);
+      setPortfolioPhotos((portfolioRes.data ?? []) as { url: string }[]);
+      setActivePhotoIndex(0);
       setLoading(false);
     })();
   }, [worker_id]));
@@ -271,6 +289,43 @@ export default function WorkerProfileScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>OFFERS</Text>
             <Text style={styles.emptySkills}>No skills listed yet.</Text>
+          </View>
+        )}
+
+        {/* ── Portfolio photos ── */}
+        {portfolioPhotos.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>PORTFOLIO</Text>
+            <View style={styles.portfolioSection}>
+              <FlatList
+                data={portfolioPhotos}
+                keyExtractor={(_, i) => `port_${i}`}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                onMomentumScrollEnd={(e) => {
+                  const idx = Math.round(e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - Spacing.md * 2));
+                  setActivePhotoIndex(idx);
+                }}
+                renderItem={({ item }) => (
+                  <Image
+                    source={{ uri: item.url }}
+                    style={[styles.portfolioImage, { width: SCREEN_WIDTH - Spacing.md * 2 }]}
+                    accessibilityLabel="Portfolio photo"
+                  />
+                )}
+              />
+              {portfolioPhotos.length > 1 && (
+                <View style={styles.portfolioDots}>
+                  {portfolioPhotos.map((_, i) => (
+                    <View
+                      key={i}
+                      style={[styles.portfolioDot, i === activePhotoIndex && styles.portfolioDotActive]}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         )}
 
@@ -429,6 +484,23 @@ const styles = StyleSheet.create({
   skillName:         { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary, flex: 1 },
   skillPrice:        { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textSecondary, marginLeft: Spacing.sm },
   emptySkills:       { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, fontStyle: 'italic' },
+
+  // Portfolio
+  portfolioSection: { borderRadius: Radius.sm, overflow: 'hidden' },
+  portfolioImage:   { height: 220, resizeMode: 'cover' as const },
+  portfolioDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: Spacing.sm,
+  },
+  portfolioDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.textTertiary,
+  },
+  portfolioDotActive: { backgroundColor: Colors.gold },
 
   // Location
   locationText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary },

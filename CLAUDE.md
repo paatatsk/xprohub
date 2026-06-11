@@ -197,7 +197,7 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 
 ## Supabase — Tables (Live)
-`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements` · `job_photos`
+`profiles` · `task_categories` · `task_library` · `worker_skills` · `job_post_tasks` · `jobs` · `bids` · `chats` · `messages` · `payments` · `xp_transactions` · `badges` · `notifications` · `user_badges` · `reports` · `user_blocks` · `endorsements` · `job_photos` · `worker_portfolio`
 
 - `task_code` format: `CCTT` e.g. `0101` = category 01, task 01
 - `worker_skills.is_featured` = worker's top 3 "Superpowers" shown on their profile card
@@ -211,8 +211,9 @@ Home = greeting masthead (real first_name + device clock + live open-job count) 
 |---|---|---|---|
 | `avatars` | Public | Profile photos | Used since project setup. Upload path: `{user_id}/avatar.{ext}` |
 | `job-photos` | Public | Job listing + evidence photos | Created 2026-06-07. **Requires a Storage INSERT policy** (authenticated, bucket_id = 'job-photos'). Without it, uploads fail with "new row violates row-level security policy". Upload path: `{job_id}/{photo_type}_{timestamp}.{ext}` |
+| `worker-portfolio` | Public | Worker portfolio photos | Created 2026-06-10. **Requires a Storage INSERT policy** (authenticated, bucket_id = 'worker-portfolio'). Upload path: `{user_id}/portfolio_{timestamp}.{ext}` |
 
-Both buckets must be recreated manually if rebuilding against a fresh Supabase project.
+All three buckets must be recreated manually if rebuilding against a fresh Supabase project.
 - Core schema: `C:\Users\sophi\Desktop\CLAUDE-DOC\xprohub_schema.sql`
 
 ## Database Schema — Core Tables
@@ -357,6 +358,8 @@ ORDER BY category_id, task_code;
 - `20260525000002_add_completion_verb_phrase_to_task_library.sql` — `task_library.completion_verb_phrase` with 20 locked phrases.
 - `20260525000003_endorsements_table.sql` — `endorsements` table, unique job_id index, immutable RLS.
 - `20260607000001_job_photos_table.sql` — `job_photos` table (party-scoped RLS, immutable). NOTE: the `job-photos` Storage bucket and its INSERT policy are created manually in the dashboard, NOT by this migration.
+- `20260610000001_listing_photos_public_read.sql` — Permissive SELECT policy for `photo_type = 'listing'` rows on `job_photos` (public read for listing photos only).
+- `20260610000002_worker_portfolio.sql` — `worker_portfolio` table (public-read RLS, owner insert/delete, immutable). NOTE: the `worker-portfolio` Storage bucket and its INSERT policy are created manually in the dashboard, NOT by this migration.
 
 ## Development Conventions
 
@@ -366,7 +369,7 @@ ORDER BY category_id, task_code;
 - **New migrations**: Place in `supabase/migrations/` with timestamp prefix `YYYYMMDDHHMMSS_description.sql`. Always wrap in `BEGIN`/`COMMIT`.
 - **Seed updates**: Changes to task data go in `supabase/seed/`. Use `ON CONFLICT (task_code) DO NOTHING` for inserts or `DO UPDATE SET ...` for corrections.
 - **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
-- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies. `worker_skills` has public read + auth CRUD. `job_post_tasks` has INSERT + SELECT. `endorsements` has party-read + endorser-insert (immutable). `reports` and `user_blocks` have auth CRUD.
+- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies. `worker_skills` has public read + auth CRUD. `job_post_tasks` has INSERT + SELECT. `endorsements` has party-read + endorser-insert (immutable). `reports` and `user_blocks` have auth CRUD. `worker_portfolio` has public-read + owner insert/delete (immutable — no UPDATE).
 - **New table migrations**: Include explicit `GRANT` statements for `anon`, `authenticated`, and `service_role` (Supabase Data API change, enforced 2026-10-30).
 - **Shared formatters**: `lib/format.ts` — fmtCents, fmtPrice, fmtDateStamp, fmtDuration, fmtDayDate, fmtShortDate, fmtReceiptDate, toCents. All dates forced to en-US locale.
 - **Support constants**: `lib/legal.ts` — PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL, SUPPORT_EMAIL.

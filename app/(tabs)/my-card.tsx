@@ -7,9 +7,10 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Animated, Modal, Pressable, TextInput, Alert,
-  PanResponder, AccessibilityInfo, ActionSheetIOS,
+  PanResponder, AccessibilityInfo, ActionSheetIOS, Image,
   type LayoutChangeEvent,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -20,6 +21,7 @@ import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-font
 import { Colors, Fonts, Spacing } from '../../constants/theme';
 import { strings } from '../../constants/strings';
 import { supabase } from '../../lib/supabase';
+import { uploadPortfolioPhoto } from '../../lib/photos';
 import WorkerCardComponent, { type Worker } from '../../components/WorkerCard';
 
 // ── Types ──────────────────────────────────────────────────────
@@ -63,6 +65,7 @@ const RADIUS_MIN = 1;
 const RADIUS_MAX = 25;
 const RADIUS_STEP = 1;
 const SKILL_CAP = 8;
+const PORTFOLIO_CAP = 6;
 const UNDO_WINDOW_MS = 5000;
 const INK = '#1A0F00';
 const CHARCOAL = '#2a2a2e';
@@ -750,6 +753,10 @@ export default function MyCardScreen() {
   const rosterUndoRef = useRef<{ action: 'add' | 'remove' | 'feature' | 'unfeature'; skill: RosterSkill } | null>(null);
   const rosterUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Portfolio state (lifetime register)
+  const [portfolioPhotos, setPortfolioPhotos] = useState<{ id: string; url: string }[]>([]);
+  const [portfolioUploading, setPortfolioUploading] = useState(false);
+
   // ── Data fetch ───────────────────────────────────────────────
 
   const fetchData = useCallback(async () => {
@@ -794,10 +801,75 @@ export default function MyCardScreen() {
 
     setCategories(catRes.data ?? []);
     setAllTasks(tasksRes.data ?? []);
+
+    // Portfolio photos (separate query — does not block core card load)
+    const { data: portfolioData } = await supabase
+      .from('worker_portfolio')
+      .select('id, url')
+      .eq('user_id', user.id)
+      .eq('type', 'photo')
+      .order('sort_order')
+      .order('created_at');
+    setPortfolioPhotos((portfolioData ?? []) as { id: string; url: string }[]);
+
     setLoading(false);
   }, []);
 
   useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
+
+  // ── Portfolio handlers ──────────────────────────────────────
+
+  const handleAddPortfolioPhoto = useCallback(async () => {
+    if (portfolioPhotos.length >= PORTFOLIO_CAP) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.75,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setPortfolioUploading(true);
+    try {
+      const { url } = await uploadPortfolioPhoto(user.id, result.assets[0].uri);
+      const { data, error } = await supabase
+        .from('worker_portfolio')
+        .insert({ user_id: user.id, type: 'photo', url, sort_order: portfolioPhotos.length })
+        .select('id, url')
+        .single();
+
+      if (!error && data) {
+        setPortfolioPhotos(prev => [...prev, data as { id: string; url: string }]);
+      }
+    } catch {
+      Alert.alert('Upload failed', 'Could not upload photo. Please try again.');
+    } finally {
+      setPortfolioUploading(false);
+    }
+  }, [portfolioPhotos.length]);
+
+  const handleDeletePortfolioPhoto = useCallback((photoId: string) => {
+    Alert.alert('Remove photo?', 'This photo will be permanently deleted.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          const { error } = await supabase
+            .from('worker_portfolio')
+            .delete()
+            .eq('id', photoId);
+          if (!error) {
+            setPortfolioPhotos(prev => prev.filter(p => p.id !== photoId));
+          }
+        },
+      },
+    ]);
+  }, []);
 
   // ── Derived state ────────────────────────────────────────────
 
@@ -1313,6 +1385,56 @@ export default function MyCardScreen() {
             <Text style={s.managePillText}>{strings['myCard.offers.manage']}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* ── Portfolio photos (lifetime) ── */}
+        <View style={s.sectionRow}>
+          <Text style={s.eyebrow}>PORTFOLIO</Text>
+          <Text style={s.skillCount}>{portfolioPhotos.length} / {PORTFOLIO_CAP}</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.portfolioStrip}
+        >
+          {portfolioPhotos.map(photo => (
+            <View key={photo.id} style={s.portfolioThumb}>
+              <Image
+                source={{ uri: photo.url }}
+                style={s.portfolioImage}
+                accessibilityLabel="Portfolio photo"
+              />
+              <TouchableOpacity
+                style={s.portfolioDelete}
+                onPress={() => handleDeletePortfolioPhoto(photo.id)}
+                activeOpacity={0.7}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel="Remove this portfolio photo"
+                accessibilityRole="button"
+              >
+                <Text style={s.portfolioDeleteText}>{'\u00d7'}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {portfolioPhotos.length < PORTFOLIO_CAP && (
+            <TouchableOpacity
+              style={s.portfolioAdd}
+              onPress={handleAddPortfolioPhoto}
+              disabled={portfolioUploading}
+              activeOpacity={0.7}
+              accessibilityLabel={portfolioPhotos.length === 0 ? 'Add your first portfolio photo' : 'Add another portfolio photo'}
+              accessibilityRole="button"
+            >
+              {portfolioUploading ? (
+                <ActivityIndicator size="small" color={Colors.gold} />
+              ) : (
+                <Text style={s.portfolioAddText}>+</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+        {portfolioPhotos.length === 0 && !portfolioUploading && (
+          <Text style={s.portfolioHint}>Show off your best work — up to {PORTFOLIO_CAP} photos.</Text>
+        )}
 
         {/* ── Skills editor ── */}
         <View style={s.sectionRow}>
@@ -2421,6 +2543,63 @@ const s = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1,
     color: Colors.gold,
+  },
+
+  // ── Portfolio ──
+  portfolioStrip: {
+    flexDirection: 'row' as const,
+    gap: 10,
+    paddingBottom: Spacing.sm,
+  },
+  portfolioThumb: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    overflow: 'hidden' as const,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  portfolioImage: {
+    width: '100%' as const,
+    height: '100%' as const,
+  },
+  portfolioDelete: {
+    position: 'absolute' as const,
+    top: 4,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  portfolioDeleteText: {
+    color: Colors.textPrimary,
+    fontSize: 14,
+    fontWeight: 'bold' as const,
+    lineHeight: 16,
+  },
+  portfolioAdd: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderStyle: 'dashed' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  portfolioAddText: {
+    fontSize: 28,
+    color: Colors.gold,
+    fontWeight: '300' as const,
+  },
+  portfolioHint: {
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.sm,
   },
 
   // ── Roster sheet chips ──
