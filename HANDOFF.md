@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-08 (Photo system COMPLETE — all 3 stages shipped)
-**Most recent commit:** `cac3371` — feat(receipt): after-photo as a visual reminder on the receipt (photo stage 3)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-10 (Detail screens Phase A COMPLETE — slices A1 + A2 shipped)
+**Most recent commit:** `e35806e` — feat(job-bids): tappable summary card → job-detail + park edit-job in POLISH_PASS (slice A2)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A COMPLETE (listing photos on job-detail + tappable summary on job-bids). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -52,6 +52,10 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
 - **Detail screens — Slice A1: listing photos on Job Detail**:
   - `job-detail.tsx` — Listing photos fetched from `job_photos` (photo_type='listing') and displayed as a full-width horizontal paginated strip (220px, cover crop, gold dot indicators) above the Posted By strip. 1 photo = hero, 2-3 = swipeable. 0 photos = layout unchanged. APPLY/owner/bid-sent footer states untouched.
   - **RLS fix:** The original party-scoped SELECT policy on `job_photos` blocked non-owner reads of listing photos (open jobs have no hired worker). Added a permissive `TO authenticated` policy for `photo_type = 'listing'` rows only — before/after evidence stays party-scoped. Migration `20260610000001_listing_photos_public_read.sql`.
+- **Detail screens — Slice A2: tappable summary card on Job Bids + edit-job parked** (Phase A COMPLETE):
+  - `job-bids.tsx` — The job context strip at the top of the bids screen is now a `TouchableOpacity` that navigates to `job-detail` for the posted job. "VIEW POST ›" hint in secondary text, Oswald font, aligned right of the APPLICATIONS FOR eyebrow. Accessibility label + role wired.
+  - `POLISH_PASS.md` — "Edit job post" feature parked as v1.1+ deferred item with proposed rule (editable until first bid, frozen after). Current workaround: cancel and repost.
+  - **Phase A complete:** Slice A1 (listing photos on job-detail) + Slice A2 (tappable summary → job-detail) ship the detail screen improvements.
 - **Photo system Stage 3 — after-photo on Receipt (completes the photo system)**:
   - `cac3371` — Wire the Receipt's HeroPhoto to the job's latest after-photo (job_photos, photo_type='after', most recent `created_at`). Shown as a single calm image in the existing hero treatment with the AFTER stamp. Gallery cruft removed (thumbnail strip, photo counter, upload hint). **Conceptual decision:** the Receipt photo is deliberately ONE after-photo as a memory anchor/keepsake — not a before/after pair. Evidence lives in the chat thread (Stage 2). The before/after pair was considered and rejected as too much for the lighthouse. Empty state preserved for jobs with no after-photo. **Photo system is now COMPLETE across all 3 stages.**
 - **Photo system Stage 2 — worker before/after evidence (2 slices, Slice C dropped)**:
