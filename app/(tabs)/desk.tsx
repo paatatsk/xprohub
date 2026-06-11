@@ -238,6 +238,112 @@ export default function DeskScreen() {
     setRefreshing(false);
   }, [fetchData]);
 
+  // ── Active groups ────────────────────────────────────────────
+
+  const GROUP_CAP = 5;
+
+  const takenJobs  = activeJobs.filter(j => j._role === 'taken');
+  const postedJobs = activeJobs.filter(j => j._role === 'posted');
+  const appliedJobs = activeJobs.filter(j => j._role === 'applied');
+
+  function renderActiveCard(job: ActiveJob) {
+    const role = job._role;
+    const price = role === 'applied'
+      ? (job._bidPrice ?? job.agreed_price ?? job.budget_max ?? job.budget_min)
+      : (job.agreed_price ?? job.budget_max ?? job.budget_min);
+
+    const tagStyle = role === 'taken' ? s.roleTagGreen
+      : role === 'posted' ? s.roleTagAmber
+      : s.roleTagBlue;
+
+    const tagText = role === 'taken'
+      ? `\u25CF TAKEN \u00b7 ${job.status === 'matched' ? 'MATCHED' : job.status === 'pending_confirmation' ? 'PENDING CONFIRM' : 'IN PROGRESS'}`
+      : role === 'posted'
+      ? `\u25C6 POSTED \u00b7 AWAITING BIDS`
+      : `\u25CF APPLIED \u00b7 AWAITING DECISION`;
+
+    const metaText = role === 'taken'
+      ? (job.timing ? job.timing.toUpperCase() : timeAgo(job.created_at))
+      : role === 'posted'
+      ? `${job.bid_count ?? 0} BID${(job.bid_count ?? 0) !== 1 ? 'S' : ''} \u00b7 POSTED ${timeAgo(job.created_at)}`
+      : `APPLIED ${timeAgo(job.created_at)}`;
+
+    const handlePress = async () => {
+      if (role === 'posted') {
+        router.push(`/(tabs)/job-bids?job_id=${job.id}` as any);
+      } else if (role === 'taken') {
+        const { data: chatRow } = await supabase
+          .from('chats')
+          .select('id')
+          .eq('job_id', job.id)
+          .maybeSingle();
+        if (chatRow?.id) {
+          router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+        }
+      } else {
+        router.push(`/(tabs)/job-detail?job_id=${job.id}` as any);
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        key={`${role}-${job.id}`}
+        style={s.activeCard}
+        onPress={handlePress}
+        activeOpacity={0.7}
+      >
+        <Text style={[s.roleTag, tagStyle]}>{tagText}</Text>
+        <Text style={s.activeTitle} numberOfLines={1}>{job.title}</Text>
+        <View style={s.activeFoot}>
+          <Text style={s.activeMeta}>{metaText}</Text>
+          {price != null && (
+            <Text style={s.activePrice}>{fmtPrice(price)}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  function renderGroup(
+    label: string,
+    items: ActiveJob[],
+    overflowRoute: string,
+    overflowLabel: string,
+  ) {
+    if (items.length === 0) return null;
+    const visible = items.slice(0, GROUP_CAP);
+    const overflow = items.length > GROUP_CAP;
+    return (
+      <View key={label}>
+        <Text style={s.groupLabel}>
+          {label} {'\u00b7'} {items.length}
+        </Text>
+        {visible.map(renderActiveCard)}
+        {overflow && (
+          <TouchableOpacity
+            style={s.viewAllRow}
+            onPress={() => router.push(overflowRoute as any)}
+            activeOpacity={0.7}
+            accessibilityLabel={`${overflowLabel}, ${items.length} total`}
+            accessibilityRole="button"
+          >
+            <Text style={s.viewAllText}>{overflowLabel} {'\u203A'}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  }
+
+  function renderActiveGroups() {
+    return (
+      <>
+        {renderGroup('TAKEN', takenJobs, '/(tabs)/my-jobs', 'VIEW ALL')}
+        {renderGroup('POSTED', postedJobs, '/(tabs)/my-jobs', 'VIEW ALL')}
+        {renderGroup('APPLIED', appliedJobs, '/(tabs)/my-applications', 'VIEW ALL')}
+      </>
+    );
+  }
+
   // ── Render ───────────────────────────────────────────────────
 
   if (loading || !fontsLoaded) {
@@ -271,63 +377,7 @@ export default function DeskScreen() {
         {activeJobs.length === 0 ? (
           <Text style={s.emptyLine}>Nothing active right now.</Text>
         ) : (
-          activeJobs.map(job => {
-            const role = job._role;
-            const price = role === 'applied'
-              ? (job._bidPrice ?? job.agreed_price ?? job.budget_max ?? job.budget_min)
-              : (job.agreed_price ?? job.budget_max ?? job.budget_min);
-
-            const tagStyle = role === 'taken' ? s.roleTagGreen
-              : role === 'posted' ? s.roleTagAmber
-              : s.roleTagBlue;
-
-            const tagText = role === 'taken'
-              ? `\u25CF TAKEN \u00b7 ${job.status === 'matched' ? 'MATCHED' : job.status === 'pending_confirmation' ? 'PENDING CONFIRM' : 'IN PROGRESS'}`
-              : role === 'posted'
-              ? `\u25C6 POSTED \u00b7 AWAITING BIDS`
-              : `\u25CF APPLIED \u00b7 AWAITING DECISION`;
-
-            const metaText = role === 'taken'
-              ? (job.timing ? job.timing.toUpperCase() : timeAgo(job.created_at))
-              : role === 'posted'
-              ? `${job.bid_count ?? 0} BID${(job.bid_count ?? 0) !== 1 ? 'S' : ''} \u00b7 POSTED ${timeAgo(job.created_at)}`
-              : `APPLIED ${timeAgo(job.created_at)}`;
-
-            const handlePress = async () => {
-              if (role === 'posted') {
-                router.push(`/(tabs)/job-bids?job_id=${job.id}` as any);
-              } else if (role === 'taken') {
-                const { data: chatRow } = await supabase
-                  .from('chats')
-                  .select('id')
-                  .eq('job_id', job.id)
-                  .maybeSingle();
-                if (chatRow?.id) {
-                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
-                }
-              } else {
-                router.push(`/(tabs)/job-detail?job_id=${job.id}` as any);
-              }
-            };
-
-            return (
-              <TouchableOpacity
-                key={`${role}-${job.id}`}
-                style={s.activeCard}
-                onPress={handlePress}
-                activeOpacity={0.7}
-              >
-                <Text style={[s.roleTag, tagStyle]}>{tagText}</Text>
-                <Text style={s.activeTitle} numberOfLines={1}>{job.title}</Text>
-                <View style={s.activeFoot}>
-                  <Text style={s.activeMeta}>{metaText}</Text>
-                  {price != null && (
-                    <Text style={s.activePrice}>{fmtPrice(price)}</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })
+          renderActiveGroups()
         )}
 
         {/* ── Section 2: Earnings · This Week ── */}
@@ -436,6 +486,27 @@ const s = StyleSheet.create({
     color: Colors.textTertiary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
+  },
+
+  // Active group labels
+  groupLabel: {
+    fontFamily: Fonts.display,
+    fontSize: 9,
+    letterSpacing: 3,
+    color: Colors.textSecondary,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  viewAllRow: {
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  viewAllText: {
+    fontFamily: Fonts.display,
+    fontSize: 10,
+    letterSpacing: 2,
+    color: Colors.gold,
   },
 
   // Active cards

@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-11 (Desk refinement — Slice C1 close-post shipped)
-**Most recent commit:** feat(jobs): close-post flow — cancel_job RPC with bid release cascade + owner UI (slice C1)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Desk refinement in progress (C1 close-post shipped). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-11 (Desk refinement COMPLETE — Slices C1 + C2 shipped)
+**Most recent commit:** feat(desk): group Active section into TAKEN/POSTED/APPLIED clusters with per-group cap (slice C2)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Desk refinement COMPLETE (C1 close-post + C2 grouping). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -56,7 +56,15 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
   - **job-detail.tsx skipped:** Doesn't fetch `status`; would need interface changes. Owner path to close is already via job-bids (MY JOBS → job-bids → CLOSE POST).
   - **Payment safety:** No payment rows can exist for `open` jobs (`create_payment_record` gates on `status = 'matched'`). Close is safe before hire with zero escrow interactions.
   - **Hardware-verified:** Closed 0-bid post (Car wash) — disappeared from Market, shows CLOSED. Closed post with pending bid — bid cascade confirmed, worker sees declined. Bid cards refetch after close (no stale ACCEPT/DECLINE buttons). Non-owner blocked by auth guard. Already-closed job: button hidden.
-- **Slice C2: Desk Active grouping + cap** — scoped but not yet built. Three labeled clusters (TAKEN / POSTED / APPLIED) with counts, 5-per-group cap with VIEW ALL navigation.
+- **Slice C2: Desk Active grouping + per-group cap** (SHIPPED):
+  - Pure render restructure — no fetch changes, no new queries. Splits the flat `[...taken, ...posted, ...applied]` concat into three labeled clusters using the existing `_role` tag.
+  - **Group labels:** TAKEN · N, POSTED · N, APPLIED · N — Oswald display font, secondary color, matching house style. Groups with 0 items render nothing.
+  - **Card rendering:** Extracted to `renderActiveCard()`. Card design, green/amber/blue color treatments, tap behaviors (POSTED→job-bids, TAKEN→job-chat, APPLIED→job-detail), and sort order within each group all preserved exactly.
+  - **Cap at 5** per group. Overflow shows `VIEW ALL ›` (gold, centered): TAKEN/POSTED → my-jobs, APPLIED → my-applications. Consistent with existing YOUR DESK nav on Home.
+  - **Masthead total unchanged:** `activeJobs.length` still counts all items across groups.
+  - **Earnings + Job History untouched** — position and content identical.
+  - **Hardware-verified:** Groups render with correct counts, sorted by recency, VIEW ALL navigates correctly, empty groups hidden, masthead total accurate, pull-to-refresh preserves grouping.
+  - **Desk refinement COMPLETE:** C1 = close-post flow, C2 = Active grouping.
 
 ### Shipped this session
 
