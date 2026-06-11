@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  TextInput, ScrollView, ActivityIndicator, Image,
+  TextInput, ScrollView, ActivityIndicator, Image, Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
@@ -455,6 +455,7 @@ export default function PostScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
 
         {/* ── Heading + category context ── */}
@@ -493,6 +494,8 @@ export default function PostScreen() {
             value={title}
             onChangeText={t => { titleEdited.current = true; setTitle(t.slice(0, 80)); clearError('title'); }}
             maxLength={80}
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
           />
           <View style={styles.rowBetween}>
             {errors.title
@@ -653,6 +656,8 @@ export default function PostScreen() {
             placeholderTextColor={Colors.textSecondary}
             value={neighborhood}
             onChangeText={t => { setNeighborhood(t); clearError('neighborhood'); }}
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
           />
           {errors.neighborhood &&
             <Text style={styles.errorText}>{errors.neighborhood}</Text>}
