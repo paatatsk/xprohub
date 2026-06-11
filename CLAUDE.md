@@ -192,6 +192,8 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
 | Payment Setup | `app/(tabs)/payment-setup.tsx` | Functional — Stripe PaymentSheet |
 | Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
+| My Card | `app/(tabs)/my-card.tsx` | Functional — worker self-view + edit (status, bio, portfolio, certificates, references, skills, rate, radius) |
+| Worker Profile | `app/(tabs)/worker-profile.tsx` | Functional — read-only worker detail (portfolio, credentials, fullscreen view), HIRE/EDIT CARD footer |
 | Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, after-photo, five-voice typography |
 
 Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.

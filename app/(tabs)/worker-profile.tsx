@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Image,
-  FlatList, Dimensions,
+  FlatList, Dimensions, Modal, Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
@@ -72,7 +72,9 @@ export default function WorkerProfileScreen() {
   const [profile, setProfile]             = useState<WorkerProfile | null>(null);
   const [skills, setSkills]               = useState<SkillRow[]>([]);
   const [portfolioPhotos, setPortfolioPhotos] = useState<{ url: string }[]>([]);
+  const [credentials, setCredentials] = useState<{ url: string; type: string }[]>([]);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useFocusEffect(useCallback(() => {
@@ -104,8 +106,8 @@ export default function WorkerProfileScreen() {
 
       setProfile(prof as WorkerProfile);
 
-      // 2 — Skills + portfolio (parallel)
-      const [skillRes, portfolioRes] = await Promise.all([
+      // 2 — Skills + portfolio + credentials (parallel)
+      const [skillRes, portfolioRes, credentialRes] = await Promise.all([
         supabase
           .from('worker_skills')
           .select('is_featured, task_library ( name, price_min, price_max )')
@@ -115,6 +117,13 @@ export default function WorkerProfileScreen() {
           .select('url')
           .eq('user_id', worker_id)
           .eq('type', 'photo')
+          .order('sort_order')
+          .order('created_at'),
+        supabase
+          .from('worker_portfolio')
+          .select('url, type')
+          .eq('user_id', worker_id)
+          .in('type', ['certificate', 'reference'])
           .order('sort_order')
           .order('created_at'),
       ]);
@@ -136,7 +145,9 @@ export default function WorkerProfileScreen() {
 
       setSkills(rows);
       setPortfolioPhotos((portfolioRes.data ?? []) as { url: string }[]);
+      setCredentials((credentialRes.data ?? []) as { url: string; type: string }[]);
       setActivePhotoIndex(0);
+      setFullscreenImage(null);
       setLoading(false);
     })();
   }, [worker_id]));
@@ -329,6 +340,33 @@ export default function WorkerProfileScreen() {
           </View>
         )}
 
+        {/* ── Credentials (certificates + references) ── */}
+        {credentials.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>CREDENTIALS</Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.credentialStrip}
+            >
+              {credentials.map((cred, i) => (
+                <TouchableOpacity
+                  key={`cred_${i}`}
+                  onPress={() => setFullscreenImage(cred.url)}
+                  activeOpacity={0.8}
+                  accessibilityLabel={`${cred.type === 'certificate' ? 'Certificate' : 'Reference'}, tap to view full size`}
+                  accessibilityRole="button"
+                >
+                  <Image
+                    source={{ uri: cred.url }}
+                    style={styles.credentialThumb}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         {/* ── Location ── */}
         {profile.city && (
           <View style={styles.section}>
@@ -338,6 +376,25 @@ export default function WorkerProfileScreen() {
         )}
 
       </ScrollView>
+
+      {/* ── Fullscreen image modal ── */}
+      <Modal visible={!!fullscreenImage} transparent animationType="fade">
+        <Pressable
+          style={styles.fullscreenOverlay}
+          onPress={() => setFullscreenImage(null)}
+          accessibilityLabel="Dismiss full-size image"
+          accessibilityRole="button"
+        >
+          {fullscreenImage && (
+            <Image
+              source={{ uri: fullscreenImage }}
+              style={styles.fullscreenImage}
+              resizeMode="contain"
+              accessibilityLabel="Full-size credential"
+            />
+          )}
+        </Pressable>
+      </Modal>
 
       {/* ── Footer CTA ── */}
       <View style={styles.footer}>
@@ -501,6 +558,31 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textTertiary,
   },
   portfolioDotActive: { backgroundColor: Colors.gold },
+
+  // Credentials
+  credentialStrip: {
+    flexDirection: 'row' as const,
+    gap: 10,
+  },
+  credentialThumb: {
+    width: 72,
+    height: 72,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+
+  // Fullscreen image modal
+  fullscreenOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  fullscreenImage: {
+    width: SCREEN_WIDTH * 0.95,
+    height: '90%' as any,
+  },
 
   // Location
   locationText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary },

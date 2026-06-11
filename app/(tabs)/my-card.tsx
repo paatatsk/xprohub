@@ -66,6 +66,15 @@ const RADIUS_MAX = 25;
 const RADIUS_STEP = 1;
 const SKILL_CAP = 8;
 const PORTFOLIO_CAP = 6;
+const CREDENTIAL_CAP = 6;
+
+type PortfolioType = 'photo' | 'certificate' | 'reference';
+
+interface PortfolioItem {
+  id: string;
+  url: string;
+  type: PortfolioType;
+}
 const UNDO_WINDOW_MS = 5000;
 const INK = '#1A0F00';
 const CHARCOAL = '#2a2a2e';
@@ -753,9 +762,11 @@ export default function MyCardScreen() {
   const rosterUndoRef = useRef<{ action: 'add' | 'remove' | 'feature' | 'unfeature'; skill: RosterSkill } | null>(null);
   const rosterUndoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Portfolio state (lifetime register)
-  const [portfolioPhotos, setPortfolioPhotos] = useState<{ id: string; url: string }[]>([]);
-  const [portfolioUploading, setPortfolioUploading] = useState(false);
+  // Portfolio + credentials state (lifetime register)
+  const [portfolioPhotos, setPortfolioPhotos] = useState<PortfolioItem[]>([]);
+  const [certificates, setCertificates] = useState<PortfolioItem[]>([]);
+  const [references, setReferences] = useState<PortfolioItem[]>([]);
+  const [portfolioUploading, setPortfolioUploading] = useState<PortfolioType | null>(null);
 
   // ── Data fetch ───────────────────────────────────────────────
 
@@ -802,25 +813,50 @@ export default function MyCardScreen() {
     setCategories(catRes.data ?? []);
     setAllTasks(tasksRes.data ?? []);
 
-    // Portfolio photos (separate query — does not block core card load)
-    const { data: portfolioData } = await supabase
+    // Portfolio + credentials (one query, split by type client-side)
+    const { data: allPortfolio } = await supabase
       .from('worker_portfolio')
-      .select('id, url')
+      .select('id, url, type')
       .eq('user_id', user.id)
-      .eq('type', 'photo')
       .order('sort_order')
       .order('created_at');
-    setPortfolioPhotos((portfolioData ?? []) as { id: string; url: string }[]);
+
+    const items = (allPortfolio ?? []) as PortfolioItem[];
+    setPortfolioPhotos(items.filter(i => i.type === 'photo'));
+    setCertificates(items.filter(i => i.type === 'certificate'));
+    setReferences(items.filter(i => i.type === 'reference'));
 
     setLoading(false);
   }, []);
 
   useFocusEffect(useCallback(() => { fetchData(); }, [fetchData]));
 
-  // ── Portfolio handlers ──────────────────────────────────────
+  // ── Portfolio / credential handlers (generalized) ───────────
 
-  const handleAddPortfolioPhoto = useCallback(async () => {
-    if (portfolioPhotos.length >= PORTFOLIO_CAP) return;
+  const setterForType = useCallback((type: PortfolioType) => {
+    if (type === 'photo') return setPortfolioPhotos;
+    if (type === 'certificate') return setCertificates;
+    return setReferences;
+  }, []);
+
+  const countForType = useCallback((type: PortfolioType) => {
+    if (type === 'photo') return portfolioPhotos.length;
+    if (type === 'certificate') return certificates.length;
+    return references.length;
+  }, [portfolioPhotos.length, certificates.length, references.length]);
+
+  const capForType = (type: PortfolioType) =>
+    type === 'photo' ? PORTFOLIO_CAP : CREDENTIAL_CAP;
+
+  const labelForType = (type: PortfolioType) => {
+    if (type === 'photo') return 'photo';
+    if (type === 'certificate') return 'certificate';
+    return 'reference';
+  };
+
+  const handleAddPortfolioItem = useCallback(async (type: PortfolioType) => {
+    const count = countForType(type);
+    if (count >= capForType(type)) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -833,27 +869,29 @@ export default function MyCardScreen() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    setPortfolioUploading(true);
+    setPortfolioUploading(type);
     try {
       const { url } = await uploadPortfolioPhoto(user.id, result.assets[0].uri);
       const { data, error } = await supabase
         .from('worker_portfolio')
-        .insert({ user_id: user.id, type: 'photo', url, sort_order: portfolioPhotos.length })
-        .select('id, url')
+        .insert({ user_id: user.id, type, url, sort_order: count })
+        .select('id, url, type')
         .single();
 
       if (!error && data) {
-        setPortfolioPhotos(prev => [...prev, data as { id: string; url: string }]);
+        const setter = setterForType(type);
+        setter(prev => [...prev, data as PortfolioItem]);
       }
     } catch {
-      Alert.alert('Upload failed', 'Could not upload photo. Please try again.');
+      Alert.alert('Upload failed', `Could not upload ${labelForType(type)}. Please try again.`);
     } finally {
-      setPortfolioUploading(false);
+      setPortfolioUploading(null);
     }
-  }, [portfolioPhotos.length]);
+  }, [countForType, setterForType]);
 
-  const handleDeletePortfolioPhoto = useCallback((photoId: string) => {
-    Alert.alert('Remove photo?', 'This photo will be permanently deleted.', [
+  const handleDeletePortfolioItem = useCallback((id: string, type: PortfolioType) => {
+    const label = labelForType(type);
+    Alert.alert(`Remove ${label}?`, `This ${label} will be permanently deleted.`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
@@ -862,14 +900,15 @@ export default function MyCardScreen() {
           const { error } = await supabase
             .from('worker_portfolio')
             .delete()
-            .eq('id', photoId);
+            .eq('id', id);
           if (!error) {
-            setPortfolioPhotos(prev => prev.filter(p => p.id !== photoId));
+            const setter = setterForType(type);
+            setter(prev => prev.filter(p => p.id !== id));
           }
         },
       },
     ]);
-  }, []);
+  }, [setterForType]);
 
   // ── Derived state ────────────────────────────────────────────
 
@@ -1405,7 +1444,7 @@ export default function MyCardScreen() {
               />
               <TouchableOpacity
                 style={s.portfolioDelete}
-                onPress={() => handleDeletePortfolioPhoto(photo.id)}
+                onPress={() => handleDeletePortfolioItem(photo.id, 'photo')}
                 activeOpacity={0.7}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 accessibilityLabel="Remove this portfolio photo"
@@ -1418,13 +1457,13 @@ export default function MyCardScreen() {
           {portfolioPhotos.length < PORTFOLIO_CAP && (
             <TouchableOpacity
               style={s.portfolioAdd}
-              onPress={handleAddPortfolioPhoto}
-              disabled={portfolioUploading}
+              onPress={() => handleAddPortfolioItem('photo')}
+              disabled={portfolioUploading === 'photo'}
               activeOpacity={0.7}
               accessibilityLabel={portfolioPhotos.length === 0 ? 'Add your first portfolio photo' : 'Add another portfolio photo'}
               accessibilityRole="button"
             >
-              {portfolioUploading ? (
+              {portfolioUploading === 'photo' ? (
                 <ActivityIndicator size="small" color={Colors.gold} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
@@ -1432,8 +1471,108 @@ export default function MyCardScreen() {
             </TouchableOpacity>
           )}
         </ScrollView>
-        {portfolioPhotos.length === 0 && !portfolioUploading && (
+        {portfolioPhotos.length === 0 && portfolioUploading !== 'photo' && (
           <Text style={s.portfolioHint}>Show off your best work — up to {PORTFOLIO_CAP} photos.</Text>
+        )}
+
+        {/* ── Certificates (lifetime) ── */}
+        <View style={s.sectionRow}>
+          <Text style={s.eyebrow}>CERTIFICATES</Text>
+          <Text style={s.skillCount}>{certificates.length} / {CREDENTIAL_CAP}</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.portfolioStrip}
+        >
+          {certificates.map(cert => (
+            <View key={cert.id} style={s.portfolioThumb}>
+              <Image
+                source={{ uri: cert.url }}
+                style={s.portfolioImage}
+                accessibilityLabel="Certificate"
+              />
+              <TouchableOpacity
+                style={s.portfolioDelete}
+                onPress={() => handleDeletePortfolioItem(cert.id, 'certificate')}
+                activeOpacity={0.7}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel="Remove this certificate"
+                accessibilityRole="button"
+              >
+                <Text style={s.portfolioDeleteText}>{'\u00d7'}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {certificates.length < CREDENTIAL_CAP && (
+            <TouchableOpacity
+              style={s.portfolioAdd}
+              onPress={() => handleAddPortfolioItem('certificate')}
+              disabled={portfolioUploading === 'certificate'}
+              activeOpacity={0.7}
+              accessibilityLabel={certificates.length === 0 ? 'Add your first certificate' : 'Add another certificate'}
+              accessibilityRole="button"
+            >
+              {portfolioUploading === 'certificate' ? (
+                <ActivityIndicator size="small" color={Colors.gold} />
+              ) : (
+                <Text style={s.portfolioAddText}>+</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+        {certificates.length === 0 && portfolioUploading !== 'certificate' && (
+          <Text style={s.portfolioHint}>Upload certificates, licenses, or qualifications.</Text>
+        )}
+
+        {/* ── References (lifetime) ── */}
+        <View style={s.sectionRow}>
+          <Text style={s.eyebrow}>REFERENCES</Text>
+          <Text style={s.skillCount}>{references.length} / {CREDENTIAL_CAP}</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.portfolioStrip}
+        >
+          {references.map(ref => (
+            <View key={ref.id} style={s.portfolioThumb}>
+              <Image
+                source={{ uri: ref.url }}
+                style={s.portfolioImage}
+                accessibilityLabel="Reference"
+              />
+              <TouchableOpacity
+                style={s.portfolioDelete}
+                onPress={() => handleDeletePortfolioItem(ref.id, 'reference')}
+                activeOpacity={0.7}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityLabel="Remove this reference"
+                accessibilityRole="button"
+              >
+                <Text style={s.portfolioDeleteText}>{'\u00d7'}</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+          {references.length < CREDENTIAL_CAP && (
+            <TouchableOpacity
+              style={s.portfolioAdd}
+              onPress={() => handleAddPortfolioItem('reference')}
+              disabled={portfolioUploading === 'reference'}
+              activeOpacity={0.7}
+              accessibilityLabel={references.length === 0 ? 'Add your first reference' : 'Add another reference'}
+              accessibilityRole="button"
+            >
+              {portfolioUploading === 'reference' ? (
+                <ActivityIndicator size="small" color={Colors.gold} />
+              ) : (
+                <Text style={s.portfolioAddText}>+</Text>
+              )}
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+        {references.length === 0 && portfolioUploading !== 'reference' && (
+          <Text style={s.portfolioHint}>Upload reference letters or recommendations.</Text>
         )}
 
         {/* ── Skills editor ── */}
