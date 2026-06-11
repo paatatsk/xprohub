@@ -122,11 +122,17 @@ section {
 .hero-kicker {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: 5px;
   color: var(--gold);
   text-transform: uppercase;
   margin-bottom: 4px;
+}
+
+@media (min-width: 720px) {
+  .hero-kicker {
+    font-size: 18px;
+  }
 }
 
 .wordmark {
