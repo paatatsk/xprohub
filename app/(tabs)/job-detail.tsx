@@ -74,6 +74,9 @@ export default function JobDetailScreen() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   useFocusEffect(useCallback(() => {
+    setLoading(true);
+    setError(null);
+
     if (!job_id) {
       setError('No job specified.');
       setLoading(false);
