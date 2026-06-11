@@ -22,38 +22,48 @@
 
   <section class="hero">
     <div class="container">
-      <p class="eyebrow">XPROHUB</p>
+      <div class="hero-grid">
+        <!-- Left column: text + waitlist -->
+        <div class="hero-text">
+          <p class="eyebrow">THE RECEIPT IS THE AD</p>
+          <h1 class="hero-tagline">Real Work. Fair Pay.<br>For Everyone.</h1>
+          <p class="hero-sub">Every job ends in a paystub. The worker's pay &mdash; itemized, public, and in gold.</p>
 
-      <!-- Receipt visual (CSS/HTML, not an image) -->
-      <div class="receipt" role="img" aria-label="Stylized receipt showing a worker payout of $139.50">
-        <p class="receipt-worker">Maria S.</p>
-        <p class="receipt-verb">cleaned your home in Brooklyn</p>
-        <div class="receipt-divider"></div>
-        <p class="receipt-label">PAID TO MARIA</p>
-        <p class="receipt-amount">$139.50</p>
-        <div class="receipt-divider"></div>
-        <p class="receipt-reconciliation">
-          <span class="paid">You paid $155.00</span> &middot; <span class="received">Maria received $139.50</span>
-        </p>
+          <div class="hero-stat">
+            <p class="hero-stat-amount">$139.50</p>
+            <p class="hero-stat-label">PAID TO <span class="hero-stat-name">Maria Reyes</span></p>
+          </div>
+
+          <p class="hero-reconciliation">
+            <span class="paid">You paid $155.00</span> &middot; <span class="received">Maria received $139.50</span>
+          </p>
+
+          <!-- Waitlist form -->
+          <form class="waitlist-form" id="waitlist-form" aria-label="Join the waitlist">
+            <label for="waitlist-email" class="sr-only">Email address</label>
+            <input
+              type="email"
+              id="waitlist-email"
+              class="waitlist-input"
+              placeholder="your@email.com"
+              required
+              autocomplete="email"
+            >
+            <button type="submit" class="waitlist-btn">JOIN WAITLIST</button>
+          </form>
+          <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
+        </div>
+
+        <!-- Right column: transparent phone screenshot -->
+        <div class="hero-phone">
+          <img
+            src="/img/receipt.png"
+            alt="XProHub Receipt screen showing Maria Reyes received $139.50 for cleaning a 2-bedroom apartment"
+            width="924"
+            height="1080"
+          >
+        </div>
       </div>
-
-      <h1 class="hero-tagline">Real Work. Fair Pay.<br>For Everyone.</h1>
-      <p class="hero-sub">A marketplace for everyday work in NYC. Post a job, get it done, pay fairly. Every user is both customer and worker.</p>
-
-      <!-- Waitlist form -->
-      <form class="waitlist-form" id="waitlist-form" aria-label="Join the waitlist">
-        <label for="waitlist-email" class="sr-only">Email address</label>
-        <input
-          type="email"
-          id="waitlist-email"
-          class="waitlist-input"
-          placeholder="your@email.com"
-          required
-          autocomplete="email"
-        >
-        <button type="submit" class="waitlist-btn">JOIN WAITLIST</button>
-      </form>
-      <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
     </div>
   </section>
 
@@ -172,18 +182,18 @@
       <h2 class="section-heading">See it in action</h2>
       <p class="section-sub">Launching first in New York City.</p>
 
-      <div class="preview-strip">
-        <div class="preview-frame">
-          <img src="/img/market.png" alt="XProHub Live Market screen showing available jobs" width="220" height="476">
+      <div class="preview-phones">
+        <div class="preview-phone">
+          <img src="/img/market.png" alt="XProHub Live Market screen showing available jobs in NYC" width="924" height="1080">
           <p class="preview-caption">LIVE MARKET</p>
         </div>
-        <div class="preview-frame">
-          <img src="/img/receipt.png" alt="XProHub Receipt screen showing worker payout and fee transparency" width="220" height="476">
+        <div class="preview-phone">
+          <img src="/img/receipt.png" alt="XProHub Receipt screen — Maria Reyes received $139.50, 10% fee visible" width="924" height="1080">
           <p class="preview-caption">RECEIPT</p>
         </div>
-        <div class="preview-frame">
-          <img src="/img/profile.png" alt="XProHub Worker Profile screen showing skills and endorsements" width="220" height="476">
-          <p class="preview-caption">WORKER PROFILE</p>
+        <div class="preview-phone">
+          <img src="/img/profile.png" alt="XProHub Worker Credential screen — David Park, licensed electrician" width="924" height="1080">
+          <p class="preview-caption">WORKER CREDENTIAL</p>
         </div>
       </div>
     </div>
