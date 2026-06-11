@@ -17,53 +17,47 @@
 
   <!-- ════════════════════════════════════════════════════════════
        SECTION 1 — HERO
-       Receipt-inspired visual + waitlist capture
+       Marketplace two-door visual + waitlist capture
        ════════════════════════════════════════════════════════════ -->
 
   <section class="hero">
     <div class="container">
-      <div class="hero-grid">
-        <!-- Left column: text + waitlist -->
-        <div class="hero-text">
-          <p class="eyebrow">THE RECEIPT IS THE AD</p>
-          <h1 class="hero-tagline">Real Work. Fair Pay.<br>For Everyone.</h1>
-          <p class="hero-sub">Every job ends in a paystub. The worker's pay &mdash; itemized, public, and in gold.</p>
+      <p class="eyebrow">WELCOME TO XPROHUB</p>
+      <h1 class="hero-tagline">The Marketplace Where Skills Meet Opportunity</h1>
+      <p class="hero-secondary-tagline">Real Work. Fair Pay. For Everyone.</p>
+      <p class="hero-sub">XProHub is the marketplace where workers advertise their services and earn on demand &mdash; and where you hire help directly, neighbor to neighbor, and save. Every user is both customer and worker.</p>
 
-          <div class="hero-stat">
-            <p class="hero-stat-amount">$139.50</p>
-            <p class="hero-stat-label">PAID TO <span class="hero-stat-name">Maria Reyes</span></p>
-          </div>
-
-          <p class="hero-reconciliation">
-            <span class="paid">You paid $155.00</span> &middot; <span class="received">Maria received $139.50</span>
-          </p>
-
-          <!-- Waitlist form -->
-          <form class="waitlist-form" id="waitlist-form" aria-label="Join the waitlist">
-            <label for="waitlist-email" class="sr-only">Email address</label>
-            <input
-              type="email"
-              id="waitlist-email"
-              class="waitlist-input"
-              placeholder="your@email.com"
-              required
-              autocomplete="email"
-            >
-            <button type="submit" class="waitlist-btn">JOIN WAITLIST</button>
-          </form>
-          <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
+      <!-- Two doors: the core visual -->
+      <div class="hero-doors" aria-label="Two sides of XProHub: post a job or take a job">
+        <div class="door door-filled">
+          <p class="door-label">HELP WANTED?</p>
+          <p class="door-action">POST A JOB</p>
+          <p class="door-benefit">Hire help directly. Set your budget. Save.</p>
         </div>
 
-        <!-- Right column: transparent phone screenshot -->
-        <div class="hero-phone">
-          <img
-            src="/img/receipt.png"
-            alt="XProHub Receipt screen showing Maria Reyes received $139.50 for cleaning a 2-bedroom apartment"
-            width="924"
-            height="1080"
-          >
+        <span class="door-separator" aria-hidden="true">&diams;</span>
+
+        <div class="door door-outline">
+          <p class="door-label">HAVE SKILLS?</p>
+          <p class="door-action">TAKE A JOB</p>
+          <p class="door-benefit">Advertise your skills. Get hired on demand. Earn.</p>
         </div>
       </div>
+
+      <!-- Waitlist form -->
+      <form class="waitlist-form" id="waitlist-form" aria-label="Join the waitlist">
+        <label for="waitlist-email" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="waitlist-email"
+          class="waitlist-input"
+          placeholder="your@email.com"
+          required
+          autocomplete="email"
+        >
+        <button type="submit" class="waitlist-btn">JOIN WAITLIST</button>
+      </form>
+      <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
     </div>
   </section>
 

@@ -115,40 +115,11 @@ section {
 /* ── HERO ────────────────────────────────────────────────────── */
 
 .hero {
-  padding: 64px 0 48px;
+  padding: 80px 0 48px;
+  text-align: center;
 }
 
-.hero .container {
-  max-width: 960px;
-}
-
-/* Two-column grid: text left, phone right */
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  align-items: center;
-}
-
-@media (min-width: 720px) {
-  .hero-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 48px;
-  }
-}
-
-/* Left column */
-.hero-text {
-  text-align: left;
-}
-
-@media (max-width: 719px) {
-  .hero-text {
-    text-align: center;
-  }
-}
-
-.hero-text .eyebrow {
+.hero .eyebrow {
   letter-spacing: 5px;
   margin-bottom: 16px;
 }
@@ -156,7 +127,7 @@ section {
 .hero-tagline {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 32px;
+  font-size: 28px;
   color: var(--text);
   line-height: 1.2;
   margin-bottom: 12px;
@@ -164,84 +135,126 @@ section {
 
 @media (min-width: 720px) {
   .hero-tagline {
-    font-size: 38px;
+    font-size: 36px;
   }
+}
+
+.hero-secondary-tagline {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 16px;
 }
 
 .hero-sub {
   font-family: var(--font-body);
   font-size: 15px;
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 24px;
+  line-height: 1.7;
+  max-width: 560px;
+  margin: 0 auto 32px;
 }
 
-/* Payout stat */
-.hero-stat {
+/* Two doors */
+.hero-doors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 720px) {
+  .hero-doors {
+    flex-direction: row;
+    gap: 24px;
+    max-width: 640px;
+  }
+}
+
+.door {
+  flex: 1;
+  width: 100%;
+  padding: 24px 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.door-filled {
+  background: var(--gold);
+  border: 2px solid var(--gold);
+}
+
+.door-filled .door-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--ink);
   margin-bottom: 8px;
 }
 
-.hero-stat-amount {
+.door-filled .door-action {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 48px;
-  color: var(--gold);
-  letter-spacing: -1px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 40px rgba(201, 168, 76, 0.35);
-  margin-bottom: 4px;
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 8px;
 }
 
-.hero-stat-label {
+.door-filled .door-benefit {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.door-outline {
+  background: transparent;
+  border: 2px solid var(--gold);
+}
+
+.door-outline .door-label {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 12px;
+  font-weight: 600;
+  font-size: 10px;
   letter-spacing: 3px;
-  color: var(--text-secondary);
-}
-
-.hero-stat-name {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-style: italic;
-  font-size: 14px;
-  letter-spacing: 0;
   color: var(--gold);
+  margin-bottom: 8px;
 }
 
-.hero-reconciliation {
+.door-outline .door-action {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.door-outline .door-benefit {
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--text-secondary);
-  margin-bottom: 24px;
+  line-height: 1.4;
 }
 
-.hero-reconciliation .paid {
-  font-weight: 500;
-  color: var(--ink-dim);
-}
-
-.hero-reconciliation .received {
-  font-weight: 500;
+.door-separator {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
   color: var(--gold);
+  letter-spacing: 2px;
 }
 
-/* Right column: phone */
-.hero-phone {
-  display: flex;
-  justify-content: center;
-}
-
-.hero-phone img {
-  max-width: 320px;
-  width: 100%;
-  height: auto;
-}
-
-@media (max-width: 719px) {
-  .hero-phone img {
-    max-width: min(78vw, 340px);
+@media (min-width: 720px) {
+  .door-separator {
+    flex-shrink: 0;
   }
 }
 
@@ -250,12 +263,7 @@ section {
   display: flex;
   gap: 10px;
   max-width: 420px;
-}
-
-@media (max-width: 719px) {
-  .waitlist-form {
-    margin: 0 auto;
-  }
+  margin: 0 auto;
 }
 
 .waitlist-input {
