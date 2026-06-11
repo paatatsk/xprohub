@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
 
   // Delete Account button
   deleteBtn: {
-    marginTop: Spacing.md,
+    marginTop: 32,
     borderWidth: 1,
     borderColor: Colors.red,
     borderRadius: Radius.md,
