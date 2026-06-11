@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-10 (Detail screens Phase B started — Slice B1 shipped)
-**Most recent commit:** `a11ea5c` — feat(worker-profile): read-only worker detail screen, tappable from Market pass (slice B1)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B in progress (B1 shipped). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-10 (Detail screens Phase B — Slices B1 + B2 shipped)
+**Most recent commit:** `89e60ed` — feat(worker-profile): worker portfolio photos — schema, upload, my-card management, profile display (slice B2)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B in progress (B1 + B2 shipped). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -64,7 +64,16 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
   - **Market wiring:** `onPress` added to all worker cards (self + non-self) → `/(tabs)/worker-profile?worker_id={id}`. Set outside the self/non-self spread so card-level HIRE, EDIT CARD, and overflow menu are untouched.
   - **Layout:** Registered as hidden tab screen with back button header.
   - **Focus-state lesson applied:** `setLoading(true); setError(null);` at top of `useFocusEffect` callback. Hardware-verified: repeat visits + cross-worker navigation render correct worker each time.
-  - **Phase B scope:** B1 = read-only profile (shipped). Portfolio/credentials in B2/B3 (not yet scoped).
+  - **Phase B scope:** B1 = read-only profile (shipped). Portfolio/credentials in B2/B3.
+- **Detail screens — Slice B2: Worker portfolio photos — full stack** (schema + upload + management + display):
+  - `89e60ed` — New `worker_portfolio` table with type discriminator (`'photo'` | `'certificate'` | `'reference'`). This slice ships photo upload/display only; certificate/reference UI comes in B3.
+  - **Schema:** Migration `20260610000002_worker_portfolio.sql`. UUID PK, user_id FK → profiles(id) CASCADE, type CHECK, url, caption, sort_order. Indexes on user_id and (user_id, type). RLS: public-read (any authenticated), owner insert/delete, no UPDATE (immutable). Explicit GRANTs per Oct-2026 Data API requirement.
+  - **Manual dashboard state:** `worker-portfolio` Storage bucket (Public) + INSERT policy (authenticated, bucket_id = 'worker-portfolio'). Documented in CLAUDE.md Storage Buckets section alongside avatars and job-photos.
+  - **A1 lesson applied:** Public-read RLS designed in from the start — no post-hoc fix needed. Party-scoped reads would have broken non-owner portfolio display (same bug as listing photos on job-detail, fixed in A1 with a second permissive policy).
+  - **Upload helper:** `lib/photos.ts` extended with `uploadPortfolioPhoto` — uploads to worker-portfolio bucket, path `{userId}/portfolio_{timestamp}.{ext}`, free aspect ratio (portfolio work is best shown as-shot).
+  - **my-card.tsx:** PORTFOLIO section between MANAGE row and Skills editor (lifetime register). Horizontal strip of 100px thumbnails with delete (×) affordance, dashed gold add button, 6-photo cap with counter, loading spinner during upload, empty state hint. Each operation is exactly ONE insert or delete — data-safety contract preserved, does not touch worker_skills or profile fields.
+  - **worker-profile.tsx:** PORTFOLIO section below OFFERS, above Location (skills establish what, portfolio shows evidence). Paginated full-width strip (220px, cover crop, gold dot indicators) — same treatment as job-detail listing photos. Hidden when 0 photos (no empty state, clean layout).
+  - **Phase B scope:** B1 = read-only profile (shipped). B2 = portfolio photos (shipped). B3 = certificate/reference UI (not yet scoped, schema ready).
 - **Photo system Stage 3 — after-photo on Receipt (completes the photo system)**:
   - `cac3371` — Wire the Receipt's HeroPhoto to the job's latest after-photo (job_photos, photo_type='after', most recent `created_at`). Shown as a single calm image in the existing hero treatment with the AFTER stamp. Gallery cruft removed (thumbnail strip, photo counter, upload hint). **Conceptual decision:** the Receipt photo is deliberately ONE after-photo as a memory anchor/keepsake — not a before/after pair. Evidence lives in the chat thread (Stage 2). The before/after pair was considered and rejected as too much for the lighthouse. Empty state preserved for jobs with no after-photo. **Photo system is now COMPLETE across all 3 stages.**
 - **Photo system Stage 2 — worker before/after evidence (2 slices, Slice C dropped)**:
