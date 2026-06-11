@@ -63,6 +63,7 @@ function statusColor(status: string): string {
     case 'matched':     return Colors.green;
     case 'in_progress': return Colors.amber;
     case 'completed':   return Colors.textSecondary;
+    case 'cancelled':   return Colors.red;
     default:            return Colors.textSecondary;
   }
 }
@@ -73,6 +74,7 @@ function statusLabel(status: string): string {
     case 'matched':     return 'MATCHED';
     case 'in_progress': return 'IN PROGRESS';
     case 'completed':   return 'COMPLETED';
+    case 'cancelled':   return 'CLOSED';
     default:            return status.toUpperCase();
   }
 }
@@ -217,6 +219,7 @@ export default function JobBidsScreen() {
   const [loadError,     setLoadError]     = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
   const [actionError,   setActionError]   = useState<string | null>(null);
+  const [cancelling,    setCancelling]    = useState(false);
 
   // ── Fetch bids only (used after decline to refresh list) ──────────────────
 
@@ -476,6 +479,42 @@ export default function JobBidsScreen() {
     );
   }
 
+  // ── Close post ───────────────────────────────────────────────────────────
+
+  function handleClosePost() {
+    if (!job || cancelling) return;
+
+    Alert.alert(
+      'Close this post?',
+      'Pending applications will be released.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Close Post',
+          style: 'destructive',
+          onPress: async () => {
+            setCancelling(true);
+            setActionError(null);
+
+            const { error: rpcErr } = await supabase
+              .rpc('cancel_job', { p_job_id: job.id });
+
+            if (rpcErr) {
+              setCancelling(false);
+              setActionError(rpcErr.message);
+              return;
+            }
+
+            // Update job status + refetch bids so cards reflect declined state
+            setJob(prev => prev ? { ...prev, status: 'cancelled' } : prev);
+            await fetchBids();
+            setCancelling(false);
+          },
+        },
+      ],
+    );
+  }
+
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (loading) {
@@ -594,6 +633,31 @@ export default function JobBidsScreen() {
               onOpenChat={() => handleOpenChat(bid)}
             />
           ))
+        )}
+
+        {/* ── Close post affordance (owner, open jobs only) ── */}
+        {job!.status === 'open' && (
+          <TouchableOpacity
+            style={styles.closePostBtn}
+            onPress={handleClosePost}
+            disabled={cancelling}
+            activeOpacity={0.7}
+            accessibilityLabel="Close this job post"
+            accessibilityRole="button"
+          >
+            {cancelling ? (
+              <ActivityIndicator size="small" color={Colors.textSecondary} />
+            ) : (
+              <Text style={styles.closePostText}>CLOSE POST</Text>
+            )}
+          </TouchableOpacity>
+        )}
+
+        {/* ── Closed confirmation ── */}
+        {job!.status === 'cancelled' && (
+          <View style={styles.closedBanner}>
+            <Text style={styles.closedBannerText}>This post has been closed.</Text>
+          </View>
         )}
 
       </ScrollView>
@@ -937,5 +1001,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
+  },
+
+  // ── Close post ────────────────────────────────────────────────
+  closePostBtn: {
+    alignSelf: 'center',
+    marginTop: Spacing.xl,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  closePostText: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: Colors.textSecondary,
+    letterSpacing: 0.5,
+  },
+  closedBanner: {
+    marginTop: Spacing.lg,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  closedBannerText: {
+    fontFamily: Fonts.body,
+    fontSize: 13,
+    color: Colors.textSecondary,
+    fontStyle: 'italic',
   },
 });

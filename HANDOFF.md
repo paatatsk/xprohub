@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-11 (Detail screens Phase B COMPLETE — Slices B1 + B2 + B3 shipped)
-**Most recent commit:** feat(worker-profile): certificate + reference credentials UI + fullscreen view (slice B3 — closes Phase B)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-11 (Desk refinement — Slice C1 close-post shipped)
+**Most recent commit:** feat(jobs): close-post flow — cancel_job RPC with bid release cascade + owner UI (slice C1)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Desk refinement in progress (C1 close-post shipped). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -46,6 +46,17 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
   - All three in-flight states tappable: POSTED→job-bids, TAKEN→job-chat, APPLIED→job-detail.
 - **job-detail focus fix** · `c0d8040` · **SHIPPED**
   - useEffect→useFocusEffect so bid-check re-runs on screen reuse (stale APPLY button fix).
+
+### Desk refinement (in progress)
+
+- **Slice C1: Close-post flow — cancel_job RPC + owner UI** (SHIPPED):
+  - **Migration:** `20260611000001_cancel_job_function.sql` — `cancel_job(p_job_id)` SECURITY DEFINER. Validates `auth.uid() = customer_id` AND `status = 'open'`, then atomically: (1) decline all pending bids, (2) set `jobs.status = 'cancelled'`. Same transactional pattern as `accept_bid`. **Applied manually in SQL Editor** (bare CREATE OR REPLACE, no BEGIN/COMMIT wrapper — dollar-quote gotcha).
+  - **UI:** Quiet "CLOSE POST" text at bottom of `job-bids.tsx`, visible only when job status is `open`. Confirmation dialog: "Close this post?" / "Pending applications will be released." (dignity language). After close: context strip shows CLOSED pill (red), bid cards refetch to reflect `declined` state, CLOSE POST button hidden. Cancelled status also handled in `statusColor` / `statusLabel` helpers.
+  - **job-chat.tsx defensive badge now live:** The existing "JOB CANCELLED" badge (written defensively in earlier session) now has a reachable code path. No code change needed — it renders when `jobStatus === 'cancelled'`.
+  - **job-detail.tsx skipped:** Doesn't fetch `status`; would need interface changes. Owner path to close is already via job-bids (MY JOBS → job-bids → CLOSE POST).
+  - **Payment safety:** No payment rows can exist for `open` jobs (`create_payment_record` gates on `status = 'matched'`). Close is safe before hire with zero escrow interactions.
+  - **Hardware-verified:** Closed 0-bid post (Car wash) — disappeared from Market, shows CLOSED. Closed post with pending bid — bid cascade confirmed, worker sees declined. Bid cards refetch after close (no stale ACCEPT/DECLINE buttons). Non-owner blocked by auth guard. Already-closed job: button hidden.
+- **Slice C2: Desk Active grouping + cap** — scoped but not yet built. Three labeled clusters (TAKEN / POSTED / APPLIED) with counts, 5-per-group cap with VIEW ALL navigation.
 
 ### Shipped this session
 
