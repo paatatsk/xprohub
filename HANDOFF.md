@@ -1,8 +1,8 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-10 (Detail screens Phase A VERIFIED-CLOSED — slices A1 + A2 + sticky-error fix)
-**Most recent commit:** `eb408a3` — fix(job-detail): reset loading/error state on focus (sticky error blocked screen reuse)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A COMPLETE (listing photos on job-detail + tappable summary on job-bids). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-06-10 (Detail screens Phase B started — Slice B1 shipped)
+**Most recent commit:** `a11ea5c` — feat(worker-profile): read-only worker detail screen, tappable from Market pass (slice B1)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B in progress (B1 shipped). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
 
 ---
 
@@ -57,6 +57,14 @@ Four-tab IA shipped across slices A → B → D (C resolved as compose thread cl
   - `POLISH_PASS.md` — "Edit job post" feature parked as v1.1+ deferred item with proposed rule (editable until first bid, frozen after). Current workaround: cancel and repost.
   - **Bugfix:** `eb408a3` — `useFocusEffect` in job-detail.tsx never reset `error`/`loading` state, so a previous error visit made the error state sticky across all re-navigations. Added `setLoading(true); setError(null);` at the top of the callback. Hardware-verified: owner VIEW POST renders, repeat visits work, cross-navigation shows correct job, bid flow intact.
   - **Phase A VERIFIED-CLOSED:** Slice A1 (listing photos on job-detail) + Slice A2 (tappable summary → job-detail) + sticky-error fix. All paths hardware-verified on iPhone.
+- **Detail screens — Slice B1: Worker Profile screen (read-only, existing data)** (Phase B started):
+  - `a11ea5c` — New `worker-profile.tsx` (459 lines). Read-only detail screen behind the Market pass card. Param: `worker_id`. Fetches from `profiles` + `worker_skills → task_library`.
+  - **Content (top to bottom):** Gold-bordered avatar (96px), name in Playfair italic gold (Receipt reverence), status dot + label, bio (dignified empty state), stats row (endorsement count + jobs completed as gold hero numbers), rate range (today_rate_min/max), OFFERS section split into SUPERPOWERS (gold text) + ALSO OFFERS (white text) with mono price ranges, location.
+  - **Footer CTA:** HIRE {FIRST_NAME} (gold fill) for non-self → `/(tabs)/direct-hire`. Self-view shows EDIT CARD (gold outline) → `/(tabs)/my-card`.
+  - **Market wiring:** `onPress` added to all worker cards (self + non-self) → `/(tabs)/worker-profile?worker_id={id}`. Set outside the self/non-self spread so card-level HIRE, EDIT CARD, and overflow menu are untouched.
+  - **Layout:** Registered as hidden tab screen with back button header.
+  - **Focus-state lesson applied:** `setLoading(true); setError(null);` at top of `useFocusEffect` callback. Hardware-verified: repeat visits + cross-worker navigation render correct worker each time.
+  - **Phase B scope:** B1 = read-only profile (shipped). Portfolio/credentials in B2/B3 (not yet scoped).
 - **Photo system Stage 3 — after-photo on Receipt (completes the photo system)**:
   - `cac3371` — Wire the Receipt's HeroPhoto to the job's latest after-photo (job_photos, photo_type='after', most recent `created_at`). Shown as a single calm image in the existing hero treatment with the AFTER stamp. Gallery cruft removed (thumbnail strip, photo counter, upload hint). **Conceptual decision:** the Receipt photo is deliberately ONE after-photo as a memory anchor/keepsake — not a before/after pair. Evidence lives in the chat thread (Stage 2). The before/after pair was considered and rejected as too much for the lighthouse. Empty state preserved for jobs with no after-photo. **Photo system is now COMPLETE across all 3 stages.**
 - **Photo system Stage 2 — worker before/after evidence (2 slices, Slice C dropped)**:
