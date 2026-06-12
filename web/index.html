@@ -4,76 +4,324 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>XProHub — Real Work. Fair Pay. For Everyone.</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0E0E0F;
-      color: #FFFFFF;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 24px;
-    }
-    .card {
-      max-width: 420px;
-    }
-    h1 {
-      color: #C9A84C;
-      font-size: 36px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      margin-bottom: 12px;
-    }
-    .tagline {
-      color: #C9A84C;
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      margin-bottom: 24px;
-    }
-    .mission {
-      color: #888890;
-      font-size: 15px;
-      line-height: 24px;
-    }
-    .divider {
-      width: 40px;
-      height: 2px;
-      background: #C9A84C;
-      margin: 24px auto;
-      opacity: 0.4;
-    }
-    .status {
-      color: #888890;
-      font-size: 13px;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .contact {
-      color: #C9A84C;
-      font-size: 13px;
-      letter-spacing: 1px;
-      text-decoration: none;
-      opacity: 0.7;
-    }
-    .contact:hover {
-      opacity: 1;
-    }
-  </style>
+  <meta name="description" content="A marketplace for everyday work. Every user is both customer and worker. Post a job, get it done, pay fairly. Launching in NYC.">
+
+  <!-- Fonts: preconnect + five-voice system -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="card">
-    <h1>XPROHUB</h1>
-    <p class="tagline">Real Work. Fair Pay. For Everyone.</p>
-    <p class="mission">
-      A marketplace for everyday work. Every user is both customer and worker. Economic empowerment for people who show up and do the work.
-    </p>
-    <div class="divider"></div>
-    <p class="status">COMING SOON — NYC</p>
-    <a class="contact" href="mailto:hello@xprohub.com">hello@xprohub.com</a>
-  </div>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SECTION 1 — HERO
+       Marketplace two-door visual + waitlist capture
+       ════════════════════════════════════════════════════════════ -->
+
+  <section class="hero">
+    <div class="container">
+      <p class="hero-kicker">WELCOME TO</p>
+      <p class="wordmark"><span class="w-x">X</span><span class="w-pro">Pro</span><span class="w-hub">Hub</span></p>
+      <h1 class="hero-tagline">The Marketplace Where Skills Meet Opportunity</h1>
+      <p class="hero-secondary-tagline">Real Work. Fair Pay. For Everyone.</p>
+      <p class="hero-sub">XProHub is the marketplace where you can hire help directly and save &mdash; or offer your skills and earn on demand. Post a job or take a job; every user can do both.</p>
+
+      <!-- Two doors: the core visual -->
+      <div class="hero-doors" aria-label="Two sides of XProHub: post a job or take a job">
+        <div class="door">
+          <p class="door-label">HELP WANTED?</p>
+          <p class="door-action">POST A JOB</p>
+          <p class="door-benefit">Hire help directly. Set your budget. Save.</p>
+        </div>
+
+        <span class="door-separator" aria-hidden="true">OR</span>
+
+        <div class="door">
+          <p class="door-label">HAVE SKILLS?</p>
+          <p class="door-action">TAKE A JOB</p>
+          <p class="door-benefit">Advertise your skills. Set your own rate. Get hired on demand. Earn.</p>
+        </div>
+      </div>
+
+      <!-- Waitlist badges (aligned: savings under POST, hired under TAKE) -->
+      <div class="waitlist-badges">
+        <span class="waitlist-badge">&#9888; CAUTION: you may experience substantial savings.</span>
+        <span class="waitlist-badge">&#9888; WARNING: high potential for getting hired.</span>
+      </div>
+
+      <!-- Waitlist form -->
+      <form class="waitlist-form" id="waitlist-form" aria-label="Join the waitlist">
+        <label for="waitlist-email" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="waitlist-email"
+          class="waitlist-input"
+          placeholder="your@email.com"
+          required
+          autocomplete="email"
+        >
+        <button type="submit" class="waitlist-btn">JOIN WAITLIST</button>
+      </form>
+      <p class="waitlist-msg" id="waitlist-msg" aria-live="polite"></p>
+      <p class="waitlist-micro">Be first in line when XProHub opens in your neighborhood.</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SECTION 2 — HOW IT WORKS
+       Customer 3-step / Worker 2-step (the two core loops)
+       ════════════════════════════════════════════════════════════ -->
+
+  <section class="how-it-works">
+    <div class="container">
+      <p class="eyebrow">HOW IT WORKS</p>
+      <h2 class="section-heading">Two sides. One transaction.</h2>
+      <p class="section-sub">Every job has a customer who needs work done and a worker who does it. The platform connects them, holds the payment, and releases it when the work is confirmed.</p>
+
+      <div class="how-grid">
+        <!-- Customer side -->
+        <div>
+          <p class="how-column-label">CUSTOMER SIDE</p>
+          <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-text">
+              <p class="step-title">Post a job</p>
+              <p class="step-desc">Describe what you need, set your budget, and publish. Workers in your area see it immediately.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-text">
+              <p class="step-title">Review and hire</p>
+              <p class="step-desc">Workers apply with their price and message. Pick the one you trust, and your payment is held securely.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-text">
+              <p class="step-title">Confirm and pay</p>
+              <p class="step-desc">When the work is done, confirm completion. The worker gets paid, and you can endorse a job well done.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Worker side -->
+        <div>
+          <p class="how-column-label">WORKER SIDE</p>
+          <div class="step">
+            <span class="step-number">1</span>
+            <div class="step-text">
+              <p class="step-title">Find work</p>
+              <p class="step-desc">Browse the Live Market for jobs that match your skills, or publish your ID Card and let customers come to you.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div class="step-text">
+              <p class="step-title">Do the work, get paid</p>
+              <p class="step-desc">Your payment is secured before you start. Complete the job, and the money is released to your account. No chasing invoices.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <div class="step-text">
+              <p class="step-title">Build your reputation</p>
+              <p class="step-desc">Earn endorsements from real clients and grow a base of people who request you by name.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SECTION 3 — THE PROMISE
+       Three trust cards
+       ════════════════════════════════════════════════════════════ -->
+
+  <section class="promise">
+    <div class="container">
+      <p class="eyebrow">THE PROMISE</p>
+      <h2 class="section-heading">Built for trust</h2>
+      <p class="section-sub">Every design decision is tested against one question: is this fair to the worker and clear to the customer?</p>
+
+      <div class="promise-grid">
+        <div class="promise-card">
+          <p class="promise-card-title">A flat 10%.</p>
+          <p class="promise-card-body">Shown as a line item, every time. You always see exactly where your money goes.</p>
+        </div>
+        <div class="promise-card">
+          <p class="promise-card-title">Real endorsements.</p>
+          <p class="promise-card-body">Reputation is built on real clients vouching for real work.</p>
+        </div>
+        <div class="promise-card">
+          <p class="promise-card-title">Set your budget.</p>
+          <p class="promise-card-body">Every task has a suggested fair price range, so the match works for both sides.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SECTION 4 — FOR EVERYONE
+       Dual-role story
+       ════════════════════════════════════════════════════════════ -->
+
+  <section class="for-everyone">
+    <div class="container">
+      <p class="eyebrow">FOR EVERYONE</p>
+      <h2 class="section-heading">Every user is both customer and worker</h2>
+      <p class="for-everyone-body">
+        There's no role selection at sign-up. No permanent labels. You post a job when you need help, and you apply for work when you have time. The same person can do both in the same week. XProHub is built for people who show up and do the work — and sometimes need work done themselves.
+      </p>
+      <p class="pull-quote">"Economic empowerment for everyday people, regardless of background."</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SECTION 5 — APP PREVIEW
+       Phone-frame screenshots (Paata supplies images)
+       ════════════════════════════════════════════════════════════ -->
+
+  <section class="app-preview">
+    <div class="container">
+      <p class="eyebrow">THE APP</p>
+      <h2 class="section-heading">See it in action</h2>
+      <p class="section-sub">Launching first in New York City.</p>
+
+      <div class="preview-phones">
+        <div class="preview-phone">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Live Market screenshot">
+            <img src="/img/market.png" alt="XProHub Live Market screen showing available jobs in NYC" width="924" height="1080">
+          </button>
+          <p class="preview-caption">LIVE MARKET</p>
+        </div>
+        <div class="preview-phone">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Receipt screenshot">
+            <img src="/img/receipt.png" alt="XProHub Receipt screen — Maria Reyes received $139.50, 10% fee visible" width="924" height="1080">
+          </button>
+          <p class="preview-caption">RECEIPT</p>
+        </div>
+        <div class="preview-phone">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Worker Credential screenshot">
+            <img src="/img/profile.png" alt="XProHub Worker Credential screen — David Park, licensed electrician" width="924" height="1080">
+          </button>
+          <p class="preview-caption">WORKER CREDENTIAL</p>
+        </div>
+      </div>
+
+      <!-- Lightbox overlay -->
+      <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged screenshot">
+        <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close enlarged view">&times;</button>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       FOOTER
+       Ticker + legal links + contact
+       ════════════════════════════════════════════════════════════ -->
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="ticker">&diams; REAL WORK &middot; FAIR PAY &middot; FOR EVERYONE &diams;</p>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+        <a href="mailto:hello@xprohub.com">hello@xprohub.com</a>
+      </nav>
+      <p class="footer-copy">&copy; 2026 XProHub. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ── Waitlist form handler ─────────────────────────────────── -->
+  <script>
+    (function () {
+      var form = document.getElementById('waitlist-form');
+      var msg = document.getElementById('waitlist-msg');
+      var btn = form.querySelector('.waitlist-btn');
+      var input = form.querySelector('.waitlist-input');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var email = input.value.trim();
+        if (!email) return;
+
+        btn.disabled = true;
+        btn.textContent = 'JOINING...';
+        msg.textContent = '';
+        msg.className = 'waitlist-msg';
+
+        fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email }),
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.ok) {
+              msg.textContent = "You\u2019re on the list \u2014 we\u2019ll be in touch.";
+              msg.className = 'waitlist-msg success';
+              input.value = '';
+            } else {
+              msg.textContent = data.error || 'Something went wrong. Please try again.';
+              msg.className = 'waitlist-msg error';
+            }
+          })
+          .catch(function () {
+            msg.textContent = 'Could not reach the server. Please try again.';
+            msg.className = 'waitlist-msg error';
+          })
+          .finally(function () {
+            btn.disabled = false;
+            btn.textContent = 'JOIN WAITLIST';
+          });
+      });
+    })();
+
+    // ── Screenshot lightbox ────────────────────────────────────
+    (function () {
+      var lightbox = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+      var lbClose = document.getElementById('lightbox-close');
+      var triggers = document.querySelectorAll('.lightbox-trigger');
+      var returnFocus = null;
+
+      function open(trigger) {
+        var img = trigger.querySelector('img');
+        lbImg.src = img.src;
+        lbImg.alt = img.alt;
+        returnFocus = trigger;
+        lightbox.classList.add('lightbox-open');
+        document.body.style.overflow = 'hidden';
+        lbClose.focus();
+      }
+
+      function close() {
+        lightbox.classList.remove('lightbox-open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+        if (returnFocus) { returnFocus.focus(); returnFocus = null; }
+      }
+
+      for (var i = 0; i < triggers.length; i++) {
+        triggers[i].addEventListener('click', function () { open(this); });
+      }
+
+      lbClose.addEventListener('click', close);
+
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) close();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && lightbox.classList.contains('lightbox-open')) close();
+      });
+    })();
+  </script>
+
 </body>
 </html>

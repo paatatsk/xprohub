@@ -1,0 +1,24 @@
+{
+  // XProHub — Cloudflare Pages configuration
+  // Adds KV namespace binding for the waitlist function (both environments).
+  // Does NOT change build command, output dir routing, or any other behavior.
+  "name": "xprohub",
+  "pages_build_output_dir": ".",
+  "compatibility_date": "2026-05-11",
+  "kv_namespaces": [
+    {
+      "binding": "XPROHUB_WAITLIST",
+      "id": "615858e9c6ab41ca96b1e11af0cf41e9"
+    }
+  ],
+  "env": {
+    "preview": {
+      "kv_namespaces": [
+        {
+          "binding": "XPROHUB_WAITLIST",
+          "id": "615858e9c6ab41ca96b1e11af0cf41e9"
+        }
+      ]
+    }
+  }
+}
