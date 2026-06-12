@@ -193,17 +193,29 @@
 
       <div class="preview-phones">
         <div class="preview-phone">
-          <img src="/img/market.png" alt="XProHub Live Market screen showing available jobs in NYC" width="924" height="1080">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Live Market screenshot">
+            <img src="/img/market.png" alt="XProHub Live Market screen showing available jobs in NYC" width="924" height="1080">
+          </button>
           <p class="preview-caption">LIVE MARKET</p>
         </div>
         <div class="preview-phone">
-          <img src="/img/receipt.png" alt="XProHub Receipt screen — Maria Reyes received $139.50, 10% fee visible" width="924" height="1080">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Receipt screenshot">
+            <img src="/img/receipt.png" alt="XProHub Receipt screen — Maria Reyes received $139.50, 10% fee visible" width="924" height="1080">
+          </button>
           <p class="preview-caption">RECEIPT</p>
         </div>
         <div class="preview-phone">
-          <img src="/img/profile.png" alt="XProHub Worker Credential screen — David Park, licensed electrician" width="924" height="1080">
+          <button class="lightbox-trigger" type="button" aria-label="Enlarge Worker Credential screenshot">
+            <img src="/img/profile.png" alt="XProHub Worker Credential screen — David Park, licensed electrician" width="924" height="1080">
+          </button>
           <p class="preview-caption">WORKER CREDENTIAL</p>
         </div>
+      </div>
+
+      <!-- Lightbox overlay -->
+      <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged screenshot">
+        <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close enlarged view">&times;</button>
+        <img class="lightbox-img" id="lightbox-img" src="" alt="">
       </div>
     </div>
   </section>
@@ -267,6 +279,46 @@
             btn.disabled = false;
             btn.textContent = 'JOIN WAITLIST';
           });
+      });
+    })();
+
+    // ── Screenshot lightbox ────────────────────────────────────
+    (function () {
+      var lightbox = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+      var lbClose = document.getElementById('lightbox-close');
+      var triggers = document.querySelectorAll('.lightbox-trigger');
+      var returnFocus = null;
+
+      function open(trigger) {
+        var img = trigger.querySelector('img');
+        lbImg.src = img.src;
+        lbImg.alt = img.alt;
+        returnFocus = trigger;
+        lightbox.classList.add('lightbox-open');
+        document.body.style.overflow = 'hidden';
+        lbClose.focus();
+      }
+
+      function close() {
+        lightbox.classList.remove('lightbox-open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+        if (returnFocus) { returnFocus.focus(); returnFocus = null; }
+      }
+
+      for (var i = 0; i < triggers.length; i++) {
+        triggers[i].addEventListener('click', function () { open(this); });
+      }
+
+      lbClose.addEventListener('click', close);
+
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) close();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && lightbox.classList.contains('lightbox-open')) close();
       });
     })();
   </script>
