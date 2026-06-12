@@ -633,15 +633,44 @@ section {
   margin-bottom: 32px;
 }
 
-.legal-page .legal-placeholder {
+.legal-page .legal-body {
   font-family: var(--font-body);
   font-size: 15px;
   color: var(--text-secondary);
   line-height: 1.7;
-  padding: 24px;
-  background: var(--card);
-  border: 1px dashed var(--border);
-  border-radius: 8px;
+}
+
+.legal-page .legal-body .legal-intro {
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.legal-page .legal-body h2 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--text);
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.legal-page .legal-body p {
+  margin-bottom: 12px;
+}
+
+.legal-page .legal-body .legal-list {
+  margin: 0 0 16px 24px;
+  padding: 0;
+}
+
+.legal-page .legal-body .legal-list li {
+  margin-bottom: 6px;
+}
+
+.legal-page .legal-body strong {
+  color: var(--text);
+  font-weight: 500;
 }
 
 .legal-back {
