@@ -276,14 +276,15 @@ section {
 }
 
 .waitlist-badge {
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--gold);
-  border: 1px solid rgba(201, 168, 76, 0.35);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: #FF8C00;
+  border: 2px solid rgba(255, 140, 0, 0.5);
   border-radius: 999px;
-  padding: 6px 14px;
+  padding: 8px 18px;
   white-space: nowrap;
+  letter-spacing: 1px;
 }
 
 .waitlist-micro {
