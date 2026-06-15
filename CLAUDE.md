@@ -363,6 +363,18 @@ ORDER BY category_id, task_code;
 - `20260610000001_listing_photos_public_read.sql` — Permissive SELECT policy for `photo_type = 'listing'` rows on `job_photos` (public read for listing photos only).
 - `20260610000002_worker_portfolio.sql` — `worker_portfolio` table (public-read RLS, owner insert/delete, immutable). NOTE: the `worker-portfolio` Storage bucket and its INSERT policy are created manually in the dashboard, NOT by this migration.
 
+## RLS — Row-Level Security (IMPORTANT)
+
+ALL public-schema tables have RLS enabled with correct policies. Verified live against `pg_class` + `pg_policies` on 2026-06-15.
+
+RLS + policies for the original tables (`profiles`, `jobs`, `bids`, `chats`, `messages`, `payments`, `xp_transactions`, `badges`, `notifications`, `user_badges`) were created in the **original April 2026 database setup** via the Supabase SQL Editor — BEFORE the migration-based workflow was adopted. They exist in the live database but appear in **no migration file**. Do not conclude RLS is missing because `grep` of `supabase/migrations/` finds no `ENABLE ROW LEVEL SECURITY` for these tables.
+
+Tables created by migrations (`task_categories`, `task_library`, `worker_skills`, `job_post_tasks`, `endorsements`, `reports`, `user_blocks`, `job_photos`, `worker_portfolio`) have their RLS statements in their respective migration files.
+
+**To verify RLS state**: query the live database (`SELECT relname, relrowsecurity FROM pg_class`) and policies (`SELECT * FROM pg_policies`), or check Supabase Dashboard > Advisors > Security. Do NOT rely on migration file grep.
+
+**Supabase advisor emails** can be stale snapshots — always check the live Advisors page before acting on a security warning.
+
 ## Development Conventions
 
 - **Adding a task**: INSERT into `task_library` with `ON CONFLICT (task_code) DO NOTHING`. Never reuse a retired task code.
@@ -371,7 +383,7 @@ ORDER BY category_id, task_code;
 - **New migrations**: Place in `supabase/migrations/` with timestamp prefix `YYYYMMDDHHMMSS_description.sql`. Always wrap in `BEGIN`/`COMMIT`.
 - **Seed updates**: Changes to task data go in `supabase/seed/`. Use `ON CONFLICT (task_code) DO NOTHING` for inserts or `DO UPDATE SET ...` for corrections.
 - **task_code rules**: Always 4 characters, zero-padded. No gaps — if a task is retired, its code is reserved and not reissued.
-- **RLS state**: `task_categories` and `task_library` have anon-safe public read policies. `worker_skills` has public read + auth CRUD. `job_post_tasks` has INSERT + SELECT. `endorsements` has party-read + endorser-insert (immutable). `reports` and `user_blocks` have auth CRUD. `worker_portfolio` has public-read + owner insert/delete (immutable — no UPDATE).
+- **RLS state**: ALL tables have RLS enabled. See the "RLS — Row-Level Security" section above for details. Migration-created tables have policies documented in their migration files. Original tables have policies in the live DB only.
 - **New table migrations**: Include explicit `GRANT` statements for `anon`, `authenticated`, and `service_role` (Supabase Data API change, enforced 2026-10-30).
 - **Shared formatters**: `lib/format.ts` — fmtCents, fmtPrice, fmtDateStamp, fmtDuration, fmtDayDate, fmtShortDate, fmtReceiptDate, toCents. All dates forced to en-US locale.
 - **Support constants**: `lib/legal.ts` — PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL, SUPPORT_EMAIL.
