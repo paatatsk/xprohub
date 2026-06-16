@@ -4,7 +4,7 @@ import {
   TextInput, ScrollView, ActivityIndicator, Image, Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
@@ -273,11 +273,6 @@ export default function PostScreen() {
     descriptionEdited.current = false;
     budgetEdited.current = false;
   }, [catId]);
-
-  // Reset on blur (leaving the screen) — returning always starts fresh
-  useFocusEffect(useCallback(() => {
-    return () => { resetForm(); };
-  }, [resetForm]));
 
   // ── Back to categories (HELP WANTED path only — no catId) ──────────────
   const handleBackToCategories = useCallback(() => {
