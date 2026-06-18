@@ -522,16 +522,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleBtnActive: {
-    backgroundColor: Colors.gold,
+    backgroundColor: 'rgba(201, 168, 76, 0.08)',
   },
   toggleText: {
-    color: Colors.gold,
+    color: Colors.textSecondary,
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
   },
   toggleTextActive: {
-    color: Colors.background,
+    color: Colors.gold,
   },
 
   // Filter strip
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
   // Anchored post bar
   postBar: {
     backgroundColor: Colors.gold,
-    borderRadius: Radius.full,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     marginHorizontal: Spacing.md,
     marginTop: Spacing.sm,

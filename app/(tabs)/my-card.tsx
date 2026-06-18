@@ -18,7 +18,7 @@ import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-disp
 import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { strings } from '../../constants/strings';
 import { supabase } from '../../lib/supabase';
 import { uploadPortfolioPhoto } from '../../lib/photos';
@@ -2248,7 +2248,7 @@ const s = StyleSheet.create({
   publishBtn: {
     width: '100%',
     paddingVertical: 14,
-    borderRadius: 999,
+    borderRadius: Radius.md,
     alignItems: 'center',
   },
   publishBtnGreen: {
@@ -2358,7 +2358,7 @@ const s = StyleSheet.create({
   },
   emptyCta: {
     backgroundColor: Colors.gold,
-    borderRadius: 999,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     paddingHorizontal: 24,
     marginTop: Spacing.sm,
@@ -2537,7 +2537,7 @@ const s = StyleSheet.create({
   // Done button
   pickerDone: {
     backgroundColor: Colors.gold,
-    borderRadius: 999,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     marginHorizontal: Spacing.md,
     alignItems: 'center',
@@ -2640,7 +2640,7 @@ const s = StyleSheet.create({
   bioSaveBtn: {
     flex: 1,
     backgroundColor: Colors.gold,
-    borderRadius: 999,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     alignItems: 'center' as const,
   },
