@@ -476,7 +476,9 @@ const s = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: Colors.gold,
+    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
     borderRadius: 8,
     paddingHorizontal: 5,
     paddingVertical: 2,
@@ -485,7 +487,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 7,
     letterSpacing: 1,
-    color: '#1A0F00',
+    color: Colors.gold,
   },
 
   // Info column
@@ -536,7 +538,9 @@ const s = StyleSheet.create({
     position: 'absolute' as const,
     bottom: 0,
     right: 0,
-    backgroundColor: Colors.gold,
+    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
     borderRadius: 8,
     paddingHorizontal: 5,
     paddingVertical: 2,
@@ -545,7 +549,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 7,
     letterSpacing: 1,
-    color: '#1A0F00',
+    color: Colors.gold,
   },
 
   // Track record

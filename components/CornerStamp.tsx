@@ -43,7 +43,9 @@ const s = StyleSheet.create({
     backgroundColor: Colors.red,
   },
   stampNew: {
-    backgroundColor: Colors.gold,
+    backgroundColor: 'rgba(201, 168, 76, 0.12)',
+    borderWidth: 1,
+    borderColor: Colors.gold,
   },
   stampNewOutline: {
     backgroundColor: 'transparent',
@@ -63,7 +65,7 @@ const s = StyleSheet.create({
     color: Colors.textPrimary,
   },
   textNew: {
-    color: '#1A0F00',
+    color: Colors.gold,
   },
   textNewOutline: {
     color: Colors.gold,
