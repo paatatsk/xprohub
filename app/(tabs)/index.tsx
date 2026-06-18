@@ -93,7 +93,7 @@ function LaunchpadCard({
         accessibilityLabel="Post a job"
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGold}>+</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadGold}>+</Text></View>
         <Text style={s.rowLabel}>Post a job</Text>
       </TouchableOpacity>
 
@@ -105,7 +105,7 @@ function LaunchpadCard({
         accessibilityLabel="Edit my card"
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGold}>{'\u25B8'}</Text>
+        <View style={s.glyphFrame}><View style={s.rowLeadSquare} /></View>
         <Text style={s.rowLabel}>Edit my card</Text>
         <View style={s.rowRight}>
           <View style={[s.statusDot, isLive ? s.statusLive : s.statusDraft]} />
@@ -124,7 +124,7 @@ function LaunchpadCard({
         accessibilityLabel={`My posts, ${pendingBids} bids`}
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadAmber}>{'\u25C6'}</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadAmber}>{'\u25C6'}</Text></View>
         <Text style={s.rowLabel}>My posts</Text>
         <View style={s.rowRight}>
           {pendingBids > 0 && (
@@ -142,7 +142,7 @@ function LaunchpadCard({
         accessibilityLabel={`My applications, ${openApplications} open`}
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGreen}>{'\u25CF'}</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadGreen}>{'\u25CF'}</Text></View>
         <Text style={s.rowLabel}>My applications</Text>
         <View style={s.rowRight}>
           {openApplications > 0 && (
@@ -321,7 +321,9 @@ export default function HomeScreen() {
             <View style={s.mastheadTop}>
               <Text style={s.wordmark}>XPROHUB</Text>
               <View style={[s.chip, isZero && s.chipDim]}>
-                <View style={[s.chipDot, isZero && s.chipDotDim]} />
+                <View style={[s.chipDotHalo, isZero && s.chipDotHaloDim]}>
+                  <View style={[s.chipDot, isZero && s.chipDotDim]} />
+                </View>
                 {isZero ? (
                   <Text style={s.chipZeroLabel}>NO OPEN JOBS YET</Text>
                 ) : (
@@ -342,7 +344,17 @@ export default function HomeScreen() {
             ) : (
               <Text style={s.greeting}>Good {greeting.toLowerCase()}.</Text>
             )}
-            <Text style={s.dateLine}>{dateLabel}</Text>
+            <View style={s.dateRow}>
+              <View style={s.dateTick} />
+              <Text style={s.dateLine}>{'\u00B7'} {dateLabel}</Text>
+            </View>
+
+            {/* Ornamental break */}
+            <View style={s.ornamentBreak}>
+              <View style={s.ornamentLine} />
+              <View style={s.ornamentDiamond} />
+              <View style={s.ornamentLine} />
+            </View>
           </View>
         );
       }
@@ -394,9 +406,13 @@ export default function HomeScreen() {
       // ── End cap ──
       case 'endcap':
         return (
-          <Text style={s.endCap}>
-            {item.count} CATEGORIES {'\u00B7'} END OF LIST
-          </Text>
+          <View style={s.endCapRow}>
+            <View style={s.endCapLine} />
+            <Text style={s.endCap}>
+              {item.count} CATEGORIES {'\u00B7'} END OF LIST
+            </Text>
+            <View style={s.endCapLine} />
+          </View>
         );
 
       // ── Empty state (loading / error) ──
@@ -460,21 +476,32 @@ const s = StyleSheet.create({
   // Live-count chip
   chip: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(201, 168, 76, 0.25)',
+    backgroundColor: 'rgba(201, 168, 76, 0.06)',
     borderRadius: 999,
     paddingVertical: 4,
     paddingHorizontal: 9,
     gap: 6,
   },
   chipDim: {},
+  chipDotHalo: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(74, 175, 122, 0.20)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chipDotHaloDim: {
+    backgroundColor: 'transparent',
+  },
   chipDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: Colors.green,
-    top: -1, // baseline alignment nudge
   },
   chipDotDim: {
     backgroundColor: Colors.textTertiary,
@@ -488,13 +515,13 @@ const s = StyleSheet.create({
   chipLabel: {
     fontFamily: Fonts.mono,
     fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
   chipZeroLabel: {
     fontFamily: Fonts.mono,
     fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
 
@@ -512,12 +539,44 @@ const s = StyleSheet.create({
   },
 
   // Date line
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 9,
+    gap: 6,
+  },
+  dateTick: {
+    width: 4,
+    height: 4,
+    backgroundColor: Colors.gold,
+  },
   dateLine: {
     fontFamily: Fonts.mono,
     fontSize: 10.5,
     letterSpacing: 1,
     color: Colors.textSecondary,
-    marginTop: 9,
+  },
+
+  // Ornamental break
+  ornamentBreak: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingHorizontal: 4,
+    gap: 10,
+  },
+  ornamentLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.gold,
+    opacity: 0.3,
+  },
+  ornamentDiamond: {
+    width: 6,
+    height: 6,
+    backgroundColor: Colors.gold,
+    opacity: 0.3,
+    transform: [{ rotate: '45deg' }],
   },
 
   // Launchpad card
@@ -530,7 +589,7 @@ const s = StyleSheet.create({
   },
   cardLabel: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 4,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -542,44 +601,52 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 13,
     gap: 13,
-    minHeight: 44,
+    minHeight: 50,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 13,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     gap: 13,
-    minHeight: 44,
+    minHeight: 50,
+  },
+  glyphFrame: {
+    width: 30,
+    height: 30,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 168, 76, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   rowLeadGold: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
+    fontSize: 21,
     color: Colors.gold,
-    width: 18,
-    textAlign: 'center',
+  },
+  rowLeadSquare: {
+    width: 12,
+    height: 12,
+    backgroundColor: Colors.textSecondary,
   },
   rowLeadAmber: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 18,
     color: Colors.amber,
-    width: 18,
-    textAlign: 'center',
   },
   rowLeadGreen: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 18,
     color: Colors.green,
-    width: 18,
-    textAlign: 'center',
   },
   rowLabel: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
     flex: 1,
   },
@@ -590,7 +657,7 @@ const s = StyleSheet.create({
   },
   chevron: {
     fontFamily: Fonts.body,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textTertiary,
   },
 
@@ -604,7 +671,7 @@ const s = StyleSheet.create({
   statusDraft: { backgroundColor: Colors.amber },
   statusText: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
   },
   statusLiveText: { color: Colors.green },
@@ -613,13 +680,13 @@ const s = StyleSheet.create({
   // Live counts
   countAmber: {
     fontFamily: Fonts.monoMed,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
     color: Colors.amber,
   },
   countGreen: {
     fontFamily: Fonts.monoMed,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
     color: Colors.green,
   },
@@ -673,6 +740,7 @@ const s = StyleSheet.create({
   },
   catRightBlock: {
     alignItems: 'flex-end',
+    minWidth: 80,
     gap: 4,
   },
   catPrice: {
@@ -683,29 +751,41 @@ const s = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   proBadge: {
-    backgroundColor: Colors.gold,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.gold,
     borderRadius: 0,
     paddingHorizontal: 6,
     paddingTop: 2,
     paddingBottom: 1,
   },
   proText: {
-    color: '#1A0F00',
+    color: Colors.gold,
     fontFamily: Fonts.displayB,
     fontSize: 8.5,
     letterSpacing: 1.5,
   },
 
   // End cap
+  endCapRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingHorizontal: 22,
+    height: 40,
+    gap: 12,
+  },
+  endCapLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.gold,
+    opacity: 0.2,
+  },
   endCap: {
     fontFamily: Fonts.mono,
     fontSize: 9,
     letterSpacing: 2,
-    color: Colors.textTertiary,
-    textAlign: 'center',
-    height: 40,
-    lineHeight: 40,
-    marginTop: 8,
+    color: Colors.textSecondary,
   },
 
   // Error
