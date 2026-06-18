@@ -665,7 +665,7 @@ const s = StyleSheet.create({
     letterSpacing: 0.4,
   },
   catDiff: {
-    color: Colors.textSecondary,
+    color: Colors.textTertiary,
     fontFamily: Fonts.mono,
     fontSize: 9.5,
     letterSpacing: 0.8,
@@ -673,6 +673,7 @@ const s = StyleSheet.create({
   },
   catRightBlock: {
     alignItems: 'flex-end',
+    minWidth: 80,
     gap: 4,
   },
   catPrice: {
@@ -683,14 +684,16 @@ const s = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   proBadge: {
-    backgroundColor: Colors.gold,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.gold,
     borderRadius: 0,
     paddingHorizontal: 6,
     paddingTop: 2,
     paddingBottom: 1,
   },
   proText: {
-    color: '#1A0F00',
+    color: Colors.gold,
     fontFamily: Fonts.displayB,
     fontSize: 8.5,
     letterSpacing: 1.5,
