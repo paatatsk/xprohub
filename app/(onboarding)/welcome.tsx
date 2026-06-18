@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import Svg, { Circle, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, Spacing, Radius } from '../../constants/theme';
 
 // ─── Colours (all from design system) ─────────────────────────
@@ -96,12 +96,13 @@ function LockIcon() {
   );
 }
 
-function StarIcon() {
+function ThumbsUpIcon() {
   return (
     <Svg width={24} height={24} viewBox="0 0 20 20">
-      <Polygon
-        points="10,2 12.4,7.2 18,7.6 14,11.4 15.4,17 10,14 4.6,17 6,11.4 2,7.6 7.6,7.2"
-        stroke={GOLD} strokeWidth={1.6} fill="none" strokeLinejoin="round"
+      <Path
+        d="M7 17V9m0 0l2.5-5a1.5 1.5 0 0 1 2.8.7L11.5 9H16a2 2 0 0 1 1.9 2.6l-1.5 5A2 2 0 0 1 14.5 18H9a2 2 0 0 1-2-2zm0-6H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"
+        stroke={GOLD} strokeWidth={1.6} fill="none"
+        strokeLinejoin="round" strokeLinecap="round"
       />
     </Svg>
   );
@@ -323,8 +324,8 @@ export default function WelcomeScreen() {
             </View>
             <View style={styles.trustDivider} />
             <View style={styles.trustItem}>
-              <StarIcon />
-              <Text style={[styles.trustLabel, { fontFamily: oswald700 }]}>RATED</Text>
+              <ThumbsUpIcon />
+              <Text style={[styles.trustLabel, { fontFamily: oswald700 }]}>ENDORSED</Text>
             </View>
             <View style={styles.trustDivider} />
             <View style={styles.trustItem}>

@@ -49,7 +49,7 @@ export default function VerifyLevel2Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -89,7 +89,7 @@ export default function VerifyLevel2Screen() {
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: Colors.background },
   scroll:        { flex: 1 },
-  scrollContent: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: Spacing.md },
 
   heading: {
     color: Colors.gold,
