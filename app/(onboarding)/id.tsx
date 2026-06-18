@@ -422,22 +422,22 @@ export default function IdScreen() {
             </View>
           )}
 
-          <View style={styles.bottomBar}>
-            <Text style={styles.counterText}>
-              {n === 0
-                ? 'Select at least one category'
-                : `${n} categor${n === 1 ? 'y' : 'ies'} selected`}
-            </Text>
-            <TouchableOpacity
-              style={[styles.continueBtn, n === 0 && styles.continueBtnDisabled]}
-              onPress={goToStep3}
-              disabled={n === 0}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.continueBtnText}>Continue →</Text>
-            </TouchableOpacity>
-          </View>
         </ScrollView>
+        <View style={styles.stickyFooter}>
+          <Text style={styles.counterText}>
+            {n === 0
+              ? 'Select at least one category'
+              : `${n} categor${n === 1 ? 'y' : 'ies'} selected`}
+          </Text>
+          <TouchableOpacity
+            style={[styles.continueBtn, n === 0 && styles.continueBtnDisabled]}
+            onPress={goToStep3}
+            disabled={n === 0}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.continueBtnText}>Continue →</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }
@@ -498,31 +498,31 @@ export default function IdScreen() {
             })
           )}
 
-          <View style={styles.bottomBar}>
-            <Text style={styles.counterText}>
-              {n === 0
-                ? 'Select at least one skill'
-                : `${n} skill${n === 1 ? '' : 's'} selected`}
-            </Text>
-            <View style={styles.bottomRow}>
-              <TouchableOpacity
-                style={styles.backBtn}
-                onPress={goBackToStep2}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.backBtnText}>← Back</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.continueBtn, styles.continueBtnFlex, n === 0 && styles.continueBtnDisabled]}
-                onPress={goToStep4}
-                disabled={n === 0}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.continueBtnText}>Continue →</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </ScrollView>
+        <View style={styles.stickyFooter}>
+          <Text style={styles.counterText}>
+            {n === 0
+              ? 'Select at least one skill'
+              : `${n} skill${n === 1 ? '' : 's'} selected`}
+          </Text>
+          <View style={styles.bottomRow}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={goBackToStep2}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.backBtnText}>← Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.continueBtn, styles.continueBtnFlex, n === 0 && styles.continueBtnDisabled]}
+              onPress={goToStep4}
+              disabled={n === 0}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.continueBtnText}>Continue →</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -573,30 +573,30 @@ export default function IdScreen() {
           })}
         </View>
 
-        <View style={styles.bottomBar}>
-          <Text style={styles.counterText}>{nFeatured}/3 featured</Text>
-          <View style={styles.bottomRow}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={goBackToStep3}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.backBtnText}>← Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.continueBtn, styles.continueBtnFlex, submitting && styles.continueBtnDisabled]}
-              onPress={handleFinish}
-              disabled={submitting}
-              activeOpacity={0.85}
-            >
-              {submitting
-                ? <ActivityIndicator color={Colors.background} />
-                : <Text style={styles.continueBtnText}>FINISH</Text>}
-            </TouchableOpacity>
-          </View>
-          {submitError && <Text style={styles.errorText}>{submitError}</Text>}
-        </View>
       </ScrollView>
+      <View style={styles.stickyFooter}>
+        <Text style={styles.counterText}>{nFeatured}/3 featured</Text>
+        <View style={styles.bottomRow}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={goBackToStep3}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backBtnText}>← Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.continueBtn, styles.continueBtnFlex, submitting && styles.continueBtnDisabled]}
+            onPress={handleFinish}
+            disabled={submitting}
+            activeOpacity={0.85}
+          >
+            {submitting
+              ? <ActivityIndicator color={Colors.background} />
+              : <Text style={styles.continueBtnText}>FINISH</Text>}
+          </TouchableOpacity>
+        </View>
+        {submitError && <Text style={styles.errorText}>{submitError}</Text>}
+      </View>
     </SafeAreaView>
   );
 }
@@ -606,7 +606,7 @@ export default function IdScreen() {
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: Colors.background },
   scroll:        { flex: 1 },
-  scrollContent: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scrollContent: { padding: Spacing.md, paddingBottom: 100 },
 
   // Header
   eyebrow: {
@@ -773,9 +773,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  // Bottom bar
-  bottomBar: {
-    marginTop: Spacing.xl,
+  // Sticky footer (pinned below ScrollView)
+  stickyFooter: {
+    backgroundColor: Colors.background,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
     gap: Spacing.sm,
   },
   counterText: {
