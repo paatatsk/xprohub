@@ -533,6 +533,8 @@ Each remaining screen refined to lighthouse standard before submission. Order TB
 ### 🔲 Deferred to v1.1
 See `POLISH_PASS.md` for the full idea queue. Includes: mode-aware Home redesign, worker view of Receipt, PDF receipt export, notifications system, photo viewer modal, Gold Forge icon system, i18n infrastructure, theming variants, worker-view verb phrasing variants (current locked phrases work for customer view but read awkwardly on worker view — needs Claude Design copy contract review).
 
+- **Live "market pulse" card (Home)** — a richer, animated activity element: live job count, recent activity, distilled market info updating in real time, to add liveness and interest. DELIBERATELY DEFERRED until the marketplace has real liquidity — an animated "live activity" card on a near-empty launch market shows "this place is dead" exactly when we need it to look viable, and would misrepresent reality (counter to the v1 trust model). Trigger: build when daily job volume is consistently high enough that the card tells a flattering, truthful story. Until then, Home keeps only a calm, honest status indicator (the "JOBS OPEN NOW" pill) that reads well at any scale. The full card graduates from that pill when volume justifies it.
+
 ## Session Start Checklist
 - [ ] `npx expo start --clear`
 - [ ] Open EAS dev client on iPhone → scan QR
