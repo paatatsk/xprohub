@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0E0E0F"
     },
     "ios": {
       "supportsTablet": true,
@@ -61,7 +61,7 @@
       "package": "com.paatatsk.xprohub",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0E0E0F"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
