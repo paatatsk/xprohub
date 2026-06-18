@@ -43,6 +43,22 @@ Every design and engineering choice gets judged against one question: **Is this 
 
 Approved into operating norms 2026-05-24.
 
+## Trust & Safety Model (v1)
+
+XProHub v1 is built on trust, good faith, and direct vetting between users — not on platform-provided guarantees. The app does NOT provide identity verification, background checks, insurance, or safety guarantees, and is honest about this everywhere it matters. Customers vet workers and workers vet customers themselves.
+
+**Core rules:**
+
+1. **No fake safeguards.** No feature, screen, or copy may imply a verification, guarantee, or safety measure that does not actually exist in code. Honesty about limits is more trustworthy than fake assurances. (This is why the old verify-level-2 tiles — which advertised ID/phone/banking verification that never ran — were removed.)
+2. **Honest venue + user empowerment.** The platform's safety role in v1 is to be an honest venue AND to equip users to protect themselves — through clear framing, contextual safety guidance, and plainspoken education on how to vet agreements and people — never through claimed protections it cannot deliver.
+3. **No artificial limits.** No dollar caps on posting, no tier-gated task restrictions. The goal is simple, intuitive, frictionless tools — make posting and hiring easy, not gated.
+4. **Real safeguards are a genuine future roadmap.** Identity verification, insurance, background checks, and escrow guarantees beyond the current Stripe flow will be built WHEN the means exist — and described with honest language at that time, not promised before they work.
+5. **Reserved safety columns stay documented as unenforced.** `requires_verification` and `requires_background_check` exist in the schema but are read by no gate logic. They remain until real enforcement ships.
+
+A lightweight safety/education layer (contextual nudges at first hire / first job acceptance / first in-person meeting, a short skippable "how to vet someone" guide, ties into existing reporting/blocking) is a planned future refinement — not yet built — to be designed deliberately in XProHub's voice when its turn comes.
+
+Approved into operating norms 2026-06-18.
+
 ## Orchestra
 
 Four players, one product. Paata mediates all communication.
