@@ -105,7 +105,7 @@ function LaunchpadCard({
         accessibilityLabel="Edit my card"
         accessibilityRole="button"
       >
-        <View style={s.glyphFrame}><Text style={s.rowLeadGold}>{'\u25B8'}</Text></View>
+        <View style={s.glyphFrame}><View style={s.rowLeadSquare} /></View>
         <Text style={s.rowLabel}>Edit my card</Text>
         <View style={s.rowRight}>
           <View style={[s.statusDot, isLive ? s.statusLive : s.statusDraft]} />
@@ -616,26 +616,32 @@ const s = StyleSheet.create({
     minHeight: 50,
   },
   glyphFrame: {
-    width: 28,
-    height: 28,
+    width: 30,
+    height: 30,
     borderWidth: 1,
     borderColor: 'rgba(201, 168, 76, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   rowLeadGold: {
     fontFamily: Fonts.heading,
-    fontSize: 17,
+    fontSize: 21,
     color: Colors.gold,
+  },
+  rowLeadSquare: {
+    width: 12,
+    height: 12,
+    backgroundColor: Colors.textSecondary,
   },
   rowLeadAmber: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.amber,
   },
   rowLeadGreen: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.green,
   },
   rowLabel: {
