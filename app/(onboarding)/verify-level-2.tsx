@@ -8,38 +8,40 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
-// Level 2 Gate — shown when an Explorer taps Post a Job or Hire Directly.
-// Real SMS + Stripe verification is deferred. "Skip For Now" sets trust_level
-// and forwards the user to their original destination.
+// Activation gate — shown when an Explorer taps Post a Job or Hire Directly.
+// Sets trust_level to 'starter' (unlocking posting + hiring) and redirects
+// the user to their original destination. Tiered verification (Starter vs Pro
+// with real SMS/ID/banking checks) is a future roadmap item; in v1 both tiers
+// are functionally identical, so this screen presents a single confirmation step.
 
 export default function VerifyLevel2Screen() {
   const router = useRouter();
   const { destination } = useLocalSearchParams<{ destination?: string }>();
 
-  const [skipping, setSkipping] = useState<'starter' | 'pro' | null>(null);
-  const [error, setError]       = useState<string | null>(null);
+  const [activating, setActivating] = useState(false);
+  const [error, setError]           = useState<string | null>(null);
 
   const dest = destination ? decodeURIComponent(destination) : '/(tabs)';
 
-  const handleSkip = async (level: 'starter' | 'pro') => {
-    setSkipping(level);
+  const handleActivate = async () => {
+    setActivating(true);
     setError(null);
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       setError('Session expired. Please sign in again.');
-      setSkipping(null);
+      setActivating(false);
       return;
     }
 
     const { error: updateErr } = await supabase
       .from('profiles')
-      .update({ trust_level: level })
+      .update({ trust_level: 'starter' })
       .eq('id', user.id);
 
     if (updateErr) {
       setError('Could not update your profile. Please try again.');
-      setSkipping(null);
+      setActivating(false);
       return;
     }
 
@@ -47,7 +49,7 @@ export default function VerifyLevel2Screen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -55,65 +57,29 @@ export default function VerifyLevel2Screen() {
       >
 
         {/* ── Header ── */}
-        <Text style={styles.heading}>VERIFY TO CONTINUE</Text>
+        <Text style={styles.heading}>ACTIVATE YOUR ACCOUNT</Text>
         <Text style={styles.subhead}>
-          Pick a path to post jobs, hire workers, or apply for work
+          One step to start posting jobs and hiring help on XProHub.
         </Text>
 
-        {/* ── Tile 1: Starter ── */}
-        <View style={styles.tile}>
-          <Text style={styles.tileEyebrow}>QUICK PATH</Text>
-          <Text style={styles.tileTitle}>STARTER</Text>
-          <Text style={styles.tileSub}>Jobs under $50 — fast onboarding</Text>
-
-          <View style={styles.bullets}>
-            <Text style={styles.bullet}>· Phone number verified</Text>
-            <Text style={styles.bullet}>· Basic payment setup via Stripe</Text>
-          </View>
-
+        {/* ── Activation card ── */}
+        <View style={styles.card}>
           <TouchableOpacity
-            style={[styles.skipBtn, skipping === 'pro' && styles.btnDisabled]}
-            onPress={() => handleSkip('starter')}
-            disabled={skipping !== null}
+            style={[styles.primaryBtn, activating && styles.btnDisabled]}
+            onPress={handleActivate}
+            disabled={activating}
             activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Continue to activate your account"
           >
-            {skipping === 'starter'
+            {activating
               ? <ActivityIndicator color={Colors.background} />
-              : <Text style={styles.skipBtnText}>SKIP FOR NOW</Text>}
-          </TouchableOpacity>
-        </View>
-
-        {/* ── Tile 2: Pro ── */}
-        <View style={styles.tile}>
-          <Text style={styles.tileEyebrow}>FULL ACCESS</Text>
-          <Text style={styles.tileTitle}>PRO</Text>
-          <Text style={styles.tileSub}>All jobs, any size — full verification</Text>
-
-          <View style={styles.bullets}>
-            <Text style={styles.bullet}>· Phone + address verified</Text>
-            <Text style={styles.bullet}>· Government ID uploaded</Text>
-            <Text style={styles.bullet}>· Stripe Connect banking setup</Text>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.skipBtnOutline, skipping === 'starter' && styles.btnDisabled]}
-            onPress={() => handleSkip('pro')}
-            disabled={skipping !== null}
-            activeOpacity={0.85}
-          >
-            {skipping === 'pro'
-              ? <ActivityIndicator color={Colors.gold} />
-              : <Text style={styles.skipBtnOutlineText}>SKIP FOR NOW</Text>}
+              : <Text style={styles.primaryBtnText}>CONTINUE</Text>}
           </TouchableOpacity>
         </View>
 
         {/* ── Error ── */}
         {error && <Text style={styles.errorText}>{error}</Text>}
-
-        {/* ── Deferral notice ── */}
-        <Text style={styles.deferralNote}>
-          Real verification coming soon. Skip for now lets you test all features.
-        </Text>
 
       </ScrollView>
     </SafeAreaView>
@@ -123,7 +89,7 @@ export default function VerifyLevel2Screen() {
 const styles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: Colors.background },
   scroll:        { flex: 1 },
-  scrollContent: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scrollContent: { flexGrow: 1, justifyContent: 'center', padding: Spacing.md },
 
   heading: {
     color: Colors.gold,
@@ -140,64 +106,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
 
-  // Tiles
-  tile: {
+  card: {
     backgroundColor: Colors.card,
     borderWidth: 1,
-    borderColor: Colors.gold,
+    borderColor: Colors.border,
     borderRadius: Radius.md,
     padding: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  tileEyebrow: {
-    color: Colors.gold,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 3,
-    marginBottom: 4,
-  },
-  tileTitle: {
-    color: Colors.textPrimary,
-    fontSize: 22,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  tileSub: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    marginBottom: Spacing.md,
   },
 
-  // Bullets
-  bullets: { gap: 6, marginBottom: Spacing.md },
-  bullet:  { fontFamily: Fonts.body, color: Colors.textPrimary, fontSize: 14, lineHeight: 20 },
-
-  // Starter skip button (solid gold)
-  skipBtn: {
+  primaryBtn: {
     backgroundColor: Colors.gold,
     borderRadius: Radius.md,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  skipBtnText: {
+  primaryBtnText: {
     color: Colors.background,
-    fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 2,
-  },
-
-  // Pro skip button (gold outline)
-  skipBtnOutline: {
-    borderWidth: 1,
-    borderColor: Colors.gold,
-    borderRadius: Radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  skipBtnOutlineText: {
-    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 2,
@@ -210,15 +134,6 @@ const styles = StyleSheet.create({
     color: Colors.red,
     fontSize: 13,
     textAlign: 'center',
-    marginBottom: Spacing.md,
-  },
-  deferralNote: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 11,
-    textAlign: 'center',
-    lineHeight: 17,
-    marginTop: Spacing.sm,
-    opacity: 0.7,
+    marginTop: Spacing.md,
   },
 });
