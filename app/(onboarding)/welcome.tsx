@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
   ctaButton: {
     width: '100%',
     backgroundColor: GOLD,
-    borderRadius: Radius.sm,
+    borderRadius: Radius.md,
     paddingVertical: 14,
     alignItems: 'center',
   },

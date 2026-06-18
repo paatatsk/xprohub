@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   hireBtn: {
     backgroundColor: Colors.gold,
     paddingVertical: 16,
-    borderRadius: Radius.sm,
+    borderRadius: Radius.md,
     alignItems: 'center',
   },
   hireBtnText: { fontFamily: Fonts.display, fontSize: 15, color: '#1A0F00', letterSpacing: 2 },

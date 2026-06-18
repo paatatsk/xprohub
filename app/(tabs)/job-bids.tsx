@@ -881,7 +881,7 @@ const styles = StyleSheet.create({
   acceptBtn: {
     flex: 1,
     backgroundColor: Colors.gold,
-    borderRadius: Radius.full,
+    borderRadius: Radius.md,
     paddingVertical: 11,
     alignItems: 'center',
   },
