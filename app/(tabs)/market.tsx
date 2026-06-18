@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
   // Anchored post bar
   postBar: {
     backgroundColor: Colors.gold,
-    borderRadius: Radius.full,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     marginHorizontal: Spacing.md,
     marginTop: Spacing.sm,
