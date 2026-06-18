@@ -344,7 +344,17 @@ export default function HomeScreen() {
             ) : (
               <Text style={s.greeting}>Good {greeting.toLowerCase()}.</Text>
             )}
-            <Text style={s.dateLine}>{dateLabel}</Text>
+            <View style={s.dateRow}>
+              <View style={s.dateTick} />
+              <Text style={s.dateLine}>{'\u00B7'} {dateLabel}</Text>
+            </View>
+
+            {/* Ornamental break */}
+            <View style={s.ornamentBreak}>
+              <View style={s.ornamentLine} />
+              <View style={s.ornamentDiamond} />
+              <View style={s.ornamentLine} />
+            </View>
           </View>
         );
       }
@@ -396,9 +406,13 @@ export default function HomeScreen() {
       // ── End cap ──
       case 'endcap':
         return (
-          <Text style={s.endCap}>
-            {item.count} CATEGORIES {'\u00B7'} END OF LIST
-          </Text>
+          <View style={s.endCapRow}>
+            <View style={s.endCapLine} />
+            <Text style={s.endCap}>
+              {item.count} CATEGORIES {'\u00B7'} END OF LIST
+            </Text>
+            <View style={s.endCapLine} />
+          </View>
         );
 
       // ── Empty state (loading / error) ──
@@ -525,12 +539,44 @@ const s = StyleSheet.create({
   },
 
   // Date line
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 9,
+    gap: 6,
+  },
+  dateTick: {
+    width: 4,
+    height: 4,
+    backgroundColor: Colors.gold,
+  },
   dateLine: {
     fontFamily: Fonts.mono,
     fontSize: 10.5,
     letterSpacing: 1,
     color: Colors.textSecondary,
-    marginTop: 9,
+  },
+
+  // Ornamental break
+  ornamentBreak: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingHorizontal: 4,
+    gap: 10,
+  },
+  ornamentLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.gold,
+    opacity: 0.3,
+  },
+  ornamentDiamond: {
+    width: 6,
+    height: 6,
+    backgroundColor: Colors.gold,
+    opacity: 0.3,
+    transform: [{ rotate: '45deg' }],
   },
 
   // Launchpad card
@@ -715,15 +761,25 @@ const s = StyleSheet.create({
   },
 
   // End cap
+  endCapRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingHorizontal: 22,
+    height: 40,
+    gap: 12,
+  },
+  endCapLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.gold,
+    opacity: 0.2,
+  },
   endCap: {
     fontFamily: Fonts.mono,
     fontSize: 9,
     letterSpacing: 2,
     color: Colors.textSecondary,
-    textAlign: 'center',
-    height: 40,
-    lineHeight: 40,
-    marginTop: 8,
   },
 
   // Error
