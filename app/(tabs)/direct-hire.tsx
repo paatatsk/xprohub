@@ -626,9 +626,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: Colors.gold },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: 'rgba(201, 168, 76, 0.08)' },
   timingText:       { color: Colors.textSecondary, fontSize: 12, fontWeight: 'bold' },
-  timingTextActive: { color: Colors.background },
+  timingTextActive: { color: Colors.gold },
 
   // Urgent toggle
   urgentRow: {
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: Colors.gold, borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: 'rgba(201, 168, 76, 0.15)', borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,
@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textSecondary,
     alignSelf: 'flex-start',
   },
-  toggleThumbOn: { backgroundColor: Colors.background, alignSelf: 'flex-end' },
+  toggleThumbOn: { backgroundColor: Colors.gold, alignSelf: 'flex-end' },
 
   // Submit
   submitBtn: {
