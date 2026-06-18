@@ -93,7 +93,7 @@ function LaunchpadCard({
         accessibilityLabel="Post a job"
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGold}>+</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadGold}>+</Text></View>
         <Text style={s.rowLabel}>Post a job</Text>
       </TouchableOpacity>
 
@@ -105,7 +105,7 @@ function LaunchpadCard({
         accessibilityLabel="Edit my card"
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGold}>{'\u25B8'}</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadGold}>{'\u25B8'}</Text></View>
         <Text style={s.rowLabel}>Edit my card</Text>
         <View style={s.rowRight}>
           <View style={[s.statusDot, isLive ? s.statusLive : s.statusDraft]} />
@@ -124,7 +124,7 @@ function LaunchpadCard({
         accessibilityLabel={`My posts, ${pendingBids} bids`}
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadAmber}>{'\u25C6'}</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadAmber}>{'\u25C6'}</Text></View>
         <Text style={s.rowLabel}>My posts</Text>
         <View style={s.rowRight}>
           {pendingBids > 0 && (
@@ -142,7 +142,7 @@ function LaunchpadCard({
         accessibilityLabel={`My applications, ${openApplications} open`}
         accessibilityRole="button"
       >
-        <Text style={s.rowLeadGreen}>{'\u25CF'}</Text>
+        <View style={s.glyphFrame}><Text style={s.rowLeadGreen}>{'\u25CF'}</Text></View>
         <Text style={s.rowLabel}>My applications</Text>
         <View style={s.rowRight}>
           {openApplications > 0 && (
@@ -543,7 +543,7 @@ const s = StyleSheet.create({
   },
   cardLabel: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 4,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -555,44 +555,46 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 13,
     gap: 13,
-    minHeight: 44,
+    minHeight: 50,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 11,
+    paddingVertical: 13,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     gap: 13,
-    minHeight: 44,
+    minHeight: 50,
+  },
+  glyphFrame: {
+    width: 28,
+    height: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 168, 76, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rowLeadGold: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
+    fontSize: 17,
     color: Colors.gold,
-    width: 18,
-    textAlign: 'center',
   },
   rowLeadAmber: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 16,
     color: Colors.amber,
-    width: 18,
-    textAlign: 'center',
   },
   rowLeadGreen: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 16,
     color: Colors.green,
-    width: 18,
-    textAlign: 'center',
   },
   rowLabel: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
     flex: 1,
   },
@@ -603,7 +605,7 @@ const s = StyleSheet.create({
   },
   chevron: {
     fontFamily: Fonts.body,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textTertiary,
   },
 
@@ -617,7 +619,7 @@ const s = StyleSheet.create({
   statusDraft: { backgroundColor: Colors.amber },
   statusText: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
   },
   statusLiveText: { color: Colors.green },
@@ -626,13 +628,13 @@ const s = StyleSheet.create({
   // Live counts
   countAmber: {
     fontFamily: Fonts.monoMed,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
     color: Colors.amber,
   },
   countGreen: {
     fontFamily: Fonts.monoMed,
-    fontSize: 9,
+    fontSize: 10,
     letterSpacing: 1,
     color: Colors.green,
   },
@@ -678,7 +680,7 @@ const s = StyleSheet.create({
     letterSpacing: 0.4,
   },
   catDiff: {
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     fontFamily: Fonts.mono,
     fontSize: 9.5,
     letterSpacing: 0.8,
@@ -717,7 +719,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 9,
     letterSpacing: 2,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     height: 40,
     lineHeight: 40,
