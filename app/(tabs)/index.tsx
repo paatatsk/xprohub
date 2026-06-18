@@ -321,7 +321,9 @@ export default function HomeScreen() {
             <View style={s.mastheadTop}>
               <Text style={s.wordmark}>XPROHUB</Text>
               <View style={[s.chip, isZero && s.chipDim]}>
-                <View style={[s.chipDot, isZero && s.chipDotDim]} />
+                <View style={[s.chipDotHalo, isZero && s.chipDotHaloDim]}>
+                  <View style={[s.chipDot, isZero && s.chipDotDim]} />
+                </View>
                 {isZero ? (
                   <Text style={s.chipZeroLabel}>NO OPEN JOBS YET</Text>
                 ) : (
@@ -460,21 +462,32 @@ const s = StyleSheet.create({
   // Live-count chip
   chip: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(201, 168, 76, 0.25)',
+    backgroundColor: 'rgba(201, 168, 76, 0.06)',
     borderRadius: 999,
     paddingVertical: 4,
     paddingHorizontal: 9,
     gap: 6,
   },
   chipDim: {},
+  chipDotHalo: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgba(74, 175, 122, 0.20)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chipDotHaloDim: {
+    backgroundColor: 'transparent',
+  },
   chipDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: Colors.green,
-    top: -1, // baseline alignment nudge
   },
   chipDotDim: {
     backgroundColor: Colors.textTertiary,
@@ -488,13 +501,13 @@ const s = StyleSheet.create({
   chipLabel: {
     fontFamily: Fonts.mono,
     fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
   chipZeroLabel: {
     fontFamily: Fonts.mono,
     fontSize: 10,
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
 
