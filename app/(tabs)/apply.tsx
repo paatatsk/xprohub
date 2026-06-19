@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, TextInput, ActivityIndicator,
+  Keyboard, Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -62,6 +63,9 @@ export default function ApplyScreen() {
   const [messageMode, setMessageMode]     = useState<MessageMode | null>(null);
   const [customText, setCustomText]       = useState('');
   const [proposedPrice, setProposedPrice] = useState('');
+
+  // Price input focus (shows dismiss checkmark)
+  const [priceFocused, setPriceFocused] = useState(false);
 
   // Submit state
   const [submitting, setSubmitting]   = useState(false);
@@ -347,7 +351,9 @@ export default function ApplyScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
+       <Pressable onPress={Keyboard.dismiss}>
 
         {/* ── 1. Job context strip ── */}
         <View style={styles.jobContextCard}>
@@ -369,7 +375,45 @@ export default function ApplyScreen() {
           </View>
         </View>
 
-        {/* ── 2. Your message ── */}
+        {/* ── 2. Proposed price (above message so keypad doesn't cover it) ── */}
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>
+            YOUR PRICE <Text style={styles.required}>*</Text>
+          </Text>
+          <Text style={styles.fieldHint}>{budgetHint}</Text>
+          <View style={styles.priceInputRow}>
+            <Text style={styles.priceDollar}>$</Text>
+            <TextInput
+              style={[styles.input, styles.priceInput]}
+              placeholder="0"
+              placeholderTextColor={Colors.textSecondary}
+              value={proposedPrice}
+              onChangeText={t => { setProposedPrice(t); setSubmitError(null); }}
+              keyboardType="numeric"
+              onFocus={() => setPriceFocused(true)}
+              onBlur={() => setPriceFocused(false)}
+            />
+            {priceFocused && (
+              <TouchableOpacity
+                style={styles.priceDoneBtn}
+                onPress={() => Keyboard.dismiss()}
+                activeOpacity={0.7}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessibilityLabel="Done entering price"
+                accessibilityRole="button"
+              >
+                <Text style={styles.priceDoneText}>✓</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {showBudgetWarning && (
+            <Text style={styles.budgetWarn}>
+              ⚠ Outside customer's budget range.
+            </Text>
+          )}
+        </View>
+
+        {/* ── 3. Your message ── */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>
             YOUR MESSAGE <Text style={styles.required}>*</Text>
@@ -434,30 +478,6 @@ export default function ApplyScreen() {
           )}
         </View>
 
-        {/* ── 3. Proposed price ── */}
-        <View style={styles.fieldGroup}>
-          <Text style={styles.label}>
-            YOUR PRICE <Text style={styles.required}>*</Text>
-          </Text>
-          <Text style={styles.fieldHint}>{budgetHint}</Text>
-          <View style={styles.priceInputRow}>
-            <Text style={styles.priceDollar}>$</Text>
-            <TextInput
-              style={[styles.input, styles.priceInput]}
-              placeholder="0"
-              placeholderTextColor={Colors.textSecondary}
-              value={proposedPrice}
-              onChangeText={t => { setProposedPrice(t); setSubmitError(null); }}
-              keyboardType="numeric"
-            />
-          </View>
-          {showBudgetWarning && (
-            <Text style={styles.budgetWarn}>
-              ⚠ Outside customer's budget range.
-            </Text>
-          )}
-        </View>
-
         {/* ── Submit error ── */}
         {submitError ? (
           <Text style={styles.submitError}>{submitError}</Text>
@@ -475,6 +495,7 @@ export default function ApplyScreen() {
             : <Text style={styles.submitText}>SUBMIT APPLICATION</Text>}
         </TouchableOpacity>
 
+       </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -651,6 +672,20 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   priceInput: { flex: 1 },
+  priceDoneBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: Colors.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceDoneText: {
+    color: Colors.gold,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   budgetWarn: {
     fontFamily: Fonts.body,
     color: Colors.amber,
