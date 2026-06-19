@@ -6,6 +6,22 @@
 >
 > Do not attempt these during feature building. They wait.
 
+## Pre-Launch Priority Checklist (triaged 2026-06-18)
+
+Reviewed the full backlog before NYC test launch. Most load-bearing items (security, App Store legal/account-deletion, customer ID gate) are already shipped. The following are the genuine pre-launch items, in priority order — to be tackled in a focused launch-prep run:
+
+1. **Proactive content moderation filters** (the real safety gap, ~80 lines total) — profanity/slur word-list filter on job titles/descriptions/reviews/chat; rate-limiting on posts and bids; minimum content length. Currently moderation is reactive-only (report-driven). For an in-person marketplace, this is the most important unshipped pre-launch item. See "Tier 1 proactive content moderation filters" entry below.
+2. **Task library audit (188 → ~80)** — narrow-and-deep for cold-start density in the Park Slope launch. A 1–2 hour conversation (Paata + chat-Claude) + bulk `UPDATE task_library SET is_active = false`. See "Task library audit" entry below.
+3. **Verify stub-screen cleanup is complete** — confirm the six former stub tab screens (match, chat, payment, belt, earnings, notifications) are hidden from the tab bar or given real states. Apple rejects for navigating to empty screens. Confirm resolved or fix. See App Store compliance audit entry.
+4. **hello@xprohub.com email routing** — the live legal pages (privacy/terms) and app reference this address; set up Cloudflare Email Routing → Gmail so it isn't a dead contact address. See "Cloudflare Email Routing" entry.
+5. **(minor) job-bids stale bid list after hire** — cosmetic: accepted bid still shows Accept/Decline if user navigates back. Fix = refetch on focus. Not blocking, but feels buggy. See entry below.
+
+Everything else in this file is correctly parked (application caps need real volume, notifications/mode-aware-Home/icon-language/theming/i18n are post-launch enhancements, etc.).
+
+Note: items 1, 2, and the parked safety/education layer form a cluster — "moderation floor + honest task density + light safety guidance" — which is arguably the most important pre-launch theme for an in-person marketplace, more than any visual polish.
+
+---
+
 ## UX Refinements
 
 - **Budget sliders on Post a Job** — replace typed MIN/MAX inputs
