@@ -917,3 +917,32 @@ real merit. None are next.
   `20260527000003_jobs_completed_trigger.sql`: AFTER UPDATE trigger on
   jobs.status transition to 'completed' + backfill from historical data.
   Discovered and resolved 2026-05-27 during PR 2.
+- **Bid flexibility beyond customer budget** — on the apply/bid screen,
+  allow a worker's proposed price to go somewhat below the min or above
+  the max of the customer's stated budget range (small play), but require
+  a justification (a short "why?" note) for larger deviations. Keeps bids
+  realistic while allowing a worker to undercut to win early jobs or bid
+  higher when the job is bigger than the customer realized. Touches bid
+  validation logic + a justification prompt. Future refinement.
+- **Operator mode (pro/power-user view)** — a future high-density
+  "terminal" view for high-volume workers: dense list rows instead of
+  cards, live job feed, fast scanning, command-line-style posting.
+  Explored in the "Five Worlds" design exploration (2026-06-18) as
+  direction 04. NOT for v1 — Dark Gold confirmed for launch. Bank as a
+  possible future "pro mode" for power users once there's volume to
+  justify it. (Note: relates to the deferred live-market-pulse card —
+  both are density/liquidity-gated.)
+- **Atelier mode (premium-tier aesthetic)** — a future gallery-quiet,
+  premium aesthetic (warm gallery-white, fine serif, vast whitespace,
+  single bronze accent) for a possible high-end service tier. Explored
+  in "Five Worlds" (2026-06-18) as direction 05. NOT for v1. Bank as a
+  possible premium-tier visual direction if/when services are segmented
+  by tier.
+- **Safety & education layer** — a lightweight, words-and-design safety
+  layer (no complex operations): contextual safety nudges at key moments
+  (first hire, first job acceptance, first in-person meeting), a short
+  skippable "how to vet someone" guide, tied into existing
+  reporting/blocking. Implements the v1 trust principle (see CLAUDE.md
+  Trust & Safety Model) of equipping users to protect themselves. To be
+  designed deliberately in XProHub's voice when its turn comes. Future
+  refinement.

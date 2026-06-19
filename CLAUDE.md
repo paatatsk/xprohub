@@ -143,6 +143,8 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 
 ## Design System — Dark Gold (Locked)
 
+An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Daylight Ledger / Union Hall / Neighborly / Operator / Atelier). Dark Gold was confirmed as the v1 direction. Operator (pro-mode) and Atelier (premium-tier) are banked as possible future directions in `POLISH_PASS.md`. The exploration informed but did not change the locked visual invariants.
+
 ### Color Tokens
 | Token | Value | Use |
 |---|---|---|
