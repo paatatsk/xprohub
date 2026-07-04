@@ -184,6 +184,15 @@ export default function AccountScreen() {
             <Text style={styles.rowLabel}>Terms of Service</Text>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
+          <View style={styles.divider} />
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => router.push('/(tabs)/community-guidelines' as any)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.rowLabel}>Community Guidelines</Text>
+            <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* ── BLOCKED USERS ── */}

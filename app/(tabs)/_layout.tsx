@@ -118,6 +118,7 @@ export default function TabLayout() {
       <Tabs.Screen name="payment-setup" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'PAYMENT SETUP', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="stripe-connect"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'GET PAID',       headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="worker-profile"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'WORKER',         headerLeft: () => <BackButton /> }} />
+      <Tabs.Screen name="community-guidelines" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'GUIDELINES', headerLeft: () => <BackButton /> }} />
     </Tabs>
   );
 }
