@@ -17,6 +17,7 @@ import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { SUPPORT_EMAIL } from '../../lib/legal';
 import { supabase } from '../../lib/supabase';
 import { uploadJobPhoto, type PhotoType } from '../../lib/photos';
+import { friendlyError } from '../../lib/moderation';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -324,7 +325,7 @@ export default function JobChatScreen() {
       });
 
     if (insertErr) {
-      setSendError(insertErr.message);
+      setSendError(friendlyError(insertErr, 'Message failed to send. Please try again.'));
       setSending(false);
       return;
       // composerText preserved — user can retry

@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { uploadJobPhoto } from '../../lib/photos';
+import { friendlyError } from '../../lib/moderation';
 
 // Screen 7 — Post a Job
 // Step 4-FIX-2: Category-first task picker for HELP WANTED path.
@@ -369,7 +370,7 @@ export default function PostScreen() {
     });
 
     if (rpcErr || !jobId) {
-      setSubmitError('Something went wrong posting your job. Please try again.');
+      setSubmitError(friendlyError(rpcErr, 'Something went wrong posting your job. Please try again.'));
       setSubmitting(false);
       return;
     }
@@ -487,7 +488,7 @@ export default function PostScreen() {
             placeholder="e.g. Deep clean 2BR apartment"
             placeholderTextColor={Colors.textSecondary}
             value={title}
-            onChangeText={t => { titleEdited.current = true; setTitle(t.slice(0, 80)); clearError('title'); }}
+            onChangeText={t => { titleEdited.current = t.length > 0; setTitle(t.slice(0, 80)); clearError('title'); }}
             maxLength={80}
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}

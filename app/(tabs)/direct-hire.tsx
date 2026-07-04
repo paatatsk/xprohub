@@ -8,6 +8,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
+import { friendlyError } from '../../lib/moderation';
 
 // Direct Hire v2 — launched from Workers Feed "Hire Directly" button
 // Params: worker_id (uuid), worker_name (display string)
@@ -187,7 +188,7 @@ export default function DirectHireScreen() {
     });
 
     if (rpcErr || !jobId) {
-      setSubmitError('Something went wrong creating this job. Please try again.');
+      setSubmitError(friendlyError(rpcErr, 'Something went wrong creating this job. Please try again.'));
       setSubmitting(false);
       return;
     }
