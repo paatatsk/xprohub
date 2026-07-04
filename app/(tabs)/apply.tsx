@@ -74,6 +74,12 @@ export default function ApplyScreen() {
   // ── Load ──────────────────────────────────────────────────────
 
   useEffect(() => {
+    // Reset form state when navigating to a different job
+    setProposedPrice('');
+    setMessageMode(null);
+    setCustomText('');
+    setSubmitError(null);
+
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
 

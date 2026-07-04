@@ -122,11 +122,10 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
     const workerProfile = job.worker as any;
     const customerProfile = job.customer as any;
 
-    if (!workerProfile || !customerProfile) {
-      setError('Could not load job parties.');
-      setLoading(false);
-      return;
-    }
+    // Profile may be null if the other party blocked the viewer —
+    // degrade to generic labels instead of blocking the receipt.
+    // Financial data (amounts, fees, dates) comes from payments/jobs,
+    // not profiles, so receipts remain financially complete.
 
     // Determine viewer role
     const viewerRole = user.id === job.customer_id ? 'customer' : 'worker';
@@ -173,8 +172,8 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
       : 0;
 
     // Names — read first_name from profiles, never split full_name
-    const workerFirst = workerProfile.first_name ?? (workerProfile.full_name ?? 'Worker').split(' ')[0];
-    const customerFirst = customerProfile.first_name ?? (customerProfile.full_name ?? 'Customer').split(' ')[0];
+    const workerFirst = workerProfile?.first_name ?? (workerProfile?.full_name ?? 'Worker').split(' ')[0];
+    const customerFirst = customerProfile?.first_name ?? (customerProfile?.full_name ?? 'Customer').split(' ')[0];
 
     // Payout state
     const payoutCompleted = payment?.escrow_status === 'released';
@@ -190,18 +189,19 @@ function useReceipt(jobId: string, _role?: 'customer' | 'worker') {
       jobId: job.id,
       viewerRole,
       worker: {
-        id: workerProfile.id,
-        fullName: workerProfile.full_name ?? 'Worker',
+        id: workerProfile?.id ?? '',
+        fullName: workerProfile?.full_name ?? 'Worker',
         firstName: workerFirst,
-        location: workerProfile.city ?? '',
+        location: workerProfile?.city ?? '',
       },
       customer: {
-        id: customerProfile.id,
-        fullName: customerProfile.full_name ?? 'Customer',
+        id: customerProfile?.id ?? '',
+        fullName: customerProfile?.full_name ?? 'Customer',
         firstName: customerFirst,
-        location: customerProfile.city ?? job.neighborhood ?? '',
+        location: customerProfile?.city ?? job.neighborhood ?? '',
       },
       actionDescription: desc,
+      category: job.category ?? 'your job',
       durationMinutes,
       completedAt: job.completed_at ?? new Date().toISOString(),
       photos: ((photosRes.data ?? []) as any[]).map(p => ({
@@ -562,10 +562,7 @@ export default function ReceiptScreen() {
           <Text style={s.workerAction}>
             {isCustomer
               ? `${data.actionDescription} in ${data.customer.location} \u2014`
-              : `You ${data.actionDescription} ${data.customer.firstName}'s ${data.customer.location} \u2014`}
-          </Text>
-          <Text style={s.workerAction}>
-            deep clean, both bathrooms, kitchen, hallway closet.
+              : `You completed ${data.category} for ${data.customer.firstName}${data.customer.location ? ` in ${data.customer.location}` : ''} \u2014`}
           </Text>
           <Text style={s.workerContext}>
             {fmtDuration(data.durationMinutes)} {'\u00B7'} {fmtDayDate(data.completedAt)}

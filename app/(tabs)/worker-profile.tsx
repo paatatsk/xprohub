@@ -171,8 +171,8 @@ export default function WorkerProfileScreen() {
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
           <Text style={styles.emptyGlyph}>⚠️</Text>
-          <Text style={styles.emptyHeading}>WORKER NOT FOUND</Text>
-          <Text style={styles.emptySub}>{error ?? 'This profile may have been removed.'}</Text>
+          <Text style={styles.emptyHeading}>PROFILE UNAVAILABLE</Text>
+          <Text style={styles.emptySub}>{error ?? 'This profile is not available.'}</Text>
           <TouchableOpacity
             style={styles.outlineBtn}
             onPress={() => router.back()}

@@ -55,6 +55,7 @@ export interface ReceiptData {
   actionDescription: string;  // "cleaned your 2-bedroom apartment"
                               //   — phrased from the customer's POV.
                               //   Worker view rewrites this client-side.
+  category: string;           // "Home Cleaning" — display-ready category name
   durationMinutes: number;    // 260
   completedAt: string;        // ISO 8601
 

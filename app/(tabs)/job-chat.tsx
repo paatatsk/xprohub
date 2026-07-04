@@ -569,6 +569,7 @@ export default function JobChatScreen() {
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <SafeAreaView style={styles.container} edges={['bottom']}>
 
@@ -827,6 +828,8 @@ export default function JobChatScreen() {
           data={[...timeline].reverse()}
           keyExtractor={(item) => item.kind === 'message' ? `msg_${item.data.id}` : `photo_${item.data.id}`}
           inverted
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => {
             if (item.kind === 'photo') {
               const p = item.data;
