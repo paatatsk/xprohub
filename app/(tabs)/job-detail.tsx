@@ -2,12 +2,13 @@ import { useState, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, ActivityIndicator, Image, ActionSheetIOS,
-  FlatList, Dimensions,
+  FlatList, Dimensions, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
+import { friendlyError } from '../../lib/moderation';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -26,6 +27,7 @@ interface JobDetail {
   is_urgent: boolean;
   created_at: string;
   customer_id: string | null;
+  status: string;
 }
 
 interface CustomerProfile {
@@ -72,6 +74,7 @@ export default function JobDetailScreen() {
   const [currentUserId, setCurrentUserId]   = useState<string | null>(null);
   const [photos, setPhotos]                 = useState<{ url: string }[]>([]);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [cancelling, setCancelling]         = useState(false);
 
   useFocusEffect(useCallback(() => {
     setLoading(true);
@@ -90,7 +93,7 @@ export default function JobDetailScreen() {
       // 1 — Load job row
       const { data: jobData, error: jobErr } = await supabase
         .from('jobs')
-        .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id')
+        .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id, status')
         .eq('id', job_id)
         .single();
 
@@ -147,6 +150,33 @@ export default function JobDetailScreen() {
       setLoading(false);
     })();
   }, [job_id]));
+
+  // ── Close post handler (owner, open jobs only) ────────────────
+  // Must live above early returns so hook count is constant.
+
+  const handleClosePost = useCallback(() => {
+    Alert.alert(
+      'Close this posting?',
+      "This removes it from the market and declines any pending applications. This can\u2019t be undone.",
+      [
+        { text: 'Keep it', style: 'cancel' },
+        {
+          text: 'Close posting',
+          style: 'destructive',
+          onPress: async () => {
+            setCancelling(true);
+            const { error: rpcErr } = await supabase.rpc('cancel_job', { p_job_id: job?.id ?? '' });
+            if (rpcErr) {
+              setCancelling(false);
+              Alert.alert('Could not close', friendlyError(rpcErr, 'Something went wrong. Please try again.'));
+              return;
+            }
+            router.back();
+          },
+        },
+      ],
+    );
+  }, [job, router]);
 
   // ── Loading ────────────────────────────────────────────────────
 
@@ -339,7 +369,27 @@ export default function JobDetailScreen() {
       {/* ── CTA footer ── */}
       <View style={styles.footer}>
         {isOwnJob ? (
-          <Text style={styles.ownJobText}>This is your job post</Text>
+          <View style={styles.ownerFooter}>
+            <Text style={styles.ownJobText}>
+              {job.status === 'cancelled' ? 'This posting has been closed.' : 'This is your job post'}
+            </Text>
+            {job.status === 'open' && (
+              <TouchableOpacity
+                style={styles.closePostBtn}
+                onPress={handleClosePost}
+                disabled={cancelling}
+                activeOpacity={0.7}
+                accessibilityLabel="Close this job posting"
+                accessibilityRole="button"
+              >
+                {cancelling ? (
+                  <ActivityIndicator size="small" color={Colors.red} />
+                ) : (
+                  <Text style={styles.closePostText}>CLOSE THIS POSTING</Text>
+                )}
+              </TouchableOpacity>
+            )}
+          </View>
         ) : hasExistingBid ? (
           <View style={[styles.applyBtn, styles.applyBtnSent]}>
             <Text style={styles.applyBtnSentText}>✓  APPLICATION SENT</Text>
@@ -601,7 +651,21 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
-    paddingVertical: 14,
     fontStyle: 'italic',
+  },
+  ownerFooter: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    gap: 10,
+  },
+  closePostBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+  },
+  closePostText: {
+    color: Colors.red,
+    fontFamily: Fonts.body,
+    fontSize: 12,
+    letterSpacing: 1,
   },
 });
