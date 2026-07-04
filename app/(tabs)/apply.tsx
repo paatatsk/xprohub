@@ -1,14 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, TextInput, ActivityIndicator,
-  Keyboard, Pressable,
+  Keyboard, Pressable, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useStripeStatus } from '../../hooks/useStripeStatus';
+import { friendlyError } from '../../lib/moderation';
 
 // Apply — worker submits a bid on a job
 // Params: job_id (uuid)
@@ -66,6 +67,10 @@ export default function ApplyScreen() {
 
   // Price input focus (shows dismiss checkmark)
   const [priceFocused, setPriceFocused] = useState(false);
+
+  // Refs for keyboard scroll + re-focus
+  const scrollRef      = useRef<ScrollView>(null);
+  const customInputRef = useRef<TextInput>(null);
 
   // Submit state
   const [submitting, setSubmitting]   = useState(false);
@@ -215,7 +220,7 @@ export default function ApplyScreen() {
       if ((bidErr as any).code === '23505') {
         setSubmitError("You've already applied to this job.");
       } else {
-        setSubmitError(bidErr.message ?? 'Failed to submit application. Please try again.');
+        setSubmitError(friendlyError(bidErr, 'Failed to submit application. Please try again.'));
       }
       return;
     }
@@ -353,7 +358,13 @@ export default function ApplyScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <KeyboardAvoidingView
+        style={styles.scroll}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -455,7 +466,13 @@ export default function ApplyScreen() {
               styles.writeOwnCard,
               messageMode === 'custom' && styles.templateCardActive,
             ]}
-            onPress={() => setMessageMode('custom')}
+            onPress={() => {
+              if (messageMode === 'custom') {
+                customInputRef.current?.focus();
+              } else {
+                setMessageMode('custom');
+              }
+            }}
             activeOpacity={0.8}
           >
             <Text style={[styles.writeOwnText, messageMode === 'custom' && styles.templateTextActive]}>
@@ -467,6 +484,7 @@ export default function ApplyScreen() {
           {messageMode === 'custom' && (
             <View style={styles.customInputWrap}>
               <TextInput
+                ref={customInputRef}
                 style={[styles.input, styles.inputMultiline]}
                 placeholder="Write your message to the customer..."
                 placeholderTextColor={Colors.textSecondary}
@@ -476,6 +494,9 @@ export default function ApplyScreen() {
                 numberOfLines={4}
                 maxLength={500}
                 autoFocus
+                onFocus={() => {
+                  setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
+                }}
               />
               <Text style={[styles.charCount, { textAlign: 'right' }]}>
                 {customText.length}/500
@@ -503,6 +524,7 @@ export default function ApplyScreen() {
 
        </Pressable>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
