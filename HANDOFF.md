@@ -1,8 +1,30 @@
 # XProHub — Session Handoff
 
-**Last updated:** 2026-06-11 (Desk refinement COMPLETE — Slices C1 + C2 shipped)
-**Most recent commit:** feat(desk): group Active section into TAKEN/POSTED/APPLIED clusters with per-group cap (slice C2)
-**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Desk refinement COMPLETE (C1 close-post + C2 grouping). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED.
+**Last updated:** 2026-07-04 (Block-aware RLS deployed + UI bug-fix batch)
+**Most recent commit:** fix(ui): block-aware RLS null-safety, receipt worker-line + stale-form fixes (`0f6c2f7`)
+**Status:** Nav restructure COMPLETE. Home restructure SHIPPED. Photo system COMPLETE (all 3 stages: listing, evidence, receipt). Detail screens Phase A VERIFIED-CLOSED. Detail screens Phase B COMPLETE (B1 profile + B2 portfolio + B3 credentials). Desk refinement COMPLETE (C1 close-post + C2 grouping). Pre-submission audit fixes shipped (atomic job RPC, webhook logging, string fallbacks). Compose thread CLOSED. Star review system REMOVED (Ruling 01 sealed). Child/Elder Care EXCLUDED (safety). Dead code cleaned. Dormant belt/XP schema documented. Self-view in Live Market SHIPPED (both Talent + Jobs feeds). Redundant Home gear icon + dead DEV receipt button REMOVED. Block-aware RLS DEPLOYED (profiles + messages). UI bug-fix batch SHIPPED (receipt, apply, job-chat).
+
+---
+
+### Block-aware RLS + UI bug-fix session (2026-06-29 → 2026-07-04)
+
+**Migration:** `20260629000001_block_aware_rls.sql` — ALREADY DEPLOYED to live Supabase.
+
+Two RESTRICTIVE SELECT policies (AND-combine with existing PERMISSIVE policies):
+- **`block_hide_profile`** on `profiles` — hides a profile from users the owner has blocked. Blocked user sees generic fallback labels ("Worker"/"Customer"/"User"/"Anonymous") on screens that join profiles. Financial data on receipts unaffected.
+- **`block_hide_messages`** on `messages` — hides a message when its sender blocked the viewer (narrow per-message check, not blanket chat hide).
+
+**Deliberately omitted:** A `jobs` RESTRICTIVE policy was designed and rejected. Reason: a customer can block a worker mid-job from the chat overflow (no status gate on the block button), which would hide the active job from the assigned worker, remove all lifecycle buttons, block `mark_completed()`, and strand escrowed funds with no automated release path (`auto_release_at` is set by `mark_completed`, not before — so the 72-hour cron never fires). Non-open jobs are already party-scoped via the existing PERMISSIVE policy (`customer_id = auth.uid() OR worker_id = auth.uid()`). Open-listing filtering from blocked users stays client-side (`market.tsx` `useBlockList` hook) for v1. Full analysis in migration header comment.
+
+**App-side changes (shipped with the migration in commit `0f6c2f7`):**
+- **receipt.tsx:** Relaxed hard gate at former lines 125-128 (`if (!workerProfile || !customerProfile)` → error) to null-safe fallbacks so a blocked counterparty's receipt still renders. Deleted hardcoded placeholder line ("deep clean, both bathrooms, kitchen, hallway closet.") that was never wired to data. Rewrote worker-side action line from broken customer-voice verb phrase reuse (`"You ran your errands Testusere's New York"`) to category-based: `"You completed ${category} for ${customer.firstName} in ${location}"`. Added `category` field to `ReceiptData` type, populated from `job.category` with `'your job'` fallback.
+- **worker-profile.tsx:** Softened error copy from "WORKER NOT FOUND" / "This profile may have been removed." to "PROFILE UNAVAILABLE" / "This profile is not available." — truthful for both deleted-account and blocked-by-owner cases.
+- **apply.tsx:** Added form state reset (`proposedPrice`, `messageMode`, `customText`, `submitError`) at top of `useEffect([job_id])`. Fixes stale price bleeding between jobs when the component stays mounted across tab navigations.
+- **job-chat.tsx:** Added `keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}` to `KeyboardAvoidingView` (accounts for nav header + status bar) and `keyboardDismissMode="on-drag"` + `keyboardShouldPersistTaps="handled"` to the message FlatList. Fixes keyboard covering the composer input.
+
+**CLAUDE.md doc drift confirmed but NOT yet patched:** CLAUDE.md's migration list has 14 discrepancies (3 wrong filenames + 11 undocumented migrations post-20260525). Fixing this is a separate doc task.
+
+**Blocking feature ground truth:** `user_blocks` table, `useBlockList` hook, and client-side feed filtering are FULLY BUILT and wired end-to-end in v3 (migration `20260516000001`, 6 app files). The block-aware RLS adds server-side enforcement on top of the existing client-side filtering.
 
 ---
 
