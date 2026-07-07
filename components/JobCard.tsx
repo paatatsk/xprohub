@@ -180,12 +180,12 @@ const s = StyleSheet.create({
   // Photo banner (conditional — only renders when photo_url exists)
   photoBanner: {
     width: '100%',
-    height: 140,
+    aspectRatio: 1.5,
     position: 'relative',
   },
   photoImage: {
     width: '100%',
-    height: 140,
+    aspectRatio: 1.5,
     resizeMode: 'cover',
   },
   photoBadge: {
