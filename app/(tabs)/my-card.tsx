@@ -8,6 +8,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, Animated, Modal, Pressable, TextInput, Alert,
   PanResponder, AccessibilityInfo, ActionSheetIOS, Image,
+  KeyboardAvoidingView, Platform,
   type LayoutChangeEvent,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -1688,6 +1689,11 @@ export default function MyCardScreen() {
       {/* ── Bio edit sheet ── */}
       <Modal visible={showBioSheet} transparent animationType="none">
         <Pressable style={s.pickerScrim} onPress={handleBioCancel}>
+          <KeyboardAvoidingView
+            style={s.bioKav}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={0}
+          >
           <View style={s.bioSheet}>
             <Pressable>
               <View style={s.pickerHandle} />
@@ -1742,6 +1748,7 @@ export default function MyCardScreen() {
               </View>
             </Pressable>
           </View>
+          </KeyboardAvoidingView>
         </Pressable>
       </Modal>
 
@@ -2550,6 +2557,10 @@ const s = StyleSheet.create({
   },
 
   // ── Bio edit sheet ──
+  bioKav: {
+    width: '100%',
+    justifyContent: 'flex-end',
+  },
   bioSheet: {
     backgroundColor: Colors.background,
     borderTopLeftRadius: 16,
