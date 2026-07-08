@@ -28,6 +28,8 @@ Note: task density + the parked safety/education layer form a cluster — "hones
 
 ## UX Refinements
 
+- **Home desk-row glyphs render inconsistently on font load (◆ and + remaining)** — the YOUR DESK leading glyphs on index.tsx use Unicode geometric characters (◆ U+25C6 amber on My posts, + on Post a job) rendered via Space Grotesk. Before the font finishes loading, the system font renders the same codepoint differently (e.g. the green ● showed as a ring vs solid circle). The green ● was fixed 2026-07-07 by converting it to a styled <View> circle (rowLeadGreenDot) — immune to font timing. The ◆ and + carry the identical risk and should get the same treatment: replace the ◆ Text glyph with a small rotated <View> square (amber), and either swap the + for an icon or accept it as lower-risk. Pattern to follow: statusDot / rowLeadSquare / rowLeadGreenDot already do this correctly. Low priority (cosmetic, brief flicker only), but a clean v1.1 sweep. Captured 2026-07-07.
+
 - **Budget sliders on Post a Job** — replace typed MIN/MAX inputs
   with dual-handle slider. Needs: max value cap (logarithmic?),
   tick marks, haptic feedback. Captured 2026-04-19.
