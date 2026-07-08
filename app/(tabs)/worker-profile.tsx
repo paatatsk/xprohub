@@ -458,9 +458,9 @@ const styles = StyleSheet.create({
   // Hero
   heroSection: { alignItems: 'center', paddingTop: Spacing.lg, paddingBottom: Spacing.md },
   avatarLarge: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: Colors.gold,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 16,
     color: Colors.gold,
     letterSpacing: 2,
     marginBottom: Spacing.sm,
@@ -524,9 +524,9 @@ const styles = StyleSheet.create({
   skillGroup:      { marginBottom: Spacing.md },
   skillGroupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    color: Colors.textSecondary,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    letterSpacing: 2,
     marginBottom: 6,
   },
   skillRow: {
@@ -537,9 +537,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
-  skillNameFeatured: { fontFamily: Fonts.bodyMed, fontSize: 15, color: Colors.gold, flex: 1 },
-  skillName:         { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary, flex: 1 },
-  skillPrice:        { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textSecondary, marginLeft: Spacing.sm },
+  skillNameFeatured: { fontFamily: Fonts.bodyMed, fontSize: 14, color: Colors.gold, flex: 1 },
+  skillName:         { fontFamily: Fonts.body, fontSize: 14, color: Colors.textPrimary, flex: 1 },
+  skillPrice:        { fontFamily: Fonts.mono, fontSize: 14, color: Colors.textSecondary, marginLeft: Spacing.sm },
   emptySkills:       { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, fontStyle: 'italic' },
 
   // Portfolio
