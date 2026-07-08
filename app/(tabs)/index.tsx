@@ -142,7 +142,7 @@ function LaunchpadCard({
         accessibilityLabel={`My applications, ${openApplications} open`}
         accessibilityRole="button"
       >
-        <View style={s.glyphFrame}><Text style={s.rowLeadGreen}>{'\u25CF'}</Text></View>
+        <View style={s.glyphFrame}><View style={s.rowLeadGreenDot} /></View>
         <Text style={s.rowLabel}>My applications</Text>
         <View style={s.rowRight}>
           {openApplications > 0 && (
@@ -643,6 +643,12 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 18,
     color: Colors.green,
+  },
+  rowLeadGreenDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: Colors.green,
   },
   rowLabel: {
     fontFamily: Fonts.bodyMed,
