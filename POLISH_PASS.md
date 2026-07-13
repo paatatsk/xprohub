@@ -28,6 +28,8 @@ Note: task density + the parked safety/education layer form a cluster — "hones
 
 ## UX Refinements
 
+- **Job expiry v1.1 refinements** — the core expiry system shipped 2026-07-13 (migration 20260713000001): jobs.expires_at (7-day default) + hourly pg_cron sweep flipping open → expired + feed/count filters in market.tsx and index.tsx. Deferred refinements: (a) worker-facing "expired" state on My Applications — bids on expired jobs currently just fail on accept with a DB error; the applications list should show the job as expired/closed; (b) customer notification or repost nudge when their job expires (ties into the parked notifications milestone); (c) owner views (Desk, My Posts) intentionally still show expired posts for management — consider a visual "EXPIRED" badge there. Captured 2026-07-13.
+
 - **Home desk-row glyphs render inconsistently on font load (◆ and + remaining)** — the YOUR DESK leading glyphs on index.tsx use Unicode geometric characters (◆ U+25C6 amber on My posts, + on Post a job) rendered via Space Grotesk. Before the font finishes loading, the system font renders the same codepoint differently (e.g. the green ● showed as a ring vs solid circle). The green ● was fixed 2026-07-07 by converting it to a styled <View> circle (rowLeadGreenDot) — immune to font timing. The ◆ and + carry the identical risk and should get the same treatment: replace the ◆ Text glyph with a small rotated <View> square (amber), and either swap the + for an icon or accept it as lower-risk. Pattern to follow: statusDot / rowLeadSquare / rowLeadGreenDot already do this correctly. Low priority (cosmetic, brief flicker only), but a clean v1.1 sweep. Captured 2026-07-07.
 
 - **Budget sliders on Post a Job** — replace typed MIN/MAX inputs
