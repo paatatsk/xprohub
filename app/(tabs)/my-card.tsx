@@ -294,9 +294,15 @@ function RateSlider({
   trackWidthRef.current = trackWidth;
   const activeRef = useRef<'min' | 'max' | null>(null);
 
+  const endRateGesture = () => {
+    activeRef.current = null;
+    setActiveThumb(null);
+  };
+
   const pan = useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
+    onPanResponderTerminationRequest: () => false,
     onPanResponderGrant: (e) => {
       const touchX = e.nativeEvent.pageX - trackLeftRef.current;
       const tw = trackWidthRef.current;
@@ -335,10 +341,8 @@ function RateSlider({
         if (val !== valMaxRef.current) onChangeMax(val);
       }
     },
-    onPanResponderRelease: () => {
-      activeRef.current = null;
-      setActiveThumb(null);
-    },
+    onPanResponderRelease: endRateGesture,
+    onPanResponderTerminate: endRateGesture,
   }), [onChangeMin, onChangeMax]);
 
   const minX = valToX(valueMin);
@@ -416,9 +420,12 @@ function RadiusSlider({
   const trackRef = useRef<View>(null);
   const trackLeftRef = useRef(0);
 
+  const endRadiusGesture = () => setDragging(false);
+
   const pan = useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
+    onPanResponderTerminationRequest: () => false,
     onPanResponderGrant: (e) => {
       const touchX = e.nativeEvent.pageX - trackLeftRef.current;
       const tw = trackWidthRef.current;
@@ -439,7 +446,8 @@ function RadiusSlider({
       const val = snap(RADIUS_MIN + (newX / tw) * (RADIUS_MAX - RADIUS_MIN), RADIUS_STEP, RADIUS_MIN, RADIUS_MAX);
       if (val !== valRef.current) onChange(val);
     },
-    onPanResponderRelease: () => setDragging(false),
+    onPanResponderRelease: endRadiusGesture,
+    onPanResponderTerminate: endRadiusGesture,
   }), [onChange]);
 
   const thumbX = trackWidth > 0 ? ((value - RADIUS_MIN) / (RADIUS_MAX - RADIUS_MIN)) * trackWidth : 0;
