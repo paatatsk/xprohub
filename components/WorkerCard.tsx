@@ -127,7 +127,7 @@ function SkillPill({ label, variant }: { label: string; variant: PillVariant }) 
 function DisclosurePill({ count }: { count: number }) {
   return (
     <View style={[s.pill, s.pillDisclosure]}>
-      <Text style={s.pillText}>+ {count} MORE</Text>
+      <Text style={s.pillTextDimmed}>+{count}</Text>
     </View>
   );
 }
@@ -193,8 +193,8 @@ export default function WorkerCard({ worker, preview, onHire, onEdit, onPress, o
     worker.worker_status === 'booked'    && useToday ? 'outlined' :
     'dimmed';
 
-  const visibleSkills = skillSource.slice(0, 3);
-  const overflowCount = skillSource.length - 3;
+  const visibleSkills = skillSource.slice(0, 2);
+  const overflowCount = skillSource.length - 2;
 
   const showNewStamp = worker.jobs_completed < 10;
 
@@ -273,9 +273,6 @@ export default function WorkerCard({ worker, preview, onHire, onEdit, onPress, o
 
         {/* Info column */}
         <View style={s.infoCol}>
-          {/* Name label */}
-          <Text style={s.nameLabel}>NAME</Text>
-
           {/* Name + status dot */}
           <View style={s.nameRow}>
             <Text style={s.nameText} numberOfLines={1}>{worker.full_name}</Text>
@@ -313,7 +310,9 @@ export default function WorkerCard({ worker, preview, onHire, onEdit, onPress, o
           {/* Skill block */}
           {visibleSkills.length > 0 && (
             <View style={s.skillBlock}>
-              <Text style={s.skillLabel}>{skillLabel}</Text>
+              {skillLabel !== strings['card.skills.offers'] && (
+                <Text style={s.skillLabel}>{skillLabel}</Text>
+              )}
               <View style={s.pillRow}>
                 {visibleSkills.map((sk, i) => (
                   <SkillPill key={i} label={sk} variant={pillVariant} />
@@ -394,14 +393,14 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(201, 168, 76, 0.10)',
     borderBottomWidth: 1,
     borderBottomColor: Colors.gold,
-    paddingVertical: 7,
+    paddingVertical: 8,
     paddingHorizontal: 14,
     borderTopLeftRadius: 13,
     borderTopRightRadius: 13,
   },
   stripeLeft: {
     fontFamily: Fonts.displayB,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 3,
     color: Colors.gold,
   },
@@ -412,13 +411,13 @@ const s = StyleSheet.create({
   },
   stripeRight: {
     fontFamily: Fonts.monoMed,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 1,
     color: Colors.gold,
   },
   stripeOverflow: {
     fontFamily: Fonts.monoMed,
-    fontSize: 11,
+    fontSize: 13,
     color: 'rgba(201, 168, 76, 0.45)',
     letterSpacing: 2,
   },
@@ -426,8 +425,8 @@ const s = StyleSheet.create({
   // Body row
   bodyRow: {
     flexDirection: 'row',
-    padding: 14,
-    gap: 14,
+    padding: 12,
+    gap: 10,
     alignItems: 'flex-start',
   },
 
@@ -452,7 +451,7 @@ const s = StyleSheet.create({
   },
   portraitInitials: {
     fontFamily: Fonts.serif,
-    fontSize: 30,
+    fontSize: 34,
     color: Colors.gold,
   },
   photoStamp: {
@@ -468,7 +467,7 @@ const s = StyleSheet.create({
   },
   photoStampText: {
     fontFamily: Fonts.mono,
-    fontSize: 7,
+    fontSize: 9,
     letterSpacing: 1,
     color: 'rgba(201,168,76,0.55)',
   },
@@ -485,7 +484,7 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 7,
+    fontSize: 9,
     letterSpacing: 1,
     color: Colors.gold,
   },
@@ -496,7 +495,7 @@ const s = StyleSheet.create({
   },
   nameLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 8,
+    fontSize: 10,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -510,7 +509,7 @@ const s = StyleSheet.create({
   },
   nameText: {
     fontFamily: Fonts.serif,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.textPrimary,
     flexShrink: 1,
   },
@@ -524,10 +523,10 @@ const s = StyleSheet.create({
     marginBottom: 9,
   },
   bio: {
-    fontFamily: Fonts.body,
-    fontSize: 11.5,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 15,
     lineHeight: 16,
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
     marginBottom: 9,
   },
   bioPlaceholder: {
@@ -547,7 +546,7 @@ const s = StyleSheet.create({
   },
   bioBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 7,
+    fontSize: 9,
     letterSpacing: 1,
     color: Colors.gold,
   },
@@ -558,43 +557,43 @@ const s = StyleSheet.create({
   },
   trackText: {
     fontFamily: Fonts.monoMed,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 0.3,
     color: Colors.textSecondary,
   },
   trackGold: {
     fontFamily: Fonts.monoMed,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 0.3,
     color: Colors.gold,
     fontWeight: '600',
   },
   trackSep: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 12,
     color: Colors.textTertiary,
   },
 
   // Skill block
   skillBlock: {
-    marginTop: 2,
+    marginTop: 0,
   },
   skillLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 2.5,
     color: Colors.gold,
-    marginBottom: 5,
+    marginBottom: 3,
   },
   pillRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 5,
   },
   pill: {
-    paddingHorizontal: 8,
-    paddingTop: 3,
-    paddingBottom: 2,
+    paddingHorizontal: 10,
+    paddingTop: 4,
+    paddingBottom: 3,
     borderRadius: Radius.full,
   },
   pillFilled: {
@@ -612,13 +611,13 @@ const s = StyleSheet.create({
   },
   pillText: {
     fontFamily: Fonts.heading,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 0.5,
     color: Colors.gold,
   },
   pillTextDimmed: {
     fontFamily: Fonts.heading,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 0.5,
     color: 'rgba(201,168,76,0.7)',
   },
@@ -644,7 +643,7 @@ const s = StyleSheet.create({
   footerMeta: {
     flex: 1,
     fontFamily: Fonts.mono,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 1,
     color: Colors.textSecondary,
   },
@@ -661,7 +660,7 @@ const s = StyleSheet.create({
   },
   hireBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 1,
     color: Colors.gold,
   },
