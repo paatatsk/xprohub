@@ -205,6 +205,7 @@ export default function HomeScreen() {
         .from('jobs')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'open')
+        .gte('expires_at', new Date().toISOString())
         .neq('customer_id', user.id);
       if (blockedIds.length > 0) {
         jobCountQuery = jobCountQuery.not('customer_id', 'in', `(${blockedIds.join(',')})`);
@@ -216,7 +217,8 @@ export default function HomeScreen() {
       const { count: jc } = await supabase
         .from('jobs')
         .select('id', { count: 'exact', head: true })
-        .eq('status', 'open');
+        .eq('status', 'open')
+        .gte('expires_at', new Date().toISOString());
       setOpenJobCount(jc ?? 0);
     }
 

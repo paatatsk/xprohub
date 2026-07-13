@@ -81,8 +81,9 @@ export default function MarketScreen() {
 
     let query = supabase
       .from('jobs')
-      .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id')
+      .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id, expires_at')
       .eq('status', 'open')
+      .gte('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(50);
 
