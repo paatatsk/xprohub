@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, TextInput, ActivityIndicator, Image, Keyboard,
@@ -51,7 +51,9 @@ export default function DirectHireScreen() {
   // Form state
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<number>>(new Set());
   const [title, setTitle]               = useState('');
+  const titleEdited                     = useRef(false);
   const [description, setDescription]   = useState('');
+  const budgetEdited                    = useRef(false);
   const [budgetMin, setBudgetMin]       = useState('');
   const [budgetMax, setBudgetMax]       = useState('');
   const [neighborhood, setNeighborhood] = useState('');
@@ -70,6 +72,21 @@ export default function DirectHireScreen() {
 
   useEffect(() => {
     if (!worker_id) return;
+
+    // Reset form state when navigating to a different worker
+    setSelectedTaskIds(new Set());
+    setTitle('');
+    titleEdited.current = false;
+    setDescription('');
+    budgetEdited.current = false;
+    setBudgetMin('');
+    setBudgetMax('');
+    setNeighborhood('');
+    setTiming('flexible');
+    setIsUrgent(false);
+    setErrors({});
+    setSubmitting(false);
+    setSubmitError(null);
 
     Promise.all([
       supabase
@@ -114,13 +131,42 @@ export default function DirectHireScreen() {
 
   // ── Form helpers ──────────────────────────────────────────────
 
+  const autoFillFromSkills = useCallback((taskIds: Set<number>) => {
+    const selected = skills.filter(s => taskIds.has(s.task_id));
+
+    // Title
+    if (!titleEdited.current) {
+      if (selected.length === 0) {
+        setTitle('');
+      } else if (selected.length <= 2) {
+        setTitle(selected.map(s => s.task_name).join(' & ').slice(0, 80));
+      } else {
+        setTitle(`${selected[0].task_name}, ${selected[1].task_name} +${selected.length - 2} more`.slice(0, 80));
+      }
+    }
+
+    // Budget — sum of price ranges
+    if (!budgetEdited.current) {
+      if (selected.length === 0) {
+        setBudgetMin('');
+        setBudgetMax('');
+      } else {
+        const sumMin = selected.reduce((s, sk) => s + sk.price_min, 0);
+        const sumMax = selected.reduce((s, sk) => s + sk.price_max, 0);
+        setBudgetMin(String(sumMin));
+        setBudgetMax(String(sumMax));
+      }
+    }
+  }, [skills]);
+
   const toggleTask = useCallback((id: number) => {
     setSelectedTaskIds(prev => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
+      autoFillFromSkills(next);
       return next;
     });
-  }, []);
+  }, [autoFillFromSkills]);
 
   const clearError = (key: keyof FormErrors) =>
     setErrors(e => ({ ...e, [key]: undefined }));
@@ -357,7 +403,7 @@ export default function DirectHireScreen() {
             placeholder="e.g. Deep clean 2BR apartment"
             placeholderTextColor={Colors.textSecondary}
             value={title}
-            onChangeText={t => { setTitle(t.slice(0, 80)); clearError('title'); }}
+            onChangeText={t => { titleEdited.current = t.length > 0; setTitle(t.slice(0, 80)); clearError('title'); }}
             maxLength={80}
             returnKeyType="done"
             onSubmitEditing={() => Keyboard.dismiss()}
@@ -403,7 +449,7 @@ export default function DirectHireScreen() {
                 placeholder="0"
                 placeholderTextColor={Colors.textSecondary}
                 value={budgetMin}
-                onChangeText={t => { setBudgetMin(t); clearError('budget'); }}
+                onChangeText={t => { budgetEdited.current = true; setBudgetMin(t); clearError('budget'); }}
                 keyboardType="numeric"
               />
             </View>
@@ -414,7 +460,7 @@ export default function DirectHireScreen() {
                 placeholder="0"
                 placeholderTextColor={Colors.textSecondary}
                 value={budgetMax}
-                onChangeText={t => { setBudgetMax(t); clearError('budget'); }}
+                onChangeText={t => { budgetEdited.current = true; setBudgetMax(t); clearError('budget'); }}
                 keyboardType="numeric"
               />
             </View>
