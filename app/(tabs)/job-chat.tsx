@@ -632,7 +632,7 @@ export default function JobChatScreen() {
 
         {/* ── Lifecycle banners (E-7/E-8 expansion point) ── */}
 
-        {jobStatus === 'matched' && (
+        {jobStatus === 'matched' && !isCustomer && (
           <View style={styles.lifecycleBanner}>
             {actionLoading
               ? <ActivityIndicator size="small" color={Colors.gold} />
@@ -651,6 +651,14 @@ export default function JobChatScreen() {
                 {actionError}
               </Text>
             ) : null}
+          </View>
+        )}
+
+        {jobStatus === 'matched' && isCustomer && (
+          <View style={styles.lifecycleBanner}>
+            <Text style={styles.bannerCopy}>
+              Worker hired — waiting for the worker to start the job.
+            </Text>
           </View>
         )}
 
@@ -675,6 +683,14 @@ export default function JobChatScreen() {
                 {actionError}
               </Text>
             ) : null}
+          </View>
+        )}
+
+        {jobStatus === 'in_progress' && isCustomer && (
+          <View style={styles.lifecycleBanner}>
+            <Text style={styles.bannerCopy}>
+              Job in progress — waiting for the worker to mark it complete.
+            </Text>
           </View>
         )}
 

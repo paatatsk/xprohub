@@ -103,11 +103,14 @@ interface ApplicationCardProps {
   onPress: () => void;
   onAccept?: () => void;
   onDecline?: () => void;
+  onHide?: () => void;
 }
 
-function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPress, onAccept, onDecline }: ApplicationCardProps) {
+function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPress, onAccept, onDecline, onHide }: ApplicationCardProps) {
   // Show accept/decline only when the current user IS the bid's worker
   const isDirectPending = bid.is_direct_offer && bid.status === 'pending' && bid.worker_id === currentUserId;
+  const isEnded = ['declined', 'withdrawn'].includes(bid.status)
+    || ['completed', 'cancelled', 'expired'].includes(bid.job?.status ?? '');
   const bidColor   = isDirectPending ? Colors.gold : bidStatusColor(bid.status);
   const bidLabel   = isDirectPending ? 'DIRECT OFFER' : bidStatusLabel(bid.status);
   const job        = bid.job;
@@ -159,9 +162,14 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
         <Text style={styles.message} numberOfLines={2}>{bid.message}</Text>
       ) : null}
 
-      {/* ── Footer: timeAgo ── */}
+      {/* ── Footer: timeAgo + hide ── */}
       <View style={styles.cardFooter}>
         <Text style={styles.timeAgo}>{timeAgo(bid.created_at)}</Text>
+        {isEnded && onHide && (
+          <TouchableOpacity onPress={onHide} hitSlop={8} activeOpacity={0.7}>
+            <Text style={styles.hideText}>HIDE</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* ── Accept / Decline buttons (direct offers only) ── */}
@@ -231,6 +239,7 @@ export default function MyApplicationsScreen() {
         job:jobs!job_id(id, title, category, status, customer_id)
       `)
       .eq('worker_id', user.id)
+      .is('hidden_by_worker_at', null)
       .order('created_at', { ascending: false });
 
     if (bidErr) {
@@ -363,6 +372,29 @@ export default function MyApplicationsScreen() {
     );
   }, [loadApplications]);
 
+  // ── Hide ended application ────────────────────────────────────────────────
+
+  const handleHide = useCallback((bid: Bid) => {
+    Alert.alert(
+      'Hide this application?',
+      'It will be removed from your list.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Hide',
+          onPress: async () => {
+            const { error: rpcErr } = await supabase.rpc('hide_application', { p_bid_id: bid.id });
+            if (rpcErr) {
+              Alert.alert('Could not hide', rpcErr.message ?? 'Please try again.');
+              return;
+            }
+            setBids(prev => prev.filter(b => b.id !== bid.id));
+          },
+        },
+      ],
+    );
+  }, []);
+
   // ── Navigation handler ────────────────────────────────────────────────────
 
   const handlePress = useCallback(async (bid: Bid) => {
@@ -435,6 +467,7 @@ export default function MyApplicationsScreen() {
             onPress={() => handlePress(item)}
             onAccept={item.is_direct_offer && item.status === 'pending' ? () => handleAcceptOffer(item) : undefined}
             onDecline={item.is_direct_offer && item.status === 'pending' ? () => handleDeclineOffer(item) : undefined}
+            onHide={() => handleHide(item)}
           />
         )}
         contentContainerStyle={
@@ -602,13 +635,19 @@ const styles = StyleSheet.create({
   // ── Card footer ───────────────────────────────────────────────
   cardFooter: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   timeAgo: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
+  },
+  hideText: {
+    color: Colors.textSecondary,
+    fontWeight: 'bold',
+    fontSize: 11,
+    letterSpacing: 1,
   },
 
   // ── Empty state ───────────────────────────────────────────────

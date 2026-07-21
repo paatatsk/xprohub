@@ -122,6 +122,7 @@ export default function DeskScreen() {
       .select('id, title, status, customer_id, worker_id, agreed_price, budget_min, budget_max, created_at, timing')
       .eq('worker_id', user.id)
       .in('status', ['matched', 'in_progress', 'pending_confirmation'])
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     const { data: postedRows } = await supabase
@@ -129,6 +130,7 @@ export default function DeskScreen() {
       .select('id, title, status, customer_id, worker_id, agreed_price, budget_min, budget_max, created_at, timing')
       .eq('customer_id', user.id)
       .eq('status', 'open')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
     const taken: ActiveJob[] = (takenRows ?? []).map(j => ({ ...j, _role: 'taken' as const }));
@@ -209,6 +211,7 @@ export default function DeskScreen() {
       `)
       .or(`customer_id.eq.${user.id},worker_id.eq.${user.id}`)
       .eq('status', 'completed')
+      .is('deleted_at', null)
       .order('completed_at', { ascending: false })
       .limit(20);
 

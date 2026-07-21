@@ -206,6 +206,7 @@ export default function HomeScreen() {
         .select('id', { count: 'exact', head: true })
         .eq('status', 'open')
         .is('worker_id', null)
+        .is('deleted_at', null)
         .gte('expires_at', new Date().toISOString())
         .neq('customer_id', user.id);
       if (blockedIds.length > 0) {
@@ -220,6 +221,7 @@ export default function HomeScreen() {
         .select('id', { count: 'exact', head: true })
         .eq('status', 'open')
         .is('worker_id', null)
+        .is('deleted_at', null)
         .gte('expires_at', new Date().toISOString());
       setOpenJobCount(jc ?? 0);
     }
@@ -240,7 +242,8 @@ export default function HomeScreen() {
       .from('jobs')
       .select('id')
       .eq('customer_id', user.id)
-      .eq('status', 'open');
+      .eq('status', 'open')
+      .is('deleted_at', null);
     if (myOpenJobs && myOpenJobs.length > 0) {
       const jobIds = myOpenJobs.map(j => j.id);
       const { count } = await supabase

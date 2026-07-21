@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  FlatList, ActivityIndicator, RefreshControl,
+  FlatList, ActivityIndicator, RefreshControl, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -63,15 +63,19 @@ function statusLabel(status: string): string {
 
 // ── JobCard ────────────────────────────────────────────────────────────────
 
+const ACTIVE_STATUSES = new Set(['matched', 'in_progress', 'pending_confirmation', 'disputed']);
+
 interface JobCardProps {
   job: Job;
   bidCount: number;
   onPress: () => void;
+  onDelete?: () => void;
 }
 
-function JobCard({ job, bidCount, onPress }: JobCardProps) {
+function JobCard({ job, bidCount, onPress, onDelete }: JobCardProps) {
   const color = statusColor(job.status);
   const label = statusLabel(job.status);
+  const isDeletable = !ACTIVE_STATUSES.has(job.status);
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
@@ -91,7 +95,7 @@ function JobCard({ job, bidCount, onPress }: JobCardProps) {
         </View>
       ) : null}
 
-      {/* ── Footer: bid count + timeAgo ── */}
+      {/* ── Footer: bid count + timeAgo + delete ── */}
       <View style={styles.cardFooter}>
         {bidCount === 0 ? (
           <Text style={styles.noBids}>No applications yet</Text>
@@ -100,7 +104,14 @@ function JobCard({ job, bidCount, onPress }: JobCardProps) {
             {bidCount} {bidCount === 1 ? 'bid' : 'bids'}
           </Text>
         )}
-        <Text style={styles.timeAgo}>{timeAgo(job.created_at)}</Text>
+        <View style={styles.footerRight}>
+          <Text style={styles.timeAgo}>{timeAgo(job.created_at)}</Text>
+          {isDeletable && onDelete && (
+            <TouchableOpacity onPress={onDelete} hitSlop={8} activeOpacity={0.7}>
+              <Text style={styles.deleteText}>DELETE</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
     </TouchableOpacity>
@@ -139,6 +150,7 @@ export default function MyJobsScreen() {
       .from('jobs')
       .select('id, title, category, status, created_at, worker:profiles!worker_id(full_name)')
       .eq('customer_id', user.id)
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .limit(100);
 
@@ -176,6 +188,30 @@ export default function MyJobsScreen() {
   }, []);
 
   useEffect(() => { loadJobs(); }, [loadJobs]);
+
+  // ── Delete handler ────────────────────────────────────────────────────────
+
+  const handleDelete = useCallback((job: Job) => {
+    Alert.alert(
+      'Delete this post?',
+      'It will be removed from your list. Payment history and chats are kept.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const { error: rpcErr } = await supabase.rpc('delete_job', { p_job_id: job.id });
+            if (rpcErr) {
+              Alert.alert('Could not delete', rpcErr.message ?? 'Please try again.');
+              return;
+            }
+            setJobs(prev => prev.filter(j => j.id !== job.id));
+          },
+        },
+      ],
+    );
+  }, []);
 
   // ── Loading state ─────────────────────────────────────────────────────────
 
@@ -234,6 +270,7 @@ export default function MyJobsScreen() {
                 router.push(`/(tabs)/job-bids?job_id=${item.id}` as any);
               }
             }}
+            onDelete={() => handleDelete(item)}
           />
         )}
         contentContainerStyle={
@@ -371,6 +408,17 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
     fontSize: 12,
+  },
+  footerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  deleteText: {
+    color: Colors.red,
+    fontWeight: 'bold',
+    fontSize: 11,
+    letterSpacing: 1,
   },
 
   // ── Empty state ───────────────────────────────────────────────

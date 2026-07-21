@@ -145,18 +145,20 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
 
       </View>
 
-      {/* ── Message body ── */}
-      {bid.message ? (
-        <Text style={styles.bidMessage}>{bid.message}</Text>
-      ) : (
-        <Text style={styles.bidMessageEmpty}>No message provided.</Text>
+      {/* ── Message body (suppressed for direct offers — customer's own boilerplate) ── */}
+      {!bid.is_direct_offer && (
+        bid.message ? (
+          <Text style={styles.bidMessage}>{bid.message}</Text>
+        ) : (
+          <Text style={styles.bidMessageEmpty}>No message provided.</Text>
+        )
       )}
 
       {/* ── Submitted time ── */}
       <Text style={styles.bidTime}>Submitted {timeAgo(bid.created_at)}</Text>
 
       {/* ── Conditional footer ── */}
-      {bid.status === 'pending' && (
+      {bid.status === 'pending' && !bid.is_direct_offer && (
         <View style={styles.actionRow}>
           {actionLoading ? (
             <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
@@ -178,6 +180,12 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
               </TouchableOpacity>
             </>
           )}
+        </View>
+      )}
+
+      {bid.status === 'pending' && bid.is_direct_offer && (
+        <View style={styles.directOfferPill}>
+          <Text style={styles.directOfferPillText}>DIRECT OFFER — AWAITING WORKER</Text>
         </View>
       )}
 
@@ -628,6 +636,29 @@ export default function JobBidsScreen() {
           </View>
         ) : null}
 
+        {/* ── Underway banner (matched/in_progress/pending_confirmation) ── */}
+        {job!.status !== 'open' && job!.status !== 'cancelled' && job!.status !== 'expired' && job!.status !== 'completed' && (
+          <View style={styles.underwayBanner}>
+            <Text style={styles.underwayText}>This job is underway — manage it from the chat.</Text>
+            <TouchableOpacity
+              style={styles.underwayChatBtn}
+              activeOpacity={0.85}
+              onPress={async () => {
+                const { data: chatRow } = await supabase
+                  .from('chats')
+                  .select('id')
+                  .eq('job_id', job!.id)
+                  .maybeSingle();
+                if (chatRow?.id) {
+                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+                }
+              }}
+            >
+              <Text style={styles.underwayChatBtnText}>OPEN CHAT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* ── Bids list or empty state ── */}
         {sortedBids.length === 0 ? (
           <View style={styles.emptyInner}>
@@ -950,6 +981,54 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   openChatBtnText: {
+    color: Colors.green,
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 1.2,
+  },
+
+  // Direct offer — awaiting worker
+  directOfferPill: {
+    alignSelf: 'flex-start',
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: Radius.full,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginTop: 2,
+  },
+  directOfferPillText: {
+    color: Colors.gold,
+    fontWeight: 'bold',
+    fontSize: 11,
+    letterSpacing: 1.5,
+  },
+
+  // Underway banner (active statuses)
+  underwayBanner: {
+    backgroundColor: Colors.card,
+    borderWidth: 1,
+    borderColor: Colors.green,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    gap: 10,
+    alignItems: 'center',
+  },
+  underwayText: {
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  underwayChatBtn: {
+    borderWidth: 1.5,
+    borderColor: Colors.green,
+    borderRadius: Radius.full,
+    paddingVertical: 9,
+    paddingHorizontal: 24,
+  },
+  underwayChatBtnText: {
     color: Colors.green,
     fontWeight: 'bold',
     fontSize: 13,
