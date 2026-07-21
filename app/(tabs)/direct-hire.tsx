@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, TextInput, ActivityIndicator, Image, Keyboard,
+  ScrollView, TextInput, ActivityIndicator, Image, Keyboard, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -10,11 +10,12 @@ import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
 import { friendlyError } from '../../lib/moderation';
 
-// Direct Hire v2 — launched from Workers Feed "Hire Directly" button
+// Direct Hire v3 — charge-on-acceptance redesign
 // Params: worker_id (uuid), worker_name (display string)
 // Full job form pre-targeted at a specific worker.
-// Backend: jobs INSERT (status=matched, worker_id set) → job_post_tasks
-//          → chats → messages → job-chat placeholder
+// Backend: creates open targeted job + direct-offer bid (is_direct_offer=true).
+// Worker sees offer in My Applications → accepts → hire-and-charge fires → matched.
+// No charge at send time. Customer's card charged only when worker accepts.
 
 type Timing = 'asap' | 'scheduled' | 'flexible';
 
@@ -31,7 +32,7 @@ interface FormErrors {
   title?:        string;
   neighborhood?: string;
   tasks?:        string;
-  budget?:       string;
+  price?:        string;
 }
 
 export default function DirectHireScreen() {
@@ -53,9 +54,8 @@ export default function DirectHireScreen() {
   const [title, setTitle]               = useState('');
   const titleEdited                     = useRef(false);
   const [description, setDescription]   = useState('');
-  const budgetEdited                    = useRef(false);
-  const [budgetMin, setBudgetMin]       = useState('');
-  const [budgetMax, setBudgetMax]       = useState('');
+  const priceEdited                     = useRef(false);
+  const [offerPrice, setOfferPrice]     = useState('');
   const [neighborhood, setNeighborhood] = useState('');
   const [timing, setTiming]             = useState<Timing>('flexible');
   const [isUrgent, setIsUrgent]         = useState(false);
@@ -78,9 +78,8 @@ export default function DirectHireScreen() {
     setTitle('');
     titleEdited.current = false;
     setDescription('');
-    budgetEdited.current = false;
-    setBudgetMin('');
-    setBudgetMax('');
+    priceEdited.current = false;
+    setOfferPrice('');
     setNeighborhood('');
     setTiming('flexible');
     setIsUrgent(false);
@@ -145,16 +144,13 @@ export default function DirectHireScreen() {
       }
     }
 
-    // Budget — sum of price ranges
-    if (!budgetEdited.current) {
+    // Offer price — sum of selected skills' price_max
+    if (!priceEdited.current) {
       if (selected.length === 0) {
-        setBudgetMin('');
-        setBudgetMax('');
+        setOfferPrice('');
       } else {
-        const sumMin = selected.reduce((s, sk) => s + sk.price_min, 0);
         const sumMax = selected.reduce((s, sk) => s + sk.price_max, 0);
-        setBudgetMin(String(sumMin));
-        setBudgetMax(String(sumMax));
+        setOfferPrice(String(sumMax));
       }
     }
   }, [skills]);
@@ -176,9 +172,9 @@ export default function DirectHireScreen() {
     if (!title.trim())              e.title        = 'Job title is required';
     if (!neighborhood.trim())       e.neighborhood = 'Neighborhood is required';
     if (selectedTaskIds.size === 0) e.tasks        = 'Select at least one skill';
-    const mn = parseFloat(budgetMin), mx = parseFloat(budgetMax);
-    if (budgetMin && budgetMax && !isNaN(mn) && !isNaN(mx) && mn > mx)
-      e.budget = 'Min budget cannot exceed max budget';
+    const p = parseFloat(offerPrice);
+    if (!offerPrice.trim() || isNaN(p) || p <= 0)
+      e.price = 'Offer price is required';
     return e;
   };
 
@@ -195,7 +191,7 @@ export default function DirectHireScreen() {
       return;
     }
 
-    // Belt-and-suspenders gate check (primary gate fires at market.tsx Hire button).
+    // Belt-and-suspenders trust-level gate (primary gate fires at market.tsx Hire button).
     // null trustLevel = still loading → allow through, no false-block.
     if (trustLevel === 'explorer') {
       const selfDest =
@@ -207,6 +203,24 @@ export default function DirectHireScreen() {
       return;
     }
 
+    // Payment method gate — customer must have card on file so the
+    // off-session charge can succeed when the worker accepts.
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_payment_method_added')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile?.stripe_payment_method_added) {
+      const returnTo =
+        `/(tabs)/direct-hire?worker_id=${worker_id}` +
+        `&worker_name=${encodeURIComponent(worker_name ?? '')}`;
+      router.push(
+        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(returnTo)}` as any
+      );
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
 
@@ -214,23 +228,21 @@ export default function DirectHireScreen() {
     const firstTaskId    = Array.from(selectedTaskIds)[0];
     const firstTask      = skills.find(s => s.task_id === firstTaskId);
     const categoryForJob = firstTask?.category_name ?? null;
+    const price          = parseFloat(offerPrice);
 
-    // First chat message: description if provided, else fall back to title
-    const firstMessage = description.trim() || title.trim();
-
-    // 1. Atomic job + tasks creation (status = matched — pre-targeted, not in Live Market)
+    // 1. Create open targeted job (worker_id set → hidden from public feed by Slice 2 filters)
     const { data: jobId, error: rpcErr } = await supabase.rpc('create_job_with_tasks', {
       p_title:        title.trim(),
       p_description:  description.trim() || null,
       p_category:     categoryForJob,
-      p_budget_min:   budgetMin ? parseFloat(budgetMin) : null,
-      p_budget_max:   budgetMax ? parseFloat(budgetMax) : null,
+      p_budget_min:   price,
+      p_budget_max:   price,
       p_neighborhood: neighborhood.trim(),
       p_timing:       timing,
       p_is_urgent:    isUrgent,
       p_task_ids:     Array.from(selectedTaskIds),
       p_worker_id:    worker_id,
-      p_status:       'matched',
+      p_status:       'open',
     });
 
     if (rpcErr || !jobId) {
@@ -239,44 +251,34 @@ export default function DirectHireScreen() {
       return;
     }
 
-    // 2. INSERT chat
-    const { data: newChat, error: chatErr } = await supabase
-      .from('chats')
+    // 2. INSERT direct-offer bid (customer inserts under Slice 1 RLS policy)
+    const { error: bidErr } = await supabase
+      .from('bids')
       .insert({
         job_id:          jobId,
-        customer_id:     user.id,
         worker_id,
-        last_message:    firstMessage,
-        last_message_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
+        proposed_price:  price,
+        message:         'Direct hire request',
+        is_direct_offer: true,
+        status:          'pending',
+      });
 
-    if (chatErr || !newChat) {
-      setSubmitError('Job created but chat failed to open. Contact support if this persists.');
+    if (bidErr) {
+      // Clean up orphaned job — it's still 'open' so cancel_job works
+      console.error('[direct-hire] Bid insert failed, cancelling orphan job:', bidErr.message);
+      await supabase.rpc('cancel_job', { p_job_id: jobId }).catch(() => {});
+      setSubmitError(friendlyError(bidErr, 'Something went wrong sending the request. Please try again.'));
       setSubmitting(false);
       return;
     }
 
-    // 4. INSERT first message (non-fatal — chat exists either way)
-    const { error: msgErr } = await supabase
-      .from('messages')
-      .insert({
-        chat_id:      newChat.id,
-        sender_id:    user.id,
-        content:      firstMessage,
-        message_type: 'text',
-      });
-
-    if (msgErr) {
-      console.warn('First message insert failed:', msgErr.message);
-    }
-
+    // 3. Success — no charge yet, no chat yet. Worker will see
+    // the offer in My Applications and accept/decline from there.
     setSubmitting(false);
-    router.replace(
-      `/(tabs)/job-chat?chat_id=${newChat.id}` +
-      `&worker_name=${encodeURIComponent(worker_name ?? 'Worker')}` +
-      `&first_message=${encodeURIComponent(firstMessage)}` as any
+    Alert.alert(
+      'Request Sent',
+      `Your request has been sent to ${worker_name ?? 'the worker'}. You'll be charged only if they accept.`,
+      [{ text: 'OK', onPress: () => router.replace('/(tabs)/my-jobs' as any) }],
     );
   };
 
@@ -436,36 +438,23 @@ export default function DirectHireScreen() {
           </Text>
         </View>
 
-        {/* ── Budget ── */}
+        {/* ── Offer Price ── */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>
-            BUDGET <Text style={styles.optional}>(optional)</Text>
+            OFFER PRICE <Text style={styles.required}>*</Text>
           </Text>
-          <View style={styles.budgetRow}>
-            <View style={styles.budgetHalf}>
-              <Text style={styles.budgetLabel}>MIN $</Text>
-              <TextInput
-                style={[styles.input, errors.budget && styles.inputError]}
-                placeholder="0"
-                placeholderTextColor={Colors.textSecondary}
-                value={budgetMin}
-                onChangeText={t => { budgetEdited.current = true; setBudgetMin(t); clearError('budget'); }}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.budgetHalf}>
-              <Text style={styles.budgetLabel}>MAX $</Text>
-              <TextInput
-                style={[styles.input, errors.budget && styles.inputError]}
-                placeholder="0"
-                placeholderTextColor={Colors.textSecondary}
-                value={budgetMax}
-                onChangeText={t => { budgetEdited.current = true; setBudgetMax(t); clearError('budget'); }}
-                keyboardType="numeric"
-              />
-            </View>
+          <View style={styles.priceRow}>
+            <Text style={styles.priceDollar}>$</Text>
+            <TextInput
+              style={[styles.input, styles.priceInput, errors.price && styles.inputError]}
+              placeholder="0"
+              placeholderTextColor={Colors.textSecondary}
+              value={offerPrice}
+              onChangeText={t => { priceEdited.current = true; setOfferPrice(t); clearError('price'); }}
+              keyboardType="numeric"
+            />
           </View>
-          {errors.budget && <Text style={styles.errorText}>{errors.budget}</Text>}
+          {errors.price && <Text style={styles.errorText}>{errors.price}</Text>}
         </View>
 
         {/* ── Neighborhood ── */}
@@ -652,16 +641,10 @@ const styles = StyleSheet.create({
   charCount:  { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
   errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 4 },
 
-  // Budget
-  budgetRow:   { flexDirection: 'row', gap: 12 },
-  budgetHalf:  { flex: 1 },
-  budgetLabel: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 11,
-    letterSpacing: 1,
-    marginBottom: 6,
-  },
+  // Price
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  priceDollar: { color: Colors.gold, fontWeight: 'bold', fontSize: 22 },
+  priceInput: { flex: 1 },
 
   // Timing
   timingRow: { flexDirection: 'row', gap: 8 },
