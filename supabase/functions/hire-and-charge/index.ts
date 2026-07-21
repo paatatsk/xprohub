@@ -7,8 +7,18 @@
 // to matched, auto-declines other bids, sets agreed_price, and
 // creates the chat).
 //
+// Supports two flows:
+//   Regular hire:  caller = customer, bid = worker's application
+//                  → accept_bid (customer-authorized RPC)
+//   Direct offer:  caller = worker accepting a customer's offer
+//                  (bid.is_direct_offer = true)
+//                  → accept_direct_offer (worker-authorized RPC)
+//
+// In BOTH flows the CUSTOMER's card is charged (off-session).
+// The caller identity only determines which accept RPC fires.
+//
 // Charge-then-accept ordering is a Locked Decision: the
-// PaymentIntent must succeed BEFORE accept_bid fires. If the
+// PaymentIntent must succeed BEFORE the accept RPC fires. If the
 // card declines, the bid stays pending and no state changes.
 // Worker Dignity: the worker knows funds are secured before
 // starting work.
@@ -17,7 +27,8 @@
 // webhook (E-4), not by this function. Single-writer pattern
 // eliminates race conditions on retry.
 //
-// Two-call contract for SCA:
+// Two-call contract for SCA (regular hire only — worker-accept
+// path cannot complete SCA on behalf of the customer):
 //   First call:  { bid_id } → may return requires_action + client_secret
 //   Resume call: { bid_id, payment_intent_id } → skips charge creation,
 //                retrieves existing PI, verifies succeeded, then accept_bid
@@ -84,7 +95,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     // ── Load bid + job + profiles ────────────────────────────
     const { data: bid, error: bidErr } = await serviceClient
       .from("bids")
-      .select("id, status, proposed_price, worker_id, job_id")
+      .select("id, status, proposed_price, worker_id, job_id, is_direct_offer")
       .eq("id", bid_id)
       .single();
 
@@ -110,10 +121,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // ── Validate preconditions ───────────────────────────────
 
-    // Auth: caller must be the customer on this job
-    if (user.id !== job.customer_id) {
+    // Auth: determine flow type and authorize caller
+    const isDirectOffer = bid.is_direct_offer === true;
+    const isWorkerAccepting = isDirectOffer && user.id === bid.worker_id;
+    const isCustomerHiring = !isDirectOffer && user.id === job.customer_id;
+
+    if (!isWorkerAccepting && !isCustomerHiring) {
       return new Response(
-        JSON.stringify({ error: "Not authorized — only the customer can hire" }),
+        JSON.stringify({ error: "Not authorized" }),
         { status: 403, headers: { "Content-Type": "application/json" } },
       );
     }
@@ -142,11 +157,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Load customer profile for Stripe IDs
+    // Load customer profile for Stripe IDs.
+    // ALWAYS charge the job's customer — caller may be the worker
+    // in the direct-offer flow.
     const { data: customerProfile, error: custErr } = await serviceClient
       .from("profiles")
       .select("stripe_customer_id, stripe_payment_method_id")
-      .eq("id", user.id)
+      .eq("id", job.customer_id)
       .single();
 
     if (custErr || !customerProfile) {
@@ -222,7 +239,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       // First call: create and confirm PaymentIntent
       console.log(
         `[hire-and-charge] Creating PaymentIntent: $${bid.proposed_price} ` +
-        `for job ${job.id}, bid ${bid.id}, customer ${user.id}`
+        `for job ${job.id}, bid ${bid.id}, customer ${job.customer_id}`
       );
 
       try {
@@ -238,7 +255,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
             metadata: {
               job_id: job.id,
               bid_id: bid.id,
-              customer_id: user.id,
+              customer_id: job.customer_id,
               worker_id: bid.worker_id,
               platform_fee_cents: String(platformFeeCents),
               worker_payout_cents: String(workerPayoutCents),
@@ -263,6 +280,17 @@ Deno.serve(async (req: Request): Promise<Response> => {
           err.code === "authentication_required" ||
           err.code === "payment_intent_authentication_failure"
         ) {
+          if (isWorkerAccepting) {
+            // Worker cannot complete SCA on behalf of the customer.
+            // Nothing has mutated — bid stays pending, job stays open.
+            return new Response(
+              JSON.stringify({
+                error: "customer_payment_issue",
+                message: "The customer's payment couldn't be processed. The request stays open — they'll need to resolve it.",
+              }),
+              { status: 402, headers: { "Content-Type": "application/json" } },
+            );
+          }
           // SCA required — return client_secret for handleNextAction
           return new Response(
             JSON.stringify({
@@ -276,6 +304,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
         }
 
         if (err.decline_code === "expired_card") {
+          if (isWorkerAccepting) {
+            return new Response(
+              JSON.stringify({
+                error: "customer_payment_issue",
+                message: "The customer's payment couldn't be processed. The request stays open — they'll need to resolve it.",
+              }),
+              { status: 402, headers: { "Content-Type": "application/json" } },
+            );
+          }
           return new Response(
             JSON.stringify({
               error: "card_expired",
@@ -287,6 +324,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
         // Generic decline
         console.error("[hire-and-charge] PaymentIntent failed:", err.message ?? err);
+        if (isWorkerAccepting) {
+          return new Response(
+            JSON.stringify({
+              error: "customer_payment_issue",
+              message: "The customer's payment couldn't be processed. The request stays open — they'll need to resolve it.",
+            }),
+            { status: 402, headers: { "Content-Type": "application/json" } },
+          );
+        }
         return new Response(
           JSON.stringify({
             error: "card_declined",
@@ -299,6 +345,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
       // Handle non-succeeded status (belt-and-suspenders)
       if (paymentIntent.status === "requires_action") {
+        if (isWorkerAccepting) {
+          return new Response(
+            JSON.stringify({
+              error: "customer_payment_issue",
+              message: "The customer's payment couldn't be processed. The request stays open — they'll need to resolve it.",
+            }),
+            { status: 402, headers: { "Content-Type": "application/json" } },
+          );
+        }
         return new Response(
           JSON.stringify({
             error: "card_requires_action",
@@ -326,24 +381,28 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
     // ── Charge succeeded — accept bid ────────────────────────
     // Uses userClient so auth.uid() resolves correctly inside
-    // accept_bid's SECURITY DEFINER customer auth check.
+    // the RPC's SECURITY DEFINER auth check:
+    //   Regular hire:  accept_bid gates on auth.uid() = customer
+    //   Direct offer:  accept_direct_offer gates on auth.uid() = worker
+    // In both cases the caller IS the authorized party.
+    const acceptRpc = isWorkerAccepting ? "accept_direct_offer" : "accept_bid";
     console.log(
       `[hire-and-charge] PaymentIntent ${paymentIntent.id} succeeded, ` +
-      `charge ${paymentIntent.latest_charge}. Accepting bid ${bid.id}`
+      `charge ${paymentIntent.latest_charge}. Calling ${acceptRpc} for bid ${bid.id}`
     );
 
     let chatId: string | null = null;
     try {
       const { data: acceptResult, error: acceptErr } = await userClient
-        .rpc("accept_bid", { p_bid_id: bid.id });
+        .rpc(acceptRpc, { p_bid_id: bid.id });
 
       if (acceptErr) throw acceptErr;
       chatId = (acceptResult as string | null) ?? null;
     } catch (acceptErr) {
-      // CRITICAL: charge succeeded but accept_bid failed.
+      // CRITICAL: charge succeeded but accept RPC failed.
       // Attempt automatic refund to avoid charging without hiring.
       console.error(
-        "[hire-and-charge] accept_bid FAILED after charge succeeded. " +
+        `[hire-and-charge] ${acceptRpc} FAILED after charge succeeded. ` +
         `PI=${paymentIntent.id}. Attempting refund.`,
         acceptErr
       );
