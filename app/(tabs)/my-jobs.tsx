@@ -20,6 +20,7 @@ interface Job {
   category: string | null;
   status: string;
   created_at: string;
+  worker: { full_name: string } | null;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -136,7 +137,7 @@ export default function MyJobsScreen() {
     // Step 2 — fetch this customer's posted jobs
     const { data: jobRows, error: jobErr } = await supabase
       .from('jobs')
-      .select('id, title, category, status, created_at')
+      .select('id, title, category, status, created_at, worker:profiles!worker_id(full_name)')
       .eq('customer_id', user.id)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -216,7 +217,23 @@ export default function MyJobsScreen() {
           <JobCard
             job={item}
             bidCount={bidCountMap[item.id] ?? 0}
-            onPress={() => router.push(`/(tabs)/job-bids?job_id=${item.id}` as any)}
+            onPress={async () => {
+              if (item.status === 'matched' || item.status === 'in_progress' || item.status === 'pending_confirmation') {
+                const { data: chatRow } = await supabase
+                  .from('chats')
+                  .select('id')
+                  .eq('job_id', item.id)
+                  .maybeSingle();
+                if (chatRow?.id) {
+                  const name = item.worker?.full_name ?? 'Worker';
+                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}&worker_name=${encodeURIComponent(name)}` as any);
+                } else {
+                  router.push(`/(tabs)/job-bids?job_id=${item.id}` as any);
+                }
+              } else {
+                router.push(`/(tabs)/job-bids?job_id=${item.id}` as any);
+              }
+            }}
           />
         )}
         contentContainerStyle={

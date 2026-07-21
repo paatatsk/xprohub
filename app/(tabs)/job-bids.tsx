@@ -8,7 +8,7 @@ import {
   ScrollView, ActivityIndicator, Alert, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { handleNextAction } from '@stripe/stripe-react-native';
@@ -277,6 +277,23 @@ export default function JobBidsScreen() {
       setLoading(false);
     })();
   }, [job_id]);
+
+  // ── Refetch bids + job status when screen regains focus ───────────────────
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!job_id) return;
+      fetchBids();
+      (async () => {
+        const { data } = await supabase
+          .from('jobs')
+          .select('id, title, category, status, budget_min, budget_max, customer_id')
+          .eq('id', job_id)
+          .single();
+        if (data) setJob(data as JobContext);
+      })();
+    }, [job_id, fetchBids])
+  );
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
