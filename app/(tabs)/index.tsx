@@ -205,6 +205,7 @@ export default function HomeScreen() {
         .from('jobs')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'open')
+        .is('worker_id', null)
         .gte('expires_at', new Date().toISOString())
         .neq('customer_id', user.id);
       if (blockedIds.length > 0) {
@@ -218,6 +219,7 @@ export default function HomeScreen() {
         .from('jobs')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'open')
+        .is('worker_id', null)
         .gte('expires_at', new Date().toISOString());
       setOpenJobCount(jc ?? 0);
     }

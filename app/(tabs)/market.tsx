@@ -83,6 +83,7 @@ export default function MarketScreen() {
       .from('jobs')
       .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id, expires_at')
       .eq('status', 'open')
+      .is('worker_id', null)
       .gte('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
       .limit(50);

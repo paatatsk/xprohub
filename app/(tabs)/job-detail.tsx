@@ -27,6 +27,7 @@ interface JobDetail {
   is_urgent: boolean;
   created_at: string;
   customer_id: string | null;
+  worker_id: string | null;
   status: string;
 }
 
@@ -93,7 +94,7 @@ export default function JobDetailScreen() {
       // 1 — Load job row
       const { data: jobData, error: jobErr } = await supabase
         .from('jobs')
-        .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id, status')
+        .select('id, title, description, category, budget_min, budget_max, neighborhood, timing, is_urgent, created_at, customer_id, worker_id, status')
         .eq('id', job_id)
         .single();
 
@@ -214,6 +215,7 @@ export default function JobDetailScreen() {
   // ── Derived ────────────────────────────────────────────────────
 
   const isOwnJob       = !!job.customer_id && !!currentUserId && job.customer_id === currentUserId;
+  const isTargetedJob  = !!job.worker_id && job.worker_id !== currentUserId;
   const customerName   = customer?.full_name ?? 'Anonymous';
   const customerAvatar = customer?.avatar_url ?? null;
   const initials       = customerName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -393,6 +395,10 @@ export default function JobDetailScreen() {
         ) : hasExistingBid ? (
           <View style={[styles.applyBtn, styles.applyBtnSent]}>
             <Text style={styles.applyBtnSentText}>✓  APPLICATION SENT</Text>
+          </View>
+        ) : isTargetedJob ? (
+          <View style={[styles.applyBtn, styles.applyBtnSent]}>
+            <Text style={styles.applyBtnSentText}>NOT ACCEPTING APPLICATIONS</Text>
           </View>
         ) : (
           <TouchableOpacity
