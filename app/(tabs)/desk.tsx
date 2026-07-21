@@ -340,9 +340,9 @@ export default function DeskScreen() {
   function renderActiveGroups() {
     return (
       <>
-        {renderGroup('TAKEN', takenJobs, '/(tabs)/my-jobs', 'VIEW ALL')}
-        {renderGroup('POSTED', postedJobs, '/(tabs)/my-jobs', 'VIEW ALL')}
-        {renderGroup('APPLIED', appliedJobs, '/(tabs)/my-applications', 'VIEW ALL')}
+        {renderGroup('TAKEN', takenJobs, '/my-jobs', 'VIEW ALL')}
+        {renderGroup('POSTED', postedJobs, '/my-jobs', 'VIEW ALL')}
+        {renderGroup('APPLIED', appliedJobs, '/my-applications', 'VIEW ALL')}
       </>
     );
   }

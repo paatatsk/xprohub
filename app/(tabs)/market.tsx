@@ -362,9 +362,9 @@ export default function MarketScreen() {
           return (
             <WorkerCardComponent
               worker={item}
-              onPress={() => router.push(`/(tabs)/worker-profile?worker_id=${item.id}` as any)}
+              onPress={() => router.push(`/worker-profile?worker_id=${item.id}` as any)}
               {...(isSelf
-                ? { onEdit: () => router.push('/(tabs)/my-card' as any) }
+                ? { onEdit: () => router.push('/my-card' as any) }
                 : {
                     onHire: () => {
                       const hireDest =

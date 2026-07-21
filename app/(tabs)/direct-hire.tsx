@@ -278,7 +278,7 @@ export default function DirectHireScreen() {
     Alert.alert(
       'Request Sent',
       `Your request has been sent to ${worker_name ?? 'the worker'}. You'll be charged only if they accept.`,
-      [{ text: 'OK', onPress: () => router.replace('/(tabs)/my-jobs' as any) }],
+      [{ text: 'OK', onPress: () => router.replace('/my-jobs' as any) }],
     );
   };
 

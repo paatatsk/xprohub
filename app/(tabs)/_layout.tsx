@@ -107,15 +107,10 @@ export default function TabLayout() {
       <Tabs.Screen name="post"          options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'POST A JOB',    headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="report"        options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'REPORT',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="direct-hire"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'HIRE DIRECTLY',  headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="my-card"       options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY ID CARD',     headerLeft: () => <BackButton /> }} />
-
       <Tabs.Screen name="apply"         options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'APPLY',          headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="apply-success" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'SENT' }} />
-      <Tabs.Screen name="my-jobs"         options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY JOBS',         headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="my-applications" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'MY APPLICATIONS', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="payment-setup" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'PAYMENT SETUP', headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="stripe-connect"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'GET PAID',       headerLeft: () => <BackButton /> }} />
-      <Tabs.Screen name="worker-profile"   options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'WORKER',         headerLeft: () => <BackButton /> }} />
       <Tabs.Screen name="community-guidelines" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'GUIDELINES', headerLeft: () => <BackButton returnTo="/(tabs)/account" /> }} />
       <Tabs.Screen name="delete-account" options={{ ...hiddenTab, ...headerDefaults, headerShown: true, title: 'DELETE ACCOUNT', headerLeft: () => <BackButton returnTo="/(tabs)/account" /> }} />
     </Tabs>

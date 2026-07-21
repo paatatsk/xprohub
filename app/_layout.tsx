@@ -113,9 +113,13 @@ export default function RootLayout() {
           <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="job/[id]" />
-          <Stack.Screen name="job-chat"   options={{ headerShown: true, header: () => <DetailHeader title="CHAT" /> }} />
-          <Stack.Screen name="job-detail" options={{ headerShown: true, header: () => <DetailHeader title="JOB DETAILS" /> }} />
-          <Stack.Screen name="job-bids"   options={{ headerShown: true, header: () => <DetailHeader title="APPLICATIONS" /> }} />
+          <Stack.Screen name="job-chat"          options={{ headerShown: true, header: () => <DetailHeader title="CHAT" /> }} />
+          <Stack.Screen name="job-detail"        options={{ headerShown: true, header: () => <DetailHeader title="JOB DETAILS" /> }} />
+          <Stack.Screen name="job-bids"          options={{ headerShown: true, header: () => <DetailHeader title="APPLICATIONS" /> }} />
+          <Stack.Screen name="my-jobs"           options={{ headerShown: true, header: () => <DetailHeader title="MY JOBS" /> }} />
+          <Stack.Screen name="my-applications"   options={{ headerShown: true, header: () => <DetailHeader title="MY APPLICATIONS" /> }} />
+          <Stack.Screen name="my-card"           options={{ headerShown: true, header: () => <DetailHeader title="MY ID CARD" /> }} />
+          <Stack.Screen name="worker-profile"    options={{ headerShown: true, header: () => <DetailHeader title="WORKER" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
           <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
         </Stack>

@@ -1,4 +1,4 @@
-// app/(tabs)/my-jobs.tsx
+// app/my-jobs.tsx
 // Screen — Customer's posted jobs list with bid counts and status.
 // Tapping a card routes to /job-bids?job_id=<id>.
 

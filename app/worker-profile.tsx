@@ -1,4 +1,4 @@
-// app/(tabs)/worker-profile.tsx
+// app/worker-profile.tsx
 // Read-only Worker Profile — the trust layer behind the Market pass card.
 // Param: worker_id (uuid)
 
@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -402,7 +402,7 @@ export default function WorkerProfileScreen() {
           <TouchableOpacity
             style={styles.editBtn}
             activeOpacity={0.85}
-            onPress={() => router.push('/(tabs)/my-card' as any)}
+            onPress={() => router.push('/my-card' as any)}
             accessibilityLabel="Edit your ID card"
             accessibilityRole="button"
           >

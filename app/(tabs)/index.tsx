@@ -101,7 +101,7 @@ function LaunchpadCard({
       <TouchableOpacity
         style={s.row}
         activeOpacity={0.7}
-        onPress={() => router.push('/(tabs)/my-card')}
+        onPress={() => router.push('/my-card')}
         accessibilityLabel="Edit my card"
         accessibilityRole="button"
       >
@@ -120,7 +120,7 @@ function LaunchpadCard({
       <TouchableOpacity
         style={s.row}
         activeOpacity={0.7}
-        onPress={() => router.push('/(tabs)/my-jobs')}
+        onPress={() => router.push('/my-jobs')}
         accessibilityLabel={`My posts, ${pendingBids} bids`}
         accessibilityRole="button"
       >
@@ -138,7 +138,7 @@ function LaunchpadCard({
       <TouchableOpacity
         style={s.row}
         activeOpacity={0.7}
-        onPress={() => router.push('/(tabs)/my-applications')}
+        onPress={() => router.push('/my-applications')}
         accessibilityLabel={`My applications, ${openApplications} open`}
         accessibilityRole="button"
       >

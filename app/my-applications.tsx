@@ -1,4 +1,4 @@
-// app/(tabs)/my-applications.tsx
+// app/my-applications.tsx
 // Screen — Worker's submitted applications (bid history) across all jobs.
 // Symmetric to my-jobs.tsx but for the worker side.
 

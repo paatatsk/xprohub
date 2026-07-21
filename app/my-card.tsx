@@ -1,4 +1,4 @@
-// app/(tabs)/my-card.tsx
+// app/my-card.tsx
 // My ID Card — Worker self-view of their credential
 // Design spec: docs/my-card/MY_CARD_SPEC.md (Revision 02)
 // Copy source: docs/my-card/copy.md
@@ -19,11 +19,11 @@ import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-disp
 import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
-import { strings } from '../../constants/strings';
-import { supabase } from '../../lib/supabase';
-import { uploadPortfolioPhoto } from '../../lib/photos';
-import WorkerCardComponent, { type Worker } from '../../components/WorkerCard';
+import { Colors, Fonts, Spacing, Radius } from '../constants/theme';
+import { strings } from '../constants/strings';
+import { supabase } from '../lib/supabase';
+import { uploadPortfolioPhoto } from '../lib/photos';
+import WorkerCardComponent, { type Worker } from '../components/WorkerCard';
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -1402,7 +1402,7 @@ export default function MyCardScreen() {
               worker={previewWorker}
               preview
               onPhotoPress={() => {
-                const dest = encodeURIComponent('/(tabs)/my-card');
+                const dest = encodeURIComponent('/my-card');
                 router.push(`/(onboarding)/id?step=photo&returnTo=${dest}` as any);
               }}
               onBioPress={openBioSheet}
