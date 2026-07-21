@@ -29,6 +29,7 @@ interface Bid {
   message: string | null;
   created_at: string;
   is_direct_offer: boolean;
+  worker_id: string;
   job: EmbeddedJob | null;
 }
 
@@ -97,14 +98,16 @@ function jobStatusLabel(status: string): string {
 interface ApplicationCardProps {
   bid: Bid;
   customerName: string | null; // only populated for accepted bids
+  currentUserId: string | null;
   actionLoading: boolean;
   onPress: () => void;
   onAccept?: () => void;
   onDecline?: () => void;
 }
 
-function ApplicationCard({ bid, customerName, actionLoading, onPress, onAccept, onDecline }: ApplicationCardProps) {
-  const isDirectPending = bid.is_direct_offer && bid.status === 'pending';
+function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPress, onAccept, onDecline }: ApplicationCardProps) {
+  // Show accept/decline only when the current user IS the bid's worker
+  const isDirectPending = bid.is_direct_offer && bid.status === 'pending' && bid.worker_id === currentUserId;
   const bidColor   = isDirectPending ? Colors.gold : bidStatusColor(bid.status);
   const bidLabel   = isDirectPending ? 'DIRECT OFFER' : bidStatusLabel(bid.status);
   const job        = bid.job;
@@ -198,6 +201,7 @@ export default function MyApplicationsScreen() {
 
   const [bids,            setBids]            = useState<Bid[]>([]);
   const [customerNameMap, setCustomerNameMap] = useState<Record<string, string>>({});
+  const [currentUserId,   setCurrentUserId]   = useState<string | null>(null);
   const [loading,         setLoading]         = useState(true);
   const [refreshing,      setRefreshing]      = useState(false);
   const [error,           setError]           = useState<string | null>(null);
@@ -217,12 +221,13 @@ export default function MyApplicationsScreen() {
       else           setLoading(false);
       return;
     }
+    setCurrentUserId(user.id);
 
     // Step 2 — fetch worker's bids with embedded job context
     const { data: bidRows, error: bidErr } = await supabase
       .from('bids')
       .select(`
-        id, status, proposed_price, message, created_at, is_direct_offer,
+        id, status, proposed_price, message, created_at, is_direct_offer, worker_id,
         job:jobs!job_id(id, title, category, status, customer_id)
       `)
       .eq('worker_id', user.id)
@@ -425,6 +430,7 @@ export default function MyApplicationsScreen() {
             customerName={
               item.job?.customer_id ? (customerNameMap[item.job.customer_id] ?? null) : null
             }
+            currentUserId={currentUserId}
             actionLoading={actionLoading[item.id] ?? false}
             onPress={() => handlePress(item)}
             onAccept={item.is_direct_offer && item.status === 'pending' ? () => handleAcceptOffer(item) : undefined}

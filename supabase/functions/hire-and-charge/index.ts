@@ -133,6 +133,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
       );
     }
 
+    // Self-hire guard — worker and customer must be different people
+    if (job.customer_id === bid.worker_id) {
+      return new Response(
+        JSON.stringify({ error: "Self-hire is not allowed" }),
+        { status: 422, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     // Bid must be pending
     if (bid.status !== "pending") {
       return new Response(
