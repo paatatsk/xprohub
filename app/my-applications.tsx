@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
