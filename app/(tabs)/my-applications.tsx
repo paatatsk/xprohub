@@ -5,10 +5,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  FlatList, ActivityIndicator, RefreshControl,
+  FlatList, ActivityIndicator, RefreshControl, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -28,6 +28,7 @@ interface Bid {
   proposed_price: number | null;
   message: string | null;
   created_at: string;
+  is_direct_offer: boolean;
   job: EmbeddedJob | null;
 }
 
@@ -96,12 +97,16 @@ function jobStatusLabel(status: string): string {
 interface ApplicationCardProps {
   bid: Bid;
   customerName: string | null; // only populated for accepted bids
+  actionLoading: boolean;
   onPress: () => void;
+  onAccept?: () => void;
+  onDecline?: () => void;
 }
 
-function ApplicationCard({ bid, customerName, onPress }: ApplicationCardProps) {
-  const bidColor   = bidStatusColor(bid.status);
-  const bidLabel   = bidStatusLabel(bid.status);
+function ApplicationCard({ bid, customerName, actionLoading, onPress, onAccept, onDecline }: ApplicationCardProps) {
+  const isDirectPending = bid.is_direct_offer && bid.status === 'pending';
+  const bidColor   = isDirectPending ? Colors.gold : bidStatusColor(bid.status);
+  const bidLabel   = isDirectPending ? 'DIRECT OFFER' : bidStatusLabel(bid.status);
   const job        = bid.job;
 
   return (
@@ -156,6 +161,32 @@ function ApplicationCard({ bid, customerName, onPress }: ApplicationCardProps) {
         <Text style={styles.timeAgo}>{timeAgo(bid.created_at)}</Text>
       </View>
 
+      {/* ── Accept / Decline buttons (direct offers only) ── */}
+      {isDirectPending && (
+        <View style={styles.actionRow}>
+          {actionLoading ? (
+            <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
+          ) : (
+            <>
+              <TouchableOpacity
+                style={styles.acceptBtn}
+                onPress={onAccept}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.acceptBtnText}>ACCEPT</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.declineBtn}
+                onPress={onDecline}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.declineBtnText}>DECLINE</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      )}
+
     </TouchableOpacity>
   );
 }
@@ -191,7 +222,7 @@ export default function MyApplicationsScreen() {
     const { data: bidRows, error: bidErr } = await supabase
       .from('bids')
       .select(`
-        id, status, proposed_price, message, created_at,
+        id, status, proposed_price, message, created_at, is_direct_offer,
         job:jobs!job_id(id, title, category, status, customer_id)
       `)
       .eq('worker_id', user.id)
@@ -234,6 +265,98 @@ export default function MyApplicationsScreen() {
   }, []);
 
   useEffect(() => { loadApplications(); }, [loadApplications]);
+
+  // ── Refetch when screen regains focus (new offers may have arrived) ────────
+
+  useFocusEffect(useCallback(() => { loadApplications(); }, [loadApplications]));
+
+  // ── Action state for direct-offer accept/decline ──────────────────────────
+
+  const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
+
+  // ── Accept direct offer ───────────────────────────────────────────────────
+
+  const handleAcceptOffer = useCallback((bid: Bid) => {
+    const price = bid.proposed_price?.toFixed(0) ?? '0';
+    Alert.alert(
+      'Accept this job?',
+      `Accept for $${price}? The customer will be charged and the job becomes yours.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Accept',
+          onPress: async () => {
+            setActionLoading(prev => ({ ...prev, [bid.id]: true }));
+            try {
+              const { data, error: fnError } = await supabase.functions.invoke(
+                'hire-and-charge',
+                { body: { bid_id: bid.id } },
+              );
+
+              if (fnError) {
+                Alert.alert('Something went wrong', fnError.message ?? 'Please try again.');
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                await loadApplications(true);
+                return;
+              }
+
+              if (data?.error === 'customer_payment_issue') {
+                Alert.alert('Payment Issue', data.message ?? "The customer's payment couldn't be processed.");
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                await loadApplications(true);
+                return;
+              }
+
+              if (data?.error) {
+                Alert.alert('Could not accept', data.message ?? 'Please try again.');
+                setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+                await loadApplications(true);
+                return;
+              }
+
+              // Success — navigate to chat
+              setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+              const chatId = data?.chat_id as string | null;
+              if (chatId) {
+                router.push(`/(tabs)/job-chat?chat_id=${chatId}` as any);
+              }
+              await loadApplications(true);
+            } catch {
+              Alert.alert('Something went wrong', 'Please try again.');
+              setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+              await loadApplications(true);
+            }
+          },
+        },
+      ],
+    );
+  }, [loadApplications, router]);
+
+  // ── Decline direct offer ──────────────────────────────────────────────────
+
+  const handleDeclineOffer = useCallback((bid: Bid) => {
+    Alert.alert(
+      'Decline this request?',
+      'The job will be closed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Decline',
+          style: 'destructive',
+          onPress: async () => {
+            setActionLoading(prev => ({ ...prev, [bid.id]: true }));
+            const { error: rpcErr } = await supabase
+              .rpc('decline_direct_offer', { p_bid_id: bid.id });
+            setActionLoading(prev => ({ ...prev, [bid.id]: false }));
+            if (rpcErr) {
+              Alert.alert('Could not decline', rpcErr.message ?? 'Please try again.');
+            }
+            await loadApplications(true);
+          },
+        },
+      ],
+    );
+  }, [loadApplications]);
 
   // ── Navigation handler ────────────────────────────────────────────────────
 
@@ -302,7 +425,10 @@ export default function MyApplicationsScreen() {
             customerName={
               item.job?.customer_id ? (customerNameMap[item.job.customer_id] ?? null) : null
             }
+            actionLoading={actionLoading[item.id] ?? false}
             onPress={() => handlePress(item)}
+            onAccept={item.is_direct_offer && item.status === 'pending' ? () => handleAcceptOffer(item) : undefined}
+            onDecline={item.is_direct_offer && item.status === 'pending' ? () => handleDeclineOffer(item) : undefined}
           />
         )}
         contentContainerStyle={
@@ -510,6 +636,40 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,
+  },
+
+  // ── Accept / Decline action row (direct offers) ───────────────
+  actionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 2,
+  },
+  acceptBtn: {
+    flex: 1,
+    backgroundColor: Colors.gold,
+    borderRadius: Radius.md,
+    paddingVertical: 11,
+    alignItems: 'center',
+  },
+  acceptBtnText: {
+    color: Colors.background,
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 1.2,
+  },
+  declineBtn: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: Colors.gold,
+    borderRadius: Radius.full,
+    paddingVertical: 11,
+    alignItems: 'center',
+  },
+  declineBtnText: {
+    color: Colors.gold,
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 1.2,
   },
 
   // ── Retry / action button ─────────────────────────────────────
