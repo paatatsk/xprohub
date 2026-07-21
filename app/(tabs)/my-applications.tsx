@@ -128,8 +128,13 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
         </View>
       </View>
 
-      {/* ── Category pill + job status pill ── */}
+      {/* ── Category pill + job status pill + direct hire pill ── */}
       <View style={styles.pillRow}>
+        {bid.is_direct_offer && (
+          <View style={styles.directHirePill}>
+            <Text style={styles.directHireText}>DIRECT HIRE</Text>
+          </View>
+        )}
         {job?.category ? (
           <View style={styles.categoryPill}>
             <Text style={styles.categoryText}>{job.category}</Text>
@@ -157,8 +162,8 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
         <Text style={styles.price}>${bid.proposed_price.toFixed(0)}</Text>
       )}
 
-      {/* ── Submitted message ── */}
-      {bid.message ? (
+      {/* ── Submitted message (suppressed for direct offers — boilerplate) ── */}
+      {!bid.is_direct_offer && bid.message ? (
         <Text style={styles.message} numberOfLines={2}>{bid.message}</Text>
       ) : null}
 
@@ -332,7 +337,7 @@ export default function MyApplicationsScreen() {
               setActionLoading(prev => ({ ...prev, [bid.id]: false }));
               const chatId = data?.chat_id as string | null;
               if (chatId) {
-                router.push(`/(tabs)/job-chat?chat_id=${chatId}` as any);
+                router.push(`/job-chat?chat_id=${chatId}` as any);
               }
               await loadApplications(true);
             } catch {
@@ -409,15 +414,15 @@ export default function MyApplicationsScreen() {
         .maybeSingle();
 
       if (!chatErr && chatRow?.id) {
-        router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+        router.push(`/job-chat?chat_id=${chatRow.id}` as any);
       } else {
         // Chat row missing — fall back to job detail
-        router.push(`/(tabs)/job-detail?job_id=${bid.job.id}` as any);
+        router.push(`/job-detail?job_id=${bid.job.id}` as any);
       }
       return;
     }
 
-    router.push(`/(tabs)/job-detail?job_id=${bid.job.id}` as any);
+    router.push(`/job-detail?job_id=${bid.job.id}` as any);
   }, [router]);
 
   // ── Loading state ─────────────────────────────────────────────────────────
@@ -573,6 +578,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  directHirePill: {
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: Colors.gold,
+    borderRadius: Radius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  directHireText: {
+    color: Colors.gold,
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   categoryPill: {
     alignSelf: 'flex-start',

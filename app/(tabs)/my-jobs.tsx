@@ -1,6 +1,6 @@
 // app/(tabs)/my-jobs.tsx
 // Screen — Customer's posted jobs list with bid counts and status.
-// Tapping a card routes to /(tabs)/job-bids?job_id=<id>.
+// Tapping a card routes to /job-bids?job_id=<id>.
 
 import { useState, useEffect, useCallback } from 'react';
 import {
@@ -262,12 +262,12 @@ export default function MyJobsScreen() {
                   .maybeSingle();
                 if (chatRow?.id) {
                   const name = item.worker?.full_name ?? 'Worker';
-                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}&worker_name=${encodeURIComponent(name)}` as any);
+                  router.push(`/job-chat?chat_id=${chatRow.id}&worker_name=${encodeURIComponent(name)}` as any);
                 } else {
-                  router.push(`/(tabs)/job-bids?job_id=${item.id}` as any);
+                  router.push(`/job-bids?job_id=${item.id}` as any);
                 }
               } else {
-                router.push(`/(tabs)/job-bids?job_id=${item.id}` as any);
+                router.push(`/job-bids?job_id=${item.id}` as any);
               }
             }}
             onDelete={() => handleDelete(item)}

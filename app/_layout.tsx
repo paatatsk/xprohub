@@ -9,6 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { DetailHeader } from '../components/DetailHeader';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -112,6 +113,9 @@ export default function RootLayout() {
           <Stack.Screen name="(onboarding)" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="job/[id]" />
+          <Stack.Screen name="job-chat"   options={{ headerShown: true, header: () => <DetailHeader title="CHAT" /> }} />
+          <Stack.Screen name="job-detail" options={{ headerShown: true, header: () => <DetailHeader title="JOB DETAILS" /> }} />
+          <Stack.Screen name="job-bids"   options={{ headerShown: true, header: () => <DetailHeader title="APPLICATIONS" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
           <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
         </Stack>

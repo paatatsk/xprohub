@@ -1,4 +1,4 @@
-// app/(tabs)/job-bids.tsx
+// app/job-bids.tsx
 // Screen — Customer reviews, accepts, and declines bids on a specific job.
 // URL param: job_id (uuid)
 
@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
 import { handleNextAction } from '@stripe/stripe-react-native';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -374,7 +374,7 @@ export default function JobBidsScreen() {
                 setActionLoading(prev => ({ ...prev, [bid.id]: false }));
                 if (resumeChatId) {
                   router.replace(
-                    `/(tabs)/job-chat?chat_id=${resumeChatId}&worker_name=${encodeURIComponent(workerName)}` as any
+                    `/job-chat?chat_id=${resumeChatId}&worker_name=${encodeURIComponent(workerName)}` as any
                   );
                 } else {
                   await fetchBids();
@@ -393,7 +393,7 @@ export default function JobBidsScreen() {
                     {
                       text: 'Update Card',
                       onPress: () => router.push(
-                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/(tabs)/job-bids?job_id=${job_id}`)}` as any
+                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
                       ),
                     },
                   ]
@@ -415,7 +415,7 @@ export default function JobBidsScreen() {
                     {
                       text: 'Set Up Payment',
                       onPress: () => router.push(
-                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/(tabs)/job-bids?job_id=${job_id}`)}` as any
+                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
                       ),
                     },
                   ]
@@ -436,7 +436,7 @@ export default function JobBidsScreen() {
 
               if (chatId) {
                 router.replace(
-                  `/(tabs)/job-chat?chat_id=${chatId}&worker_name=${encodeURIComponent(workerName)}` as any
+                  `/job-chat?chat_id=${chatId}&worker_name=${encodeURIComponent(workerName)}` as any
                 );
               } else {
                 await fetchBids();
@@ -500,7 +500,7 @@ export default function JobBidsScreen() {
 
     const workerName = bid.worker?.full_name ?? 'Worker';
     router.push(
-      `/(tabs)/job-chat?chat_id=${chatRow.id}&worker_name=${encodeURIComponent(workerName)}` as any
+      `/job-chat?chat_id=${chatRow.id}&worker_name=${encodeURIComponent(workerName)}` as any
     );
   }
 
@@ -602,7 +602,7 @@ export default function JobBidsScreen() {
         <TouchableOpacity
           style={styles.contextCard}
           activeOpacity={0.8}
-          onPress={() => router.push(`/(tabs)/job-detail?job_id=${job!.id}` as any)}
+          onPress={() => router.push(`/job-detail?job_id=${job!.id}` as any)}
           accessibilityLabel="View your job post"
           accessibilityRole="button"
         >
@@ -650,7 +650,7 @@ export default function JobBidsScreen() {
                   .eq('job_id', job!.id)
                   .maybeSingle();
                 if (chatRow?.id) {
-                  router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+                  router.push(`/job-chat?chat_id=${chatRow.id}` as any);
                 }
               }}
             >

@@ -1,4 +1,4 @@
-// app/(tabs)/job-chat.tsx
+// app/job-chat.tsx
 // Screen — Realtime-powered chat thread between customer and worker.
 // Replaces the placeholder. Param: chat_id (uuid, required).
 // worker_name and first_message params are intentionally ignored —
@@ -13,11 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { SUPPORT_EMAIL } from '../../lib/legal';
-import { supabase } from '../../lib/supabase';
-import { uploadJobPhoto, type PhotoType } from '../../lib/photos';
-import { friendlyError } from '../../lib/moderation';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { SUPPORT_EMAIL } from '../lib/legal';
+import { supabase } from '../lib/supabase';
+import { uploadJobPhoto, type PhotoType } from '../lib/photos';
+import { friendlyError } from '../lib/moderation';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

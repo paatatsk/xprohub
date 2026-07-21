@@ -273,7 +273,7 @@ export default function DeskScreen() {
 
     const handlePress = async () => {
       if (role === 'posted') {
-        router.push(`/(tabs)/job-bids?job_id=${job.id}` as any);
+        router.push(`/job-bids?job_id=${job.id}` as any);
       } else if (role === 'taken') {
         const { data: chatRow } = await supabase
           .from('chats')
@@ -281,10 +281,10 @@ export default function DeskScreen() {
           .eq('job_id', job.id)
           .maybeSingle();
         if (chatRow?.id) {
-          router.push(`/(tabs)/job-chat?chat_id=${chatRow.id}` as any);
+          router.push(`/job-chat?chat_id=${chatRow.id}` as any);
         }
       } else {
-        router.push(`/(tabs)/job-detail?job_id=${job.id}` as any);
+        router.push(`/job-detail?job_id=${job.id}` as any);
       }
     };
 

@@ -298,8 +298,8 @@ export default function MarketScreen() {
               isOwnPost={isOwnPost}
               onPress={() => router.push(
                 isOwnPost
-                  ? `/(tabs)/job-bids?job_id=${item.id}` as any
-                  : `/(tabs)/job-detail?job_id=${item.id}` as any
+                  ? `/job-bids?job_id=${item.id}` as any
+                  : `/job-detail?job_id=${item.id}` as any
               )}
             />
           );
