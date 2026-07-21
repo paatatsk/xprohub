@@ -1,9 +1,9 @@
 // app/(tabs)/account.tsx
-// Screen: ACCOUNT — About, Legal, Sign Out, Delete Account
+// Screen: ACCOUNT — Identity, About, Legal, Sign Out
 // Entry point: gear icon on Home screen header
 
 import { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Linking, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
@@ -17,21 +17,41 @@ export default function AccountScreen() {
   const router = useRouter();
   const { clearCredentials } = useBiometrics();
   const appVersion = Constants.expoConfig?.version ?? '1.0.0';
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  // ── Identity header data ──────────────────────────────────────
+  const [fullName, setFullName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   // ── Blocked users ──────────────────────────────────────────
   const [blockedUsers, setBlockedUsers] = useState<{ id: string; blocked_id: string; full_name: string }[]>([]);
 
-  const fetchBlockedUsers = useCallback(async () => {
+  const fetchAccountData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data } = await supabase
-      .from('user_blocks')
-      .select('id, blocked_id, profiles!blocked_id(full_name)')
-      .eq('blocker_id', user.id)
-      .order('created_at', { ascending: false });
+
+    setEmail(user.email ?? null);
+
+    // Profile + blocked users in parallel
+    const [profileRes, blocksRes] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('id', user.id)
+        .single(),
+      supabase
+        .from('user_blocks')
+        .select('id, blocked_id, profiles!blocked_id(full_name)')
+        .eq('blocker_id', user.id)
+        .order('created_at', { ascending: false }),
+    ]);
+
+    if (profileRes.data) {
+      setFullName(profileRes.data.full_name);
+      setAvatarUrl(profileRes.data.avatar_url);
+    }
     setBlockedUsers(
-      (data ?? []).map((r: any) => ({
+      (blocksRes.data ?? []).map((r: any) => ({
         id: r.id,
         blocked_id: r.blocked_id,
         full_name: r.profiles?.full_name ?? 'User',
@@ -39,7 +59,7 @@ export default function AccountScreen() {
     );
   }, []);
 
-  useFocusEffect(useCallback(() => { fetchBlockedUsers(); }, [fetchBlockedUsers]));
+  useFocusEffect(useCallback(() => { fetchAccountData(); }, [fetchAccountData]));
 
   async function handleUnblock(blockId: string, name: string) {
     const { error } = await supabase
@@ -49,7 +69,7 @@ export default function AccountScreen() {
     if (error) {
       Alert.alert('Unblock Failed', "Couldn't unblock this user. Please try again.");
     } else {
-      await fetchBlockedUsers();
+      await fetchAccountData();
     }
   }
 
@@ -64,84 +84,26 @@ export default function AccountScreen() {
     }
   }
 
-  function handleDeleteAccount() {
-    Alert.alert(
-      'Delete Your Account?',
-      'This is permanent. Your profile, jobs, and payment history will be anonymized. You cannot undo this.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete My Account',
-          style: 'destructive',
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              const { data, error: fnError } = await supabase.functions.invoke(
-                'delete-account',
-                { body: {} },
-              );
-
-              if (fnError) {
-                // supabase-js routes non-2xx responses to fnError as
-                // FunctionsHttpError. The response body (with our structured
-                // error codes) is in fnError.context, a Response-like object.
-                try {
-                  const body = await (fnError as any).context?.json?.();
-                  if (body?.error === 'active_jobs' || body?.error === 'held_payments') {
-                    Alert.alert('Active Commitments', body.message);
-                    return;
-                  }
-                  if (body?.error) {
-                    Alert.alert(
-                      'Deletion Failed',
-                      body.message ?? 'Account deletion could not be completed. Please try again or contact hello@xprohub.com.',
-                    );
-                    return;
-                  }
-                } catch {
-                  // context parsing failed — genuine network/infra error
-                }
-                Alert.alert(
-                  'Connection Error',
-                  "Couldn't reach our servers. Check your connection and try again.",
-                );
-                return;
-              }
-
-              if (data?.error === 'active_jobs' || data?.error === 'held_payments') {
-                Alert.alert('Active Commitments', data.message);
-                return;
-              }
-
-              if (data?.error) {
-                Alert.alert(
-                  'Deletion Failed',
-                  data.message ?? 'Account deletion could not be completed. Please try again or contact hello@xprohub.com.',
-                );
-                return;
-              }
-
-              // Success — sign out, clear biometrics, route to welcome
-              await supabase.auth.signOut();
-              await clearCredentials();
-              router.replace('/(onboarding)/welcome');
-            } catch (err) {
-              Alert.alert(
-                'Deletion Failed',
-                'Something went wrong. Please try again or contact hello@xprohub.com.',
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ],
-    );
-  }
+  const initials = fullName
+    ? fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.scroll}>
+
+        {/* ── IDENTITY HEADER ── */}
+        <View style={styles.identityHeader}>
+          <View style={styles.identityAvatar}>
+            {avatarUrl ? (
+              <Image source={{ uri: avatarUrl }} style={styles.identityAvatarImg} />
+            ) : (
+              <Text style={styles.identityInitials}>{initials}</Text>
+            )}
+          </View>
+          {fullName && <Text style={styles.identityName}>{fullName}</Text>}
+          {email && <Text style={styles.identityEmail}>{email}</Text>}
+        </View>
 
         {/* ── ABOUT ── */}
         <Text style={styles.eyebrow}>ABOUT</Text>
@@ -195,8 +157,21 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ── BLOCKED USERS ── */}
-        <Text style={styles.eyebrow}>BLOCKED USERS</Text>
+        {/* ── ACTIONS ── */}
+        <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.7}>
+          <Text style={styles.signOutText}>SIGN OUT</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.deleteBtn}
+          onPress={() => router.push('/(tabs)/delete-account' as any)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.deleteText}>DELETE ACCOUNT</Text>
+        </TouchableOpacity>
+
+        {/* ── BLOCKED USERS (footer section) ── */}
+        <Text style={[styles.eyebrow, { marginTop: Spacing.xxl }]}>BLOCKED USERS</Text>
         <View style={styles.card}>
           {blockedUsers.length === 0 ? (
             <View style={styles.row}>
@@ -220,20 +195,6 @@ export default function AccountScreen() {
           )}
         </View>
 
-        {/* ── ACTIONS ── */}
-        <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.7}>
-          <Text style={styles.signOutText}>SIGN OUT</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.deleteBtn, isDeleting && { opacity: 0.5 }]}
-          onPress={handleDeleteAccount}
-          activeOpacity={0.7}
-          disabled={isDeleting}
-        >
-          <Text style={styles.deleteText}>{isDeleting ? 'Deleting…' : 'DELETE ACCOUNT'}</Text>
-        </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -243,8 +204,46 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.md,
     paddingBottom: Spacing.xxl,
+  },
+
+  // Identity header
+  identityHeader: {
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: Spacing.lg,
+  },
+  identityAvatar: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: Colors.gold,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  identityAvatarImg: {
+    width: 64,
+    height: 64,
+  },
+  identityInitials: {
+    color: Colors.gold,
+    fontWeight: 'bold',
+    fontSize: 22,
+  },
+  identityName: {
+    color: Colors.textPrimary,
+    fontWeight: 'bold',
+    fontSize: 18,
+    letterSpacing: 0.3,
+  },
+  identityEmail: {
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    fontSize: 13,
   },
 
   // Section eyebrow
@@ -312,7 +311,23 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.md,
   },
 
-  // Sign Out button
+  // Delete Account button (below sign out, with separation)
+  deleteBtn: {
+    marginTop: 56,
+    borderWidth: 1,
+    borderColor: Colors.red,
+    borderRadius: Radius.md,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  deleteText: {
+    color: Colors.red,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+
+  // Sign Out button (first action after content)
   signOutBtn: {
     marginTop: Spacing.xl,
     borderWidth: 1,
@@ -323,22 +338,6 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: Colors.gold,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-
-  // Delete Account button
-  deleteBtn: {
-    marginTop: 32,
-    borderWidth: 1,
-    borderColor: Colors.red,
-    borderRadius: Radius.md,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  deleteText: {
-    color: Colors.red,
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 1,
