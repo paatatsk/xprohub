@@ -5,10 +5,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { useTrustLevel } from '../../hooks/useTrustLevel';
-import { friendlyError } from '../../lib/moderation';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { useTrustLevel } from '../hooks/useTrustLevel';
+import { friendlyError } from '../lib/moderation';
 
 // Direct Hire v3 — charge-on-acceptance redesign
 // Params: worker_id (uuid), worker_name (display string)
@@ -195,7 +195,7 @@ export default function DirectHireScreen() {
     // null trustLevel = still loading → allow through, no false-block.
     if (trustLevel === 'explorer') {
       const selfDest =
-        `/(tabs)/direct-hire?worker_id=${worker_id}` +
+        `/direct-hire?worker_id=${worker_id}` +
         `&worker_name=${encodeURIComponent(worker_name ?? '')}`;
       router.replace(
         `/(onboarding)/verify-level-2?destination=${encodeURIComponent(selfDest)}` as Parameters<typeof router.replace>[0]
@@ -213,7 +213,7 @@ export default function DirectHireScreen() {
 
     if (!profile?.stripe_payment_method_added) {
       const returnTo =
-        `/(tabs)/direct-hire?worker_id=${worker_id}` +
+        `/direct-hire?worker_id=${worker_id}` +
         `&worker_name=${encodeURIComponent(worker_name ?? '')}`;
       router.push(
         `/(tabs)/payment-setup?returnTo=${encodeURIComponent(returnTo)}` as any

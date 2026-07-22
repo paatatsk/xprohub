@@ -6,10 +6,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { uploadJobPhoto } from '../../lib/photos';
-import { friendlyError } from '../../lib/moderation';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { uploadJobPhoto } from '../lib/photos';
+import { friendlyError } from '../lib/moderation';
 
 // Screen 7 — Post a Job
 // Step 4-FIX-2: Category-first task picker for HELP WANTED path.
@@ -340,7 +340,7 @@ export default function PostScreen() {
     // Identity gate — name + photo required to post jobs
     if (!profile?.full_name || !profile?.avatar_url) {
       router.push(
-        `/(onboarding)/profile-setup?mode=gate&returnTo=${encodeURIComponent('/(tabs)/post')}` as any
+        `/(onboarding)/profile-setup?mode=gate&returnTo=${encodeURIComponent('/post')}` as any
       );
       return;
     }
@@ -348,7 +348,7 @@ export default function PostScreen() {
     // Payment method gate (D-5)
     if (!profile?.stripe_payment_method_added) {
       router.push(
-        `/(tabs)/payment-setup?returnTo=${encodeURIComponent('/(tabs)/post')}` as any
+        `/(tabs)/payment-setup?returnTo=${encodeURIComponent('/post')}` as any
       );
       return;
     }

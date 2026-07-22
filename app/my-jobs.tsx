@@ -294,7 +294,7 @@ export default function MyJobsScreen() {
             </Text>
             <TouchableOpacity
               style={styles.retryBtn}
-              onPress={() => router.push('/(tabs)/post')}
+              onPress={() => router.push('/post')}
             >
               <Text style={styles.retryText}>POST A JOB</Text>
             </TouchableOpacity>

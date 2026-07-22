@@ -6,10 +6,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { useStripeStatus } from '../../hooks/useStripeStatus';
-import { friendlyError } from '../../lib/moderation';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { useStripeStatus } from '../hooks/useStripeStatus';
+import { friendlyError } from '../lib/moderation';
 
 // Apply — worker submits a bid on a job
 // Params: job_id (uuid)
@@ -225,7 +225,7 @@ export default function ApplyScreen() {
       return;
     }
 
-    router.replace(`/(tabs)/apply-success?job_id=${job_id}` as any);
+    router.replace(`/apply-success?job_id=${job_id}` as any);
   };
 
   // ── Loading ────────────────────────────────────────────────────
@@ -310,7 +310,7 @@ export default function ApplyScreen() {
           <TouchableOpacity
             style={styles.submitBtn}
             onPress={() => router.push(
-              `/(onboarding)/id?returnTo=${encodeURIComponent(`/(tabs)/apply?job_id=${job_id}`)}` as any
+              `/(onboarding)/id?returnTo=${encodeURIComponent(`/apply?job_id=${job_id}`)}` as any
             )}
             activeOpacity={0.85}
           >
@@ -340,7 +340,7 @@ export default function ApplyScreen() {
           <TouchableOpacity
             style={styles.submitBtn}
             onPress={() => router.push(
-              `/(tabs)/stripe-connect?returnTo=${encodeURIComponent(`/(tabs)/apply?job_id=${job_id}`)}` as any
+              `/(tabs)/stripe-connect?returnTo=${encodeURIComponent(`/apply?job_id=${job_id}`)}` as any
             )}
             activeOpacity={0.85}
           >

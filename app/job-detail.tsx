@@ -404,7 +404,7 @@ export default function JobDetailScreen() {
           <TouchableOpacity
             style={styles.applyBtn}
             activeOpacity={0.85}
-            onPress={() => router.push(`/(tabs)/apply?job_id=${job.id}` as any)}
+            onPress={() => router.push(`/apply?job_id=${job.id}` as any)}
           >
             <Text style={styles.applyBtnText}>APPLY FOR THIS JOB</Text>
           </TouchableOpacity>

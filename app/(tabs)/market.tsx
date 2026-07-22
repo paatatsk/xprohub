@@ -368,7 +368,7 @@ export default function MarketScreen() {
                 : {
                     onHire: () => {
                       const hireDest =
-                        `/(tabs)/direct-hire?worker_id=${item.id}` +
+                        `/direct-hire?worker_id=${item.id}` +
                         `&worker_name=${encodeURIComponent(item.full_name)}`;
                       if (trustLevel === 'explorer') {
                         router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(hireDest)}` as any);
@@ -474,8 +474,8 @@ export default function MarketScreen() {
         activeOpacity={0.85}
         onPress={() => {
           const dest = category_id
-            ? `/(tabs)/post?category_id=${category_id}`
-            : '/(tabs)/post';
+            ? `/post?category_id=${category_id}`
+            : '/post';
           if (trustLevel === 'explorer') {
             router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(dest)}` as any);
           } else {

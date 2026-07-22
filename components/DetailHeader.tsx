@@ -11,24 +11,29 @@ import { Colors, Fonts } from '../constants/theme';
 
 interface DetailHeaderProps {
   title: string;
+  showBack?: boolean;
 }
 
-export function DetailHeader({ title }: DetailHeaderProps) {
+export function DetailHeader({ title, showBack = true }: DetailHeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.row}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backBtn}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          accessibilityLabel="Go back"
-          accessibilityRole="button"
-        >
-          <View style={styles.chevron} />
-        </TouchableOpacity>
+        {showBack ? (
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backBtn}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            accessibilityLabel="Go back"
+            accessibilityRole="button"
+          >
+            <View style={styles.chevron} />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
         <Text style={styles.title} numberOfLines={1}>{title}</Text>
         {/* Spacer to keep title centered */}
         <View style={styles.backBtn} />

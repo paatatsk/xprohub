@@ -11,9 +11,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useStripeStatus, StripeStatus } from '../../hooks/useStripeStatus';
+
+const STORAGE_KEY = 'stripe_connect_return_to';
 
 // ── Copy strings — all user-facing text in one place ──────────
 
@@ -81,14 +84,27 @@ function badgeTextColor(state: StripeStatus) {
 export default function StripeConnectScreen() {
   const router = useRouter();
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
-  const destination = returnTo ? decodeURIComponent(returnTo) : '/(tabs)';
+  const [destination, setDestination] = useState(
+    returnTo ? decodeURIComponent(returnTo) : '/(tabs)',
+  );
 
   const {
     derivedState, loading, error, refresh,
   } = useStripeStatus();
 
-  // Refetch Stripe status when screen regains focus (e.g. returning from Safari)
-  useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
+  // Refetch Stripe status when screen regains focus (e.g. returning from Safari).
+  // Restore returnTo from AsyncStorage if the URL param was lost in the Safari round-trip.
+  useFocusEffect(useCallback(() => {
+    refresh();
+    if (!returnTo) {
+      AsyncStorage.getItem(STORAGE_KEY).then(stored => {
+        if (stored) {
+          setDestination(stored);
+          AsyncStorage.removeItem(STORAGE_KEY);
+        }
+      });
+    }
+  }, [refresh, returnTo]));
 
   const [ctaLoading, setCtaLoading] = useState(false);
   const [ctaError, setCtaError]     = useState<string | null>(null);
@@ -138,11 +154,12 @@ export default function StripeConnectScreen() {
     setCtaLoading(false);
 
     try {
+      await AsyncStorage.setItem(STORAGE_KEY, destination);
       await Linking.openURL(linkData.url);
     } catch {
       setCtaError('We couldn\'t open the setup page. Please try again.');
     }
-  }, [refresh]);
+  }, [refresh, destination]);
 
   // ── Handler: State 2 — CONTINUE SETUP (single-call flow) ───
 
@@ -171,11 +188,12 @@ export default function StripeConnectScreen() {
     setCtaLoading(false);
 
     try {
+      await AsyncStorage.setItem(STORAGE_KEY, destination);
       await Linking.openURL(data.url);
     } catch {
       setCtaError('We couldn\'t open the setup page. Please try again.');
     }
-  }, []);
+  }, [destination]);
 
   // ── Render ──────────────────────────────────────────────────
 
@@ -286,11 +304,14 @@ export default function StripeConnectScreen() {
             </TouchableOpacity>
           )}
 
-          {/* CTA — FULLY_VERIFIED with returnTo only */}
-          {derivedState === StripeStatus.FULLY_VERIFIED && returnTo && (
+          {/* CTA — FULLY_VERIFIED with a saved destination */}
+          {derivedState === StripeStatus.FULLY_VERIFIED && destination !== '/(tabs)' && (
             <TouchableOpacity
               style={styles.primaryBtn}
-              onPress={() => router.replace(destination as Parameters<typeof router.replace>[0])}
+              onPress={() => {
+                AsyncStorage.removeItem(STORAGE_KEY);
+                router.replace(destination as Parameters<typeof router.replace>[0]);
+              }}
               activeOpacity={0.85}
             >
               <Text style={styles.primaryBtnText}>CONTINUE TO APPLICATION →</Text>

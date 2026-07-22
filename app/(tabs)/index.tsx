@@ -83,7 +83,7 @@ function LaunchpadCard({
         style={s.rowFirst}
         activeOpacity={0.7}
         onPress={() => {
-          const dest = '/(tabs)/post';
+          const dest = '/post';
           if (trustLevel === 'explorer') {
             router.push(`/(onboarding)/verify-level-2?destination=${encodeURIComponent(dest)}` as any);
           } else {

@@ -120,6 +120,10 @@ export default function RootLayout() {
           <Stack.Screen name="my-applications"   options={{ headerShown: true, header: () => <DetailHeader title="MY APPLICATIONS" /> }} />
           <Stack.Screen name="my-card"           options={{ headerShown: true, header: () => <DetailHeader title="MY ID CARD" /> }} />
           <Stack.Screen name="worker-profile"    options={{ headerShown: true, header: () => <DetailHeader title="WORKER" /> }} />
+          <Stack.Screen name="post"              options={{ headerShown: true, header: () => <DetailHeader title="POST A JOB" /> }} />
+          <Stack.Screen name="apply"             options={{ headerShown: true, header: () => <DetailHeader title="APPLY" /> }} />
+          <Stack.Screen name="apply-success"     options={{ headerShown: true, header: () => <DetailHeader title="SENT" showBack={false} /> }} />
+          <Stack.Screen name="direct-hire"       options={{ headerShown: true, header: () => <DetailHeader title="HIRE DIRECTLY" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
           <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
         </Stack>

@@ -413,7 +413,7 @@ export default function WorkerProfileScreen() {
             style={styles.hireBtn}
             activeOpacity={0.85}
             onPress={() => router.push(
-              `/(tabs)/direct-hire?worker_id=${profile.id}` +
+              `/direct-hire?worker_id=${profile.id}` +
               `&worker_name=${encodeURIComponent(profile.full_name)}` as any
             )}
             accessibilityLabel={`Hire ${profile.full_name}`}
