@@ -555,8 +555,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 23,
   },
 
   // ── Bid status badge ──────────────────────────────────────────
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   },
   directHireText: {
     color: Colors.gold,
-    fontSize: 10,
+    fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: Fonts.body,
     color: Colors.gold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   jobStatusText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
   customerLine: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
   },
   customerNameAccepted: {
     color: Colors.gold,
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
   message: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 19,
   },
 
@@ -660,12 +660,12 @@ const styles = StyleSheet.create({
   timeAgo: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
   hideText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
   },
 
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
   emptySub: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
   acceptBtnText: {
     color: Colors.background,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
   declineBtn: {
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   declineBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
 });

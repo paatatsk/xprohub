@@ -400,7 +400,7 @@ const s = StyleSheet.create({
   },
   stripeLeft: {
     fontFamily: Fonts.displayB,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 3,
     color: Colors.gold,
   },
@@ -411,13 +411,13 @@ const s = StyleSheet.create({
   },
   stripeRight: {
     fontFamily: Fonts.monoMed,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     color: Colors.gold,
   },
   stripeOverflow: {
     fontFamily: Fonts.monoMed,
-    fontSize: 13,
+    fontSize: 14,
     color: 'rgba(201, 168, 76, 0.45)',
     letterSpacing: 2,
   },
@@ -467,7 +467,7 @@ const s = StyleSheet.create({
   },
   photoStampText: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 1,
     color: 'rgba(201,168,76,0.55)',
   },
@@ -484,7 +484,7 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 1,
     color: Colors.gold,
   },
@@ -495,7 +495,7 @@ const s = StyleSheet.create({
   },
   nameLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -524,7 +524,7 @@ const s = StyleSheet.create({
   },
   bio: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 15,
+    fontSize: 16,
     lineHeight: 16,
     color: Colors.textPrimary,
     marginBottom: 9,
@@ -546,7 +546,7 @@ const s = StyleSheet.create({
   },
   bioBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 1,
     color: Colors.gold,
   },
@@ -557,20 +557,20 @@ const s = StyleSheet.create({
   },
   trackText: {
     fontFamily: Fonts.monoMed,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.3,
     color: Colors.textSecondary,
   },
   trackGold: {
     fontFamily: Fonts.monoMed,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.3,
     color: Colors.gold,
     fontWeight: '600',
   },
   trackSep: {
     fontFamily: Fonts.mono,
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textTertiary,
   },
 
@@ -580,7 +580,7 @@ const s = StyleSheet.create({
   },
   skillLabel: {
     fontFamily: Fonts.display,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 2.5,
     color: Colors.gold,
     marginBottom: 3,
@@ -611,13 +611,13 @@ const s = StyleSheet.create({
   },
   pillText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 0.5,
     color: Colors.gold,
   },
   pillTextDimmed: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 0.5,
     color: 'rgba(201,168,76,0.7)',
   },
@@ -643,7 +643,7 @@ const s = StyleSheet.create({
   footerMeta: {
     flex: 1,
     fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     color: Colors.textSecondary,
   },
@@ -660,7 +660,7 @@ const s = StyleSheet.create({
   },
   hireBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 1,
     color: Colors.gold,
   },

@@ -753,13 +753,13 @@ const styles = StyleSheet.create({
   },
   contextEyebrow: {
     color: Colors.gold,
-    fontSize: 10,
+    fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 2,
   },
   contextViewHint: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: Colors.gold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -801,7 +801,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
+    fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -823,7 +823,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 18,
   },
   errorBannerDismiss: {
@@ -907,7 +907,7 @@ const styles = StyleSheet.create({
   bidMessageEmpty: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     fontStyle: 'italic',
   },
 
@@ -915,7 +915,7 @@ const styles = StyleSheet.create({
   bidTime: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
 
   // ── Action row (shared container for pending + accepted) ──────
@@ -936,7 +936,7 @@ const styles = StyleSheet.create({
   acceptBtnText: {
     color: Colors.background,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
   declineBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -967,7 +967,7 @@ const styles = StyleSheet.create({
   acceptedBadgeText: {
     color: Colors.background,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -983,7 +983,7 @@ const styles = StyleSheet.create({
   openChatBtnText: {
     color: Colors.green,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -1000,7 +1000,7 @@ const styles = StyleSheet.create({
   directOfferPillText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.5,
   },
 
@@ -1017,7 +1017,7 @@ const styles = StyleSheet.create({
   underwayText: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -1031,7 +1031,7 @@ const styles = StyleSheet.create({
   underwayChatBtnText: {
     color: Colors.green,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.2,
   },
 
@@ -1047,7 +1047,7 @@ const styles = StyleSheet.create({
   declinedBadgeText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 1,
   },
 
@@ -1080,7 +1080,7 @@ const styles = StyleSheet.create({
   emptySub: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -1095,7 +1095,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
 
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   },
   closePostText: {
     fontFamily: Fonts.body,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textSecondary,
     letterSpacing: 0.5,
   },
@@ -1119,7 +1119,7 @@ const styles = StyleSheet.create({
   },
   closedBannerText: {
     fontFamily: Fonts.body,
-    fontSize: 13,
+    fontSize: 14,
     color: Colors.textSecondary,
     fontStyle: 'italic',
   },

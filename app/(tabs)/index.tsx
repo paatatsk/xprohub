@@ -475,7 +475,7 @@ const s = StyleSheet.create({
   },
   wordmark: {
     color: Colors.gold,
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: Fonts.heading,
     letterSpacing: 4,
   },
@@ -515,19 +515,19 @@ const s = StyleSheet.create({
   },
   chipCount: {
     fontFamily: 'SpaceGrotesk_600SemiBold',
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.gold,
     fontVariant: ['tabular-nums'],
   },
   chipLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
   chipZeroLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
@@ -559,7 +559,7 @@ const s = StyleSheet.create({
   },
   dateLine: {
     fontFamily: Fonts.mono,
-    fontSize: 10.5,
+    fontSize: 12,
     letterSpacing: 1,
     color: Colors.textSecondary,
   },
@@ -596,7 +596,7 @@ const s = StyleSheet.create({
   },
   cardLabel: {
     fontFamily: Fonts.display,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 4,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -684,7 +684,7 @@ const s = StyleSheet.create({
   statusDraft: { backgroundColor: Colors.amber },
   statusText: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1,
   },
   statusLiveText: { color: Colors.green },
@@ -693,13 +693,13 @@ const s = StyleSheet.create({
   // Live counts
   countAmber: {
     fontFamily: Fonts.monoMed,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1,
     color: Colors.amber,
   },
   countGreen: {
     fontFamily: Fonts.monoMed,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1,
     color: Colors.green,
   },
@@ -707,7 +707,7 @@ const s = StyleSheet.create({
   // Section
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 5,
     color: Colors.gold,
     textTransform: 'uppercase',
@@ -741,13 +741,13 @@ const s = StyleSheet.create({
   catName: {
     color: Colors.textPrimary,
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 0.4,
   },
   catDiff: {
     color: Colors.textSecondary,
     fontFamily: Fonts.mono,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
@@ -759,7 +759,7 @@ const s = StyleSheet.create({
   catPrice: {
     color: Colors.gold,
     fontFamily: 'SpaceGrotesk_600SemiBold',
-    fontSize: 14,
+    fontSize: 15,
     letterSpacing: -0.2,
     fontVariant: ['tabular-nums'],
   },
@@ -775,7 +775,7 @@ const s = StyleSheet.create({
   proText: {
     color: Colors.gold,
     fontFamily: Fonts.displayB,
-    fontSize: 8.5,
+    fontSize: 11,
     letterSpacing: 1.5,
   },
 
@@ -796,7 +796,7 @@ const s = StyleSheet.create({
   },
   endCap: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 2,
     color: Colors.textSecondary,
   },
@@ -804,7 +804,7 @@ const s = StyleSheet.create({
   // Error
   errorText: {
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
     marginTop: 32,
     paddingHorizontal: 24,

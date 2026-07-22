@@ -465,7 +465,7 @@ const s = StyleSheet.create({
   },
   edition: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 11.5,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -475,7 +475,7 @@ const s = StyleSheet.create({
   // Section eyebrows
   sectionEyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: 3,
     color: Colors.gold,
     marginTop: Spacing.lg,
@@ -485,7 +485,7 @@ const s = StyleSheet.create({
   // Empty
   emptyLine: {
     fontFamily: Fonts.body,
-    fontSize: 13,
+    fontSize: 15,
     color: Colors.textTertiary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
@@ -494,7 +494,7 @@ const s = StyleSheet.create({
   // Active group labels
   groupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: 3,
     color: Colors.textSecondary,
     marginTop: Spacing.md,
@@ -507,7 +507,7 @@ const s = StyleSheet.create({
   },
   viewAllText: {
     fontFamily: Fonts.display,
-    fontSize: 10,
+    fontSize: 12.5,
     letterSpacing: 2,
     color: Colors.gold,
   },
@@ -524,7 +524,7 @@ const s = StyleSheet.create({
   },
   roleTag: {
     fontFamily: Fonts.displayB,
-    fontSize: 8.5,
+    fontSize: 11,
     letterSpacing: 2,
   },
   roleTagGreen: { color: Colors.green },
@@ -532,7 +532,7 @@ const s = StyleSheet.create({
   roleTagBlue: { color: Colors.blue },
   activeTitle: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   activeFoot: {
@@ -542,13 +542,13 @@ const s = StyleSheet.create({
   },
   activeMeta: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 11.5,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
   activePrice: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.gold,
     fontVariant: ['tabular-nums'],
   },
@@ -571,7 +571,7 @@ const s = StyleSheet.create({
   },
   earningsSub: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: 2,
     color: Colors.textSecondary,
   },
@@ -589,9 +589,9 @@ const s = StyleSheet.create({
   },
   historyDate: {
     fontFamily: Fonts.mono,
-    fontSize: 9.5,
+    fontSize: 12,
     color: Colors.textSecondary,
-    width: 58,
+    width: 70,
     letterSpacing: 0.5,
   },
   historyDesc: {
@@ -600,12 +600,12 @@ const s = StyleSheet.create({
   },
   historyTitle: {
     fontFamily: Fonts.body,
-    fontSize: 13,
+    fontSize: 15,
     color: Colors.textPrimary,
   },
   historyReceipt: {
     fontFamily: Fonts.display,
-    fontSize: 8.5,
+    fontSize: 11,
     letterSpacing: 1.5,
     color: Colors.gold,
   },
@@ -615,7 +615,7 @@ const s = StyleSheet.create({
   },
   historyValue: {
     fontFamily: Fonts.heading,
-    fontSize: 13.5,
+    fontSize: 15.5,
     color: Colors.gold,
     fontVariant: ['tabular-nums'],
   },
@@ -624,7 +624,7 @@ const s = StyleSheet.create({
   },
   historyDirection: {
     fontFamily: Fonts.mono,
-    fontSize: 8,
+    fontSize: 11,
     letterSpacing: 1,
   },
   dirEarned: { color: Colors.green },

@@ -647,7 +647,7 @@ export default function JobChatScreen() {
               )
             }
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -679,7 +679,7 @@ export default function JobChatScreen() {
               )
             }
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -768,7 +768,7 @@ export default function JobChatScreen() {
             )}
 
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 11, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -1006,7 +1006,7 @@ const styles = StyleSheet.create({
   stateSub: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
     lineHeight: 19,
   },
@@ -1021,7 +1021,7 @@ const styles = StyleSheet.create({
   backBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
 
@@ -1058,7 +1058,7 @@ const styles = StyleSheet.create({
   contextJob: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
 
   // ── Lifecycle banner ──────────────────────────────────────────
@@ -1081,7 +1081,7 @@ const styles = StyleSheet.create({
   lifecycleBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
   lifecycleStaticBadge: {
@@ -1108,7 +1108,7 @@ const styles = StyleSheet.create({
   lifecycleStaticText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 1.5,
   },
 
@@ -1122,7 +1122,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     fontStyle: 'italic',
   },
 
@@ -1163,7 +1163,7 @@ const styles = StyleSheet.create({
   },
   bubbleTime: {
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 12,
     alignSelf: 'flex-end',
   },
 
@@ -1182,7 +1182,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 17,
   },
   sendErrorDismiss: {
@@ -1254,7 +1254,7 @@ const styles = StyleSheet.create({
   },
   photoCardLabel: {
     fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontSize: 11.5,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
   },
@@ -1263,7 +1263,7 @@ const styles = StyleSheet.create({
   },
   photoCardTime: {
     fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontSize: 11,
     color: Colors.textTertiary,
   },
   photoCardImage: {
@@ -1274,7 +1274,7 @@ const styles = StyleSheet.create({
   },
   photoCardAttribution: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
   },
 
@@ -1291,7 +1291,7 @@ const styles = StyleSheet.create({
   },
   photoCapNote: {
     fontFamily: Fonts.mono,
-    fontSize: 8,
+    fontSize: 11,
     color: Colors.textTertiary,
     textAlign: 'center',
     width: 40,
@@ -1308,7 +1308,7 @@ const styles = StyleSheet.create({
   },
   photoTypeLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 2,
     color: Colors.textSecondary,
   },
@@ -1325,7 +1325,7 @@ const styles = StyleSheet.create({
   },
   photoTypeBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1,
     color: Colors.textSecondary,
   },
@@ -1337,7 +1337,7 @@ const styles = StyleSheet.create({
   },
   photoTypeCancelText: {
     fontFamily: Fonts.body,
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.textTertiary,
   },
 
@@ -1345,13 +1345,13 @@ const styles = StyleSheet.create({
   bannerCopy: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
     lineHeight: 18,
   },
   timerText: {
     color: Colors.gold,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     letterSpacing: 1,
     textAlign: 'center',
@@ -1380,7 +1380,7 @@ const styles = StyleSheet.create({
   disputeCharCount: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 12,
     textAlign: 'right',
   },
   disputedBadge: {
@@ -1393,13 +1393,13 @@ const styles = StyleSheet.create({
   disputedBadgeText: {
     color: Colors.red,
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 1.5,
   },
   disputeReasonText: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     fontStyle: 'italic',
     textAlign: 'center',
     lineHeight: 18,
@@ -1435,12 +1435,12 @@ const styles = StyleSheet.create({
   feeLabel: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
   feeValue: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
 });

@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   toggleText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
   toggleTextActive: {
@@ -556,13 +556,13 @@ const styles = StyleSheet.create({
   filterText: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     paddingVertical: 10,
   },
   filterClear: {
     color: Colors.gold,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
     paddingVertical: 10,
     paddingRight: 14,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   emptySub: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
 
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
   },
   postBarText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
     color: Colors.background,
   },

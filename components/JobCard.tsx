@@ -199,7 +199,7 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 2.5,
     color: Colors.gold,
   },
@@ -225,7 +225,7 @@ const s = StyleSheet.create({
   },
   categoryLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 3,
     color: Colors.gold,
     paddingHorizontal: 10,
@@ -234,7 +234,7 @@ const s = StyleSheet.create({
   // Own-post eyebrow (no-photo cards)
   ownPostTag: {
     fontFamily: Fonts.display,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 2.5,
     color: Colors.gold,
     marginBottom: 6,
@@ -253,7 +253,7 @@ const s = StyleSheet.create({
   // Description
   description: {
     fontFamily: Fonts.body,
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 20,
     color: Colors.textSecondary,
     marginBottom: 14,
@@ -274,7 +274,7 @@ const s = StyleSheet.create({
   },
   budgetUnit: {
     fontFamily: Fonts.mono,
-    fontSize: 9.5,
+    fontSize: 11,
     letterSpacing: 1.5,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
@@ -292,7 +292,7 @@ const s = StyleSheet.create({
   },
   metaItem: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textSecondary,
   },
   metaAccent: {
@@ -301,7 +301,7 @@ const s = StyleSheet.create({
   },
   metaSep: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 12,
     color: Colors.textTertiary,
   },
 });

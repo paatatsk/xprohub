@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   statusText: {
-    fontSize: 10,
+    fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: Fonts.body,
     color: Colors.gold,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -397,17 +397,17 @@ const styles = StyleSheet.create({
   bidCount: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
   },
   noBids: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
   },
   timeAgo: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
   footerRight: {
     flexDirection: 'row',
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   deleteText: {
     color: Colors.red,
     fontWeight: 'bold',
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
   },
 
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   emptySub: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 15,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 14,
     letterSpacing: 1.5,
   },
 });
