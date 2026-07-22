@@ -388,7 +388,7 @@ export default function MarketScreen() {
                         async (buttonIndex) => {
                           if (buttonIndex === 0) {
                             router.push(
-                              `/(tabs)/report?reported_user_id=${item.id}` +
+                              `/report?reported_user_id=${item.id}` +
                               `&content_type=user` +
                               `&reported_user_name=${encodeURIComponent(item.full_name)}` as any
                             );

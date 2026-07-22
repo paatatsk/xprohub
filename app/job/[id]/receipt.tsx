@@ -475,7 +475,7 @@ export default function ReceiptScreen() {
   const handleConcern = useCallback(() => {
     if (!data) return;
     router.push(
-      `/(tabs)/report?reported_user_id=${data.worker.id}&content_type=job&content_id=${data.jobId}&reported_user_name=${encodeURIComponent(data.worker.fullName)}` as any
+      `/report?reported_user_id=${data.worker.id}&content_type=job&content_id=${data.jobId}&reported_user_name=${encodeURIComponent(data.worker.fullName)}` as any
     );
   }, [data, router]);
 

@@ -340,7 +340,7 @@ export default function ApplyScreen() {
           <TouchableOpacity
             style={styles.submitBtn}
             onPress={() => router.push(
-              `/(tabs)/stripe-connect?returnTo=${encodeURIComponent(`/apply?job_id=${job_id}`)}` as any
+              `/stripe-connect?returnTo=${encodeURIComponent(`/apply?job_id=${job_id}`)}` as any
             )}
             activeOpacity={0.85}
           >

@@ -149,7 +149,7 @@ export default function AccountScreen() {
           <View style={styles.divider} />
           <TouchableOpacity
             style={styles.row}
-            onPress={() => router.push('/(tabs)/community-guidelines' as any)}
+            onPress={() => router.push('/community-guidelines' as any)}
             activeOpacity={0.7}
           >
             <Text style={styles.rowLabel}>Community Guidelines</Text>
@@ -164,7 +164,7 @@ export default function AccountScreen() {
 
         <TouchableOpacity
           style={styles.deleteBtn}
-          onPress={() => router.push('/(tabs)/delete-account' as any)}
+          onPress={() => router.push('/delete-account' as any)}
           activeOpacity={0.7}
         >
           <Text style={styles.deleteText}>DELETE ACCOUNT</Text>

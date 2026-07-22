@@ -1,4 +1,4 @@
-// app/(tabs)/delete-account.tsx
+// app/delete-account.tsx
 // Screen: DELETE ACCOUNT — confirmation + execution
 // Moved from inline handler in account.tsx for deliberate friction.
 
@@ -6,9 +6,9 @@ import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { useBiometrics } from '../../hooks/useBiometrics';
+import { Colors, Fonts, Spacing, Radius } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { useBiometrics } from '../hooks/useBiometrics';
 
 export default function DeleteAccountScreen() {
   const router = useRouter();

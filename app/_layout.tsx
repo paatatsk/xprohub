@@ -124,6 +124,11 @@ export default function RootLayout() {
           <Stack.Screen name="apply"             options={{ headerShown: true, header: () => <DetailHeader title="APPLY" /> }} />
           <Stack.Screen name="apply-success"     options={{ headerShown: true, header: () => <DetailHeader title="SENT" showBack={false} /> }} />
           <Stack.Screen name="direct-hire"       options={{ headerShown: true, header: () => <DetailHeader title="HIRE DIRECTLY" /> }} />
+          <Stack.Screen name="payment-setup"     options={{ headerShown: true, header: () => <DetailHeader title="PAYMENT SETUP" /> }} />
+          <Stack.Screen name="stripe-connect"    options={{ headerShown: true, header: () => <DetailHeader title="GET PAID" /> }} />
+          <Stack.Screen name="report"            options={{ headerShown: true, header: () => <DetailHeader title="REPORT" /> }} />
+          <Stack.Screen name="community-guidelines" options={{ headerShown: true, header: () => <DetailHeader title="GUIDELINES" /> }} />
+          <Stack.Screen name="delete-account"    options={{ headerShown: true, header: () => <DetailHeader title="DELETE ACCOUNT" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
           <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
         </Stack>

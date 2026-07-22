@@ -348,7 +348,7 @@ export default function PostScreen() {
     // Payment method gate (D-5)
     if (!profile?.stripe_payment_method_added) {
       router.push(
-        `/(tabs)/payment-setup?returnTo=${encodeURIComponent('/post')}` as any
+        `/payment-setup?returnTo=${encodeURIComponent('/post')}` as any
       );
       return;
     }

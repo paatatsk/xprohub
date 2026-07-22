@@ -1,4 +1,4 @@
-// app/(tabs)/report.tsx
+// app/report.tsx
 // Screen: REPORT — User/content reporting flow (G-4)
 // Params: reported_user_id, content_type, content_id, reported_user_name
 
@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
 
 // ── Reason options ────────────────────────────────────────────────────────────
 

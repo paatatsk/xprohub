@@ -597,7 +597,7 @@ export default function JobChatScreen() {
                   async (buttonIndex) => {
                     if (buttonIndex === 0) {
                       router.push(
-                        `/(tabs)/report?reported_user_id=${otherPartyId}` +
+                        `/report?reported_user_id=${otherPartyId}` +
                         `&content_type=user` +
                         `&reported_user_name=${encodeURIComponent(otherName)}` as any
                       );

@@ -1,4 +1,4 @@
-// app/(tabs)/payment-setup.tsx
+// app/payment-setup.tsx
 // Screen: ADD PAYMENT METHOD — Customer-side card setup
 // Two-state screen driven by usePaymentMethodStatus hook.
 // Design spec: docs/CHUNK_D_DESIGN.md
@@ -11,9 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { usePaymentMethodStatus } from '../../hooks/usePaymentMethodStatus';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { usePaymentMethodStatus } from '../hooks/usePaymentMethodStatus';
 
 // ── Copy strings ─────────────────────────────────────────────
 

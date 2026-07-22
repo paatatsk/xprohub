@@ -282,7 +282,7 @@ export default function JobDetailScreen() {
                   (buttonIndex) => {
                     if (buttonIndex === 0) {
                       router.push(
-                        `/(tabs)/report?reported_user_id=${job.customer_id}` +
+                        `/report?reported_user_id=${job.customer_id}` +
                         `&content_type=job` +
                         `&content_id=${job.id}` +
                         `&reported_user_name=${encodeURIComponent(customerName)}` as any

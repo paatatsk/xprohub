@@ -393,7 +393,7 @@ export default function JobBidsScreen() {
                     {
                       text: 'Update Card',
                       onPress: () => router.push(
-                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
+                        `/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
                       ),
                     },
                   ]
@@ -415,7 +415,7 @@ export default function JobBidsScreen() {
                     {
                       text: 'Set Up Payment',
                       onPress: () => router.push(
-                        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
+                        `/payment-setup?returnTo=${encodeURIComponent(`/job-bids?job_id=${job_id}`)}` as any
                       ),
                     },
                   ]

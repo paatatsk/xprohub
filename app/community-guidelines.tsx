@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Fonts, Spacing } from '../../constants/theme';
-import { SUPPORT_EMAIL } from '../../lib/legal';
+import { Colors, Fonts, Spacing } from '../constants/theme';
+import { SUPPORT_EMAIL } from '../lib/legal';
 
 export default function CommunityGuidelinesScreen() {
   return (

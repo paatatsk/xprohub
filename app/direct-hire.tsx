@@ -216,7 +216,7 @@ export default function DirectHireScreen() {
         `/direct-hire?worker_id=${worker_id}` +
         `&worker_name=${encodeURIComponent(worker_name ?? '')}`;
       router.push(
-        `/(tabs)/payment-setup?returnTo=${encodeURIComponent(returnTo)}` as any
+        `/payment-setup?returnTo=${encodeURIComponent(returnTo)}` as any
       );
       return;
     }

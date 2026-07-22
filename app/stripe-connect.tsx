@@ -1,4 +1,4 @@
-// app/(tabs)/stripe-connect.tsx
+// app/stripe-connect.tsx
 // Screen: GET PAID — Stripe Express account setup
 // Four-state screen driven by useStripeStatus hook.
 // Design spec: docs/CHUNK_C_C4_DESIGN.md
@@ -12,9 +12,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
-import { supabase } from '../../lib/supabase';
-import { useStripeStatus, StripeStatus } from '../../hooks/useStripeStatus';
+import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { supabase } from '../lib/supabase';
+import { useStripeStatus, StripeStatus } from '../hooks/useStripeStatus';
 
 const STORAGE_KEY = 'stripe_connect_return_to';
 
