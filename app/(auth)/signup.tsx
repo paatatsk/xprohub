@@ -124,9 +124,13 @@ export default function SignUpScreen() {
               <Text style={styles.legalLink} accessibilityRole="link" onPress={() => WebBrowser.openBrowserAsync(TERMS_OF_SERVICE_URL)}>
                 Terms of Service
               </Text>
-              {' '}and{' '}
+              ,{' '}
               <Text style={styles.legalLink} accessibilityRole="link" onPress={() => WebBrowser.openBrowserAsync(PRIVACY_POLICY_URL)}>
                 Privacy Policy
+              </Text>
+              , and{' '}
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => router.push('/community-guidelines' as any)}>
+                Community Guidelines
               </Text>
               .
             </Text>
