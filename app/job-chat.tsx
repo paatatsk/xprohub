@@ -924,6 +924,17 @@ export default function JobChatScreen() {
           </View>
         )}
 
+        {/* ── Agreement link (hired states) ── */}
+        {chat?.job?.id && jobStatus && ['matched', 'in_progress', 'pending_confirmation', 'completed', 'disputed'].includes(jobStatus) && (
+          <TouchableOpacity
+            style={styles.agreementLink}
+            onPress={() => router.push(`/agreement?job_id=${chat.job!.id}` as any)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.agreementLinkText}>VIEW AGREEMENT ›</Text>
+          </TouchableOpacity>
+        )}
+
         {/* ── Messages + evidence photos timeline ── */}
         <FlatList
           ref={listRef}
@@ -1536,5 +1547,21 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontSize: 13,
     fontWeight: '600',
+  },
+
+  // ── Agreement link ─────────────────────────────────────────
+  agreementLink: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.card,
+    alignItems: 'center',
+  },
+  agreementLinkText: {
+    fontFamily: Fonts.mono,
+    fontSize: 12,
+    letterSpacing: 1.5,
+    color: Colors.textSecondary,
   },
 });

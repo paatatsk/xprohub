@@ -127,6 +127,7 @@ export default function RootLayout() {
           <Stack.Screen name="payment-setup"     options={{ headerShown: true, header: () => <DetailHeader title="PAYMENT SETUP" /> }} />
           <Stack.Screen name="stripe-connect"    options={{ headerShown: true, header: () => <DetailHeader title="GET PAID" /> }} />
           <Stack.Screen name="report"            options={{ headerShown: true, header: () => <DetailHeader title="REPORT" /> }} />
+          <Stack.Screen name="agreement"             options={{ headerShown: true, header: () => <DetailHeader title="AGREEMENT" /> }} />
           <Stack.Screen name="community-guidelines" options={{ headerShown: true, header: () => <DetailHeader title="GUIDELINES" /> }} />
           <Stack.Screen name="delete-account"    options={{ headerShown: true, header: () => <DetailHeader title="DELETE ACCOUNT" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
