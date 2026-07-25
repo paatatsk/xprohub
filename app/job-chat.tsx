@@ -32,7 +32,7 @@ interface ChatRow {
   worker_id: string;
   customer: ChatProfile | null;
   worker: ChatProfile | null;
-  job: { id: string; title: string | null; status: string } | null;
+  job: { id: string; title: string | null; status: string; agreed_price: number | null } | null;
 }
 
 interface Message {
@@ -164,7 +164,7 @@ export default function JobChatScreen() {
           id, customer_id, worker_id, job_id,
           customer:profiles!customer_id(id, full_name),
           worker:profiles!worker_id(id, full_name),
-          job:jobs!job_id(id, title, status)
+          job:jobs!job_id(id, title, status, agreed_price)
         `)
         .eq('id', chat_id)
         .single();
@@ -370,7 +370,7 @@ export default function JobChatScreen() {
     if (!chat?.job?.id) return;
     const { data, error } = await supabase
       .from('jobs')
-      .select('id, title, status')
+      .select('id, title, status, agreed_price')
       .eq('id', chat.job.id)
       .single();
     if (!error && data) {
@@ -495,6 +495,78 @@ export default function JobChatScreen() {
     }
     setActionLoading(false);
   }, [chat, disputeText, refetchJobStatus, fetchPayment]);
+
+  // ── Cancel hire handler (matched state only) ──────────────────────────────
+
+  const handleCancelHire = useCallback(() => {
+    if (!chat?.job?.id) return;
+    const title = chat.job.title ?? 'Job';
+    const isCallerCustomer = currentUserId === chat.customer_id;
+    const workerName = chat.worker?.full_name ?? 'The worker';
+    const agreedPrice = chat.job.agreed_price;
+
+    const body = isCallerCustomer
+      ? `${title}\n\n${workerName} will be released and ${agreedPrice ? `your $${agreedPrice.toFixed(0)} will be refunded in full` : "you'll be refunded in full"}.\n\nThe job will be reposted so you can hire someone else.`
+      : `${title}\n\nYou'll be released from this job and the customer will be refunded in full.\n\nThe job will be reposted to other workers.`;
+
+    Alert.alert(
+      'Cancel this hire?',
+      body,
+      [
+        { text: 'Keep the job', style: 'cancel' },
+        {
+          text: 'Cancel hire',
+          style: 'destructive',
+          onPress: async () => {
+            setActionLoading(true);
+            setActionError(null);
+            try {
+              const { data, error: fnError } = await supabase.functions.invoke(
+                'cancel-hire',
+                { body: { job_id: chat.job!.id } },
+              );
+
+              if (fnError) {
+                Alert.alert('Something went wrong', fnError.message ?? 'Please try again.');
+                setActionLoading(false);
+                return;
+              }
+
+              if (data?.error === 'not_cancellable') {
+                Alert.alert('Cannot cancel', data.message ?? 'This job can no longer be cancelled.');
+                setActionLoading(false);
+                return;
+              }
+
+              if (data?.error === 'payment_processing') {
+                Alert.alert('Payment processing', 'Payment is still processing — try again in a moment.');
+                setActionLoading(false);
+                return;
+              }
+
+              if (data?.error) {
+                Alert.alert('Could not cancel', data.message ?? 'Please try again.');
+                setActionLoading(false);
+                return;
+              }
+
+              // Success
+              setActionLoading(false);
+              Alert.alert(
+                'Hire cancelled',
+                'The payment has been refunded and the job is open again.',
+              );
+              await refetchJobStatus();
+              await fetchPayment();
+            } catch {
+              Alert.alert('Something went wrong', 'Please try again.');
+              setActionLoading(false);
+            }
+          },
+        },
+      ],
+    );
+  }, [chat, currentUserId, refetchJobStatus, fetchPayment]);
 
   // ── Loading state ─────────────────────────────────────────────────────────
 
@@ -637,13 +709,18 @@ export default function JobChatScreen() {
             {actionLoading
               ? <ActivityIndicator size="small" color={Colors.gold} />
               : (
-                <TouchableOpacity
-                  style={styles.lifecycleBtn}
-                  onPress={handleMarkInProgress}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.lifecycleBtnText}>MARK IN PROGRESS</Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity
+                    style={styles.lifecycleBtn}
+                    onPress={handleMarkInProgress}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.lifecycleBtnText}>MARK IN PROGRESS</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleCancelHire} activeOpacity={0.7}>
+                    <Text style={styles.cancelHireText}>CANCEL HIRE</Text>
+                  </TouchableOpacity>
+                </>
               )
             }
             {actionError ? (
@@ -659,6 +736,14 @@ export default function JobChatScreen() {
             <Text style={styles.bannerCopy}>
               Worker hired — waiting for the worker to start the job.
             </Text>
+            {actionLoading
+              ? <ActivityIndicator size="small" color={Colors.red} />
+              : (
+                <TouchableOpacity onPress={handleCancelHire} activeOpacity={0.7}>
+                  <Text style={styles.cancelHireText}>CANCEL HIRE</Text>
+                </TouchableOpacity>
+              )
+            }
           </View>
         )}
 
@@ -1110,6 +1195,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
+  },
+
+  // ── Cancel hire link ────────────────────────────────────────────
+  cancelHireText: {
+    color: Colors.red,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1,
+    paddingVertical: 4,
   },
 
   // ── Empty state ────────────────────────────────────────────────
