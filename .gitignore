@@ -50,3 +50,6 @@ deno.lock
 
 # Generated docs (print artifacts derived from .md source)
 docs/*.html
+
+# Generated landing-page exports (re-exportable from design tools)
+web/exports/
