@@ -30,6 +30,7 @@ interface WorkerSkill {
 
 interface FormErrors {
   title?:        string;
+  description?:  string;
   neighborhood?: string;
   tasks?:        string;
   price?:        string;
@@ -170,6 +171,8 @@ export default function DirectHireScreen() {
   const validate = (): FormErrors => {
     const e: FormErrors = {};
     if (!title.trim())              e.title        = 'Job title is required';
+    if (!description.trim() || description.trim().length < 20)
+      e.description = 'Please describe the work (at least 20 characters).';
     if (!neighborhood.trim())       e.neighborhood = 'Neighborhood is required';
     if (selectedTaskIds.size === 0) e.tasks        = 'Select at least one skill';
     const p = parseFloat(offerPrice);
@@ -421,21 +424,25 @@ export default function DirectHireScreen() {
         {/* ── Description ── */}
         <View style={styles.fieldGroup}>
           <Text style={styles.label}>
-            DESCRIPTION <Text style={styles.optional}>(optional)</Text>
+            DESCRIPTION <Text style={styles.required}>*</Text>
           </Text>
+          <Text style={styles.fieldHint}>Describe the work clearly — this is what you're both agreeing to.</Text>
           <TextInput
-            style={[styles.input, styles.inputMultiline]}
-            placeholder="Any extra details or special requirements..."
+            style={[styles.input, styles.inputMultiline, errors.description && styles.inputError]}
+            placeholder="What needs to be done, any special requirements..."
             placeholderTextColor={Colors.textSecondary}
             value={description}
-            onChangeText={t => setDescription(t.slice(0, 500))}
+            onChangeText={t => { setDescription(t.slice(0, 500)); clearError('description'); }}
             multiline
             numberOfLines={3}
             maxLength={500}
           />
-          <Text style={[styles.charCount, { textAlign: 'right' }]}>
-            {description.length}/500
-          </Text>
+          <View style={styles.rowBetween}>
+            {errors.description
+              ? <Text style={styles.errorText}>{errors.description}</Text>
+              : <View />}
+            <Text style={styles.charCount}>{description.length}/500</Text>
+          </View>
         </View>
 
         {/* ── Offer Price ── */}
@@ -603,6 +610,12 @@ const styles = StyleSheet.create({
   },
   required: { color: Colors.red },
   optional: { color: Colors.textSecondary, fontWeight: 'normal' },
+  fieldHint: {
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    fontSize: 12,
+    marginBottom: 8,
+  },
 
   // Task chips
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 4 },

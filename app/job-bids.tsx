@@ -321,7 +321,7 @@ export default function JobBidsScreen() {
 
     Alert.alert(
       `Hire ${workerName}?`,
-      `This charges your card $${price} and declines all other applications.`,
+      `${job!.title}\n\nTotal: $${price} — charged now and held in escrow until you confirm the work is done.\n\nAll other applications will be declined.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {

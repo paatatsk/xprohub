@@ -17,6 +17,7 @@ import { supabase } from '../lib/supabase';
 interface EmbeddedJob {
   id: string;
   title: string;
+  description: string | null;
   category: string | null;
   status: string;
   customer_id: string | null;
@@ -149,6 +150,11 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
         ) : null}
       </View>
 
+      {/* ── Job description (direct offers — worker needs to see scope before accepting) ── */}
+      {bid.is_direct_offer && bid.status === 'pending' && job?.description ? (
+        <Text style={styles.message} numberOfLines={3}>{job.description}</Text>
+      ) : null}
+
       {/* ── Customer line (privacy-gated) ── */}
       <Text style={styles.customerLine}>
         For:{' '}
@@ -241,7 +247,7 @@ export default function MyApplicationsScreen() {
       .from('bids')
       .select(`
         id, status, proposed_price, message, created_at, is_direct_offer, worker_id,
-        job:jobs!job_id(id, title, category, status, customer_id)
+        job:jobs!job_id(id, title, description, category, status, customer_id)
       `)
       .eq('worker_id', user.id)
       .is('hidden_by_worker_at', null)
@@ -296,10 +302,12 @@ export default function MyApplicationsScreen() {
   // ── Accept direct offer ───────────────────────────────────────────────────
 
   const handleAcceptOffer = useCallback((bid: Bid) => {
-    const price = bid.proposed_price?.toFixed(0) ?? '0';
+    const price = bid.proposed_price ?? 0;
+    const payout = (price * 0.9).toFixed(2);
+    const jobTitle = bid.job?.title ?? 'Job';
     Alert.alert(
       'Accept this job?',
-      `Accept for $${price}? The customer will be charged and the job becomes yours.`,
+      `${jobTitle}\n\nPrice: $${price.toFixed(0)}\nYou'll receive: $${payout} after the 10% platform fee.\n\nThe customer is charged now; you're paid after they confirm the work.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {

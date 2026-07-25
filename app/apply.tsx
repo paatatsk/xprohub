@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, TextInput, ActivityIndicator,
+  ScrollView, TextInput, ActivityIndicator, Alert,
   Keyboard, Pressable, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -190,42 +190,54 @@ export default function ApplyScreen() {
 
   // ── Submit ─────────────────────────────────────────────────────
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!finalMessage) { setSubmitError('Please select or write a message.'); return; }
     if (!proposedPrice || isNaN(priceNum) || priceNum <= 0) {
       setSubmitError('Please enter a valid price greater than $0.');
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setSubmitError('Session expired. Please sign in again.'); return; }
+    const payout = (priceNum * 0.9).toFixed(2);
+    Alert.alert(
+      'Send application?',
+      `${job!.title}\n\nYour price: $${priceNum.toFixed(0)}\nIf hired, you'll receive: $${payout} after the 10% platform fee.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Send',
+          onPress: async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { setSubmitError('Session expired. Please sign in again.'); return; }
 
-    setSubmitting(true);
-    setSubmitError(null);
+            setSubmitting(true);
+            setSubmitError(null);
 
-    const { error: bidErr } = await supabase
-      .from('bids')
-      .insert({
-        job_id,
-        worker_id:      user.id,
-        proposed_price: priceNum,
-        message:        finalMessage,
-        status:         'pending',
-      });
+            const { error: bidErr } = await supabase
+              .from('bids')
+              .insert({
+                job_id,
+                worker_id:      user.id,
+                proposed_price: priceNum,
+                message:        finalMessage,
+                status:         'pending',
+              });
 
-    setSubmitting(false);
+            setSubmitting(false);
 
-    if (bidErr) {
-      // 23505 = unique_violation — already applied
-      if ((bidErr as any).code === '23505') {
-        setSubmitError("You've already applied to this job.");
-      } else {
-        setSubmitError(friendlyError(bidErr, 'Failed to submit application. Please try again.'));
-      }
-      return;
-    }
+            if (bidErr) {
+              if ((bidErr as any).code === '23505') {
+                setSubmitError("You've already applied to this job.");
+              } else {
+                setSubmitError(friendlyError(bidErr, 'Failed to submit application. Please try again.'));
+              }
+              return;
+            }
 
-    router.replace(`/apply-success?job_id=${job_id}` as any);
+            router.replace(`/apply-success?job_id=${job_id}` as any);
+          },
+        },
+      ],
+    );
   };
 
   // ── Loading ────────────────────────────────────────────────────
