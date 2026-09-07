@@ -9,6 +9,7 @@ import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
 import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { useBiometrics } from '../../hooks/useBiometrics';
+import { XProHubLogo } from '../../components/XProHubLogo';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -69,6 +70,10 @@ export default function LoginScreen() {
         style={styles.kav}
       >
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+
+          <View style={styles.logoWrap}>
+            <XProHubLogo width={130} />
+          </View>
 
           <Text style={styles.title}>WELCOME BACK</Text>
           <Text style={styles.sub}>Sign in to your XProHub account</Text>
@@ -153,6 +158,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.xl,
+  },
+  logoWrap: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
   },
   title: {
     color: Colors.gold,

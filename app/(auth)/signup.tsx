@@ -10,6 +10,7 @@ import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/Button';
 import { Colors, Fonts, Spacing, Radius } from '../../constants/theme';
 import { PRIVACY_POLICY_URL, TERMS_OF_SERVICE_URL } from '../../lib/legal';
+import { XProHubLogo } from '../../components/XProHubLogo';
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -80,6 +81,10 @@ export default function SignUpScreen() {
         style={styles.kav}
       >
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+
+          <View style={styles.logoWrap}>
+            <XProHubLogo width={130} />
+          </View>
 
           <Text style={styles.title}>CREATE ACCOUNT</Text>
           <Text style={styles.sub}>Join XProHub — work, earn, repeat.</Text>
@@ -176,6 +181,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.xl,
+  },
+  logoWrap: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
   },
   title: {
     color: Colors.gold,
