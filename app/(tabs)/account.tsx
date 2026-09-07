@@ -195,6 +195,15 @@ export default function AccountScreen() {
           )}
         </View>
 
+        {/* ── TEMP — logo evaluation link. Remove with app/logo-test.tsx. ── */}
+        <TouchableOpacity
+          style={styles.tempRow}
+          onPress={() => router.push('/logo-test' as any)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.tempText}>Logo test (temporary)</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -341,5 +350,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 1,
+  },
+
+  // TEMP — logo evaluation link
+  tempRow: {
+    marginTop: Spacing.xxl,
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  tempText: {
+    fontFamily: Fonts.body,
+    color: Colors.textSecondary,
+    fontSize: 12,
   },
 });

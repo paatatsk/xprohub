@@ -130,6 +130,8 @@ export default function RootLayout() {
           <Stack.Screen name="agreement"             options={{ headerShown: true, header: () => <DetailHeader title="AGREEMENT" /> }} />
           <Stack.Screen name="community-guidelines" options={{ headerShown: true, header: () => <DetailHeader title="GUIDELINES" /> }} />
           <Stack.Screen name="delete-account"    options={{ headerShown: true, header: () => <DetailHeader title="DELETE ACCOUNT" /> }} />
+          {/* TEMP — logo evaluation screen. Remove with app/logo-test.tsx. */}
+          <Stack.Screen name="logo-test"         options={{ headerShown: true, header: () => <DetailHeader title="LOGO TEST" /> }} />
           <Stack.Screen name="stripe-return"  options={{ headerShown: false }} />
           <Stack.Screen name="stripe-refresh" options={{ headerShown: false }} />
         </Stack>
