@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { Colors } from '../constants/theme';
+import { XProHubLogo } from '../components/XProHubLogo';
 
 const MIN_DISPLAY_MS = 2500;
 
@@ -102,7 +103,7 @@ export default function SplashScreenRoute() {
 
   return (
     <View style={styles.container}>
-      {/* Gold glow behind wordmark */}
+      {/* Gold glow behind logo */}
       <Animated.View
         style={[
           styles.glow,
@@ -113,7 +114,7 @@ export default function SplashScreenRoute() {
         ]}
       />
 
-      {/* Wordmark block */}
+      {/* Logo block */}
       <Animated.View
         style={{
           opacity: wordmarkOpacity,
@@ -121,7 +122,7 @@ export default function SplashScreenRoute() {
           alignItems: 'center',
         }}
       >
-        <Text style={styles.wordmark}>XPROHUB</Text>
+        <XProHubLogo variant="lockup" width={220} />
         <Animated.Text style={[styles.tagline, { opacity: taglineOpacity }]}>
           Real Work. Fair Pay. For Everyone.
         </Animated.Text>
@@ -145,13 +146,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold,
     opacity: 0.08,
     // Soft blur approximated via large border radius + low opacity layer stack
-  },
-  wordmark: {
-    color: Colors.gold,
-    fontSize: 42,
-    fontWeight: '800',
-    letterSpacing: 6,
-    textAlign: 'center',
   },
   tagline: {
     color: Colors.textSecondary,
