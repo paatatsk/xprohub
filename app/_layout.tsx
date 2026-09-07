@@ -15,10 +15,10 @@ SplashScreen.preventAutoHideAsync();
 
 const AUTH_TIMEOUT_MS = 3000;
 
-// Stripe publishable key (sandbox). Public by design — safe to embed
+// Stripe publishable key (test mode). Public by design — safe to embed
 // in client code per Stripe docs. Visible in every web integration's
 // HTML source. For live-mode rollover: swap pk_test_ for pk_live_
-// from the XProHub Stripe dashboard (acct_1TRNSu08l7Que01i).
+// from the XProHub Stripe dashboard.
 const STRIPE_PUBLISHABLE_KEY =
   'pk_test_51TRNSu08l7Que01i7wSpWjuTyIRYdzJHv3RjJMPtQzjcCSTIMXgnscC85ZyqLnPMbEnnIW23QAgdmYuO9Sne0FFq00vCTmyxqg';
 

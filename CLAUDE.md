@@ -184,35 +184,56 @@ An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Da
 
 ## Production Screens
 
-### Reachable screens (registered in tab layout or routed to)
+### Navigation shape
+**Four tabs** (`app/(tabs)/_layout.tsx`): Home · Market · Desk · Account.
+Every other screen is a **detail screen in the root Stack** (`app/*.tsx`,
+`app/_layout.tsx`), reached via flat `router.push()` with a `DetailHeader`.
+Per `NAV_SPEC.md` / `NAVIGATION_IA_PROPOSAL_2026-05-28.md` (locked). The old
+`app/(tabs)/<detail>.tsx` paths were moved to root in commit `22d1606`.
+
+#### Tab screens
+| Tab | File | Status |
+|---|---|---|
+| Home | `app/(tabs)/index.tsx` | **Lighthouse** — greeting masthead, live open-job count, sticky YOUR DESK card, single-column category list |
+| Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed (listing photos on cards) + Workers Feed, category filter |
+| Desk | `app/(tabs)/desk.tsx` | Functional — read-only back office: active work, completed history, earnings. All SELECT, no writes |
+| Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
+
+#### Entry / onboarding screens
 | Screen | File | Status |
 |---|---|---|
-| Splash | `app/splash.tsx` | Functional |
+| Splash | `app/splash.tsx` | Functional — animated wordmark, auth check, 2.5s min |
 | Welcome | `app/(onboarding)/welcome.tsx` | Functional (editorial treatment, not yet lighthouse) |
-| Sign Up | `app/(auth)/signup.tsx` | Functional — wired to Supabase Auth |
-| Login | `app/(auth)/login.tsx` | Functional — Face ID support |
+| Sign Up | `app/(auth)/signup.tsx` | Functional — Supabase Auth; logo lockup above form |
+| Login | `app/(auth)/login.tsx` | Functional — Face ID support; logo lockup above form |
 | Forgot Password | `app/(auth)/forgot-password.tsx` | Functional |
 | Profile Setup | `app/(onboarding)/profile-setup.tsx` | Functional — captures full_name + first_name + photo |
-| Worker ID Setup | `app/(onboarding)/id.tsx` | Functional — 4-step wizard (768 lines) |
-| Verify Level 2 | `app/(onboarding)/verify-level-2.tsx` | Functional — trust level gate (real verification deferred) |
-| Home | `app/(tabs)/index.tsx` | **Lighthouse** — greeting masthead, live job-count, sticky YOUR DESK card, single-column category list |
-| Live Market | `app/(tabs)/market.tsx` | Functional — Jobs Feed (listing photos on cards) + Workers Feed |
-| Post a Job | `app/(tabs)/post.tsx` | Functional — 3-section form, smart auto-fill, photo picker (up to 3 listing photos) |
-| Job Detail | `app/(tabs)/job-detail.tsx` | Functional — full job info + apply CTA (525 lines) |
-| Apply | `app/(tabs)/apply.tsx` | Functional — templates + price + gates (679 lines) |
-| Apply Success | `app/(tabs)/apply-success.tsx` | Functional — forward-only confirmation |
-| My Jobs | `app/(tabs)/my-jobs.tsx` | Functional — customer's posted jobs |
-| My Applications | `app/(tabs)/my-applications.tsx` | Functional — worker's bid history |
-| Job Bids | `app/(tabs)/job-bids.tsx` | Functional — accept/decline + hire-and-charge |
-| Direct Hire | `app/(tabs)/direct-hire.tsx` | Functional — bypasses bidding |
-| Job Chat | `app/(tabs)/job-chat.tsx` | Functional — Realtime + lifecycle CTAs + before/after evidence photos |
-| Report | `app/(tabs)/report.tsx` | Functional — multi-reason + optional block |
-| Account | `app/(tabs)/account.tsx` | Functional — legal, blocked users, sign out, delete account |
-| Payment Setup | `app/(tabs)/payment-setup.tsx` | Functional — Stripe PaymentSheet |
-| Stripe Connect | `app/(tabs)/stripe-connect.tsx` | Functional — 4-state Express onboarding |
-| My Card | `app/(tabs)/my-card.tsx` | Functional — worker self-view + edit (status, bio, portfolio, certificates, references, skills, rate, radius) |
-| Worker Profile | `app/(tabs)/worker-profile.tsx` | Functional — read-only worker detail (portfolio, credentials, fullscreen view), HIRE/EDIT CARD footer |
+| Worker ID Setup | `app/(onboarding)/id.tsx` | Functional — 4-step wizard |
+| Verify Level 2 | `app/(onboarding)/verify-level-2.tsx` | Functional — one-tap account-activation step (sets `trust_level='starter'`); no verification runs. Gate is under keep/cut review |
+
+#### Detail screens (root Stack — `app/*.tsx`)
+| Screen | File | Status |
+|---|---|---|
+| Post a Job | `app/post.tsx` | Functional — 3-section form, smart auto-fill, photo picker (up to 3 listing photos) |
+| Job Detail | `app/job-detail.tsx` | Functional — full job info + apply CTA |
+| Apply | `app/apply.tsx` | Functional — templates + price + gates |
+| Apply Success | `app/apply-success.tsx` | Functional — forward-only confirmation |
+| My Jobs | `app/my-jobs.tsx` | Functional — customer's posted jobs |
+| My Applications | `app/my-applications.tsx` | Functional — worker's bid history |
+| Job Bids | `app/job-bids.tsx` | Functional — accept/decline + hire-and-charge |
+| Direct Hire | `app/direct-hire.tsx` | Functional — bypasses bidding |
+| Job Chat | `app/job-chat.tsx` | Functional — Realtime + lifecycle CTAs + before/after evidence photos |
+| Agreement | `app/agreement.tsx` | Functional — read-only mini-contract from job data, Receipt-styled |
+| Report | `app/report.tsx` | Functional — multi-reason + optional block |
+| Community Guidelines | `app/community-guidelines.tsx` | Functional — static UGC policy |
+| Delete Account | `app/delete-account.tsx` | Functional — Edge Function + money-state blocker |
+| Payment Setup | `app/payment-setup.tsx` | Functional — Stripe PaymentSheet |
+| Stripe Connect | `app/stripe-connect.tsx` | Functional — 4-state Express onboarding |
+| My Card | `app/my-card.tsx` | Functional — worker self-view + edit (status, bio, portfolio, certificates, references, skills, rate, radius) |
+| Worker Profile | `app/worker-profile.tsx` | Functional — read-only worker detail, HIRE/EDIT CARD footer |
 | Receipt | `app/job/[id]/receipt.tsx` | **Lighthouse** — real Supabase data, endorsements, after-photo, five-voice typography |
+
+**TEMP:** `app/logo-test.tsx` — evaluation-only screen (commit `ee97f1c`), revert before submission.
 
 Home = greeting masthead (real first_name + device clock + live open-job count) above sticky YOUR DESK card (four flow-rows: Post a job / Edit my card / My posts / My applications). Single-column compact category list below as the post on-ramp. No credential preview on Home; full card lives on my-card.tsx.
 

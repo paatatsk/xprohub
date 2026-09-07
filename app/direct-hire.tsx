@@ -267,9 +267,12 @@ export default function DirectHireScreen() {
       });
 
     if (bidErr) {
-      // Clean up orphaned job — it's still 'open' so cancel_job works
+      // Clean up orphaned job — it's still 'open' so cancel_job works.
+      // Best-effort: the RPC resolves with { error }, it does not reject,
+      // so a failure here is logged but never blocks the user-facing error.
       console.error('[direct-hire] Bid insert failed, cancelling orphan job:', bidErr.message);
-      await supabase.rpc('cancel_job', { p_job_id: jobId }).catch(() => {});
+      const { error: cancelErr } = await supabase.rpc('cancel_job', { p_job_id: jobId });
+      if (cancelErr) console.error('[direct-hire] Orphan-job cleanup failed:', cancelErr.message);
       setSubmitError(friendlyError(bidErr, 'Something went wrong sending the request. Please try again.'));
       setSubmitting(false);
       return;

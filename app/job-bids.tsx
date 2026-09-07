@@ -39,6 +39,7 @@ interface BidWithWorker {
   message: string | null;
   status: string;
   created_at: string;
+  is_direct_offer: boolean; // bids.is_direct_offer — NOT NULL DEFAULT false
   worker: BidWorker | null;
 }
 

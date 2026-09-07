@@ -161,7 +161,10 @@ export default function MyJobsScreen() {
       return;
     }
 
-    const rows = jobRows ?? [];
+    // Supabase infers the to-one `worker` embed as an array; PostgREST returns
+    // a single object (or null) for the many-to-one FK. Same cast pattern as
+    // my-applications.tsx.
+    const rows = (jobRows ?? []) as unknown as Job[];
     setJobs(rows);
 
     // Step 3 — single batch query for bid counts across all jobs.

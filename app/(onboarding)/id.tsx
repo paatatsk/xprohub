@@ -783,6 +783,12 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.sm,
     gap: Spacing.sm,
   },
+  // Step 1 inline footer — lives inside the ScrollView (the photo step is
+  // short, so it doesn't need the pinned treatment of stickyFooter).
+  bottomBar: {
+    marginTop: Spacing.xl,
+    gap: Spacing.sm,
+  },
   counterText: {
     fontFamily: Fonts.body,
     color: Colors.textSecondary,
