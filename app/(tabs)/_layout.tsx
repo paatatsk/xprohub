@@ -1,18 +1,10 @@
-import { Text } from 'react-native';
 import { Tabs } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
 import { Colors, Fonts } from '../../constants/theme';
 
 // Four-tab navigator: HOME · MARKET · DESK · ACCOUNT
 // Per NAVIGATION_IA_PROPOSAL_2026-05-28.md (LOCKED) and NAV_SPEC.md §1.
 // All detail screens live in the root Stack; this layout is tabs only.
-
-// ── Tab icon map (swap-ready — Paata supplies finals later) ────────────
-const TAB_ICONS: Record<string, string> = {
-  index:   '\u2302',   // ⌂ Home
-  market:  '\u25C9',   // ◉ Market
-  desk:    '\u25A4',   // ▤ Desk
-  account: '\u25CB',   // ○ Account
-};
 
 // ── Shared header style for tabs that show a title bar ─────────────────
 const tabHeader = {
@@ -49,14 +41,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'HOME',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.index}</Text>,
+          tabBarIcon: ({ color }) => <Feather name="home" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="market"
         options={{
           title: 'MARKET',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.market}</Text>,
+          tabBarIcon: ({ color }) => <Feather name="compass" size={22} color={color} />,
           ...tabHeader,
           headerShown: true,
         }}
@@ -65,14 +57,14 @@ export default function TabLayout() {
         name="desk"
         options={{
           title: 'DESK',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.desk}</Text>,
+          tabBarIcon: ({ color }) => <Feather name="book-open" size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="account"
         options={{
           title: 'ACCOUNT',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 18, color }}>{TAB_ICONS.account}</Text>,
+          tabBarIcon: ({ color }) => <Feather name="user" size={22} color={color} />,
           ...tabHeader,
           headerShown: true,
         }}
