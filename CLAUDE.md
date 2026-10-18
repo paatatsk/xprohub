@@ -147,6 +147,15 @@ An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Da
 
 **2026-10-18 palette history (Paata's calls):** Dark Gold (bg `#0E0E0F`, gold `#C9A84C`) → light neutral grey + highlighter gold (bg `#A6A6A6`, card `#B6B6B6`, text `#111111`, gold `#F5E663` fill-only) → **mid grey + gold (current)**. The mid-grey reference (bg `#5B5B5E`, card `#666669`) was evaluated and rejected: white only reaches 5.7:1 on that card, so status colors would have had to be near-white pastels; one step darker keeps them distinct. Changed from the light-grey palette: background `#A6A6A6`, card `#B6B6B6`, border `#808080`, gold `#F5E663`, text `#111111` / `#383838` / `#5A5A5A`, green `#1C412D`, blue `#133E5D`, purple `#471998`, red `#770F0F`, amber `#F2A93B` + amberText `#513305`, errorFill `#CCC3C3`.
 
+### Theme versions
+All three are on GitHub; switch with `git switch <branch>`.
+
+| Version | Where to find it |
+|---|---|
+| Dark Gold | branch `dark-gold`, tag `v1-dark-gold` (commit `3f02d82`) |
+| Light grey + highlighter yellow | branch `grey-theme`, tag `v1-light-grey-highlighter`. Does **not** include the later layout, photo and Welcome fixes — cherry-pick those from `mid-grey-theme` if needed |
+| Mid grey + gold (current) | branch `mid-grey-theme` |
+
 ### Color Tokens
 | Token | Value | Use |
 |---|---|---|
