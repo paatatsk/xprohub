@@ -202,16 +202,8 @@ export default function WelcomeScreen() {
     inputRange: [0, 1],
     outputRange: [BG, GOLD],
   });
-  // Left border: 0 → 1.5
-  const leftBorderWidth = swapAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1.5],
-  });
-  // Right border: 1.5 → 0
-  const rightBorderWidth = swapAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1.5, 0],
-  });
+  // Borders are constant (see styles.boxTop): animating borderWidth 0 ↔ 1.5
+  // resized both boxes mid-swap and nudged everything below up and down.
 
   // Text colours derived from state (instant switch is fine — bg animates)
   const leftTopColor  = topBoxesSwapped ? GOLD : INK;
@@ -287,11 +279,8 @@ export default function WelcomeScreen() {
           <TouchableOpacity onPress={goSignup} activeOpacity={0.85} style={styles.boxTouchable}>
             <Animated.View style={[
               styles.boxBase,
-              {
-                backgroundColor: leftBg,
-                borderWidth: leftBorderWidth,
-                borderColor: GOLD,
-              },
+              styles.boxTop,
+              { backgroundColor: leftBg },
             ]}>
               <Text style={[styles.boxTopLabel, { fontFamily: oswald700, color: leftTopColor }]}>
                 HELP WANTED?
@@ -316,11 +305,8 @@ export default function WelcomeScreen() {
           <TouchableOpacity onPress={goSignup} activeOpacity={0.85} style={styles.boxTouchable}>
             <Animated.View style={[
               styles.boxBase,
-              {
-                backgroundColor: rightBg,
-                borderWidth: rightBorderWidth,
-                borderColor: GOLD,
-              },
+              styles.boxTop,
+              { backgroundColor: rightBg },
             ]}>
               <Text style={[styles.boxTopLabel, { fontFamily: oswald700, color: rightTopColor }]}>
                 HAVE SKILLS?
@@ -574,6 +560,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Top boxes: same border and fixed minimum height in both swap states, so
+  // only colours change. The filled box's gold border matches its fill.
+  boxTop: {
+    borderWidth: 1.5,
+    borderColor: GOLD,
+    minHeight: 104,
+  },
   // Bottom box variants — mirror top-left (gold) and top-right (dark+border)
   boxBottomGold: {
     backgroundColor: GOLD,
@@ -602,12 +595,14 @@ const styles = StyleSheet.create({
   // Box labels — Change 1: top 10 → 13, main 15 → 20
   boxTopLabel: {
     fontSize: 15,
+    lineHeight: 20,
     fontWeight: '700',
     letterSpacing: 1,
     marginBottom: 4,
   },
   boxMainLabel: {
     fontSize: 23,
+    lineHeight: 28,
     fontWeight: '700',
     letterSpacing: 0.7,
   },
