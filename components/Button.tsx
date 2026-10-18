@@ -19,7 +19,7 @@ export function Button({ label, onPress, variant = 'primary', loading = false, d
       activeOpacity={0.8}
     >
       {loading
-        ? <ActivityIndicator color={variant === 'primary' ? Colors.ink : Colors.textPrimary} />
+        ? <ActivityIndicator color={variant === 'primary' ? Colors.ink : Colors.gold} />
         : <Text style={[styles.label, variant !== 'primary' && styles.labelAlt]}>{label}</Text>
       }
     </TouchableOpacity>
@@ -54,6 +54,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   labelAlt: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
 });

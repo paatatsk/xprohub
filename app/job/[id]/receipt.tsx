@@ -484,7 +484,7 @@ export default function ReceiptScreen() {
     return (
       <SafeAreaView style={s.container}>
         <View style={s.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -678,7 +678,7 @@ const s = StyleSheet.create({
     fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2.6,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
-  navShare: { color: Colors.textPrimary, fontSize: 23, lineHeight: 23 },
+  navShare: { color: Colors.gold, fontSize: 23, lineHeight: 23 },
 
   body: { paddingHorizontal: 30, paddingBottom: 40 },
 
@@ -738,7 +738,7 @@ const s = StyleSheet.create({
   workerBlock: { marginTop: 36 },
   workerName: {
     fontFamily: FONT.playfair, fontSize: 38,
-    color: Colors.textPrimary, letterSpacing: -1, lineHeight: 40,
+    color: Colors.gold, letterSpacing: -1, lineHeight: 40,
   },
   workerAction: {
     fontFamily: FONT.inter, fontSize: 16, color: INK_DIM,
@@ -789,7 +789,7 @@ const s = StyleSheet.create({
   },
   totalAmount: {
     fontFamily: FONT.spaceGroteskB, fontSize: 46, letterSpacing: -1,
-    color: Colors.textPrimary, lineHeight: 46, fontVariant: ['tabular-nums'],
+    color: Colors.gold, lineHeight: 46, fontVariant: ['tabular-nums'],
   },
   reconcile: {
     fontFamily: FONT.interMed, fontSize: 13, color: Colors.textSecondary,
@@ -854,7 +854,7 @@ const s = StyleSheet.create({
   },
   endorseBtnText: {
     fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 2,
-    color: Colors.textPrimary, textTransform: 'uppercase',
+    color: Colors.gold, textTransform: 'uppercase',
   },
   endorsedPill: {
     width: '100%', paddingVertical: 18,
@@ -901,7 +901,7 @@ const s = StyleSheet.create({
     borderWidth: 2, borderColor: Colors.gold,
     alignItems: 'center', justifyContent: 'center', marginBottom: 8,
   },
-  errorGlyph: { fontSize: 38, color: Colors.textPrimary },
+  errorGlyph: { fontSize: 38, color: Colors.gold },
   errorHead: {
     fontFamily: FONT.oswaldB, fontSize: 21, letterSpacing: 1,
     color: Colors.textPrimary, textAlign: 'center',
@@ -915,7 +915,7 @@ const s = StyleSheet.create({
     paddingVertical: 10, paddingHorizontal: 28,
   },
   errorBtnText: {
-    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 1, color: Colors.textPrimary,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 1, color: Colors.gold,
   },
   errorBack: {
     fontFamily: FONT.interMed, fontSize: 16, color: Colors.textSecondary,

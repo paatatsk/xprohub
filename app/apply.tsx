@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus } from '../hooks/useStripeStatus';
 import { friendlyError } from '../lib/moderation';
@@ -246,7 +246,7 @@ export default function ApplyScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   outlineBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1,
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   jobContextBudget: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
   },
   templateCardActive: {
     borderColor: Colors.gold,
-    backgroundColor: whiteAlpha(0.3),
+    backgroundColor: blackAlpha(0.2),
   },
   templateCardDim: { opacity: 0.45 },
   templateText: {
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   priceDollar: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 25,
     fontWeight: 'bold',
     lineHeight: 31,
@@ -722,13 +722,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   priceDoneText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 21,
     fontWeight: 'bold',
   },
   budgetWarn: {
     fontFamily: Fonts.bodySemi,
-    color: Colors.amberText,
+    color: Colors.amber,
     fontSize: 13,
     marginTop: 6,
   },

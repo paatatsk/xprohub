@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { usePaymentMethodStatus } from '../hooks/usePaymentMethodStatus';
 
@@ -122,7 +122,7 @@ export default function PaymentSetupScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -147,7 +147,7 @@ export default function PaymentSetupScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -210,7 +210,7 @@ export default function PaymentSetupScreen() {
           {/* Confirming state — spinner + message */}
           {confirming && (
             <View style={styles.confirmingRow}>
-              <ActivityIndicator color={Colors.textPrimary} />
+              <ActivityIndicator color={Colors.gold} />
               <Text style={styles.confirmingText}>{COPY.confirming}</Text>
             </View>
           )}
@@ -263,12 +263,12 @@ const styles = StyleSheet.create({
                     borderColor: Colors.border, borderRadius: Radius.md,
                     padding: Spacing.lg, gap: 14 },
   cardGlow:       { borderColor: Colors.gold,
-                    backgroundColor: whiteAlpha(0.3) },
+                    backgroundColor: blackAlpha(0.2) },
 
   // Typography
   eyebrow:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '700',
                     letterSpacing: 2 },
-  heading:        { color: Colors.textPrimary, fontSize: 31, fontWeight: 'bold',
+  heading:        { color: Colors.gold, fontSize: 31, fontWeight: 'bold',
                     letterSpacing: 1.3, fontFamily: Fonts.heading },
   body:           { color: Colors.textSecondary, fontSize: 16, lineHeight: 22, fontWeight: '500' },
 
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   outlineBtn:     { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 12,
                     alignItems: 'center' },
-  outlineBtnText: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 16,
+  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 16,
                     letterSpacing: 1 },
   btnDisabled:    { opacity: 0.5 },
 
@@ -304,6 +304,6 @@ const styles = StyleSheet.create({
   retryBtn:       { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 10,
                     paddingHorizontal: 28 },
-  retryBtnText:   { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 15,
+  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 15,
                     letterSpacing: 1 },
 });

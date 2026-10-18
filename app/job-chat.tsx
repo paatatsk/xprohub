@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { SUPPORT_EMAIL } from '../lib/legal';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto, type PhotoType } from '../lib/photos';
@@ -574,7 +574,7 @@ export default function JobChatScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -707,7 +707,7 @@ export default function JobChatScreen() {
         {jobStatus === 'matched' && !isCustomer && (
           <View style={styles.lifecycleBanner}>
             {actionLoading
-              ? <ActivityIndicator size="small" color={Colors.textPrimary} />
+              ? <ActivityIndicator size="small" color={Colors.gold} />
               : (
                 <>
                   <TouchableOpacity
@@ -790,7 +790,7 @@ export default function JobChatScreen() {
 
             {isCustomer && !disputeMode && (
               actionLoading
-                ? <ActivityIndicator size="small" color={Colors.textPrimary} />
+                ? <ActivityIndicator size="small" color={Colors.gold} />
                 : (
                   <View style={styles.bannerBtnRow}>
                     <TouchableOpacity
@@ -914,10 +914,10 @@ export default function JobChatScreen() {
               <Text style={styles.feeValue}>${payment.platform_fee.toFixed(2)}</Text>
             </View>
             <View style={[styles.feeRow, styles.feeRowHighlight]}>
-              <Text style={[styles.feeLabel, { color: isCustomer ? Colors.textPrimary : Colors.textPrimary }]}>
+              <Text style={[styles.feeLabel, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
                 {isCustomer ? 'Your cost' : 'Your earnings'}
               </Text>
-              <Text style={[styles.feeValue, { color: isCustomer ? Colors.textPrimary : Colors.textPrimary }]}>
+              <Text style={[styles.feeValue, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
                 ${isCustomer ? payment.amount.toFixed(2) : payment.worker_payout.toFixed(2)}
               </Text>
             </View>
@@ -1029,7 +1029,7 @@ export default function JobChatScreen() {
           )}
           {photoUploading && (
             <View style={styles.cameraBtn}>
-              <ActivityIndicator size="small" color={Colors.textPrimary} />
+              <ActivityIndicator size="small" color={Colors.gold} />
             </View>
           )}
           {!isCustomer && (jobStatus === 'in_progress' || jobStatus === 'pending_confirmation') && evidenceCount >= 10 && (
@@ -1115,7 +1115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   backBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,
@@ -1148,7 +1148,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.3,
   },
   contextName: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 18,
   },
@@ -1176,7 +1176,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   lifecycleBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,
@@ -1252,7 +1252,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   bubbleOutgoing: {
-    backgroundColor: whiteAlpha(0.3),
+    backgroundColor: blackAlpha(0.2),
     borderColor: Colors.gold,
     borderBottomRightRadius: 4,
   },
@@ -1459,7 +1459,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   timerText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.7,
@@ -1515,7 +1515,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
   },
   emailLink: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.5,

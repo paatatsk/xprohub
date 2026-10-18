@@ -118,7 +118,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
-        <StatusBar style="dark" backgroundColor={Colors.background} />
+        <StatusBar style="light" backgroundColor={Colors.background} />
         <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="splash" />
           <Stack.Screen name="(auth)" />

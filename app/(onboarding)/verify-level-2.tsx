@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: Spacing.md },
 
   heading: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 29,
     fontWeight: 'bold',
     letterSpacing: 1.3,

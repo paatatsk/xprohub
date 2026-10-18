@@ -131,7 +131,7 @@ const s = StyleSheet.create({
   },
   noteText: {
     fontFamily: Fonts.body,
-    color: Colors.amberText,
+    color: Colors.amber,
     fontSize: 12,
     lineHeight: 17,
   },
@@ -208,7 +208,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.card,
   },
   currentWordmark: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 14,
     fontFamily: Fonts.heading,
     letterSpacing: 4,

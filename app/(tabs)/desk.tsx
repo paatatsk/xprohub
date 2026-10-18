@@ -353,7 +353,7 @@ export default function DeskScreen() {
     return (
       <SafeAreaView style={s.screen} edges={['top']}>
         <View style={s.loadingCenter}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -366,7 +366,7 @@ export default function DeskScreen() {
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.textPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
         }
       >
         {/* ── Masthead ── */}
@@ -528,7 +528,7 @@ const s = StyleSheet.create({
     letterSpacing: 1.3,
   },
   roleTagGreen: { color: Colors.green },
-  roleTagAmber: { color: Colors.amberText },
+  roleTagAmber: { color: Colors.amber },
   roleTagBlue: { color: Colors.blue },
   activeTitle: {
     fontFamily: Fonts.bodySemi,
@@ -549,7 +549,7 @@ const s = StyleSheet.create({
   activePrice: {
     fontFamily: Fonts.heading,
     fontSize: 18,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontVariant: ['tabular-nums'],
   },
 
@@ -565,7 +565,7 @@ const s = StyleSheet.create({
   earningsTotal: {
     fontFamily: Fonts.heading,
     fontSize: 40,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontVariant: ['tabular-nums'],
     marginBottom: 4,
   },
@@ -616,7 +616,7 @@ const s = StyleSheet.create({
   historyValue: {
     fontFamily: Fonts.heading,
     fontSize: 17.5,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontVariant: ['tabular-nums'],
   },
   historyValueEarned: {

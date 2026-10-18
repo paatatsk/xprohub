@@ -158,7 +158,7 @@ export default function AgreementScreen() {
     return (
       <SafeAreaView style={s.container} edges={['bottom']}>
         <View style={s.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );

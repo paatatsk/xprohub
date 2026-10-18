@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetupScreen() {
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.gold,
   },
   avatarIcon: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 31,
     fontWeight: '300',
     lineHeight: 35,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: whiteAlpha(0.4),
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 10,

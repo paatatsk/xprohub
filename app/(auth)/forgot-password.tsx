@@ -69,7 +69,7 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   safe:      { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, justifyContent: 'center', paddingHorizontal: Spacing.lg },
-  title:     { color: Colors.textPrimary, fontSize: 31, fontWeight: '800', letterSpacing: 0.7, marginBottom: Spacing.xs },
+  title:     { color: Colors.gold, fontSize: 31, fontWeight: '800', letterSpacing: 0.7, marginBottom: Spacing.xs },
   sub:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 17, marginBottom: Spacing.xl },
   errorText: {
     fontFamily: Fonts.body,

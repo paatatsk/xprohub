@@ -41,8 +41,8 @@ function statusColor(status: string): string {
   switch (status) {
     case 'open':                  return Colors.textPrimary;
     case 'matched':               return Colors.green;
-    case 'in_progress':           return Colors.amberText;
-    case 'pending_confirmation':  return Colors.amberText;
+    case 'in_progress':           return Colors.amber;
+    case 'pending_confirmation':  return Colors.amber;
     case 'completed':             return Colors.textSecondary;
     case 'disputed':              return Colors.red;
     default:                      return Colors.textSecondary;
@@ -222,7 +222,7 @@ export default function MyJobsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -283,7 +283,7 @@ export default function MyJobsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadJobs(true)}
-            tintColor={Colors.textPrimary}
+            tintColor={Colors.gold}
           />
         }
         ListEmptyComponent={
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bidCount: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,

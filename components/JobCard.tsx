@@ -270,7 +270,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 27,
     letterSpacing: 0.5,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   budgetUnit: {
     fontFamily: Fonts.monoMed,

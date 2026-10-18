@@ -16,7 +16,7 @@ import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono';
 import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
-import { Colors, Fonts, Spacing, whiteAlpha } from '../../constants/theme';
+import { Colors, Fonts, Spacing, whiteAlpha, blackAlpha } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
 import { useBlockList } from '../../hooks/useBlockList';
@@ -424,7 +424,7 @@ export default function HomeScreen() {
 
       // ── Empty state (loading / error) ──
       case 'empty':
-        if (loading) return <ActivityIndicator color={Colors.textPrimary} style={{ marginTop: 32 }} />;
+        if (loading) return <ActivityIndicator color={Colors.gold} style={{ marginTop: 32 }} />;
         if (error) return <Text style={s.errorText}>{error}</Text>;
         return null;
     }
@@ -440,7 +440,7 @@ export default function HomeScreen() {
         contentContainerStyle={s.listContent}
         style={s.list}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.textPrimary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
         }
       />
     </SafeAreaView>
@@ -474,7 +474,7 @@ const s = StyleSheet.create({
     marginBottom: 20,
   },
   wordmark: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 16,
     fontFamily: Fonts.heading,
     letterSpacing: 2.6,
@@ -486,7 +486,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: Colors.border,
-    backgroundColor: whiteAlpha(0.15),
+    backgroundColor: blackAlpha(0.12),
     borderRadius: 999,
     paddingVertical: 4,
     paddingHorizontal: 9,
@@ -497,7 +497,7 @@ const s = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: whiteAlpha(0.45),
+    backgroundColor: whiteAlpha(0.15),
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -542,7 +542,7 @@ const s = StyleSheet.create({
   },
   greetingName: {
     fontFamily: Fonts.serif,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
 
   // Date line
@@ -632,7 +632,7 @@ const s = StyleSheet.create({
   rowLeadGold: {
     fontFamily: Fonts.heading,
     fontSize: 24,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   rowLeadSquare: {
     width: 12,
@@ -642,7 +642,7 @@ const s = StyleSheet.create({
   rowLeadAmber: {
     fontFamily: Fonts.heading,
     fontSize: 21,
-    color: Colors.amberText,
+    color: Colors.amber,
   },
   rowLeadGreen: {
     fontFamily: Fonts.heading,
@@ -679,21 +679,21 @@ const s = StyleSheet.create({
     borderRadius: 3,
   },
   statusLive: { backgroundColor: Colors.green },
-  statusDraft: { backgroundColor: Colors.amberText },
+  statusDraft: { backgroundColor: Colors.amber },
   statusText: {
     fontFamily: Fonts.monoMed,
     fontSize: 13,
     letterSpacing: 0.7,
   },
   statusLiveText: { color: Colors.green },
-  statusDraftText: { color: Colors.amberText },
+  statusDraftText: { color: Colors.amber },
 
   // Live counts
   countAmber: {
     fontFamily: Fonts.monoMed,
     fontSize: 13,
     letterSpacing: 0.7,
-    color: Colors.amberText,
+    color: Colors.amber,
   },
   countGreen: {
     fontFamily: Fonts.monoMed,

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
-import { Colors, Fonts, Radius, whiteAlpha, backgroundAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, backgroundAlpha, blackAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import CornerStamp from './CornerStamp';
 
@@ -80,7 +80,7 @@ function StatusDot({ status }: { status: Worker['worker_status'] }) {
 
   const dotColor =
     status === 'available' ? Colors.green :
-    status === 'booked'    ? Colors.amberText :
+    status === 'booked'    ? Colors.amber :
     Colors.textTertiary;
 
   const shadowOpacity = pulseAnim.interpolate({
@@ -390,7 +390,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: whiteAlpha(0.25),
+    backgroundColor: blackAlpha(0.12),
     borderBottomWidth: 1,
     borderBottomColor: Colors.gold,
     paddingVertical: 8,
@@ -452,7 +452,7 @@ const s = StyleSheet.create({
   portraitInitials: {
     fontFamily: Fonts.serif,
     fontSize: 37,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   photoStamp: {
     position: 'absolute',
@@ -475,7 +475,7 @@ const s = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: whiteAlpha(0.4),
+    backgroundColor: blackAlpha(0.5),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -537,7 +537,7 @@ const s = StyleSheet.create({
     position: 'absolute' as const,
     bottom: 0,
     right: 0,
-    backgroundColor: whiteAlpha(0.4),
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -565,7 +565,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.monoMed,
     fontSize: 15,
     letterSpacing: 0.3,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: '600',
   },
   trackSep: {
@@ -597,7 +597,7 @@ const s = StyleSheet.create({
     borderRadius: Radius.full,
   },
   pillFilled: {
-    backgroundColor: whiteAlpha(0.4),
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1,
     borderColor: Colors.gold,
   },
@@ -627,7 +627,7 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: whiteAlpha(0.12),
+    backgroundColor: blackAlpha(0.12),
   },
 
   // Footer
@@ -664,7 +664,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 15,
     letterSpacing: 0.7,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
 
 });

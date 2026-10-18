@@ -62,7 +62,7 @@ function statusColor(status: string): string {
   switch (status) {
     case 'open':        return Colors.textPrimary;
     case 'matched':     return Colors.green;
-    case 'in_progress': return Colors.amberText;
+    case 'in_progress': return Colors.amber;
     case 'completed':   return Colors.textSecondary;
     case 'cancelled':   return Colors.red;
     default:            return Colors.textSecondary;
@@ -162,7 +162,7 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
       {bid.status === 'pending' && !bid.is_direct_offer && (
         <View style={styles.actionRow}>
           {actionLoading ? (
-            <ActivityIndicator color={Colors.textPrimary} style={{ flex: 1 }} />
+            <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
           ) : (
             <>
               <TouchableOpacity
@@ -547,7 +547,7 @@ export default function JobBidsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   contextBudget: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 17,
   },
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarInitials: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 17,
   },
@@ -892,7 +892,7 @@ const styles = StyleSheet.create({
 
   // Proposed price — loudest element
   proposedPrice: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 25,
     letterSpacing: 0.5,
@@ -951,7 +951,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   declineBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 0.8,
@@ -966,7 +966,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptedBadgeText: {
-    color: Colors.onDark,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 0.8,
@@ -1094,7 +1094,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,

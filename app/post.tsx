@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto } from '../lib/photos';
 import { friendlyError } from '../lib/moderation';
@@ -419,7 +419,7 @@ export default function PostScreen() {
           <Text style={styles.subhead}>What kind of help do you need?</Text>
 
           {catsLoading ? (
-            <ActivityIndicator color={Colors.textPrimary} style={{ marginTop: 40 }} />
+            <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
           ) : (
             <View style={styles.catGrid}>
               {categories.map(cat => (
@@ -575,7 +575,7 @@ export default function PostScreen() {
         <Text style={styles.sectionLabel}>SELECT TASKS</Text>
 
         {tasksLoading ? (
-          <ActivityIndicator color={Colors.textPrimary} style={{ marginVertical: 12 }} />
+          <ActivityIndicator color={Colors.gold} style={{ marginVertical: 12 }} />
         ) : (
           <View style={styles.taskBox}>
             {tasks.map((task, i) => {
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   // Heading
   heading: {
     fontFamily: Fonts.heading,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 37,
     letterSpacing: 1.3,
     marginBottom: 6,
@@ -881,7 +881,7 @@ const styles = StyleSheet.create({
   photoAddIcon: {
     fontFamily: Fonts.heading,
     fontSize: 25,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     marginTop: -2,
   },
   photoAddLabel: {
@@ -943,7 +943,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   taskNameActive: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   taskPrice: {
     fontFamily: Fonts.monoMed,
@@ -986,7 +986,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.35) },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: blackAlpha(0.2) },
   timingText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 13 },
   timingTextActive: { color: Colors.textPrimary },
 
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: whiteAlpha(0.4), borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: blackAlpha(0.2), borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,

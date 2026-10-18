@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 120,
     borderRadius: 60,
-    backgroundColor: whiteAlpha(0.15),
+    backgroundColor: whiteAlpha(0.06),
     // Soft blur approximated via large border radius + low opacity layer stack
   },
   tagline: {

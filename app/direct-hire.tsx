@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useTrustLevel } from '../hooks/useTrustLevel';
 import { friendlyError } from '../lib/moderation';
@@ -326,7 +326,7 @@ export default function DirectHireScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 18 },
+  avatarInitials: { color: Colors.gold, fontWeight: 'bold', fontSize: 18 },
   workerMeta:     { flex: 1 },
   hiringEyebrow: {
     color: Colors.textPrimary,
@@ -631,9 +631,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 2,
   },
-  chipActive:      { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
+  chipActive:      { borderColor: Colors.gold, backgroundColor: blackAlpha(0.2) },
   chipName:        { color: Colors.textPrimary, fontSize: 15, fontWeight: '700' },
-  chipNameActive:  { color: Colors.textPrimary },
+  chipNameActive:  { color: Colors.gold },
   chipPrice:       { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13 },
   chipPriceActive: { color: Colors.textPrimary, opacity: 0.8 },
   emptyText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 15, fontStyle: 'italic' },
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
 
   // Price
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  priceDollar: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 25 },
+  priceDollar: { color: Colors.gold, fontWeight: 'bold', fontSize: 25 },
   priceInput: { flex: 1 },
 
   // Timing
@@ -672,7 +672,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.35) },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: blackAlpha(0.2) },
   timingText:       { color: Colors.textSecondary, fontSize: 13, fontWeight: 'bold' },
   timingTextActive: { color: Colors.textPrimary },
 
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: whiteAlpha(0.4), borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: blackAlpha(0.2), borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,

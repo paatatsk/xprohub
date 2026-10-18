@@ -74,8 +74,8 @@ function jobStatusColor(status: string): string {
   switch (status) {
     case 'open':                  return Colors.textPrimary;
     case 'matched':               return Colors.green;
-    case 'in_progress':           return Colors.amberText;
-    case 'pending_confirmation':  return Colors.amberText;
+    case 'in_progress':           return Colors.amber;
+    case 'pending_confirmation':  return Colors.amber;
     case 'completed':             return Colors.textSecondary;
     case 'disputed':              return Colors.red;
     default:                      return Colors.textSecondary;
@@ -187,7 +187,7 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
       {isDirectPending && (
         <View style={styles.actionRow}>
           {actionLoading ? (
-            <ActivityIndicator color={Colors.textPrimary} style={{ flex: 1 }} />
+            <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
           ) : (
             <>
               <TouchableOpacity
@@ -439,7 +439,7 @@ export default function MyApplicationsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -490,7 +490,7 @@ export default function MyApplicationsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadApplications(true)}
-            tintColor={Colors.textPrimary}
+            tintColor={Colors.gold}
           />
         }
         ListEmptyComponent={
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   customerNameAccepted: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: '600',
   },
   customerNameHidden: {
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
 
   // ── Price ─────────────────────────────────────────────────────
   price: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 21,
     letterSpacing: 0.5,
@@ -738,7 +738,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   declineBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 0.8,
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 16,
     letterSpacing: 1,

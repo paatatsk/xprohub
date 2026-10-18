@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     height: 64,
   },
   identityInitials: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 25,
   },
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unblockText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 0.7,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   },
   rowValueGold: {
     fontFamily: Fonts.bodySemi,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 17,
   },
   rowRight: {
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signOutText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.7,

@@ -19,7 +19,7 @@ import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-disp
 import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Spacing, Radius, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Spacing, Radius, blackAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import { supabase } from '../lib/supabase';
 import { uploadPortfolioPhoto } from '../lib/photos';
@@ -142,7 +142,7 @@ const SEGMENT_LABELS = [strings['status.offline'], strings['status.available'], 
 const SEGMENT_COLORS: Record<WorkerStatus, string> = {
   offline: Colors.textTertiary,
   available: Colors.green,
-  booked: Colors.amberText,
+  booked: Colors.amber,
 };
 
 function StatusSegment({
@@ -246,7 +246,7 @@ function StatusSegment({
                   s.segDot,
                   {
                     backgroundColor: state === 'booked' && isSelected
-                      ? Colors.amberText
+                      ? Colors.amber
                       : Colors.textTertiary,
                   },
                 ]}
@@ -1339,7 +1339,7 @@ export default function MyCardScreen() {
     return (
       <SafeAreaView style={s.screen}>
         <View style={s.loadingCenter}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -1472,7 +1472,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'photo' ? (
-                <ActivityIndicator size="small" color={Colors.textPrimary} />
+                <ActivityIndicator size="small" color={Colors.gold} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1522,7 +1522,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'certificate' ? (
-                <ActivityIndicator size="small" color={Colors.textPrimary} />
+                <ActivityIndicator size="small" color={Colors.gold} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1572,7 +1572,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'reference' ? (
-                <ActivityIndicator size="small" color={Colors.textPrimary} />
+                <ActivityIndicator size="small" color={Colors.gold} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1664,8 +1664,7 @@ export default function MyCardScreen() {
           <Text
             style={[
               s.publishBtnText,
-              publishConfig.color === 'green' && { color: Colors.onDark },
-              publishConfig.color === 'outlined' && { color: Colors.textPrimary },
+              publishConfig.color === 'outlined' && { color: Colors.gold },
               publishConfig.color === 'disabled' && { opacity: 0.4 },
             ]}
           >
@@ -1739,7 +1738,7 @@ export default function MyCardScreen() {
 
               {/* Counter + coach */}
               <View style={s.bioCounterRow}>
-                <Text style={[s.bioCounter, bioInput.length >= 75 && { color: Colors.amberText }]}>
+                <Text style={[s.bioCounter, bioInput.length >= 75 && { color: Colors.amber }]}>
                   {bioInput.length}/90
                 </Text>
                 <Text style={s.bioCoach}>{strings['myCard.bio.counterHint']}</Text>
@@ -2122,7 +2121,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: whiteAlpha(0.35),
+    backgroundColor: blackAlpha(0.2),
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -2136,7 +2135,7 @@ const s = StyleSheet.create({
   chipRemove: {
     fontFamily: Fonts.heading,
     fontSize: 16,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     opacity: 0.6,
   },
   skillsFallback: {
@@ -2180,7 +2179,7 @@ const s = StyleSheet.create({
   sliderValue: {
     fontFamily: Fonts.heading,
     fontSize: 31,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     marginBottom: Spacing.sm,
   },
   sliderUnit: {
@@ -2453,7 +2452,7 @@ const s = StyleSheet.create({
   pickerRowSelected: {
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: whiteAlpha(0.35),
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -2481,12 +2480,12 @@ const s = StyleSheet.create({
   pickerCheck: {
     fontFamily: Fonts.heading,
     fontSize: 16,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   pickerCapText: {
     fontFamily: Fonts.body,
     fontSize: 13,
-    color: Colors.amberText,
+    color: Colors.amber,
     fontStyle: 'italic',
     marginTop: 4,
   },
@@ -2653,7 +2652,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 15,
     letterSpacing: 0.7,
-    color: Colors.textPrimary,
+    color: Colors.gold,
   },
   bioSaveBtn: {
     flex: 1,
@@ -2749,7 +2748,7 @@ const s = StyleSheet.create({
   },
   portfolioAddText: {
     fontSize: 31,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: '300' as const,
   },
   portfolioHint: {
@@ -2779,7 +2778,7 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   rosterChipFeatured: {
-    backgroundColor: whiteAlpha(0.4),
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1,
     borderColor: Colors.gold,
     paddingHorizontal: 10,
@@ -2816,7 +2815,7 @@ const s = StyleSheet.create({
   capLine: {
     fontFamily: Fonts.body,
     fontSize: 13,
-    color: Colors.amberText,
+    color: Colors.amber,
     fontStyle: 'italic' as const,
     marginTop: Spacing.sm,
   },

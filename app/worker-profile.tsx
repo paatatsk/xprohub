@@ -42,7 +42,7 @@ interface SkillRow {
 function statusDot(status: string): { color: string; label: string } {
   switch (status) {
     case 'available': return { color: Colors.green,         label: 'Available' };
-    case 'booked':    return { color: Colors.amberText,         label: 'Booked' };
+    case 'booked':    return { color: Colors.amber,         label: 'Booked' };
     default:          return { color: Colors.textTertiary,  label: 'Offline' };
   }
 }
@@ -158,7 +158,7 @@ export default function WorkerProfileScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.gold,
   },
-  outlineBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.textPrimary, letterSpacing: 1.3 },
+  outlineBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.gold, letterSpacing: 1.3 },
 
   // Hero
   heroSection: { alignItems: 'center', paddingTop: Spacing.lg, paddingBottom: Spacing.md },
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
   workerName: {
     fontFamily: Fonts.serif,
     fontSize: 29,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     textAlign: 'center',
     marginBottom: 6,
   },
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontFamily: Fonts.display,
     fontSize: 18,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     letterSpacing: 1.3,
     marginBottom: Spacing.sm,
   },
@@ -513,12 +513,12 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   statBox:     { flex: 1, alignItems: 'center' },
-  statNumber:  { fontFamily: Fonts.heading, fontSize: 31, color: Colors.textPrimary },
+  statNumber:  { fontFamily: Fonts.heading, fontSize: 31, color: Colors.gold },
   statCaption: { fontFamily: Fonts.display, fontSize: 13, color: Colors.textSecondary, letterSpacing: 1, marginTop: 4 },
   statDivider: { width: 1, height: 32, backgroundColor: Colors.border },
 
   // Rate
-  rateText: { fontFamily: Fonts.heading, fontSize: 23, color: Colors.textPrimary },
+  rateText: { fontFamily: Fonts.heading, fontSize: 23, color: Colors.gold },
 
   // Skills
   skillGroup:      { marginBottom: Spacing.md },
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
-  skillNameFeatured: { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.textPrimary, flex: 1 },
+  skillNameFeatured: { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.gold, flex: 1 },
   skillName:         { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.textPrimary, flex: 1 },
   skillPrice:        { fontFamily: Fonts.monoMed, fontSize: 16, color: Colors.textSecondary, marginLeft: Spacing.sm },
   emptySkills:       { fontFamily: Fonts.bodyMed, fontSize: 16, color: Colors.textSecondary, fontStyle: 'italic' },
@@ -609,5 +609,5 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
   },
-  editBtnText: { fontFamily: Fonts.display, fontSize: 17, color: Colors.textPrimary, letterSpacing: 1.3 },
+  editBtnText: { fontFamily: Fonts.display, fontSize: 17, color: Colors.gold, letterSpacing: 1.3 },
 });

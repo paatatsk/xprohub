@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus, StripeStatus } from '../hooks/useStripeStatus';
 
@@ -202,7 +202,7 @@ export default function StripeConnectScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -227,7 +227,7 @@ export default function StripeConnectScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -299,7 +299,7 @@ export default function StripeConnectScreen() {
               activeOpacity={0.85}
             >
               {ctaLoading
-                ? <ActivityIndicator color={Colors.textPrimary} />
+                ? <ActivityIndicator color={Colors.gold} />
                 : <Text style={styles.outlineBtnText}>CONTINUE SETUP →</Text>}
             </TouchableOpacity>
           )}
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
                     borderColor: Colors.border, borderRadius: Radius.md,
                     padding: Spacing.lg, gap: 14 },
   cardGlow:       { borderColor: Colors.gold,
-                    backgroundColor: whiteAlpha(0.3) },
+                    backgroundColor: blackAlpha(0.2) },
 
   // Progress dots
   dotsRow:        { flexDirection: 'row', gap: 20, alignItems: 'center' },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   // Typography
   eyebrow:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '700',
                     letterSpacing: 2 },
-  heading:        { color: Colors.textPrimary, fontSize: 31, fontWeight: 'bold',
+  heading:        { color: Colors.gold, fontSize: 31, fontWeight: 'bold',
                     letterSpacing: 1.3, fontFamily: Fonts.heading },
   body:           { color: Colors.textSecondary, fontSize: 16, lineHeight: 22, fontWeight: '500' },
 
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   outlineBtn:     { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 12,
                     alignItems: 'center' },
-  outlineBtnText: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 16,
+  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 16,
                     letterSpacing: 1 },
   btnDisabled:    { opacity: 0.5 },
 
@@ -382,6 +382,6 @@ const styles = StyleSheet.create({
   retryBtn:       { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 10,
                     paddingHorizontal: 28 },
-  retryBtnText:   { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 15,
+  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 15,
                     letterSpacing: 1 },
 });

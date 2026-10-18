@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   title: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 31,
     fontWeight: '800',
     letterSpacing: 0.7,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
   switchLink: {
     fontFamily: Fonts.body,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontFamily: Fonts.body,
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: '600',
   },
   // Email confirmation state
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   confirmedEmail: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: '700',
   },
   confirmedHint: {

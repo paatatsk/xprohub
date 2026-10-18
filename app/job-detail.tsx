@@ -185,7 +185,7 @@ export default function JobDetailScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.textPrimary} />
+          <ActivityIndicator size="large" color={Colors.gold} />
         </View>
       </SafeAreaView>
     );
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   outlineBtnText: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1,
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials:  { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 17 },
+  avatarInitials:  { color: Colors.gold, fontWeight: 'bold', fontSize: 17 },
   postedByInfo:    { flex: 1 },
   postedByEyebrow: {
     color: Colors.textPrimary,
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
 
   // Budget
   budget: {
-    color: Colors.textPrimary,
+    color: Colors.gold,
     fontWeight: 'bold',
     fontSize: 29,
     marginBottom: Spacing.lg,
