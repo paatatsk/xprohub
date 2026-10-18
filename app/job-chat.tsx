@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { SUPPORT_EMAIL } from '../lib/legal';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto, type PhotoType } from '../lib/photos';
@@ -574,7 +574,7 @@ export default function JobChatScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -707,7 +707,7 @@ export default function JobChatScreen() {
         {jobStatus === 'matched' && !isCustomer && (
           <View style={styles.lifecycleBanner}>
             {actionLoading
-              ? <ActivityIndicator size="small" color={Colors.gold} />
+              ? <ActivityIndicator size="small" color={Colors.textPrimary} />
               : (
                 <>
                   <TouchableOpacity
@@ -790,7 +790,7 @@ export default function JobChatScreen() {
 
             {isCustomer && !disputeMode && (
               actionLoading
-                ? <ActivityIndicator size="small" color={Colors.gold} />
+                ? <ActivityIndicator size="small" color={Colors.textPrimary} />
                 : (
                   <View style={styles.bannerBtnRow}>
                     <TouchableOpacity
@@ -914,10 +914,10 @@ export default function JobChatScreen() {
               <Text style={styles.feeValue}>${payment.platform_fee.toFixed(2)}</Text>
             </View>
             <View style={[styles.feeRow, styles.feeRowHighlight]}>
-              <Text style={[styles.feeLabel, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
+              <Text style={[styles.feeLabel, { color: isCustomer ? Colors.textPrimary : Colors.textPrimary }]}>
                 {isCustomer ? 'Your cost' : 'Your earnings'}
               </Text>
-              <Text style={[styles.feeValue, { color: isCustomer ? Colors.textPrimary : Colors.gold }]}>
+              <Text style={[styles.feeValue, { color: isCustomer ? Colors.textPrimary : Colors.textPrimary }]}>
                 ${isCustomer ? payment.amount.toFixed(2) : payment.worker_payout.toFixed(2)}
               </Text>
             </View>
@@ -1029,7 +1029,7 @@ export default function JobChatScreen() {
           )}
           {photoUploading && (
             <View style={styles.cameraBtn}>
-              <ActivityIndicator size="small" color={Colors.gold} />
+              <ActivityIndicator size="small" color={Colors.textPrimary} />
             </View>
           )}
           {!isCustomer && (jobStatus === 'in_progress' || jobStatus === 'pending_confirmation') && evidenceCount >= 10 && (
@@ -1052,7 +1052,7 @@ export default function JobChatScreen() {
             activeOpacity={0.8}
           >
             {sending
-              ? <ActivityIndicator size="small" color={Colors.background} />
+              ? <ActivityIndicator size="small" color={Colors.ink} />
               : <Text style={styles.sendBtnText}>{'\u2191'}</Text>
             }
           </TouchableOpacity>
@@ -1115,7 +1115,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   backBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,
@@ -1147,7 +1147,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   contextName: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -1175,7 +1175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   lifecycleBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,
@@ -1251,7 +1251,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   bubbleOutgoing: {
-    backgroundColor: Colors.gold + '22',
+    backgroundColor: whiteAlpha(0.3),
     borderColor: Colors.gold,
     borderBottomRightRadius: 4,
   },
@@ -1334,7 +1334,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sendBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 24,
@@ -1369,7 +1369,7 @@ const styles = StyleSheet.create({
   photoCardTime: {
     fontFamily: Fonts.mono,
     fontSize: 11,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   photoCardImage: {
     width: '100%',
@@ -1397,7 +1397,7 @@ const styles = StyleSheet.create({
   photoCapNote: {
     fontFamily: Fonts.mono,
     fontSize: 11,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     textAlign: 'center',
     width: 40,
     lineHeight: 11,
@@ -1443,7 +1443,7 @@ const styles = StyleSheet.create({
   photoTypeCancelText: {
     fontFamily: Fonts.body,
     fontSize: 13,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
 
   // ── Pending confirmation + dispute ──────────────────────────
@@ -1455,7 +1455,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   timerText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 1,
@@ -1511,7 +1511,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
   },
   emailLink: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.5,

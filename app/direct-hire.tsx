@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useTrustLevel } from '../hooks/useTrustLevel';
 import { friendlyError } from '../lib/moderation';
@@ -313,7 +313,7 @@ export default function DirectHireScreen() {
             onPress={() => router.back()}
             activeOpacity={0.8}
           >
-            <Text style={[styles.submitText, { color: Colors.gold }]}>GO BACK</Text>
+            <Text style={[styles.submitText, { color: Colors.textPrimary }]}>GO BACK</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -326,7 +326,7 @@ export default function DirectHireScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -529,7 +529,7 @@ export default function DirectHireScreen() {
           activeOpacity={0.85}
         >
           {submitting
-            ? <ActivityIndicator color={Colors.background} />
+            ? <ActivityIndicator color={Colors.ink} />
             : <Text style={styles.submitText}>SEND REQUEST</Text>}
         </TouchableOpacity>
 
@@ -575,10 +575,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials: { color: Colors.gold, fontWeight: 'bold', fontSize: 16 },
+  avatarInitials: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 16 },
   workerMeta:     { flex: 1 },
   hiringEyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 3,
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  spChipText: { color: Colors.gold, fontSize: 10, fontWeight: '600' },
+  spChipText: { color: Colors.textPrimary, fontSize: 10, fontWeight: '600' },
 
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
@@ -631,11 +631,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 2,
   },
-  chipActive:      { borderColor: Colors.gold, backgroundColor: Colors.gold + '22' },
+  chipActive:      { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
   chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
-  chipNameActive:  { color: Colors.gold },
+  chipNameActive:  { color: Colors.textPrimary },
   chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
-  chipPriceActive: { color: Colors.gold, opacity: 0.8 },
+  chipPriceActive: { color: Colors.textPrimary, opacity: 0.8 },
   emptyText:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 13, fontStyle: 'italic' },
 
   // Inputs
@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
 
   // Price
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  priceDollar: { color: Colors.gold, fontWeight: 'bold', fontSize: 22 },
+  priceDollar: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 22 },
   priceInput: { flex: 1 },
 
   // Timing
@@ -672,9 +672,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: 'rgba(201, 168, 76, 0.08)' },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.35) },
   timingText:       { color: Colors.textSecondary, fontSize: 12, fontWeight: 'bold' },
-  timingTextActive: { color: Colors.gold },
+  timingTextActive: { color: Colors.textPrimary },
 
   // Urgent toggle
   urgentRow: {
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: 'rgba(201, 168, 76, 0.15)', borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: whiteAlpha(0.4), borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 2,

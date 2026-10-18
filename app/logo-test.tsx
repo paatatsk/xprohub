@@ -6,7 +6,7 @@
 // when the logo decision is locked.
 //
 // v2 assets (corrected knot↔wordmark spacing). One artwork, locked brand
-// gold #C9A84C. Two component variants:
+// gold (Colors.gold). Two component variants:
 //   • lockup — knot + wordmark, wordmark dropped 12u for the wider gap
 //   • mark   — knot alone, square, icon-safe
 // White variant shown too (for light surfaces / the eventual print use).
@@ -16,7 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, Spacing } from '../constants/theme';
 import { XProHubLogo } from '../components/XProHubLogo';
 
-const BRAND_GOLD = '#C9A84C'; // Colors.gold — the only logo colour now
+const BRAND_GOLD = Colors.gold; // the only logo colour now
 
 function Label({ children }: { children: React.ReactNode }) {
   return <Text style={s.label}>{children}</Text>;
@@ -39,7 +39,7 @@ export default function LogoTestScreen() {
         <View style={s.note}>
           <Text style={s.noteText}>
             Temporary evaluation screen · v2 artwork (wider knot↔wordmark gap) ·
-            brand gold #C9A84C only. Checking: lockup shows the opened-up gap,
+            brand gold (Colors.gold) only. Checking: lockup shows the opened-up gap,
             mark renders the knot alone and stays legible small.
           </Text>
         </View>
@@ -94,7 +94,7 @@ export default function LogoTestScreen() {
         </Section>
 
         {/* ── E. MOCK SPLASH ────────────────────────────────────── */}
-        <Section title="E · MOCK SPLASH — lockup 200 px on #0E0E0F">
+        <Section title="E · MOCK SPLASH — lockup 200 px on Colors.background">
           <View style={s.splash}>
             <XProHubLogo variant="lockup" width={200} />
           </View>
@@ -131,14 +131,14 @@ const s = StyleSheet.create({
   },
   noteText: {
     fontFamily: Fonts.body,
-    color: Colors.amber,
+    color: Colors.amberText,
     fontSize: 12,
     lineHeight: 17,
   },
 
   section: { gap: Spacing.md },
   eyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -189,7 +189,7 @@ const s = StyleSheet.create({
   splash: {
     width: '100%',
     height: 320,
-    backgroundColor: '#0E0E0F',
+    backgroundColor: Colors.background,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',
@@ -208,7 +208,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.card,
   },
   currentWordmark: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 14,
     fontFamily: Fonts.heading,
     letterSpacing: 4,

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { Colors, Fonts } from '../constants/theme';
+import { Colors, Fonts, whiteAlpha } from '../constants/theme';
 
 type StampVariant = 'urgent' | 'new' | 'new-outline';
 
@@ -43,7 +43,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.red,
   },
   stampNew: {
-    backgroundColor: 'rgba(201, 168, 76, 0.12)',
+    backgroundColor: whiteAlpha(0.3),
     borderWidth: 1,
     borderColor: Colors.gold,
   },
@@ -62,12 +62,12 @@ const s = StyleSheet.create({
     letterSpacing: 2,
   },
   textUrgent: {
-    color: Colors.textPrimary,
+    color: Colors.onDark,
   },
   textNew: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   textNewOutline: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 });

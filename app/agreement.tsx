@@ -158,7 +158,7 @@ export default function AgreementScreen() {
     return (
       <SafeAreaView style={s.container} edges={['bottom']}>
         <View style={s.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -213,7 +213,7 @@ export default function AgreementScreen() {
         <LedgerRow
           label="Job total"
           value={`$${data.agreedPrice.toFixed(2)}`}
-          valueColor={Colors.gold}
+          valueColor={Colors.textPrimary}
         />
         <LedgerRow
           label="Platform fee (10%)"
@@ -223,7 +223,7 @@ export default function AgreementScreen() {
         <LedgerRow
           label="Worker receives"
           value={`$${data.workerPayout.toFixed(2)}`}
-          valueColor={Colors.gold}
+          valueColor={Colors.textPrimary}
         />
 
         <Divider />
@@ -254,7 +254,7 @@ export default function AgreementScreen() {
 
 // ── Styles ─────────────────────────────────────────────────────
 
-const INK_DIM = '#d8d8d8';
+const INK_DIM = Colors.textPrimary; // was '#d8d8d8' (light text on dark)
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
@@ -296,7 +296,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 4,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     textTransform: 'uppercase',
   },
   headerTitle: {

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
-import { Colors, Fonts, Radius } from '../constants/theme';
+import { Colors, Fonts, Radius, whiteAlpha, backgroundAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import CornerStamp from './CornerStamp';
 
@@ -80,7 +80,7 @@ function StatusDot({ status }: { status: Worker['worker_status'] }) {
 
   const dotColor =
     status === 'available' ? Colors.green :
-    status === 'booked'    ? Colors.amber :
+    status === 'booked'    ? Colors.amberText :
     Colors.textTertiary;
 
   const shadowOpacity = pulseAnim.interpolate({
@@ -390,7 +390,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(201, 168, 76, 0.10)',
+    backgroundColor: whiteAlpha(0.25),
     borderBottomWidth: 1,
     borderBottomColor: Colors.gold,
     paddingVertical: 8,
@@ -402,7 +402,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.displayB,
     fontSize: 12,
     letterSpacing: 3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   stripeRightRow: {
     flexDirection: 'row',
@@ -413,12 +413,12 @@ const s = StyleSheet.create({
     fontFamily: Fonts.monoMed,
     fontSize: 12,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   stripeOverflow: {
     fontFamily: Fonts.monoMed,
     fontSize: 14,
-    color: 'rgba(201, 168, 76, 0.45)',
+    color: Colors.textSecondary,
     letterSpacing: 2,
   },
 
@@ -452,7 +452,7 @@ const s = StyleSheet.create({
   portraitInitials: {
     fontFamily: Fonts.serif,
     fontSize: 34,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   photoStamp: {
     position: 'absolute',
@@ -460,22 +460,22 @@ const s = StyleSheet.create({
     left: 0,
     right: 0,
     paddingVertical: 2,
-    backgroundColor: 'rgba(14,14,15,0.5)',
+    backgroundColor: backgroundAlpha(0.5),
     borderTopWidth: 1,
-    borderTopColor: 'rgba(201,168,76,0.4)',
+    borderTopColor: Colors.gold,
     alignItems: 'center',
   },
   photoStampText: {
     fontFamily: Fonts.mono,
     fontSize: 11,
     letterSpacing: 1,
-    color: 'rgba(201,168,76,0.55)',
+    color: Colors.textPrimary,
   },
   photoBadge: {
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: whiteAlpha(0.4),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -486,7 +486,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 11,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Info column
@@ -531,13 +531,13 @@ const s = StyleSheet.create({
   },
   bioPlaceholder: {
     fontStyle: 'italic' as const,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   bioBadge: {
     position: 'absolute' as const,
     bottom: 0,
     right: 0,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: whiteAlpha(0.4),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -548,7 +548,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 11,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Track record
@@ -565,13 +565,13 @@ const s = StyleSheet.create({
     fontFamily: Fonts.monoMed,
     fontSize: 13,
     letterSpacing: 0.3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '600',
   },
   trackSep: {
     fontFamily: Fonts.mono,
     fontSize: 13,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
 
   // Skill block
@@ -582,7 +582,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 12,
     letterSpacing: 2.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: 3,
   },
   pillRow: {
@@ -597,35 +597,37 @@ const s = StyleSheet.create({
     borderRadius: Radius.full,
   },
   pillFilled: {
-    backgroundColor: 'rgba(201,168,76,0.12)',
+    backgroundColor: whiteAlpha(0.4),
+    borderWidth: 1,
+    borderColor: Colors.gold,
   },
   pillOutlined: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
+    borderColor: Colors.border,
     backgroundColor: 'transparent',
   },
   pillDimmed: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.25)',
+    borderColor: Colors.border,
     backgroundColor: 'transparent',
   },
   pillText: {
     fontFamily: Fonts.heading,
     fontSize: 12,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   pillTextDimmed: {
     fontFamily: Fonts.heading,
     fontSize: 12,
     letterSpacing: 0.5,
-    color: 'rgba(201,168,76,0.7)',
+    color: Colors.textSecondary,
   },
   pillDisclosure: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
+    borderColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(201,168,76,0.04)',
+    backgroundColor: whiteAlpha(0.12),
   },
 
   // Footer
@@ -638,7 +640,7 @@ const s = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(14,14,15,0.4)',
+    backgroundColor: backgroundAlpha(0.4),
   },
   footerMeta: {
     flex: 1,
@@ -648,7 +650,7 @@ const s = StyleSheet.create({
     color: Colors.textSecondary,
   },
   footerMetaGold: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '600',
   },
   hireBtn: {
@@ -662,7 +664,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 13,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
 });

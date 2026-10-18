@@ -107,7 +107,7 @@ export default function DeleteAccountScreen() {
           disabled={isDeleting}
         >
           {isDeleting ? (
-            <ActivityIndicator color={Colors.background} />
+            <ActivityIndicator color={Colors.onDark} />
           ) : (
             <Text style={styles.deleteBtnText}>DELETE MY ACCOUNT</Text>
           )}
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   deleteBtnText: {
-    color: Colors.background,
+    color: Colors.onDark,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1.5,
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1,

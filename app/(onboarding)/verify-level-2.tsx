@@ -73,7 +73,7 @@ export default function VerifyLevel2Screen() {
             accessibilityLabel="Continue to activate your account"
           >
             {activating
-              ? <ActivityIndicator color={Colors.background} />
+              ? <ActivityIndicator color={Colors.ink} />
               : <Text style={styles.primaryBtnText}>CONTINUE</Text>}
           </TouchableOpacity>
         </View>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: Spacing.md },
 
   heading: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 26,
     fontWeight: 'bold',
     letterSpacing: 2,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 2,

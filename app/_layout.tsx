@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { DetailHeader } from '../components/DetailHeader';
+import { Colors } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -106,7 +107,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
-        <StatusBar style="light" backgroundColor="#0E0E0F" />
+        <StatusBar style="dark" backgroundColor={Colors.background} />
         <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="splash" />
           <Stack.Screen name="(auth)" />

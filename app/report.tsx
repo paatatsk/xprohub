@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 
 // ── Reason options ────────────────────────────────────────────────────────────
@@ -188,7 +188,7 @@ export default function ReportScreen() {
           activeOpacity={0.85}
         >
           {submitting ? (
-            <ActivityIndicator color={Colors.background} />
+            <ActivityIndicator color={Colors.ink} />
           ) : (
             <Text style={styles.submitBtnText}>SUBMIT REPORT</Text>
           )}
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
   },
   eyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 3,
@@ -239,14 +239,14 @@ const styles = StyleSheet.create({
   },
   reasonCardActive: {
     borderColor: Colors.gold,
-    backgroundColor: Colors.gold + '18',
+    backgroundColor: whiteAlpha(0.3),
   },
   reasonText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
     fontSize: 14,
   },
-  reasonTextActive: { color: Colors.gold },
+  reasonTextActive: { color: Colors.textPrimary },
 
   // Details
   detailsLabel: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1.5,

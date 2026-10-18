@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   iconGlyph: { fontSize: 44 },
   heading: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 26,
     letterSpacing: 2,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 2,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   secondaryBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 2,

@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetupScreen() {
@@ -209,7 +209,7 @@ export default function ProfileSetupScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={Colors.background} />
+              <ActivityIndicator color={Colors.ink} />
             ) : (
               <Text style={styles.buttonText}>{isGate ? 'SAVE AND CONTINUE' : 'LET\'S GO →'}</Text>
             )}
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xl,
   },
   eyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 3,
@@ -275,13 +275,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.gold,
   },
   avatarIcon: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 28,
     fontWeight: '300',
     lineHeight: 32,
   },
   avatarLabel: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatarRequired: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: whiteAlpha(0.4),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 10,
@@ -312,21 +312,21 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   avatarEditText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1,
   },
   errorText: {
     fontFamily: Fonts.body,
-    color: '#FF6B6B',
+    color: Colors.red,
     fontSize: 14,
     marginBottom: Spacing.md,
-    backgroundColor: '#2A1515',
+    backgroundColor: Colors.errorFill,
     padding: Spacing.sm,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: Colors.red,
   },
   label: {
     fontFamily: Fonts.body,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 1.5,

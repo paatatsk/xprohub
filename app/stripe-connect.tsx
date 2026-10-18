@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus, StripeStatus } from '../hooks/useStripeStatus';
 
@@ -76,7 +76,7 @@ function badgeBorderStyle(state: StripeStatus) {
 
 function badgeTextColor(state: StripeStatus) {
   const isGreen = state === StripeStatus.CHARGES_ACTIVE || state === StripeStatus.FULLY_VERIFIED;
-  return { color: isGreen ? Colors.green : Colors.gold };
+  return { color: isGreen ? Colors.green : Colors.textPrimary };
 }
 
 // ── Screen ────────────────────────────────────────────────────
@@ -202,7 +202,7 @@ export default function StripeConnectScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -227,7 +227,7 @@ export default function StripeConnectScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -285,7 +285,7 @@ export default function StripeConnectScreen() {
               activeOpacity={0.85}
             >
               {ctaLoading
-                ? <ActivityIndicator color={Colors.background} />
+                ? <ActivityIndicator color={Colors.ink} />
                 : <Text style={styles.primaryBtnText}>GET VERIFIED →</Text>}
             </TouchableOpacity>
           )}
@@ -299,7 +299,7 @@ export default function StripeConnectScreen() {
               activeOpacity={0.85}
             >
               {ctaLoading
-                ? <ActivityIndicator color={Colors.gold} />
+                ? <ActivityIndicator color={Colors.textPrimary} />
                 : <Text style={styles.outlineBtnText}>CONTINUE SETUP →</Text>}
             </TouchableOpacity>
           )}
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
                     borderColor: Colors.border, borderRadius: Radius.md,
                     padding: Spacing.lg, gap: 14 },
   cardGlow:       { borderColor: Colors.gold,
-                    backgroundColor: Colors.gold + '1A' },
+                    backgroundColor: whiteAlpha(0.3) },
 
   // Progress dots
   dotsRow:        { flexDirection: 'row', gap: 20, alignItems: 'center' },
@@ -348,9 +348,9 @@ const styles = StyleSheet.create({
                     textAlign: 'center' },
 
   // Typography
-  eyebrow:        { color: Colors.gold, fontSize: 11, fontWeight: '700',
+  eyebrow:        { color: Colors.textPrimary, fontSize: 11, fontWeight: '700',
                     letterSpacing: 3 },
-  heading:        { color: Colors.gold, fontSize: 28, fontWeight: 'bold',
+  heading:        { color: Colors.textPrimary, fontSize: 28, fontWeight: 'bold',
                     letterSpacing: 2, fontFamily: Fonts.heading },
   body:           { color: Colors.textSecondary, fontSize: 14, lineHeight: 20 },
 
@@ -363,24 +363,24 @@ const styles = StyleSheet.create({
   // Buttons
   primaryBtn:     { backgroundColor: Colors.gold, borderRadius: Radius.md,
                     paddingVertical: 16, alignItems: 'center' },
-  primaryBtnText: { color: Colors.background, fontWeight: 'bold', fontSize: 15,
+  primaryBtnText: { color: Colors.ink, fontWeight: 'bold', fontSize: 15,
                     letterSpacing: 1.5 },
   outlineBtn:     { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 12,
                     alignItems: 'center' },
-  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 14,
+  outlineBtnText: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 14,
                     letterSpacing: 1.5 },
   btnDisabled:    { opacity: 0.5 },
 
   // Error states
   ctaError:       { color: Colors.red, fontSize: 13, textAlign: 'center' },
   fetchError:     { color: Colors.red, fontSize: 14, textAlign: 'center',
-                    backgroundColor: '#2A1515', padding: Spacing.sm,
+                    backgroundColor: Colors.errorFill, padding: Spacing.sm,
                     borderRadius: Radius.sm, borderWidth: 1,
                     borderColor: Colors.red },
   retryBtn:       { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 10,
                     paddingHorizontal: 28 },
-  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 13,
+  retryBtnText:   { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 13,
                     letterSpacing: 1.5 },
 });

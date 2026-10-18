@@ -39,10 +39,10 @@ function timeAgo(iso: string): string {
 
 function statusColor(status: string): string {
   switch (status) {
-    case 'open':                  return Colors.gold;
+    case 'open':                  return Colors.textPrimary;
     case 'matched':               return Colors.green;
-    case 'in_progress':           return Colors.amber;
-    case 'pending_confirmation':  return Colors.amber;
+    case 'in_progress':           return Colors.amberText;
+    case 'pending_confirmation':  return Colors.amberText;
     case 'completed':             return Colors.textSecondary;
     case 'disputed':              return Colors.red;
     default:                      return Colors.textSecondary;
@@ -222,7 +222,7 @@ export default function MyJobsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -283,7 +283,7 @@ export default function MyJobsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadJobs(true)}
-            tintColor={Colors.gold}
+            tintColor={Colors.textPrimary}
           />
         }
         ListEmptyComponent={
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontFamily: Fonts.body,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bidCount: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,

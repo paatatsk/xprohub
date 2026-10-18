@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { initPaymentSheet, presentPaymentSheet } from '@stripe/stripe-react-native';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { usePaymentMethodStatus } from '../hooks/usePaymentMethodStatus';
 
@@ -122,7 +122,7 @@ export default function PaymentSetupScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -147,7 +147,7 @@ export default function PaymentSetupScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -210,7 +210,7 @@ export default function PaymentSetupScreen() {
           {/* Confirming state — spinner + message */}
           {confirming && (
             <View style={styles.confirmingRow}>
-              <ActivityIndicator color={Colors.gold} />
+              <ActivityIndicator color={Colors.textPrimary} />
               <Text style={styles.confirmingText}>{COPY.confirming}</Text>
             </View>
           )}
@@ -238,7 +238,7 @@ export default function PaymentSetupScreen() {
               activeOpacity={0.85}
             >
               {ctaLoading
-                ? <ActivityIndicator color={Colors.background} />
+                ? <ActivityIndicator color={Colors.ink} />
                 : <Text style={styles.primaryBtnText}>ADD CARD →</Text>}
             </TouchableOpacity>
           )}
@@ -263,12 +263,12 @@ const styles = StyleSheet.create({
                     borderColor: Colors.border, borderRadius: Radius.md,
                     padding: Spacing.lg, gap: 14 },
   cardGlow:       { borderColor: Colors.gold,
-                    backgroundColor: Colors.gold + '1A' },
+                    backgroundColor: whiteAlpha(0.3) },
 
   // Typography
-  eyebrow:        { color: Colors.gold, fontSize: 11, fontWeight: '700',
+  eyebrow:        { color: Colors.textPrimary, fontSize: 11, fontWeight: '700',
                     letterSpacing: 3 },
-  heading:        { color: Colors.gold, fontSize: 28, fontWeight: 'bold',
+  heading:        { color: Colors.textPrimary, fontSize: 28, fontWeight: 'bold',
                     letterSpacing: 2, fontFamily: Fonts.heading },
   body:           { color: Colors.textSecondary, fontSize: 14, lineHeight: 20 },
 
@@ -286,24 +286,24 @@ const styles = StyleSheet.create({
   // Buttons
   primaryBtn:     { backgroundColor: Colors.gold, borderRadius: Radius.md,
                     paddingVertical: 16, alignItems: 'center' },
-  primaryBtnText: { color: Colors.background, fontWeight: 'bold', fontSize: 15,
+  primaryBtnText: { color: Colors.ink, fontWeight: 'bold', fontSize: 15,
                     letterSpacing: 1.5 },
   outlineBtn:     { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 12,
                     alignItems: 'center' },
-  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 14,
+  outlineBtnText: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 14,
                     letterSpacing: 1.5 },
   btnDisabled:    { opacity: 0.5 },
 
   // Error states
   ctaError:       { color: Colors.red, fontSize: 13, textAlign: 'center' },
   fetchError:     { color: Colors.red, fontSize: 14, textAlign: 'center',
-                    backgroundColor: '#2A1515', padding: Spacing.sm,
+                    backgroundColor: Colors.errorFill, padding: Spacing.sm,
                     borderRadius: Radius.sm, borderWidth: 1,
                     borderColor: Colors.red },
   retryBtn:       { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 10,
                     paddingHorizontal: 28 },
-  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 13,
+  retryBtnText:   { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 13,
                     letterSpacing: 1.5 },
 });

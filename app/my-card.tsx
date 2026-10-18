@@ -19,7 +19,7 @@ import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-disp
 import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Spacing, Radius } from '../constants/theme';
+import { Colors, Fonts, Spacing, Radius, whiteAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import { supabase } from '../lib/supabase';
 import { uploadPortfolioPhoto } from '../lib/photos';
@@ -78,7 +78,6 @@ interface PortfolioItem {
 }
 const UNDO_WINDOW_MS = 5000;
 const INK = '#1A0F00';
-const CHARCOAL = '#2a2a2e';
 const THUMB_SIZE = 24;
 const THUMB_ACTIVE_SIZE = 34;
 
@@ -141,9 +140,9 @@ function snap(value: number, step: number, min: number, max: number): number {
 const SEGMENT_STATES: WorkerStatus[] = ['offline', 'available', 'booked'];
 const SEGMENT_LABELS = [strings['status.offline'], strings['status.available'], strings['status.booked']];
 const SEGMENT_COLORS: Record<WorkerStatus, string> = {
-  offline: CHARCOAL,
+  offline: Colors.textTertiary,
   available: Colors.green,
-  booked: Colors.amber,
+  booked: Colors.amberText,
 };
 
 function StatusSegment({
@@ -247,7 +246,7 @@ function StatusSegment({
                   s.segDot,
                   {
                     backgroundColor: state === 'booked' && isSelected
-                      ? Colors.amber
+                      ? Colors.amberText
                       : Colors.textTertiary,
                   },
                 ]}
@@ -257,7 +256,7 @@ function StatusSegment({
               style={[
                 s.segLabel,
                 isSelected && { color: INK },
-                !isSelected && { color: Colors.textTertiary },
+                !isSelected && { color: Colors.textSecondary },
               ]}
             >
               {SEGMENT_LABELS[i]}
@@ -1340,7 +1339,7 @@ export default function MyCardScreen() {
     return (
       <SafeAreaView style={s.screen}>
         <View style={s.loadingCenter}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -1473,7 +1472,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'photo' ? (
-                <ActivityIndicator size="small" color={Colors.gold} />
+                <ActivityIndicator size="small" color={Colors.textPrimary} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1523,7 +1522,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'certificate' ? (
-                <ActivityIndicator size="small" color={Colors.gold} />
+                <ActivityIndicator size="small" color={Colors.textPrimary} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1573,7 +1572,7 @@ export default function MyCardScreen() {
               accessibilityRole="button"
             >
               {portfolioUploading === 'reference' ? (
-                <ActivityIndicator size="small" color={Colors.gold} />
+                <ActivityIndicator size="small" color={Colors.textPrimary} />
               ) : (
                 <Text style={s.portfolioAddText}>+</Text>
               )}
@@ -1665,7 +1664,8 @@ export default function MyCardScreen() {
           <Text
             style={[
               s.publishBtnText,
-              publishConfig.color === 'outlined' && { color: Colors.gold },
+              publishConfig.color === 'green' && { color: Colors.onDark },
+              publishConfig.color === 'outlined' && { color: Colors.textPrimary },
               publishConfig.color === 'disabled' && { opacity: 0.4 },
             ]}
           >
@@ -1739,7 +1739,7 @@ export default function MyCardScreen() {
 
               {/* Counter + coach */}
               <View style={s.bioCounterRow}>
-                <Text style={[s.bioCounter, bioInput.length >= 75 && { color: Colors.amber }]}>
+                <Text style={[s.bioCounter, bioInput.length >= 75 && { color: Colors.amberText }]}>
                   {bioInput.length}/90
                 </Text>
                 <Text style={s.bioCoach}>{strings['myCard.bio.counterHint']}</Text>
@@ -2030,7 +2030,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 4,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
 
@@ -2085,7 +2085,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 9,
     letterSpacing: 3,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
   previewWrap: {
@@ -2122,7 +2122,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(201,168,76,0.12)',
+    backgroundColor: whiteAlpha(0.35),
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -2131,12 +2131,12 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 11,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   chipRemove: {
     fontFamily: Fonts.heading,
     fontSize: 14,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     opacity: 0.6,
   },
   skillsFallback: {
@@ -2160,7 +2160,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 10,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // ── Knob panels ──
@@ -2180,7 +2180,7 @@ const s = StyleSheet.create({
   sliderValue: {
     fontFamily: Fonts.heading,
     fontSize: 28,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
   sliderUnit: {
@@ -2242,7 +2242,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 9,
     letterSpacing: 0.5,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
 
   // ── Publish bar ──
@@ -2328,7 +2328,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 12,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
@@ -2387,7 +2387,7 @@ const s = StyleSheet.create({
   emptyLocked: {
     fontFamily: Fonts.body,
     fontSize: 11,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
@@ -2437,7 +2437,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 9,
     letterSpacing: 3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
   pickerRow: {
@@ -2454,7 +2454,7 @@ const s = StyleSheet.create({
   pickerRowSelected: {
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: 'rgba(201,168,76,0.1)',
+    backgroundColor: whiteAlpha(0.35),
     borderWidth: 1,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -2474,20 +2474,20 @@ const s = StyleSheet.create({
   pickerRowTextSelected: {
     fontFamily: Fonts.bodyMed,
     fontSize: 14,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   pickerRowTextDimmed: {
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   pickerCheck: {
     fontFamily: Fonts.heading,
     fontSize: 14,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   pickerCapText: {
     fontFamily: Fonts.body,
     fontSize: 11,
-    color: Colors.amber,
+    color: Colors.amberText,
     fontStyle: 'italic',
     marginTop: 4,
   },
@@ -2516,7 +2516,7 @@ const s = StyleSheet.create({
   pickerCatChevron: {
     fontFamily: Fonts.body,
     fontSize: 12,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   pickerTaskRow: {
     flexDirection: 'row',
@@ -2540,10 +2540,10 @@ const s = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 9,
     letterSpacing: 0.5,
-    color: 'rgba(201,168,76,0.5)',
+    color: Colors.textSecondary,
     fontStyle: 'italic',
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.25)',
+    borderColor: Colors.border,
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -2636,7 +2636,7 @@ const s = StyleSheet.create({
   bioCoach: {
     fontFamily: Fonts.body,
     fontSize: 11,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   bioActions: {
     flexDirection: 'row' as const,
@@ -2654,7 +2654,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 13,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   bioSaveBtn: {
     flex: 1,
@@ -2700,7 +2700,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 10,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // ── Portfolio ──
@@ -2733,7 +2733,7 @@ const s = StyleSheet.create({
     justifyContent: 'center' as const,
   },
   portfolioDeleteText: {
-    color: Colors.textPrimary,
+    color: Colors.onDark,
     fontSize: 14,
     fontWeight: 'bold' as const,
     lineHeight: 16,
@@ -2750,7 +2750,7 @@ const s = StyleSheet.create({
   },
   portfolioAddText: {
     fontSize: 28,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '300' as const,
   },
   portfolioHint: {
@@ -2771,16 +2771,18 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 10,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   rosterHint: {
     fontFamily: Fonts.body,
     fontSize: 11,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
   rosterChipFeatured: {
-    backgroundColor: 'rgba(201,168,76,0.15)',
+    backgroundColor: whiteAlpha(0.4),
+    borderWidth: 1,
+    borderColor: Colors.gold,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
@@ -2789,7 +2791,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 11,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   rosterChipOutline: {
     flexDirection: 'row' as const,
@@ -2805,7 +2807,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 11,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   rosterRemoveX: {
     fontFamily: Fonts.heading,
@@ -2815,7 +2817,7 @@ const s = StyleSheet.create({
   capLine: {
     fontFamily: Fonts.body,
     fontSize: 11,
-    color: Colors.amber,
+    color: Colors.amberText,
     fontStyle: 'italic' as const,
     marginTop: Spacing.sm,
   },
@@ -2831,13 +2833,13 @@ const s = StyleSheet.create({
   addFlowBack: {
     fontFamily: Fonts.body,
     fontSize: 14,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   addFlowStep: {
     fontFamily: Fonts.display,
     fontSize: 9,
     letterSpacing: 3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   addConfirmContent: {
     padding: Spacing.md,

@@ -353,7 +353,7 @@ export default function DeskScreen() {
     return (
       <SafeAreaView style={s.screen} edges={['top']}>
         <View style={s.loadingCenter}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -366,7 +366,7 @@ export default function DeskScreen() {
         contentContainerStyle={s.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.gold} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.textPrimary} />
         }
       >
         {/* ── Masthead ── */}
@@ -454,7 +454,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 4,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
   title: {
@@ -477,7 +477,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 12,
     letterSpacing: 3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
   },
@@ -486,7 +486,7 @@ const s = StyleSheet.create({
   emptyLine: {
     fontFamily: Fonts.body,
     fontSize: 15,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
   },
@@ -509,7 +509,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 12.5,
     letterSpacing: 2,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Active cards
@@ -528,7 +528,7 @@ const s = StyleSheet.create({
     letterSpacing: 2,
   },
   roleTagGreen: { color: Colors.green },
-  roleTagAmber: { color: Colors.amber },
+  roleTagAmber: { color: Colors.amberText },
   roleTagBlue: { color: Colors.blue },
   activeTitle: {
     fontFamily: Fonts.bodyMed,
@@ -549,7 +549,7 @@ const s = StyleSheet.create({
   activePrice: {
     fontFamily: Fonts.heading,
     fontSize: 16,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
 
@@ -565,7 +565,7 @@ const s = StyleSheet.create({
   earningsTotal: {
     fontFamily: Fonts.heading,
     fontSize: 38,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
     marginBottom: 4,
   },
@@ -607,7 +607,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 1.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   historyValueCol: {
     alignItems: 'flex-end',
@@ -616,7 +616,7 @@ const s = StyleSheet.create({
   historyValue: {
     fontFamily: Fonts.heading,
     fontSize: 15.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   historyValueEarned: {

@@ -33,7 +33,7 @@ import {
   IBMPlexMono_400Regular,
   IBMPlexMono_500Medium,
 } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors } from '../../../constants/theme';
+import { Colors, whiteAlpha, backgroundAlpha } from '../../../constants/theme';
 import { fmtCents, fmtDateStamp, fmtDuration, fmtDayDate, fmtShortDate, toCents } from '../../../lib/format';
 import type { ReceiptData } from '../../../types/receipt';
 
@@ -53,7 +53,7 @@ const FONT = {
 
 // Receipt-specific neutral. Slightly dimmer than textPrimary —
 // feels like ink on dark paper, not pure white on screen.
-const INK_DIM = '#d8d8d8';
+const INK_DIM = Colors.textPrimary; // was '#d8d8d8' (light text on dark)
 
 // Format helpers imported from lib/format.ts
 
@@ -349,7 +349,7 @@ function TraceBlock({ data }: { data: ReceiptData }) {
       <TraceRow
         label="payout"
         value={concernHold ? 'held pending review' : payoutStr}
-        valueColor={concernHold ? Colors.red : Colors.gold}
+        valueColor={concernHold ? Colors.red : Colors.textPrimary}
       />
       <TraceRow label="job id" value={trace.jobId} />
     </View>
@@ -484,7 +484,7 @@ export default function ReceiptScreen() {
     return (
       <SafeAreaView style={s.container}>
         <View style={s.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -676,22 +676,22 @@ const s = StyleSheet.create({
   },
   navTitle: {
     fontFamily: FONT.oswald, fontSize: 12, letterSpacing: 4,
-    color: Colors.gold, textTransform: 'uppercase',
+    color: Colors.textPrimary, textTransform: 'uppercase',
   },
-  navShare: { color: Colors.gold, fontSize: 20, lineHeight: 20 },
+  navShare: { color: Colors.textPrimary, fontSize: 20, lineHeight: 20 },
 
   body: { paddingHorizontal: 30, paddingBottom: 40 },
 
   // Ornate divider
   ornate:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 14 },
   ornateRule:    { flex: 1, height: 1, backgroundColor: Colors.gold, opacity: 0.4 },
-  ornateDiamond: { color: Colors.gold, fontSize: 8 },
+  ornateDiamond: { color: Colors.textPrimary, fontSize: 8 },
 
   // Stamp
   stampRow:     { alignItems: 'center', marginBottom: 20 },
   eyebrowGold: {
     fontFamily: FONT.oswald, fontSize: 11, letterSpacing: 4,
-    color: Colors.gold, textTransform: 'uppercase',
+    color: Colors.textPrimary, textTransform: 'uppercase',
   },
   stampDate: {
     fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
@@ -709,19 +709,19 @@ const s = StyleSheet.create({
   photoImg:         { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
   photoInnerBorder: {
     position: 'absolute', top: 10, left: 10, right: 10, bottom: 10,
-    borderWidth: 1, borderColor: 'rgba(201,168,76,0.18)',
+    borderWidth: 1, borderColor: whiteAlpha(0.35),
   },
   photoStamp: {
     position: 'absolute', top: 22, left: 22,
     fontFamily: FONT.oswaldB, fontSize: 10, letterSpacing: 4,
-    color: Colors.gold, borderWidth: 1.5, borderColor: Colors.gold,
+    color: Colors.textPrimary, borderWidth: 1.5, borderColor: Colors.gold,
     paddingHorizontal: 9, paddingVertical: 5,
     transform: [{ rotate: '-3deg' }],
-    backgroundColor: 'rgba(14,14,15,0.6)',
+    backgroundColor: backgroundAlpha(0.6),
   },
   photoMeta: {
     position: 'absolute', bottom: 18, right: 22,
-    fontFamily: FONT.mono, fontSize: 9, color: Colors.gold,
+    fontFamily: FONT.mono, fontSize: 9, color: Colors.textPrimary,
     letterSpacing: 1.5,
   },
   photoPlaceholderCenter: {
@@ -729,7 +729,7 @@ const s = StyleSheet.create({
   },
   photoStampLabel: {
     fontFamily: FONT.oswald, fontSize: 11, letterSpacing: 3,
-    color: Colors.gold, marginBottom: 6,
+    color: Colors.textPrimary, marginBottom: 6,
   },
   photoPlaceholderBody: {
     fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
@@ -738,7 +738,7 @@ const s = StyleSheet.create({
   workerBlock: { marginTop: 36 },
   workerName: {
     fontFamily: FONT.playfair, fontSize: 36,
-    color: Colors.gold, letterSpacing: -1, lineHeight: 38,
+    color: Colors.textPrimary, letterSpacing: -1, lineHeight: 38,
   },
   workerAction: {
     fontFamily: FONT.inter, fontSize: 14, color: INK_DIM,
@@ -785,18 +785,18 @@ const s = StyleSheet.create({
   },
   totalLabel: {
     fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
-    color: '#FFFFFF', textTransform: 'uppercase',
+    color: Colors.textPrimary, textTransform: 'uppercase',
   },
   totalAmount: {
     fontFamily: FONT.spaceGroteskB, fontSize: 44, letterSpacing: -1,
-    color: Colors.gold, lineHeight: 44, fontVariant: ['tabular-nums'],
+    color: Colors.textPrimary, lineHeight: 44, fontVariant: ['tabular-nums'],
   },
   reconcile: {
     fontFamily: FONT.inter, fontSize: 12, color: Colors.textSecondary,
     marginTop: 2,
   },
   reconcileEm:   { color: INK_DIM, fontFamily: FONT.interMed },
-  reconcileGold: { color: Colors.gold, fontFamily: FONT.interMed },
+  reconcileGold: { color: Colors.textPrimary, fontFamily: FONT.interMed },
 
   // Note
   noteBlock: {
@@ -828,7 +828,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2,
   },
   traceK: {
-    fontFamily: FONT.mono, fontSize: 10, color: '#555558',
+    fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
     letterSpacing: 0.5, lineHeight: 18, width: 80,
   },
   traceV: {
@@ -849,12 +849,12 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   endorseCheckGlyph: {
-    fontSize: 9, color: Colors.gold, lineHeight: 9,
+    fontSize: 9, color: Colors.textPrimary, lineHeight: 9,
     marginTop: Platform.OS === 'ios' ? 0 : -1,
   },
   endorseBtnText: {
     fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
-    color: Colors.gold, textTransform: 'uppercase',
+    color: Colors.textPrimary, textTransform: 'uppercase',
   },
   endorsedPill: {
     width: '100%', paddingVertical: 18,
@@ -892,7 +892,7 @@ const s = StyleSheet.create({
   },
   footerText: {
     fontFamily: FONT.oswald, fontSize: 10, letterSpacing: 3,
-    color: Colors.gold, textTransform: 'uppercase',
+    color: Colors.textPrimary, textTransform: 'uppercase',
   },
 
   // Error state
@@ -901,10 +901,10 @@ const s = StyleSheet.create({
     borderWidth: 2, borderColor: Colors.gold,
     alignItems: 'center', justifyContent: 'center', marginBottom: 8,
   },
-  errorGlyph: { fontSize: 36, color: Colors.gold },
+  errorGlyph: { fontSize: 36, color: Colors.textPrimary },
   errorHead: {
     fontFamily: FONT.oswaldB, fontSize: 18, letterSpacing: 1.5,
-    color: '#FFFFFF', textAlign: 'center',
+    color: Colors.textPrimary, textAlign: 'center',
   },
   errorBody: {
     fontFamily: FONT.inter, fontSize: 14, color: Colors.textSecondary,
@@ -915,7 +915,7 @@ const s = StyleSheet.create({
     paddingVertical: 10, paddingHorizontal: 28,
   },
   errorBtnText: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 1.5, color: Colors.gold,
+    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 1.5, color: Colors.textPrimary,
   },
   errorBack: {
     fontFamily: FONT.inter, fontSize: 14, color: Colors.textSecondary,

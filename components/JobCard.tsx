@@ -201,7 +201,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 2.5,
-    color: Colors.gold,
+    color: Colors.onDark,
   },
 
   // Card body
@@ -227,7 +227,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 3,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     paddingHorizontal: 10,
   },
 
@@ -236,7 +236,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.display,
     fontSize: 11,
     letterSpacing: 2.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
 
@@ -270,7 +270,7 @@ const s = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 24,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   budgetUnit: {
     fontFamily: Fonts.mono,
@@ -302,6 +302,6 @@ const s = StyleSheet.create({
   metaSep: {
     fontFamily: Fonts.body,
     fontSize: 12,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
 });

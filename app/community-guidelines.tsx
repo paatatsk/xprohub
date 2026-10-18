@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   link: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 });

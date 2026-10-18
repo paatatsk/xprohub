@@ -60,9 +60,9 @@ function timeAgo(iso: string): string {
 // Job-level status color + label (for the context strip)
 function statusColor(status: string): string {
   switch (status) {
-    case 'open':        return Colors.gold;
+    case 'open':        return Colors.textPrimary;
     case 'matched':     return Colors.green;
-    case 'in_progress': return Colors.amber;
+    case 'in_progress': return Colors.amberText;
     case 'completed':   return Colors.textSecondary;
     case 'cancelled':   return Colors.red;
     default:            return Colors.textSecondary;
@@ -162,7 +162,7 @@ function BidCard({ bid, actionLoading, onAccept, onDecline, onOpenChat }: BidCar
       {bid.status === 'pending' && !bid.is_direct_offer && (
         <View style={styles.actionRow}>
           {actionLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
+            <ActivityIndicator color={Colors.textPrimary} style={{ flex: 1 }} />
           ) : (
             <>
               <TouchableOpacity
@@ -547,7 +547,7 @@ export default function JobBidsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -753,7 +753,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contextEyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 2,
@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   contextBudget: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 15,
   },
@@ -790,7 +790,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   categoryText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarInitials: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 15,
   },
@@ -892,7 +892,7 @@ const styles = StyleSheet.create({
 
   // Proposed price — loudest element
   proposedPrice: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 22,
     letterSpacing: 0.5,
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.2,
@@ -951,7 +951,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   declineBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.2,
@@ -966,7 +966,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptedBadgeText: {
-    color: Colors.background,
+    color: Colors.onDark,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.2,
@@ -999,7 +999,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   directOfferPillText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 12,
     letterSpacing: 1.5,
@@ -1094,7 +1094,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,

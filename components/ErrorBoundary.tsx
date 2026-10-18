@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 48,
     fontWeight: '800',
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginBottom: Spacing.lg,
     width: 72,
     height: 72,
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.full,
   },
   title: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 22,
     fontWeight: '800',
     letterSpacing: 1,

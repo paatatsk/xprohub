@@ -51,7 +51,7 @@ function timeAgo(iso: string): string {
 // Bid status — what happened to this application
 function bidStatusColor(status: string): string {
   switch (status) {
-    case 'pending':   return Colors.gold;
+    case 'pending':   return Colors.textPrimary;
     case 'accepted':  return Colors.green;
     case 'declined':  return Colors.textSecondary;
     case 'withdrawn': return Colors.textSecondary;
@@ -72,10 +72,10 @@ function bidStatusLabel(status: string): string {
 // Job status — the underlying job's lifecycle state
 function jobStatusColor(status: string): string {
   switch (status) {
-    case 'open':                  return Colors.gold;
+    case 'open':                  return Colors.textPrimary;
     case 'matched':               return Colors.green;
-    case 'in_progress':           return Colors.amber;
-    case 'pending_confirmation':  return Colors.amber;
+    case 'in_progress':           return Colors.amberText;
+    case 'pending_confirmation':  return Colors.amberText;
     case 'completed':             return Colors.textSecondary;
     case 'disputed':              return Colors.red;
     default:                      return Colors.textSecondary;
@@ -112,7 +112,7 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
   const isDirectPending = bid.is_direct_offer && bid.status === 'pending' && bid.worker_id === currentUserId;
   const isEnded = ['declined', 'withdrawn'].includes(bid.status)
     || ['completed', 'cancelled', 'expired'].includes(bid.job?.status ?? '');
-  const bidColor   = isDirectPending ? Colors.gold : bidStatusColor(bid.status);
+  const bidColor   = isDirectPending ? Colors.textPrimary : bidStatusColor(bid.status);
   const bidLabel   = isDirectPending ? 'DIRECT OFFER' : bidStatusLabel(bid.status);
   const job        = bid.job;
 
@@ -187,7 +187,7 @@ function ApplicationCard({ bid, customerName, currentUserId, actionLoading, onPr
       {isDirectPending && (
         <View style={styles.actionRow}>
           {actionLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ flex: 1 }} />
+            <ActivityIndicator color={Colors.textPrimary} style={{ flex: 1 }} />
           ) : (
             <>
               <TouchableOpacity
@@ -439,7 +439,7 @@ export default function MyApplicationsScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['bottom']}>
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -490,7 +490,7 @@ export default function MyApplicationsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => loadApplications(true)}
-            tintColor={Colors.gold}
+            tintColor={Colors.textPrimary}
           />
         }
         ListEmptyComponent={
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   directHireText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11.5,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontFamily: Fonts.body,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '600',
     letterSpacing: 0.4,
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   customerNameAccepted: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '600',
   },
   customerNameHidden: {
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
 
   // ── Price ─────────────────────────────────────────────────────
   price: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 18,
     letterSpacing: 0.5,
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.2,
@@ -738,7 +738,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   declineBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.2,
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,

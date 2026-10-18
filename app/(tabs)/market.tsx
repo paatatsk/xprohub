@@ -10,7 +10,7 @@ import { useFonts } from 'expo-font';
 import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../../constants/theme';
 import { strings } from '../../constants/strings';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
@@ -264,7 +264,7 @@ export default function MarketScreen() {
     if (loading) {
       return (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       );
     }
@@ -309,7 +309,7 @@ export default function MarketScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={() => fetchJobs(true)}
-            tintColor={Colors.gold}
+            tintColor={Colors.textPrimary}
           />
         }
         ListEmptyComponent={
@@ -331,7 +331,7 @@ export default function MarketScreen() {
     if (workersLoading) {
       return (
         <View style={styles.centerBox}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       );
     }
@@ -424,7 +424,7 @@ export default function MarketScreen() {
           <RefreshControl
             refreshing={workersRefreshing}
             onRefresh={() => fetchWorkers(true)}
-            tintColor={Colors.gold}
+            tintColor={Colors.textPrimary}
           />
         }
         ListEmptyComponent={
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleBtnActive: {
-    backgroundColor: 'rgba(201, 168, 76, 0.08)',
+    backgroundColor: whiteAlpha(0.45),
   },
   toggleText: {
     color: Colors.textSecondary,
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   toggleTextActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Filter strip
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   filterClear: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: 'bold',
     paddingVertical: 10,
@@ -629,7 +629,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   retryText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
     letterSpacing: 1.5,
@@ -651,6 +651,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.heading,
     fontSize: 14,
     letterSpacing: 1.5,
-    color: Colors.background,
+    color: Colors.ink,
   },
 });

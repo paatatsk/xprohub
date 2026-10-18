@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus } from '../hooks/useStripeStatus';
 import { friendlyError } from '../lib/moderation';
@@ -246,7 +246,7 @@ export default function ApplyScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -530,7 +530,7 @@ export default function ApplyScreen() {
           activeOpacity={0.85}
         >
           {submitting
-            ? <ActivityIndicator color={Colors.background} />
+            ? <ActivityIndicator color={Colors.ink} />
             : <Text style={styles.submitText}>SUBMIT APPLICATION</Text>}
         </TouchableOpacity>
 
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   outlineBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   jobContextEyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 3,
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   jobContextBudget: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   contextPillText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
   },
   templateCardActive: {
     borderColor: Colors.gold,
-    backgroundColor: Colors.gold + '18',
+    backgroundColor: whiteAlpha(0.3),
   },
   templateCardDim: { opacity: 0.45 },
   templateText: {
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
   },
-  templateTextActive: { color: Colors.gold },
+  templateTextActive: { color: Colors.textPrimary },
 
   // Write my own
   writeOwnCard: {
@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   priceDollar: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 22,
     fontWeight: 'bold',
     lineHeight: 28,
@@ -722,13 +722,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   priceDoneText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
   },
   budgetWarn: {
     fontFamily: Fonts.body,
-    color: Colors.amber,
+    color: Colors.amberText,
     fontSize: 12,
     marginTop: 6,
   },
@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 2,

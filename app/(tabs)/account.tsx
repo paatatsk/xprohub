@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     height: 64,
   },
   identityInitials: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 22,
   },
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
 
   // Section eyebrow
   eyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   unblockText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 1,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   },
   rowValueGold: {
     fontFamily: Fonts.body,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 15,
   },
   rowRight: {
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signOutText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 15,
     fontWeight: '700',
     letterSpacing: 1,

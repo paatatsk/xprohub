@@ -22,10 +22,10 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, Spacing, Radius } from '../../constants/theme';
 
 // ─── Colours (all from design system) ─────────────────────────
-const GOLD  = Colors.gold;        // #C9A84C
-const BG    = Colors.background;  // #0E0E0F
-const PAPER = '#F5EEDC';
-const CREAM = '#E8DCC0';
+const GOLD  = Colors.gold;        // #F5E663 — fills, strokes, borders only
+const BG    = Colors.background;  // #A6A6A6
+const PAPER = Colors.textPrimary;  // was '#F5EEDC' (light text on dark)
+const CREAM = Colors.textSecondary; // was '#E8DCC0' (light text on dark)
 const INK   = '#1A0F00';
 
 // ─── Ornate gold divider (line ◆ line) ────────────────────────
@@ -189,10 +189,10 @@ export default function WelcomeScreen() {
   });
 
   // Text colours derived from state (instant switch is fine — bg animates)
-  const leftTopColor  = topBoxesSwapped ? GOLD : INK;
-  const leftMainColor = topBoxesSwapped ? GOLD : INK;
-  const rightTopColor  = topBoxesSwapped ? INK  : GOLD;
-  const rightMainColor = topBoxesSwapped ? INK  : GOLD;
+  const leftTopColor  = topBoxesSwapped ? Colors.textPrimary : INK;
+  const leftMainColor = topBoxesSwapped ? Colors.textPrimary : INK;
+  const rightTopColor  = topBoxesSwapped ? INK  : Colors.textPrimary;
+  const rightMainColor = topBoxesSwapped ? INK  : Colors.textPrimary;
 
   const goSignup = () => router.replace('/(auth)/signup');
   const goLogin  = () => router.replace('/(auth)/login');
@@ -354,7 +354,7 @@ export default function WelcomeScreen() {
 
             {/* Right bottom box — dark + gold border, mirrors top-right */}
             <View style={[styles.boxBase, styles.boxOutline]}>
-              <Text style={[styles.bottomBoxLabel, { fontFamily: oswald700, color: GOLD }]}>
+              <Text style={[styles.bottomBoxLabel, { fontFamily: oswald700, color: Colors.textPrimary }]}>
                 YOUR RATE
               </Text>
             </View>
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
   kickerText: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 11,
     letterSpacing: 6,
   },
@@ -434,18 +434,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   nameplateX: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 48,
     letterSpacing: -1,
   },
   nameplatePro: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 48,
     letterSpacing: -1,
     fontStyle: 'italic',
   },
   nameplateHub: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 48,
     letterSpacing: -1,
   },
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
   },
   tickerText: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 11,
     letterSpacing: 3,
   },
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   dividerDiamond: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 10,
     marginHorizontal: 8,
     lineHeight: 14,
@@ -513,7 +513,7 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   eyebrow: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 11,
     letterSpacing: 3,
   },
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   setLabel: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 13,
     letterSpacing: 2,
     marginBottom: 6,
@@ -613,7 +613,7 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   trustHeaderText: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 11,
     letterSpacing: 3,
   },
@@ -676,7 +676,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   signInLink: {
-    color: GOLD,
+    color: Colors.textPrimary,
     fontSize: 13,
     letterSpacing: 1.5,
     textDecorationLine: 'underline',

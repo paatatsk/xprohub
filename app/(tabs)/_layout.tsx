@@ -9,7 +9,7 @@ import { Colors, Fonts } from '../../constants/theme';
 // ── Shared header style for tabs that show a title bar ─────────────────
 const tabHeader = {
   headerStyle:         { backgroundColor: Colors.background },
-  headerTintColor:     Colors.gold,
+  headerTintColor:     Colors.textPrimary,
   headerTitleStyle:    { color: Colors.textPrimary, fontWeight: 'bold' as const },
   headerShadowVisible: false,
 };
@@ -26,7 +26,8 @@ export default function TabLayout() {
           height: 84,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: Colors.gold,
+        tabBarActiveTintColor: Colors.ink,
+        tabBarActiveBackgroundColor: Colors.gold,
         tabBarInactiveTintColor: Colors.textSecondary,
         tabBarLabelStyle: {
           fontFamily: Fonts.heading,

@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto } from '../lib/photos';
 import { friendlyError } from '../lib/moderation';
@@ -419,7 +419,7 @@ export default function PostScreen() {
           <Text style={styles.subhead}>What kind of help do you need?</Text>
 
           {catsLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
+            <ActivityIndicator color={Colors.textPrimary} style={{ marginTop: 40 }} />
           ) : (
             <View style={styles.catGrid}>
               {categories.map(cat => (
@@ -575,7 +575,7 @@ export default function PostScreen() {
         <Text style={styles.sectionLabel}>SELECT TASKS</Text>
 
         {tasksLoading ? (
-          <ActivityIndicator color={Colors.gold} style={{ marginVertical: 12 }} />
+          <ActivityIndicator color={Colors.textPrimary} style={{ marginVertical: 12 }} />
         ) : (
           <View style={styles.taskBox}>
             {tasks.map((task, i) => {
@@ -710,7 +710,7 @@ export default function PostScreen() {
           disabled={isSubmitDisabled}
         >
           {submitting
-            ? <ActivityIndicator color={Colors.background} />
+            ? <ActivityIndicator color={Colors.ink} />
             : <Text style={styles.submitText}>POST JOB</Text>
           }
         </TouchableOpacity>
@@ -732,7 +732,7 @@ const styles = StyleSheet.create({
   // Heading
   heading: {
     fontFamily: Fonts.heading,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 34,
     letterSpacing: 2,
     marginBottom: 6,
@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backLinkText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontFamily: Fonts.bodyMed,
     fontSize: 13,
   },
@@ -863,7 +863,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoRemoveText: {
-    color: '#fff',
+    color: Colors.onDark,
     fontSize: 11,
     fontWeight: 'bold',
   },
@@ -881,14 +881,14 @@ const styles = StyleSheet.create({
   photoAddIcon: {
     fontFamily: Fonts.heading,
     fontSize: 22,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     marginTop: -2,
   },
   photoAddLabel: {
     fontFamily: Fonts.mono,
     fontSize: 8,
     letterSpacing: 1,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold,
   },
   checkmark: {
-    color: Colors.background,
+    color: Colors.ink,
     fontSize: 13,
     fontWeight: 'bold',
     marginTop: -1,
@@ -943,7 +943,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   taskNameActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   taskPrice: {
     fontFamily: Fonts.mono,
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   taskPriceActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   taskCount: {
     fontFamily: Fonts.mono,
@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   taskCountActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Budget
@@ -986,9 +986,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: 'rgba(201, 168, 76, 0.08)' },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.35) },
   timingText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 12 },
-  timingTextActive: { color: Colors.gold },
+  timingTextActive: { color: Colors.textPrimary },
 
   // Urgent toggle
   urgentRow: {
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: 'rgba(201, 168, 76, 0.15)', borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: whiteAlpha(0.4), borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,
@@ -1032,7 +1032,7 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontFamily: Fonts.heading,
     fontSize: 15,
     letterSpacing: 2,

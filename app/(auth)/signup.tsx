@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   title: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 28,
     fontWeight: '800',
     letterSpacing: 1,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     color: Colors.red,
     fontSize: 14,
     marginBottom: Spacing.md,
-    backgroundColor: '#2A1515',
+    backgroundColor: Colors.errorFill,
     padding: Spacing.sm,
     borderRadius: Radius.sm,
     borderWidth: 1,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
   switchLink: {
     fontFamily: Fonts.body,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontFamily: Fonts.body,
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '600',
   },
   // Email confirmation state
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   confirmedEmail: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '700',
   },
   confirmedHint: {

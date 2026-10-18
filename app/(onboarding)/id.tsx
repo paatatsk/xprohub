@@ -6,7 +6,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, whiteAlpha } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 // ID (Business Card) — 4-step setup
@@ -395,7 +395,7 @@ export default function IdScreen() {
           </Text>
 
           {catsLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
+            <ActivityIndicator color={Colors.textPrimary} style={{ marginTop: 40 }} />
           ) : (
             <View style={styles.catGrid}>
               {categories.map(cat => {
@@ -463,7 +463,7 @@ export default function IdScreen() {
           </Text>
 
           {tasksLoading ? (
-            <ActivityIndicator color={Colors.gold} style={{ marginTop: 40 }} />
+            <ActivityIndicator color={Colors.textPrimary} style={{ marginTop: 40 }} />
           ) : (
             catOrder.map(cat => {
               const catTasks = tasks.filter(t => t.category_id === cat.id);
@@ -591,7 +591,7 @@ export default function IdScreen() {
             activeOpacity={0.85}
           >
             {submitting
-              ? <ActivityIndicator color={Colors.background} />
+              ? <ActivityIndicator color={Colors.ink} />
               : <Text style={styles.continueBtnText}>FINISH</Text>}
           </TouchableOpacity>
         </View>
@@ -610,14 +610,14 @@ const styles = StyleSheet.create({
 
   // Header
   eyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 3,
     marginBottom: 4,
   },
   heading: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 28,
     fontWeight: 'bold',
     letterSpacing: 2,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 6,
   },
-  catTileActive:  { borderColor: Colors.gold, backgroundColor: Colors.gold + '1A' },
+  catTileActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
   catEmoji:       { fontSize: 28 },
   catName: {
     color: Colors.textPrimary,
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     lineHeight: 18,
   },
-  catNameActive:  { color: Colors.gold },
+  catNameActive:  { color: Colors.textPrimary },
   catCount:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
 
   // Field group
@@ -682,11 +682,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 2,
   },
-  chipActive:      { borderColor: Colors.gold, backgroundColor: Colors.gold + '22' },
+  chipActive:      { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
   chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
-  chipNameActive:  { color: Colors.gold },
+  chipNameActive:  { color: Colors.textPrimary },
   chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
-  chipPriceActive: { color: Colors.gold, opacity: 0.8 },
+  chipPriceActive: { color: Colors.textPrimary, opacity: 0.8 },
 
   // Superpower rows (step 4)
   superRow: {
@@ -700,7 +700,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     gap: 12,
   },
-  superRowActive:       { borderColor: Colors.gold, backgroundColor: Colors.gold + '1A' },
+  superRowActive:       { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
   superCheck: {
     width: 24,
     height: 24,
@@ -712,10 +712,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   superCheckActive:     { borderColor: Colors.gold, backgroundColor: Colors.gold },
-  superCheckMark:       { color: Colors.background, fontSize: 13, fontWeight: 'bold' },
+  superCheckMark:       { color: Colors.ink, fontSize: 13, fontWeight: 'bold' },
   superTaskInfo:        { flex: 1 },
   superTaskName:        { color: Colors.textPrimary, fontSize: 14, fontWeight: '600' },
-  superTaskNameActive:  { color: Colors.gold },
+  superTaskNameActive:  { color: Colors.textPrimary },
   superTaskPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
 
   // Avatar (step 1)
@@ -743,13 +743,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.gold,
   },
   avatarIcon: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 32,
     fontWeight: '300',
     lineHeight: 36,
   },
   avatarLabel: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 1.5,
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: whiteAlpha(0.4),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 10,
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   avatarEditText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 1,
@@ -820,7 +820,7 @@ const styles = StyleSheet.create({
   continueBtnFlex:     { flex: 1 },
   continueBtnDisabled: { opacity: 0.5 },
   continueBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 1.5,

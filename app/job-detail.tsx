@@ -185,7 +185,7 @@ export default function JobDetailScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.gold} />
+          <ActivityIndicator size="large" color={Colors.textPrimary} />
         </View>
       </SafeAreaView>
     );
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   outlineBtnText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 13,
     letterSpacing: 1.5,
@@ -528,10 +528,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials:  { color: Colors.gold, fontWeight: 'bold', fontSize: 15 },
+  avatarInitials:  { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 15 },
   postedByInfo:    { flex: 1 },
   postedByEyebrow: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 10,
     fontWeight: '700',
     letterSpacing: 2.5,
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   categoryPillText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontSize: 11,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
 
   // Budget
   budget: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
     fontSize: 26,
     marginBottom: Spacing.lg,
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  taskChipText: { color: Colors.gold, fontSize: 12, fontWeight: '600' },
+  taskChipText: { color: Colors.textPrimary, fontSize: 12, fontWeight: '600' },
 
   // Details
   detailRow: {
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.green,
   },
-  applyBtnText:     { color: Colors.background, fontWeight: 'bold', fontSize: 14, letterSpacing: 2 },
+  applyBtnText:     { color: Colors.ink, fontWeight: 'bold', fontSize: 14, letterSpacing: 2 },
   applyBtnSentText: { color: Colors.green,      fontWeight: 'bold', fontSize: 14, letterSpacing: 1.5 },
   ownJobText: {
     fontFamily: Fonts.body,
