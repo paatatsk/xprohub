@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus } from '../hooks/useStripeStatus';
 import { friendlyError } from '../lib/moderation';
@@ -530,7 +530,7 @@ export default function ApplyScreen() {
           activeOpacity={0.85}
         >
           {submitting
-            ? <ActivityIndicator color={Colors.background} />
+            ? <ActivityIndicator color={Colors.ink} />
             : <Text style={styles.submitText}>SUBMIT APPLICATION</Text>}
         </TouchableOpacity>
 
@@ -556,20 +556,20 @@ const styles = StyleSheet.create({
   },
 
   // Gate screens
-  gateGlyph: { fontSize: 44, marginBottom: 4 },
+  gateGlyph: { fontSize: 46, marginBottom: 4 },
   gateHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   gateSub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 21,
   },
   outlineBtn: {
     borderWidth: 1.5,
@@ -582,8 +582,8 @@ const styles = StyleSheet.create({
   outlineBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
   },
 
   // Job context card
@@ -597,16 +597,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   jobContextEyebrow: {
-    color: Colors.gold,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
   },
   jobContextTitle: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 18,
+    lineHeight: 24,
   },
   jobContextMeta: {
     flexDirection: 'row',
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   jobContextBudget: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   contextPill: {
     borderWidth: 1,
@@ -627,25 +627,25 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   contextPillText: {
-    color: Colors.gold,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
   label: {
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: 4,
   },
   fieldHint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     marginBottom: 12,
   },
   required: { color: Colors.red },
@@ -661,16 +661,16 @@ const styles = StyleSheet.create({
   },
   templateCardActive: {
     borderColor: Colors.gold,
-    backgroundColor: Colors.gold + '18',
+    backgroundColor: blackAlpha(0.2),
   },
   templateCardDim: { opacity: 0.45 },
   templateText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 15,
+    lineHeight: 21,
   },
-  templateTextActive: { color: Colors.gold },
+  templateTextActive: { color: Colors.textPrimary },
 
   // Write my own
   writeOwnCard: {
@@ -680,8 +680,8 @@ const styles = StyleSheet.create({
   writeOwnText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontSize: 13,
+    letterSpacing: 1,
   },
 
   // Custom input
@@ -692,12 +692,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 15,
+    fontSize: 17,
     paddingHorizontal: Spacing.md,
     paddingVertical: 12,
   },
   inputMultiline: { minHeight: 100, textAlignVertical: 'top', paddingTop: 12 },
-  charCount:      { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
+  charCount:      { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13, marginTop: 4 },
 
   // Price field
   priceInputRow: {
@@ -707,9 +707,9 @@ const styles = StyleSheet.create({
   },
   priceDollar: {
     color: Colors.gold,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 'bold',
-    lineHeight: 28,
+    lineHeight: 31,
   },
   priceInput: { flex: 1 },
   priceDoneBtn: {
@@ -723,13 +723,13 @@ const styles = StyleSheet.create({
   },
   priceDoneText: {
     color: Colors.gold,
-    fontSize: 18,
+    fontSize: 21,
     fontWeight: 'bold',
   },
   budgetWarn: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.amber,
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 6,
   },
 
@@ -743,15 +743,15 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 2,
+    fontSize: 17,
+    letterSpacing: 1.3,
   },
   submitError: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },

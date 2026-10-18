@@ -199,9 +199,9 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2.5,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 1.6,
+    color: Colors.onDark,
   },
 
   // Card body
@@ -225,26 +225,26 @@ const s = StyleSheet.create({
   },
   categoryLabel: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 3,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.textPrimary,
     paddingHorizontal: 10,
   },
 
   // Own-post eyebrow (no-photo cards)
   ownPostTag: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2.5,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 1.6,
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
 
   // Title — more pronounced
   title: {
     fontFamily: Fonts.heading,
-    fontSize: 19,
-    lineHeight: 25,
+    fontSize: 22,
+    lineHeight: 28,
     color: Colors.textPrimary,
     paddingRight: 8,
     marginBottom: 8,
@@ -252,9 +252,9 @@ const s = StyleSheet.create({
 
   // Description
   description: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
-    lineHeight: 20,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 16,
+    lineHeight: 22,
     color: Colors.textSecondary,
     marginBottom: 14,
   },
@@ -268,14 +268,14 @@ const s = StyleSheet.create({
   },
   budgetNumber: {
     fontFamily: Fonts.heading,
-    fontSize: 24,
+    fontSize: 27,
     letterSpacing: 0.5,
     color: Colors.gold,
   },
   budgetUnit: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
   },
@@ -291,8 +291,8 @@ const s = StyleSheet.create({
     paddingTop: 12,
   },
   metaItem: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
   metaAccent: {
@@ -300,8 +300,8 @@ const s = StyleSheet.create({
     fontWeight: '500',
   },
   metaSep: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
   },
 });

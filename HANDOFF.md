@@ -232,7 +232,7 @@ Migration `20260530000001` shipped. Going forward, NULL is structurally impossib
 ### Brand invariants (carry forward always)
 
 - 10% flat platform fee (3% Stripe + 7% ops)
-- Dark Gold design: bg `#0E0E0F`, gold `#C9A84C`, ink `#1A0F00`, cream `#F5EEDC`, green `#4CAF7A`, amber `#E5901A`
+- Design (2026-10-18 mid grey + gold; changed from light grey bg `#A6A6A6` / gold `#F5E663`, originally Dark Gold bg `#0E0E0F` / gold `#C9A84C`): bg `#4A4A4D`, card `#555558`, gold `#F0D48A`, text `#FFFFFF` / `#D0D0D4`, ink `#1A0F00` on gold, green `#88DDB0`, amber `#FFBF87`
 - Fonts: Space Grotesk (headings/numbers), Inter (body), Playfair Display 700 italic (worker names), Oswald (eyebrows), IBM Plex Mono (ledger voice)
 - Bundle: `com.paatatsk.xprohub`
 

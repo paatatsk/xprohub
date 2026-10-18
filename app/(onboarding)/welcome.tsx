@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFonts } from 'expo-font';
 import {
   Oswald_600SemiBold,
@@ -9,6 +9,7 @@ import {
   PlayfairDisplay_700Bold_Italic,
 } from '@expo-google-fonts/playfair-display';
 import {
+  AccessibilityInfo,
   Animated,
   ScrollView,
   StyleSheet,
@@ -17,16 +18,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, Spacing, Radius } from '../../constants/theme';
 
 // ─── Colours (all from design system) ─────────────────────────
-const GOLD  = Colors.gold;        // #C9A84C
-const BG    = Colors.background;  // #0E0E0F
-const PAPER = '#F5EEDC';
-const CREAM = '#E8DCC0';
+const GOLD  = Colors.gold;        // #F0D48A
+const BG    = Colors.background;  // #4A4A4D
+const PAPER = Colors.textPrimary;  // was '#F5EEDC' (light text on dark)
+const CREAM = Colors.textSecondary; // was '#E8DCC0' (light text on dark)
 const INK   = '#1A0F00';
+const AUTO_SWAP_MS = 3000; // yin-yang auto-swap interval
 
 // ─── Ornate gold divider (line ◆ line) ────────────────────────
 function OrnateDivider() {
@@ -131,7 +133,6 @@ export default function WelcomeScreen() {
     PlayfairDisplay_700Bold,
     PlayfairDisplay_700Bold_Italic,
   });
-  const oswald600  = fontsLoaded ? 'Oswald_600SemiBold'             : 'System';
   const oswald700  = fontsLoaded ? 'Oswald_700Bold'                 : 'System';
   const playfair   = fontsLoaded ? 'PlayfairDisplay_700Bold'        : 'serif';
   const playfairIt = fontsLoaded ? 'PlayfairDisplay_700Bold_Italic' : 'serif';
@@ -156,15 +157,39 @@ export default function WelcomeScreen() {
   // ── Change 5: top-box color swap on yin-yang tap ───────────
   const [topBoxesSwapped, setTopBoxesSwapped] = useState(false);
   const swapAnim = useRef(new Animated.Value(0)).current;
+  // Ref mirrors the state so the auto-swap interval never reads a stale value.
+  const swappedRef = useRef(false);
 
-  const handleSwap = () => {
-    const next = !topBoxesSwapped;
+  const swap = useCallback(() => {
+    const next = !swappedRef.current;
+    swappedRef.current = next;
     setTopBoxesSwapped(next);
     Animated.timing(swapAnim, {
       toValue: next ? 1 : 0,
       duration: 300,
       useNativeDriver: false, // colour interpolation requires JS driver
     }).start();
+  }, [swapAnim]);
+
+  // ── Auto-swap every 3s while focused; skipped when Reduce Motion is on ──
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => sub.remove();
+  }, []);
+
+  // Bumped on every tap so the interval restarts and doesn't flip right after.
+  const [swapTimerKey, setSwapTimerKey] = useState(0);
+  useFocusEffect(useCallback(() => {
+    if (reduceMotion) return undefined;
+    const id = setInterval(swap, AUTO_SWAP_MS);
+    return () => clearInterval(id);
+  }, [reduceMotion, swap, swapTimerKey]));
+
+  const handleSwap = () => {
+    swap();
+    setSwapTimerKey((k) => k + 1);
   };
 
   // Left box: GOLD bg → BG bg
@@ -177,16 +202,8 @@ export default function WelcomeScreen() {
     inputRange: [0, 1],
     outputRange: [BG, GOLD],
   });
-  // Left border: 0 → 1.5
-  const leftBorderWidth = swapAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1.5],
-  });
-  // Right border: 1.5 → 0
-  const rightBorderWidth = swapAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1.5, 0],
-  });
+  // Borders are constant (see styles.boxTop): animating borderWidth 0 ↔ 1.5
+  // resized both boxes mid-swap and nudged everything below up and down.
 
   // Text colours derived from state (instant switch is fine — bg animates)
   const leftTopColor  = topBoxesSwapped ? GOLD : INK;
@@ -209,7 +226,7 @@ export default function WelcomeScreen() {
           {/* "THE" kicker row */}
           <View style={styles.kickerRow}>
             <View style={styles.kickerLine} />
-            <Text style={[styles.kickerText, { fontFamily: oswald600 }]}>THE</Text>
+            <Text style={[styles.kickerText, { fontFamily: oswald700 }]}>THE</Text>
             <View style={styles.kickerLine} />
           </View>
           {/* XProHub — mixed inline styles on same baseline */}
@@ -222,7 +239,7 @@ export default function WelcomeScreen() {
 
         {/* ── 1. TICKER BAR ──────────────────────────────── */}
         <View style={styles.ticker}>
-          <Text style={[styles.tickerText, { fontFamily: oswald600 }]}>
+          <Text style={[styles.tickerText, { fontFamily: oswald700 }]}>
             {'◆  REAL WORK  ·  FAIR PAY  ·  FOR EVERYONE  ◆'}
           </Text>
         </View>
@@ -241,7 +258,7 @@ export default function WelcomeScreen() {
         <View style={styles.masthead}>
           <View style={styles.eyebrowRow}>
             <View style={styles.goldSquare} />
-            <Text style={[styles.eyebrow, { fontFamily: oswald600 }]}>
+            <Text style={[styles.eyebrow, { fontFamily: oswald700 }]}>
               {'  WELCOME TO XPROHUB'}
             </Text>
           </View>
@@ -262,13 +279,10 @@ export default function WelcomeScreen() {
           <TouchableOpacity onPress={goSignup} activeOpacity={0.85} style={styles.boxTouchable}>
             <Animated.View style={[
               styles.boxBase,
-              {
-                backgroundColor: leftBg,
-                borderWidth: leftBorderWidth,
-                borderColor: GOLD,
-              },
+              styles.boxTop,
+              { backgroundColor: leftBg },
             ]}>
-              <Text style={[styles.boxTopLabel, { fontFamily: oswald600, color: leftTopColor }]}>
+              <Text style={[styles.boxTopLabel, { fontFamily: oswald700, color: leftTopColor }]}>
                 HELP WANTED?
               </Text>
               <Text style={[styles.boxMainLabel, { fontFamily: oswald700, color: leftMainColor }]}>
@@ -291,13 +305,10 @@ export default function WelcomeScreen() {
           <TouchableOpacity onPress={goSignup} activeOpacity={0.85} style={styles.boxTouchable}>
             <Animated.View style={[
               styles.boxBase,
-              {
-                backgroundColor: rightBg,
-                borderWidth: rightBorderWidth,
-                borderColor: GOLD,
-              },
+              styles.boxTop,
+              { backgroundColor: rightBg },
             ]}>
-              <Text style={[styles.boxTopLabel, { fontFamily: oswald600, color: rightTopColor }]}>
+              <Text style={[styles.boxTopLabel, { fontFamily: oswald700, color: rightTopColor }]}>
                 HAVE SKILLS?
               </Text>
               <Text style={[styles.boxMainLabel, { fontFamily: oswald700, color: rightMainColor }]}>
@@ -312,7 +323,7 @@ export default function WelcomeScreen() {
         <View style={styles.trustStrip}>
           <View style={styles.trustHeader}>
             <View style={styles.goldSquareSm} />
-            <Text style={[styles.trustHeaderText, { fontFamily: oswald600 }]}>
+            <Text style={[styles.trustHeaderText, { fontFamily: oswald700 }]}>
               {'  BUILT FOR TRUST  '}
             </Text>
             <View style={styles.goldSquareSm} />
@@ -379,7 +390,7 @@ export default function WelcomeScreen() {
             onPress={goLogin}
             activeOpacity={0.7}
           >
-            <Text style={[styles.signInBase, { fontFamily: oswald600 }]}>
+            <Text style={[styles.signInBase, { fontFamily: oswald700 }]}>
               {'Already a member? '}
               <Text style={[styles.signInLink, { fontFamily: oswald700 }]}>
                 SIGN IN
@@ -418,14 +429,14 @@ const styles = StyleSheet.create({
   kickerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: GOLD,
-    opacity: 0.6,
+    backgroundColor: Colors.border,
     marginHorizontal: 12,
   },
   kickerText: {
-    color: GOLD,
-    fontSize: 11,
-    letterSpacing: 6,
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 3.9,
   },
   nameplateRow: {
     flexDirection: 'row',
@@ -434,19 +445,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   nameplateX: {
-    color: GOLD,
-    fontSize: 48,
+    color: Colors.gold,
+    fontSize: 50,
+    fontWeight: '700',
     letterSpacing: -1,
   },
   nameplatePro: {
-    color: GOLD,
-    fontSize: 48,
+    color: Colors.gold,
+    fontSize: 50,
+    fontWeight: '700',
     letterSpacing: -1,
     fontStyle: 'italic',
   },
   nameplateHub: {
-    color: GOLD,
-    fontSize: 48,
+    color: Colors.gold,
+    fontSize: 50,
+    fontWeight: '700',
     letterSpacing: -1,
   },
 
@@ -460,9 +474,9 @@ const styles = StyleSheet.create({
     backgroundColor: BG,
   },
   tickerText: {
-    color: GOLD,
-    fontSize: 11,
-    letterSpacing: 3,
+    color: Colors.textPrimary,
+    fontSize: 13,
+    letterSpacing: 2,
   },
 
   // 2. Tagline — Change 1: 15 → 18
@@ -473,7 +487,8 @@ const styles = StyleSheet.create({
   },
   tagline: {
     color: CREAM,
-    fontSize: 18,
+    fontSize: 21,
+    fontWeight: '700',
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -491,10 +506,10 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   dividerDiamond: {
-    color: GOLD,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     marginHorizontal: 8,
-    lineHeight: 14,
+    lineHeight: 17,
   },
 
   // 4. Masthead — Change 1: eyebrow 9 → 11, headline 21 → 26
@@ -513,14 +528,15 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   eyebrow: {
-    color: GOLD,
-    fontSize: 11,
-    letterSpacing: 3,
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 2,
   },
   headline: {
     color: PAPER,
-    fontSize: 26,
-    lineHeight: 34,
+    fontSize: 29,
+    lineHeight: 37,
   },
 
   // 6. Hero row shared layout
@@ -544,6 +560,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Top boxes: same border and fixed minimum height in both swap states, so
+  // only colours change. The filled box's gold border matches its fill.
+  boxTop: {
+    borderWidth: 1.5,
+    borderColor: GOLD,
+    minHeight: 104,
+  },
   // Bottom box variants — mirror top-left (gold) and top-right (dark+border)
   boxBottomGold: {
     backgroundColor: GOLD,
@@ -562,28 +585,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   setLabel: {
-    color: GOLD,
-    fontSize: 13,
-    letterSpacing: 2,
+    color: Colors.gold,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 1.3,
     marginBottom: 6,
   },
 
   // Box labels — Change 1: top 10 → 13, main 15 → 20
   boxTopLabel: {
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700',
+    letterSpacing: 1,
     marginBottom: 4,
   },
   boxMainLabel: {
-    fontSize: 20,
-    letterSpacing: 1,
+    fontSize: 23,
+    lineHeight: 28,
+    fontWeight: '700',
+    letterSpacing: 0.7,
   },
 
   // Change 6: bottom box single text line
   bottomBoxLabel: {
     color: PAPER,
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    fontWeight: '700',
+    letterSpacing: 1,
     textAlign: 'center',
     paddingHorizontal: 6,
   },
@@ -613,9 +642,10 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
   },
   trustHeaderText: {
-    color: GOLD,
-    fontSize: 11,
-    letterSpacing: 3,
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 2,
   },
   trustItems: {
     flexDirection: 'row',
@@ -630,13 +660,13 @@ const styles = StyleSheet.create({
   trustDivider: {
     width: 1,
     height: 32,
-    backgroundColor: GOLD,
-    opacity: 0.5,
+    backgroundColor: Colors.border,
   },
   trustLabel: {
     color: CREAM,
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 1.3,
   },
 
   // 8. Bottom boxes section — Change 6
@@ -664,21 +694,22 @@ const styles = StyleSheet.create({
   },
   ctaButtonText: {
     color: INK,
-    fontSize: 16,
-    letterSpacing: 3,
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 2,
   },
   signInRow: {
     paddingVertical: 4,
   },
   signInBase: {
     color: CREAM,
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: 0.5,
   },
   signInLink: {
-    color: GOLD,
-    fontSize: 13,
-    letterSpacing: 1.5,
+    color: Colors.gold,
+    fontSize: 15,
+    letterSpacing: 1,
     textDecorationLine: 'underline',
   },
 });

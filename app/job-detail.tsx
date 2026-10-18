@@ -455,19 +455,19 @@ const styles = StyleSheet.create({
   },
 
   // Error / empty states
-  emptyGlyph: { fontSize: 40 },
+  emptyGlyph: { fontSize: 42 },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 21,
   },
   outlineBtn: {
     borderWidth: 1.5,
@@ -479,8 +479,8 @@ const styles = StyleSheet.create({
   outlineBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
   },
 
   // Posted by strip
@@ -508,8 +508,9 @@ const styles = StyleSheet.create({
   },
   overflowIcon: {
     color: Colors.textSecondary,
-    fontSize: 18,
-    letterSpacing: 2,
+    fontSize: 21,
+    fontWeight: '500',
+    letterSpacing: 1.3,
   },
   avatarWrap: {
     width: 44,
@@ -528,28 +529,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials:  { color: Colors.gold, fontWeight: 'bold', fontSize: 15 },
+  avatarInitials:  { color: Colors.gold, fontWeight: 'bold', fontSize: 17 },
   postedByInfo:    { flex: 1 },
   postedByEyebrow: {
-    color: Colors.gold,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 2.5,
+    letterSpacing: 1.6,
     marginBottom: 2,
   },
   postedByName: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
-  postedByTime: { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  postedByTime: { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
 
   // Title
   title: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 24,
-    lineHeight: 30,
+    fontSize: 27,
+    lineHeight: 33,
     marginBottom: Spacing.sm,
   },
 
@@ -568,10 +569,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   categoryPillText: {
-    color: Colors.gold,
-    fontSize: 11,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
   urgentPill: {
     borderWidth: 1.5,
@@ -582,16 +583,16 @@ const styles = StyleSheet.create({
   },
   urgentPillText: {
     color: Colors.red,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // Budget
   budget: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 26,
+    fontSize: 29,
     marginBottom: Spacing.lg,
     letterSpacing: 0.5,
   },
@@ -600,16 +601,16 @@ const styles = StyleSheet.create({
   section:      { marginBottom: Spacing.lg },
   sectionLabel: {
     color: Colors.textSecondary,
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: 8,
   },
   descText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 16,
+    lineHeight: 23,
   },
 
   // Task chips
@@ -621,15 +622,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  taskChipText: { color: Colors.gold, fontSize: 12, fontWeight: '600' },
+  taskChipText: { color: Colors.textPrimary, fontSize: 13, fontWeight: '700' },
 
   // Details
   detailRow: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 6,
-    lineHeight: 20,
+    lineHeight: 22,
   },
 
   // Footer CTA
@@ -650,12 +651,12 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.green,
   },
-  applyBtnText:     { color: Colors.background, fontWeight: 'bold', fontSize: 14, letterSpacing: 2 },
-  applyBtnSentText: { color: Colors.green,      fontWeight: 'bold', fontSize: 14, letterSpacing: 1.5 },
+  applyBtnText:     { color: Colors.ink, fontWeight: 'bold', fontSize: 16, letterSpacing: 1.3 },
+  applyBtnSentText: { color: Colors.green,      fontWeight: 'bold', fontSize: 16, letterSpacing: 1 },
   ownJobText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -671,7 +672,7 @@ const styles = StyleSheet.create({
   closePostText: {
     color: Colors.red,
     fontFamily: Fonts.body,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
 });

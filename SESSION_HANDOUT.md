@@ -58,9 +58,12 @@ Differentiates from Uber/TaskRabbit by:
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
 - **Test device:** iPhone via EAS dev client on LAN mode
 
-**Design system: Dark Gold (locked).**
-- bg `#0E0E0F`, gold `#C9A84C`, card `#171719`, border `#2E2E33`
-- text `#FFFFFF`/`#888890`, green `#4CAF7A`, red `#E05252`, amber `#E5901A`
+**Design system: Mid Grey + Gold (changed 2026-10-18).**
+- bg `#4A4A4D`, card `#555558`, border `#7C7C80`, gold `#F0D48A` (text only at ≥18 or bold ≥14)
+- text `#FFFFFF` / `#D0D0D4` (tertiary `#A8A8AE`, non-text), ink `#111111` on fills, onDark `#FFFFFF`
+- green `#88DDB0`, blue `#9ED2F7`, purple `#D8C2FC`, red `#FFBBBB`, amber `#FFBF87`, errorFill `#5E3B3E`
+- 2026-10-18: changed from the light-grey palette (bg `#A6A6A6`, card `#B6B6B6`, text `#111111`, gold `#F5E663`),
+  which replaced Dark Gold (bg `#0E0E0F`, gold `#C9A84C`). Selected fills via `blackAlpha()`.
 - Five-voice typography: Space Grotesk (headings), Inter (body), Playfair Display
   (serif accent — worker names, quotes), Oswald (editorial labels), IBM Plex Mono
   (ledger voice — dates, trace IDs, money metadata)

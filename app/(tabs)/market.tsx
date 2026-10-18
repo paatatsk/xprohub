@@ -10,7 +10,7 @@ import { useFonts } from 'expo-font';
 import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../../constants/theme';
 import { strings } from '../../constants/strings';
 import { supabase } from '../../lib/supabase';
 import { useTrustLevel } from '../../hooks/useTrustLevel';
@@ -525,13 +525,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleBtnActive: {
-    backgroundColor: 'rgba(201, 168, 76, 0.08)',
+    backgroundColor: blackAlpha(0.2),
   },
   toggleText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
   toggleTextActive: {
     color: Colors.gold,
@@ -556,13 +556,13 @@ const styles = StyleSheet.create({
   filterText: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     paddingVertical: 10,
   },
   filterClear: {
     color: Colors.gold,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     paddingVertical: 10,
     paddingRight: 14,
@@ -604,21 +604,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyIconGlyph: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   retryBtn: {
     marginTop: 8,
@@ -631,8 +631,8 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 
   // Anchored post bar
@@ -649,8 +649,8 @@ const styles = StyleSheet.create({
   },
   postBarText: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
-    letterSpacing: 1.5,
-    color: Colors.background,
+    fontSize: 16,
+    letterSpacing: 1,
+    color: Colors.ink,
   },
 });

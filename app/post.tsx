@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto } from '../lib/photos';
 import { friendlyError } from '../lib/moderation';
@@ -710,7 +710,7 @@ export default function PostScreen() {
           disabled={isSubmitDisabled}
         >
           {submitting
-            ? <ActivityIndicator color={Colors.background} />
+            ? <ActivityIndicator color={Colors.ink} />
             : <Text style={styles.submitText}>POST JOB</Text>
           }
         </TouchableOpacity>
@@ -733,14 +733,14 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: Fonts.heading,
     color: Colors.gold,
-    fontSize: 34,
-    letterSpacing: 2,
+    fontSize: 37,
+    letterSpacing: 1.3,
     marginBottom: 6,
   },
   subhead: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: 12,
   },
 
@@ -749,16 +749,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backLinkText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontFamily: Fonts.bodyMed,
-    fontSize: 13,
+    fontSize: 15,
   },
 
   // Section structure
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 10,
-    letterSpacing: 4,
+    fontSize: 13,
+    letterSpacing: 2.6,
     color: Colors.textSecondary,
     marginBottom: 16,
   },
@@ -786,37 +786,37 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   catEmoji: {
-    fontSize: 28,
+    fontSize: 31,
   },
   catName: {
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 'bold',
     letterSpacing: 0.5,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   catCount: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
   },
 
   // Field group
   fieldGroup: { marginBottom: 20 },
   label: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: 8,
   },
   required: { color: Colors.red },
   optional: { color: Colors.textSecondary, fontWeight: 'normal' },
   fieldHint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     marginBottom: 8,
   },
 
@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     color: Colors.textPrimary,
     fontFamily: Fonts.body,
-    fontSize: 15,
+    fontSize: 17,
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
@@ -863,8 +863,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   photoRemoveText: {
-    color: '#fff',
-    fontSize: 11,
+    color: Colors.onDark,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   photoAdd: {
@@ -880,22 +880,22 @@ const styles = StyleSheet.create({
   },
   photoAddIcon: {
     fontFamily: Fonts.heading,
-    fontSize: 22,
+    fontSize: 25,
     color: Colors.gold,
     marginTop: -2,
   },
   photoAddLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 8,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
     textAlign: 'center',
   },
 
   // Helpers
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  charCount:  { fontFamily: Fonts.mono, color: Colors.textSecondary, fontSize: 10, marginTop: 4 },
-  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 6 },
+  charCount:  { fontFamily: Fonts.monoMed, color: Colors.textSecondary, fontSize: 13, marginTop: 4 },
+  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 13, marginTop: 6 },
 
   // Task selector (contained box)
   taskBox: {
@@ -931,48 +931,48 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gold,
   },
   checkmark: {
-    color: Colors.background,
-    fontSize: 13,
+    color: Colors.ink,
+    fontSize: 15,
     fontWeight: 'bold',
     marginTop: -1,
   },
   taskName: {
     flex: 1,
-    fontFamily: Fonts.bodyMed,
-    fontSize: 13,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 15,
     color: Colors.textPrimary,
   },
   taskNameActive: {
     color: Colors.gold,
   },
   taskPrice: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
   taskPriceActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   taskCount: {
-    fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     marginTop: 8,
   },
   taskCountActive: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
 
   // Budget
   budgetRow:   { flexDirection: 'row', gap: 12 },
   budgetHalf:  { flex: 1 },
   budgetLabel: {
-    fontFamily: Fonts.mono,
+    fontFamily: Fonts.monoMed,
     color: Colors.textSecondary,
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     marginBottom: 6,
   },
 
@@ -986,9 +986,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
   },
-  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: 'rgba(201, 168, 76, 0.08)' },
-  timingText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 12 },
-  timingTextActive: { color: Colors.gold },
+  timingBtnActive:  { borderColor: Colors.gold, backgroundColor: blackAlpha(0.2) },
+  timingText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 13 },
+  timingTextActive: { color: Colors.textPrimary },
 
   // Urgent toggle
   urgentRow: {
@@ -1001,7 +1001,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Spacing.md,
   },
-  urgentSub: { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  urgentSub: { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
   toggleTrack: {
     width: 48,
     height: 28,
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 3,
   },
-  toggleTrackOn:  { backgroundColor: 'rgba(201, 168, 76, 0.15)', borderColor: Colors.gold },
+  toggleTrackOn:  { backgroundColor: blackAlpha(0.2), borderColor: Colors.gold },
   toggleThumb: {
     width: 20,
     height: 20,
@@ -1032,15 +1032,15 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontFamily: Fonts.heading,
-    fontSize: 15,
-    letterSpacing: 2,
+    fontSize: 17,
+    letterSpacing: 1.3,
   },
   submitError: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginTop: Spacing.sm,
   },

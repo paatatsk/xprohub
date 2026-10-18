@@ -3,13 +3,17 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import { useFonts } from 'expo-font';
-import { SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
-import { Inter_400Regular, Inter_500Medium } from '@expo-google-fonts/inter';
+import { SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold } from '@expo-google-fonts/space-grotesk';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { Oswald_700Bold } from '@expo-google-fonts/oswald';
+import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
+import { PlayfairDisplay_700Bold, PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-display';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { DetailHeader } from '../components/DetailHeader';
+import { Colors } from '../constants/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,7 +27,15 @@ const STRIPE_PUBLISHABLE_KEY =
   'pk_test_51TRNSu08l7Que01i7wSpWjuTyIRYdzJHv3RjJMPtQzjcCSTIMXgnscC85ZyqLnPMbEnnIW23QAgdmYuO9Sne0FFq00vCTmyxqg';
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({ SpaceGrotesk_700Bold, Inter_400Regular, Inter_500Medium });
+  // Every weight referenced by Fonts / screen styles is loaded here, so no
+  // screen depends on another screen having loaded a font first.
+  const [fontsLoaded] = useFonts({
+    SpaceGrotesk_600SemiBold, SpaceGrotesk_700Bold,
+    Inter_400Regular, Inter_500Medium, Inter_600SemiBold,
+    Oswald_700Bold,
+    IBMPlexMono_400Regular, IBMPlexMono_500Medium,
+    PlayfairDisplay_700Bold, PlayfairDisplay_700Bold_Italic,
+  });
   const { session, loading } = useAuth();
   const router = useRouter();
   const segments = useSegments();
@@ -106,7 +118,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} urlScheme="xprohub">
-        <StatusBar style="light" backgroundColor="#0E0E0F" />
+        <StatusBar style="light" backgroundColor={Colors.background} />
         <Stack initialRouteName="splash" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="splash" />
           <Stack.Screen name="(auth)" />

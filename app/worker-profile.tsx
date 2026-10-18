@@ -12,8 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
 import { supabase } from '../lib/supabase';
+import { useImageAspects } from '../lib/useImageAspects';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+
+// Portfolio carousel: frame follows the active photo's real aspect ratio,
+// clamped so very tall or very wide photos don't break the layout. Photos
+// render with "contain", so nothing is ever cropped.
+const PORTFOLIO_W = SCREEN_WIDTH - Spacing.md * 2;
+const PORTFOLIO_MIN_H = 200;
+const PORTFOLIO_MAX_H = 440;
+const DEFAULT_ASPECT = 4 / 3;
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -76,6 +85,12 @@ export default function WorkerProfileScreen() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const portfolioAspects = useImageAspects(portfolioPhotos.map(p => p.url));
+  const activePortfolioUrl = portfolioPhotos[activePhotoIndex]?.url;
+  const portfolioFrameH = Math.min(
+    PORTFOLIO_MAX_H,
+    Math.max(PORTFOLIO_MIN_H, PORTFOLIO_W / ((activePortfolioUrl && portfolioAspects[activePortfolioUrl]) || DEFAULT_ASPECT)),
+  );
 
   useFocusEffect(useCallback(() => {
     setLoading(true);
@@ -314,16 +329,24 @@ export default function WorkerProfileScreen() {
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
+                extraData={portfolioFrameH}
                 onMomentumScrollEnd={(e) => {
-                  const idx = Math.round(e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - Spacing.md * 2));
+                  const idx = Math.round(e.nativeEvent.contentOffset.x / PORTFOLIO_W);
                   setActivePhotoIndex(idx);
                 }}
                 renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item.url }}
-                    style={[styles.portfolioImage, { width: SCREEN_WIDTH - Spacing.md * 2 }]}
-                    accessibilityLabel="Portfolio photo"
-                  />
+                  <TouchableOpacity
+                    onPress={() => setFullscreenImage(item.url)}
+                    activeOpacity={0.9}
+                    accessibilityLabel="Portfolio photo, tap to view full size"
+                    accessibilityRole="button"
+                  >
+                    <Image
+                      source={{ uri: item.url }}
+                      style={[styles.portfolioImage, { width: PORTFOLIO_W, height: portfolioFrameH }]}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
                 )}
               />
               {portfolioPhotos.length > 1 && (
@@ -390,7 +413,7 @@ export default function WorkerProfileScreen() {
               source={{ uri: fullscreenImage }}
               style={styles.fullscreenImage}
               resizeMode="contain"
-              accessibilityLabel="Full-size credential"
+              accessibilityLabel="Full-size photo"
             />
           )}
         </Pressable>
@@ -442,9 +465,9 @@ const styles = StyleSheet.create({
   },
 
   // Empty / error
-  emptyGlyph:   { fontSize: 36, marginBottom: 4 },
-  emptyHeading: { fontFamily: Fonts.display, fontSize: 16, color: Colors.textPrimary, letterSpacing: 2 },
-  emptySub:     { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  emptyGlyph:   { fontSize: 38, marginBottom: 4 },
+  emptyHeading: { fontFamily: Fonts.display, fontSize: 18, color: Colors.textPrimary, letterSpacing: 1.3 },
+  emptySub:     { fontFamily: Fonts.bodyMed, fontSize: 16, color: Colors.textSecondary, textAlign: 'center' },
   outlineBtn: {
     marginTop: 16,
     paddingVertical: 12,
@@ -453,7 +476,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.gold,
   },
-  outlineBtnText: { fontFamily: Fonts.display, fontSize: 13, color: Colors.gold, letterSpacing: 2 },
+  outlineBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.gold, letterSpacing: 1.3 },
 
   // Hero
   heroSection: { alignItems: 'center', paddingTop: Spacing.lg, paddingBottom: Spacing.md },
@@ -474,18 +497,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials: { fontFamily: Fonts.heading, fontSize: 28, color: Colors.textSecondary },
+  avatarInitials: { fontFamily: Fonts.heading, fontSize: 31, color: Colors.textSecondary },
 
   workerName: {
     fontFamily: Fonts.serif,
-    fontSize: 26,
+    fontSize: 29,
     color: Colors.gold,
     textAlign: 'center',
     marginBottom: 6,
   },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusLabel: { fontFamily: Fonts.body, fontSize: 13, color: Colors.textSecondary },
+  statusLabel: { fontFamily: Fonts.bodySemi, fontSize: 15, color: Colors.textSecondary },
 
   // Sections
   section: {
@@ -495,14 +518,14 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.gold,
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: Spacing.sm,
   },
 
   // Bio
-  bioText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary, lineHeight: 22 },
+  bioText: { fontFamily: Fonts.body, fontSize: 17, color: Colors.textPrimary, lineHeight: 24 },
 
   // Stats
   statsRow: {
@@ -513,20 +536,20 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   statBox:     { flex: 1, alignItems: 'center' },
-  statNumber:  { fontFamily: Fonts.heading, fontSize: 28, color: Colors.gold },
-  statCaption: { fontFamily: Fonts.display, fontSize: 9, color: Colors.textSecondary, letterSpacing: 1.5, marginTop: 4 },
+  statNumber:  { fontFamily: Fonts.heading, fontSize: 31, color: Colors.gold },
+  statCaption: { fontFamily: Fonts.display, fontSize: 13, color: Colors.textSecondary, letterSpacing: 1, marginTop: 4 },
   statDivider: { width: 1, height: 32, backgroundColor: Colors.border },
 
   // Rate
-  rateText: { fontFamily: Fonts.heading, fontSize: 20, color: Colors.gold },
+  rateText: { fontFamily: Fonts.heading, fontSize: 23, color: Colors.gold },
 
   // Skills
   skillGroup:      { marginBottom: Spacing.md },
   skillGroupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: 6,
   },
   skillRow: {
@@ -537,14 +560,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
-  skillNameFeatured: { fontFamily: Fonts.bodyMed, fontSize: 14, color: Colors.gold, flex: 1 },
-  skillName:         { fontFamily: Fonts.body, fontSize: 14, color: Colors.textPrimary, flex: 1 },
-  skillPrice:        { fontFamily: Fonts.mono, fontSize: 14, color: Colors.textSecondary, marginLeft: Spacing.sm },
-  emptySkills:       { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, fontStyle: 'italic' },
+  skillNameFeatured: { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.gold, flex: 1 },
+  skillName:         { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.textPrimary, flex: 1 },
+  skillPrice:        { fontFamily: Fonts.monoMed, fontSize: 16, color: Colors.textSecondary, marginLeft: Spacing.sm },
+  emptySkills:       { fontFamily: Fonts.bodyMed, fontSize: 16, color: Colors.textSecondary, fontStyle: 'italic' },
 
   // Portfolio
   portfolioSection: { borderRadius: Radius.sm, overflow: 'hidden' },
-  portfolioImage:   { height: 220, resizeMode: 'cover' as const },
+  portfolioImage:   { backgroundColor: Colors.card },
   portfolioDots: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -585,7 +608,7 @@ const styles = StyleSheet.create({
   },
 
   // Location
-  locationText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary },
+  locationText: { fontFamily: Fonts.body, fontSize: 17, color: Colors.textPrimary },
 
   // Footer
   footer: {
@@ -601,7 +624,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: 'center',
   },
-  hireBtnText: { fontFamily: Fonts.display, fontSize: 15, color: '#1A0F00', letterSpacing: 2 },
+  hireBtnText: { fontFamily: Fonts.display, fontSize: 17, color: '#1A0F00', letterSpacing: 1.3 },
   editBtn: {
     borderWidth: 1.5,
     borderColor: Colors.gold,
@@ -609,5 +632,5 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
   },
-  editBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.gold, letterSpacing: 2 },
+  editBtnText: { fontFamily: Fonts.display, fontSize: 17, color: Colors.gold, letterSpacing: 1.3 },
 });

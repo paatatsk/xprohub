@@ -19,10 +19,11 @@ import { PlayfairDisplay_700Bold_Italic } from '@expo-google-fonts/playfair-disp
 import { SpaceGrotesk_500Medium } from '@expo-google-fonts/space-grotesk';
 import { Oswald_600SemiBold, Oswald_700Bold } from '@expo-google-fonts/oswald';
 import { IBMPlexMono_400Regular, IBMPlexMono_500Medium } from '@expo-google-fonts/ibm-plex-mono';
-import { Colors, Fonts, Spacing, Radius } from '../constants/theme';
+import { Colors, Fonts, Spacing, Radius, blackAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import { supabase } from '../lib/supabase';
 import { uploadPortfolioPhoto } from '../lib/photos';
+import { useImageAspects } from '../lib/useImageAspects';
 import WorkerCardComponent, { type Worker } from '../components/WorkerCard';
 
 // ── Types ──────────────────────────────────────────────────────
@@ -69,6 +70,12 @@ const SKILL_CAP = 8;
 const PORTFOLIO_CAP = 6;
 const CREDENTIAL_CAP = 6;
 
+// Portfolio tiles keep a fixed height and take their width from the photo's
+// real aspect ratio (clamped), so the whole photo shows — no cropping.
+const PORTFOLIO_TILE_H = 100;
+const PORTFOLIO_TILE_MIN_W = 64;
+const PORTFOLIO_TILE_MAX_W = 200;
+
 type PortfolioType = 'photo' | 'certificate' | 'reference';
 
 interface PortfolioItem {
@@ -78,7 +85,6 @@ interface PortfolioItem {
 }
 const UNDO_WINDOW_MS = 5000;
 const INK = '#1A0F00';
-const CHARCOAL = '#2a2a2e';
 const THUMB_SIZE = 24;
 const THUMB_ACTIVE_SIZE = 34;
 
@@ -141,7 +147,7 @@ function snap(value: number, step: number, min: number, max: number): number {
 const SEGMENT_STATES: WorkerStatus[] = ['offline', 'available', 'booked'];
 const SEGMENT_LABELS = [strings['status.offline'], strings['status.available'], strings['status.booked']];
 const SEGMENT_COLORS: Record<WorkerStatus, string> = {
-  offline: CHARCOAL,
+  offline: Colors.textTertiary,
   available: Colors.green,
   booked: Colors.amber,
 };
@@ -232,7 +238,7 @@ function StatusSegment({
               <Animated.View
                 style={[
                   s.segDot,
-                  { backgroundColor: isSelected ? Colors.green : Colors.textTertiary },
+                  { backgroundColor: isSelected ? INK : Colors.textTertiary },
                   isSelected && {
                     shadowColor: Colors.green,
                     shadowOpacity: pulseAnim,
@@ -246,9 +252,8 @@ function StatusSegment({
                 style={[
                   s.segDot,
                   {
-                    backgroundColor: state === 'booked' && isSelected
-                      ? Colors.amber
-                      : Colors.textTertiary,
+                    // Selected segment sits on its status-color fill, so the dot uses ink.
+                    backgroundColor: isSelected ? INK : Colors.textTertiary,
                   },
                 ]}
               />
@@ -257,7 +262,7 @@ function StatusSegment({
               style={[
                 s.segLabel,
                 isSelected && { color: INK },
-                !isSelected && { color: Colors.textTertiary },
+                !isSelected && { color: Colors.textSecondary },
               ]}
             >
               {SEGMENT_LABELS[i]}
@@ -776,6 +781,8 @@ export default function MyCardScreen() {
   const [certificates, setCertificates] = useState<PortfolioItem[]>([]);
   const [references, setReferences] = useState<PortfolioItem[]>([]);
   const [portfolioUploading, setPortfolioUploading] = useState<PortfolioType | null>(null);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const portfolioAspects = useImageAspects(portfolioPhotos.map(p => p.url));
 
   // ── Data fetch ───────────────────────────────────────────────
 
@@ -1445,12 +1452,23 @@ export default function MyCardScreen() {
           contentContainerStyle={s.portfolioStrip}
         >
           {portfolioPhotos.map(photo => (
-            <View key={photo.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: photo.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Portfolio photo"
-              />
+            <View key={photo.id} style={[s.portfolioThumb, {
+                width: Math.min(PORTFOLIO_TILE_MAX_W, Math.max(PORTFOLIO_TILE_MIN_W,
+                  PORTFOLIO_TILE_H * (portfolioAspects[photo.url] ?? 1))),
+              }]}>
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(photo.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Portfolio photo, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: photo.url }}
+                  style={s.portfolioImage}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(photo.id, 'photo')}
@@ -1496,11 +1514,18 @@ export default function MyCardScreen() {
         >
           {certificates.map(cert => (
             <View key={cert.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: cert.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Certificate"
-              />
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(cert.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Certificate, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: cert.url }}
+                  style={s.credentialImage}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(cert.id, 'certificate')}
@@ -1546,11 +1571,18 @@ export default function MyCardScreen() {
         >
           {references.map(ref => (
             <View key={ref.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: ref.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Reference"
-              />
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(ref.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Reference, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: ref.url }}
+                  style={s.credentialImage}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(ref.id, 'reference')}
@@ -1695,6 +1727,25 @@ export default function MyCardScreen() {
       />
 
       {/* ── Bio edit sheet ── */}
+      {/* ── Fullscreen photo viewer (whole photo, never cropped) ── */}
+      <Modal visible={!!fullscreenImage} transparent animationType="fade" onRequestClose={() => setFullscreenImage(null)}>
+        <Pressable
+          style={s.fullscreenOverlay}
+          onPress={() => setFullscreenImage(null)}
+          accessibilityLabel="Dismiss full-size photo"
+          accessibilityRole="button"
+        >
+          {fullscreenImage && (
+            <Image
+              source={{ uri: fullscreenImage }}
+              style={s.fullscreenImage}
+              resizeMode="contain"
+              accessibilityLabel="Full-size photo"
+            />
+          )}
+        </Pressable>
+      </Modal>
+
       <Modal visible={showBioSheet} transparent animationType="none">
         <Pressable style={s.pickerScrim} onPress={handleBioCancel}>
           <KeyboardAvoidingView
@@ -2012,15 +2063,15 @@ const s = StyleSheet.create({
 
   // ── Masthead ──
   editionLine: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     marginBottom: 6,
   },
   greeting: {
     fontFamily: Fonts.serif,
-    fontSize: 24,
+    fontSize: 27,
     color: Colors.textPrimary,
     marginBottom: Spacing.lg,
   },
@@ -2028,9 +2079,9 @@ const s = StyleSheet.create({
   // ── Eyebrow ──
   eyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 4,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2.6,
+    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
 
@@ -2067,14 +2118,14 @@ const s = StyleSheet.create({
   },
   segLabel: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
 
   // ── Status line ──
   statusLine: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginTop: Spacing.sm,
     marginBottom: Spacing.lg,
@@ -2083,17 +2134,17 @@ const s = StyleSheet.create({
   // ── Preview ──
   previewLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
-    color: Colors.textTertiary,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
   previewWrap: {
     marginBottom: Spacing.sm,
   },
   photoHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.lg,
@@ -2107,8 +2158,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   skillCount: {
-    fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
@@ -2122,26 +2173,26 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(201,168,76,0.12)',
+    backgroundColor: blackAlpha(0.2),
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
   },
   chipText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   chipRemove: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.gold,
     opacity: 0.6,
   },
   skillsFallback: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
@@ -2158,9 +2209,9 @@ const s = StyleSheet.create({
   },
   addSkillText: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
 
   // ── Knob panels ──
@@ -2179,14 +2230,14 @@ const s = StyleSheet.create({
   },
   sliderValue: {
     fontFamily: Fonts.heading,
-    fontSize: 28,
+    fontSize: 31,
     color: Colors.gold,
     marginBottom: Spacing.sm,
   },
   sliderUnit: {
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
   sliderTrack: {
@@ -2239,10 +2290,10 @@ const s = StyleSheet.create({
     marginTop: 2,
   },
   sliderLabelText: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
 
   // ── Publish bar ──
@@ -2278,18 +2329,17 @@ const s = StyleSheet.create({
     borderColor: Colors.gold,
   },
   publishBtnDisabled: {
-    backgroundColor: Colors.gold,
-    opacity: 0.4,
+    backgroundColor: Colors.border,
   },
   publishBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
     color: INK,
   },
   publishHint: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
 
@@ -2314,21 +2364,21 @@ const s = StyleSheet.create({
   },
   toastTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.cream,
     marginBottom: 2,
   },
   toastSub: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
   toastUndo: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
@@ -2355,19 +2405,19 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   emptyRingIcon: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     color: Colors.textPrimary,
     textAlign: 'center',
   },
   emptyBody: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
-    lineHeight: 20,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 16,
+    lineHeight: 22,
     color: Colors.textSecondary,
     textAlign: 'center',
   },
@@ -2380,14 +2430,14 @@ const s = StyleSheet.create({
   },
   emptyCtaText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
   emptyLocked: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
 
@@ -2415,14 +2465,14 @@ const s = StyleSheet.create({
   },
   pickerTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.textPrimary,
     paddingHorizontal: Spacing.md,
     marginBottom: 4,
   },
   pickerSubhead: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.md,
@@ -2435,9 +2485,9 @@ const s = StyleSheet.create({
   },
   pickerGroupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
   pickerRow: {
@@ -2454,7 +2504,7 @@ const s = StyleSheet.create({
   pickerRowSelected: {
     paddingVertical: 10,
     paddingHorizontal: 12,
-    backgroundColor: 'rgba(201,168,76,0.1)',
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -2468,25 +2518,25 @@ const s = StyleSheet.create({
   },
   pickerRowText: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerRowTextSelected: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 14,
-    color: Colors.gold,
+    fontSize: 16,
+    color: Colors.textPrimary,
   },
   pickerRowTextDimmed: {
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   pickerCheck: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.gold,
   },
   pickerCapText: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.amber,
     fontStyle: 'italic',
     marginTop: 4,
@@ -2505,18 +2555,18 @@ const s = StyleSheet.create({
     marginBottom: 6,
   },
   pickerCatEmoji: {
-    fontSize: 20,
+    fontSize: 23,
   },
   pickerCatName: {
     flex: 1,
-    fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerCatChevron: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
   },
   pickerTaskRow: {
     flexDirection: 'row',
@@ -2537,13 +2587,13 @@ const s = StyleSheet.create({
     gap: 8,
   },
   pickerUnverified: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: 'rgba(201,168,76,0.5)',
+    color: Colors.textSecondary,
     fontStyle: 'italic',
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.25)',
+    borderColor: Colors.border,
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -2559,8 +2609,8 @@ const s = StyleSheet.create({
   },
   pickerDoneText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
 
@@ -2579,13 +2629,13 @@ const s = StyleSheet.create({
   },
   bioSheetTitle: {
     fontFamily: Fonts.serif,
-    fontSize: 20,
+    fontSize: 23,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
   bioSheetHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginBottom: Spacing.md,
   },
@@ -2599,19 +2649,19 @@ const s = StyleSheet.create({
   },
   bioProofName: {
     fontFamily: Fonts.serif,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
   bioProofLine: {
-    fontFamily: Fonts.body,
-    fontSize: 11.5,
-    lineHeight: 16,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    lineHeight: 17.5,
     color: Colors.textSecondary,
   },
   bioTextInput: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -2627,16 +2677,16 @@ const s = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   bioCounter: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     fontVariant: ['tabular-nums'] as any,
   },
   bioCoach: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
   },
   bioActions: {
     flexDirection: 'row' as const,
@@ -2652,8 +2702,8 @@ const s = StyleSheet.create({
   },
   bioCancelText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.gold,
   },
   bioSaveBtn: {
@@ -2665,8 +2715,8 @@ const s = StyleSheet.create({
   },
   bioSaveText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
 
@@ -2683,8 +2733,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   manageValue: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     marginTop: 4,
@@ -2698,9 +2748,9 @@ const s = StyleSheet.create({
   },
   managePillText: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
 
   // ── Portfolio ──
@@ -2711,7 +2761,7 @@ const s = StyleSheet.create({
   },
   portfolioThumb: {
     width: 100,
-    height: 100,
+    height: PORTFOLIO_TILE_H,
     borderRadius: 8,
     overflow: 'hidden' as const,
     borderWidth: 1,
@@ -2720,6 +2770,27 @@ const s = StyleSheet.create({
   portfolioImage: {
     width: '100%' as const,
     height: '100%' as const,
+    backgroundColor: Colors.card,
+  },
+  tilePress: {
+    width: '100%' as const,
+    height: '100%' as const,
+  },
+  // Certificate / reference tiles stay cropped squares; tap opens the full photo.
+  credentialImage: {
+    width: '100%' as const,
+    height: '100%' as const,
+    resizeMode: 'cover' as const,
+  },
+  fullscreenOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  fullscreenImage: {
+    width: '95%' as const,
+    height: '90%' as const,
   },
   portfolioDelete: {
     position: 'absolute' as const,
@@ -2733,10 +2804,10 @@ const s = StyleSheet.create({
     justifyContent: 'center' as const,
   },
   portfolioDeleteText: {
-    color: Colors.textPrimary,
-    fontSize: 14,
+    color: Colors.onDark,
+    fontSize: 16,
     fontWeight: 'bold' as const,
-    lineHeight: 16,
+    lineHeight: 18,
   },
   portfolioAdd: {
     width: 100,
@@ -2749,13 +2820,13 @@ const s = StyleSheet.create({
     justifyContent: 'center' as const,
   },
   portfolioAddText: {
-    fontSize: 28,
+    fontSize: 31,
     color: Colors.gold,
     fontWeight: '300' as const,
   },
   portfolioHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
@@ -2769,27 +2840,29 @@ const s = StyleSheet.create({
   },
   rosterEditToggle: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
   rosterHint: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
   rosterChipFeatured: {
-    backgroundColor: 'rgba(201,168,76,0.15)',
+    backgroundColor: blackAlpha(0.2),
+    borderWidth: 1,
+    borderColor: Colors.gold,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
   },
   rosterChipFeaturedText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   rosterChipOutline: {
     flexDirection: 'row' as const,
@@ -2803,18 +2876,18 @@ const s = StyleSheet.create({
   },
   rosterChipOutlineText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   rosterRemoveX: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.red,
   },
   capLine: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.amber,
     fontStyle: 'italic' as const,
     marginTop: Spacing.sm,
@@ -2830,14 +2903,14 @@ const s = StyleSheet.create({
   },
   addFlowBack: {
     fontFamily: Fonts.body,
-    fontSize: 14,
-    color: Colors.gold,
+    fontSize: 16,
+    color: Colors.textPrimary,
   },
   addFlowStep: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.textPrimary,
   },
   addConfirmContent: {
     padding: Spacing.md,
@@ -2845,13 +2918,13 @@ const s = StyleSheet.create({
   },
   addConfirmTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.textPrimary,
   },
   addConfirmBody: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    lineHeight: 19,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 15,
+    lineHeight: 21,
     color: Colors.textSecondary,
   },
 

@@ -3,6 +3,12 @@
 > For Claude Design, design tools, and new contributors.
 > Source of truth: `constants/theme.ts`. This document explains the
 > intent behind the tokens, not just the values.
+>
+> **2026-10-18 palette:** mid grey + gold (current). Changed from the same-day light-grey
+> palette: background `#A6A6A6`, card `#B6B6B6`, border `#808080`, gold `#F5E663`, text `#111111` /
+> `#383838` / `#5A5A5A`, green `#1C412D`, blue `#133E5D`, purple `#471998`, red `#770F0F`,
+> amber `#F2A93B` + amberText `#513305`, errorFill `#CCC3C3` — which itself replaced Dark Gold
+> (bg `#0E0E0F`, card `#171719`, gold `#C9A84C`).
 
 ## Brand
 
@@ -15,31 +21,42 @@ real people do real work here and are treated with dignity.
 
 ## Color Palette
 
-| Token | Hex | Usage | When to use |
-|---|---|---|---|
-| `background` | `#0E0E0F` | All screens | The only background color. Never white, never grey. |
-| `gold` | `#C9A84C` | CTAs, highlights, accents, borders | Primary action buttons, active states, gold border glow on selected cards, big numbers, eyebrow text |
-| `card` | `#171719` | All cards and surfaces | Every card, every panel, every elevated surface |
-| `border` | `#2E2E33` | Card borders, dividers | Subtle separation. Cards have 1px border in this color. |
-| `textPrimary` | `#FFFFFF` | Headings and body text | All readable text on dark backgrounds |
-| `textSecondary` | `#888890` | Supporting text, metadata | Timestamps, hints, secondary labels, placeholder text |
-| `green` | `#4CAF7A` | Success, completions | "CARD ADDED" badge, "ACCEPTED" status, "CONFIRM COMPLETION" button, Worker mode accents |
-| `blue` | `#4A9EDB` | Trust, verification, info | Verification badges, informational states |
-| `purple` | `#9B6EE8` | XP, growth | XP counters, belt progression, Royal theme accent |
-| `red` | `#E05252` | Urgent, alerts, cancel, destructive | Error messages, "RAISE CONCERN" button, "DELETE ACCOUNT", "DECLINED" status, cancel actions |
+| Token | Hex | Use (ratio on background / card) |
+|---|---|---|
+| Background | `#4A4A4D` | All screens — mid grey |
+| Card | `#555558` | All cards and surfaces (1.2:1 vs background) |
+| Border | `#7C7C80` | Card borders, dividers |
+| Gold | `#F0D48A` | Big numbers, prices, names, eyebrows, links, active states, CTAs (6.1:1 bg / 5.1:1 card) |
+| Text Primary | `#FFFFFF` | All headings and body text (8.8:1 / 7.4:1) |
+| Text Secondary | `#D0D0D4` | Supporting text, metadata (5.7:1 / 4.8:1) |
+| Text Tertiary | `#A8A8AE` | Non-text only — dots, separators (3.1:1 card) |
+| Green | `#88DDB0` | Success, completions (5.5:1 / 4.6:1) |
+| Blue | `#9ED2F7` | Trust, verification, info (5.5:1 / 4.6:1) |
+| Purple | `#D8C2FC` | XP, growth (5.5:1 / 4.6:1) |
+| Red | `#FFBBBB` | Urgent, alerts, cancel (5.5:1 / 4.6:1) |
+| Amber | `#FFBF87` | In-progress, soft warnings — text and fills (5.5:1 / 4.6:1). The amberText split is gone |
+| Ink | `#111111` | Text and icons on gold / amber / status-color fills (11.7–13:1) |
+| On Dark | `#FFFFFF` | Text on photos and black scrims |
+| Error Fill | `#5E3B3E` | Error-box background behind red text + red border (red text 6.0:1) |
+| Cream | `#FFFFFF` | Legacy editorial-accent token — same as Text Primary |
+
+### Gold as text
+
+Gold text only at fontSize ≥ 18, or bold at ≥ 14 (big numbers, prices, names, eyebrows
+that are large enough, links, active states, the back arrow, the active tab). Smaller
+text stays `textPrimary` or `textSecondary`.
 
 ### Active/Selected State Pattern
 
 When a card or option is selected:
-- Border color changes from `border` (#2E2E33) to `gold` (#C9A84C)
-- Background gains a 10% gold tint: `gold + '18'` → rgba(201, 168, 76, 0.094)
-- Text inside turns gold
+- Border changes from `border` (#7C7C80) to solid `gold` (#F0D48A)
+- Background gets a neutral dark fill: `blackAlpha(0.2)` — never a gold tint
+- Text may turn gold if it meets the size rule above
 
-### No Pure White Rule
+### Surfaces
 
-Never use `#FFFFFF` as a background. The darkest element is `background`
-(#0E0E0F), the lightest surface is `card` (#171719). White is reserved
-for `textPrimary` only.
+`background` (#4A4A4D) is the base; `card` (#555558) sits slightly lighter. Selected and
+subtle fills use `blackAlpha()`. White appears only as text.
 
 ---
 
@@ -96,8 +113,8 @@ The fundamental surface. Used everywhere — job listings, worker
 profiles, settings rows, fee panels, lifecycle banners.
 
 ```
-Background: #171719 (card)
-Border: 1px solid #2E2E33 (border)
+Background: #555558 (card)
+Border: 1px solid #7C7C80 (border)
 Border radius: 12px (Radius.md)
 Padding: 16px (Spacing.md)
 ```
@@ -106,8 +123,8 @@ Padding: 16px (Spacing.md)
 
 **Primary CTA (gold):**
 ```
-Background: #C9A84C (gold)
-Text: #0E0E0F (background) — dark text on gold
+Background: #F0D48A (gold)
+Text: #111111 (ink) — dark text on gold
 Border radius: 12px (Radius.md)
 Height: 52-54px
 Font: Bold, 15-16px, letterSpacing 1.5
@@ -116,16 +133,16 @@ Font: Bold, 15-16px, letterSpacing 1.5
 **Outline/Secondary:**
 ```
 Background: transparent
-Border: 1.5px solid #C9A84C (gold)
-Text: #C9A84C (gold)
+Border: 1.5px solid #F0D48A (gold)
+Text: #F0D48A (gold)
 Border radius: 999px (Radius.full) — pill shape
 ```
 
 **Destructive:**
 ```
 Background: transparent
-Border: 1.5px solid #E05252 (red)
-Text: #E05252 (red)
+Border: 1.5px solid #FFBBBB (red)
+Text: #FFBBBB (red)
 ```
 
 ### Status Badges
@@ -139,17 +156,17 @@ Text: 10-11px, bold, letterSpacing 1.5
 ```
 
 Status colors: gold (open/pending), green (accepted/completed),
-amber #E5901A (in-progress/awaiting), red (declined/disputed),
+amber #FFBF87 (in-progress/awaiting), red (declined/disputed),
 grey (expired/withdrawn).
 
 ### Form Inputs
 
 ```
-Background: #171719 (card)
-Border: 1px solid #2E2E33 (border)
+Background: #555558 (card)
+Border: 1px solid #7C7C80 (border)
 Border radius: 12px (Radius.md)
 Text color: #FFFFFF (textPrimary)
-Placeholder color: #888890 (textSecondary)
+Placeholder color: #D0D0D4 (textSecondary)
 Height: 52px (single line)
 Padding: 16px horizontal
 ```
@@ -160,7 +177,7 @@ Used on worker cards, job detail, chat for Report/Block actions:
 ```
 Position: absolute, top-right of parent
 Size: 44x44px (Apple HIG minimum)
-Icon: "⋯" character, 18px, #888890 (textSecondary)
+Icon: "⋯" character, 18px, #D0D0D4 (textSecondary)
 Trigger: ActionSheetIOS (native iOS sheet)
 ```
 
@@ -193,7 +210,7 @@ match the Dark Gold aesthetic.
 ## Screen Structure
 
 Every screen follows this hierarchy:
-1. `SafeAreaView` with `backgroundColor: #0E0E0F`
+1. `SafeAreaView` with `backgroundColor: #4A4A4D`
 2. Header (either system-provided Dark Gold header or custom)
 3. Content area (ScrollView or FlatList)
 4. Optional: fixed bottom element (composer, CTA bar)
@@ -201,7 +218,7 @@ Every screen follows this hierarchy:
 ### Dark Gold Header (most screens)
 
 ```
-Background: #0E0E0F (background)
+Background: #4A4A4D (background)
 Title: white, bold
 Left: gold "‹" back button (TouchableOpacity)
 Shadow: none (headerShadowVisible: false)
@@ -217,8 +234,8 @@ Shadow: none (headerShadowVisible: false)
   for overflow menus (Report/Block).
 - **Loading states:** `ActivityIndicator` in gold or contextual color.
   Buttons show spinner + disabled opacity (0.5).
-- **Error states:** Red text (#E05252) centered above the action button.
-  Error banners use red border + dark red background (#2A1515).
+- **Error states:** Red text (#FFBBBB) centered above the action button.
+  Error banners use red border + a red tint background (`redAlpha(0.12)`).
 
 ---
 

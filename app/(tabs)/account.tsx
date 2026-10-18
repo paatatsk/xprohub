@@ -241,26 +241,26 @@ const styles = StyleSheet.create({
   identityInitials: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 25,
   },
   identityName: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 21,
     letterSpacing: 0.3,
   },
   identityEmail: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
 
   // Section eyebrow
   eyebrow: {
-    color: Colors.gold,
-    fontSize: 12,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: Spacing.sm,
     marginTop: Spacing.lg,
     marginLeft: Spacing.xs,
@@ -284,26 +284,26 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   rowLabel: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textPrimary,
-    fontSize: 15,
+    fontSize: 17,
     flex: 1,
   },
   unblockText: {
     color: Colors.gold,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
   rowValue: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
   },
   rowValueGold: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.gold,
-    fontSize: 15,
+    fontSize: 17,
   },
   rowRight: {
     flexDirection: 'row',
@@ -312,7 +312,8 @@ const styles = StyleSheet.create({
   },
   chevron: {
     color: Colors.textSecondary,
-    fontSize: 18,
+    fontSize: 21,
+    fontWeight: '500',
   },
   divider: {
     height: 1,
@@ -331,9 +332,9 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: Colors.red,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // Sign Out button (first action after content)
@@ -347,9 +348,9 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: Colors.gold,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // TEMP — logo evaluation link
@@ -359,8 +360,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   tempText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
   },
 });

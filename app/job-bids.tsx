@@ -60,7 +60,7 @@ function timeAgo(iso: string): string {
 // Job-level status color + label (for the context strip)
 function statusColor(status: string): string {
   switch (status) {
-    case 'open':        return Colors.gold;
+    case 'open':        return Colors.textPrimary;
     case 'matched':     return Colors.green;
     case 'in_progress': return Colors.amber;
     case 'completed':   return Colors.textSecondary;
@@ -753,22 +753,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contextEyebrow: {
-    color: Colors.gold,
-    fontSize: 11.5,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 2,
+    letterSpacing: 1.3,
   },
   contextViewHint: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
   contextTitle: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    lineHeight: 24,
+    fontSize: 21,
+    lineHeight: 27,
   },
   contextMeta: {
     flexDirection: 'row',
@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
   contextBudget: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 17,
   },
   categoryPill: {
     borderWidth: 1,
@@ -790,8 +790,8 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   categoryText: {
-    color: Colors.gold,
-    fontSize: 12,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -802,9 +802,9 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // ── Action error banner ───────────────────────────────────────
@@ -824,12 +824,12 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 16,
+    lineHeight: 20,
   },
   errorBannerDismiss: {
     color: Colors.textSecondary,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     paddingHorizontal: 4,
   },
@@ -876,7 +876,7 @@ const styles = StyleSheet.create({
   avatarInitials: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 17,
   },
 
   workerInfo: {
@@ -886,7 +886,7 @@ const styles = StyleSheet.create({
   workerName: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 17,
     letterSpacing: 0.2,
   },
 
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
   proposedPrice: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 25,
     letterSpacing: 0.5,
   },
 
@@ -902,21 +902,21 @@ const styles = StyleSheet.create({
   bidMessage: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
   },
   bidMessageEmpty: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     fontStyle: 'italic',
   },
 
   // Submitted time
   bidTime: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
 
   // ── Action row (shared container for pending + accepted) ──────
@@ -935,10 +935,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // Pending — DECLINE
@@ -953,8 +953,8 @@ const styles = StyleSheet.create({
   declineBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // Accepted — badge
@@ -966,10 +966,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptedBadgeText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // Accepted — OPEN CHAT
@@ -984,8 +984,8 @@ const styles = StyleSheet.create({
   openChatBtnText: {
     color: Colors.green,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // Direct offer — awaiting worker
@@ -999,10 +999,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   directOfferPillText: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontSize: 13,
+    letterSpacing: 1,
   },
 
   // Underway banner (active statuses)
@@ -1016,11 +1016,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   underwayText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
   },
   underwayChatBtn: {
     borderWidth: 1.5,
@@ -1032,8 +1032,8 @@ const styles = StyleSheet.create({
   underwayChatBtnText: {
     color: Colors.green,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // Declined / withdrawn — badge only
@@ -1048,8 +1048,8 @@ const styles = StyleSheet.create({
   declinedBadgeText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
   },
 
   // ── Empty / error states ──────────────────────────────────────
@@ -1069,21 +1069,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyIconGlyph: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   retryBtn: {
     marginTop: 8,
@@ -1096,8 +1096,8 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 
   // ── Close post ────────────────────────────────────────────────
@@ -1108,8 +1108,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   closePostText: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 16,
     color: Colors.textSecondary,
     letterSpacing: 0.5,
   },
@@ -1119,8 +1119,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   closedBannerText: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 16,
     color: Colors.textSecondary,
     fontStyle: 'italic',
   },

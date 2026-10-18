@@ -213,7 +213,7 @@ export default function AgreementScreen() {
         <LedgerRow
           label="Job total"
           value={`$${data.agreedPrice.toFixed(2)}`}
-          valueColor={Colors.gold}
+          valueColor={Colors.textPrimary}
         />
         <LedgerRow
           label="Platform fee (10%)"
@@ -223,7 +223,7 @@ export default function AgreementScreen() {
         <LedgerRow
           label="Worker receives"
           value={`$${data.workerPayout.toFixed(2)}`}
-          valueColor={Colors.gold}
+          valueColor={Colors.textPrimary}
         />
 
         <Divider />
@@ -254,7 +254,7 @@ export default function AgreementScreen() {
 
 // ── Styles ─────────────────────────────────────────────────────
 
-const INK_DIM = '#d8d8d8';
+const INK_DIM = Colors.textPrimary; // was '#d8d8d8' (light text on dark)
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
@@ -271,18 +271,18 @@ const s = StyleSheet.create({
   },
 
   // Error state
-  errorGlyph: { fontSize: 40 },
+  errorGlyph: { fontSize: 42 },
   errorHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   errorSub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
   },
 
@@ -294,24 +294,24 @@ const s = StyleSheet.create({
   },
   headerEyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 4,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2.6,
+    color: Colors.textPrimary,
     textTransform: 'uppercase',
   },
   headerTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 20,
+    fontSize: 23,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 29,
   },
 
   // Section eyebrow
   sectionEyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 10,
-    letterSpacing: 4,
+    fontSize: 13,
+    letterSpacing: 2.6,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 12,
@@ -332,8 +332,8 @@ const s = StyleSheet.create({
     paddingVertical: 6,
   },
   ledgerLabel: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 16,
     color: INK_DIM,
   },
   ledgerLeader: {
@@ -345,8 +345,8 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   ledgerValue: {
-    fontFamily: Fonts.mono,
-    fontSize: 14,
+    fontFamily: Fonts.monoMed,
+    fontSize: 16,
     color: INK_DIM,
     minWidth: 64,
     textAlign: 'right',
@@ -362,25 +362,25 @@ const s = StyleSheet.create({
   // Scope
   scopeText: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: INK_DIM,
-    lineHeight: 21,
+    lineHeight: 23,
   },
 
   // Accepted
   acceptedText: {
-    fontFamily: Fonts.mono,
-    fontSize: 13,
+    fontFamily: Fonts.monoMed,
+    fontSize: 15,
     color: Colors.textSecondary,
-    lineHeight: 19,
+    lineHeight: 21,
   },
 
   // Footer
   footerText: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     color: Colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: 18,
     marginTop: Spacing.xl,
     textAlign: 'center',
     opacity: 0.6,

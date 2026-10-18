@@ -31,7 +31,7 @@ interface XProHubLogoProps {
   width: number;
   /** "lockup" (knot + wordmark, default) or "mark" (knot only, square). */
   variant?: Variant;
-  /** Any colour string. Defaults to the design-system gold (#C9A84C). */
+  /** Any colour string. Defaults to the design-system gold (Colors.gold). */
   color?: string;
 }
 

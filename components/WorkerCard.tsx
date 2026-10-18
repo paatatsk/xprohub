@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
-import { Colors, Fonts, Radius } from '../constants/theme';
+import { Colors, Fonts, Radius, backgroundAlpha, blackAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import CornerStamp from './CornerStamp';
 
@@ -390,7 +390,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(201, 168, 76, 0.10)',
+    backgroundColor: blackAlpha(0.12),
     borderBottomWidth: 1,
     borderBottomColor: Colors.gold,
     paddingVertical: 8,
@@ -400,9 +400,9 @@ const s = StyleSheet.create({
   },
   stripeLeft: {
     fontFamily: Fonts.displayB,
-    fontSize: 12,
-    letterSpacing: 3,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: Colors.textPrimary,
   },
   stripeRightRow: {
     flexDirection: 'row',
@@ -411,15 +411,15 @@ const s = StyleSheet.create({
   },
   stripeRight: {
     fontFamily: Fonts.monoMed,
-    fontSize: 12,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
   stripeOverflow: {
     fontFamily: Fonts.monoMed,
-    fontSize: 14,
-    color: 'rgba(201, 168, 76, 0.45)',
-    letterSpacing: 2,
+    fontSize: 16,
+    color: Colors.textSecondary,
+    letterSpacing: 1.3,
   },
 
   // Body row
@@ -451,7 +451,7 @@ const s = StyleSheet.create({
   },
   portraitInitials: {
     fontFamily: Fonts.serif,
-    fontSize: 34,
+    fontSize: 37,
     color: Colors.gold,
   },
   photoStamp: {
@@ -460,22 +460,22 @@ const s = StyleSheet.create({
     left: 0,
     right: 0,
     paddingVertical: 2,
-    backgroundColor: 'rgba(14,14,15,0.5)',
+    backgroundColor: backgroundAlpha(0.5),
     borderTopWidth: 1,
-    borderTopColor: 'rgba(201,168,76,0.4)',
+    borderTopColor: Colors.gold,
     alignItems: 'center',
   },
   photoStampText: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1,
-    color: 'rgba(201,168,76,0.55)',
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
   photoBadge: {
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: blackAlpha(0.5),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -484,9 +484,9 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
 
   // Info column
@@ -494,9 +494,9 @@ const s = StyleSheet.create({
     flex: 1,
   },
   nameLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 2,
@@ -509,7 +509,7 @@ const s = StyleSheet.create({
   },
   nameText: {
     fontFamily: Fonts.serif,
-    fontSize: 21,
+    fontSize: 24,
     color: Colors.textPrimary,
     flexShrink: 1,
   },
@@ -524,20 +524,20 @@ const s = StyleSheet.create({
   },
   bio: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 16,
-    lineHeight: 16,
+    fontSize: 18,
+    lineHeight: 18,
     color: Colors.textPrimary,
     marginBottom: 9,
   },
   bioPlaceholder: {
     fontStyle: 'italic' as const,
-    color: Colors.textTertiary,
+    color: Colors.textSecondary,
   },
   bioBadge: {
     position: 'absolute' as const,
     bottom: 0,
     right: 0,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 8,
@@ -546,9 +546,9 @@ const s = StyleSheet.create({
   },
   bioBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 0.7,
+    color: Colors.textPrimary,
   },
 
   // Track record
@@ -557,21 +557,21 @@ const s = StyleSheet.create({
   },
   trackText: {
     fontFamily: Fonts.monoMed,
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: 0.3,
     color: Colors.textSecondary,
   },
   trackGold: {
     fontFamily: Fonts.monoMed,
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: 0.3,
     color: Colors.gold,
     fontWeight: '600',
   },
   trackSep: {
-    fontFamily: Fonts.mono,
-    fontSize: 13,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.monoMed,
+    fontSize: 15,
+    color: Colors.textSecondary,
   },
 
   // Skill block
@@ -580,9 +580,9 @@ const s = StyleSheet.create({
   },
   skillLabel: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 2.5,
-    color: Colors.gold,
+    fontSize: 13,
+    letterSpacing: 1.6,
+    color: Colors.textPrimary,
     marginBottom: 3,
   },
   pillRow: {
@@ -597,35 +597,37 @@ const s = StyleSheet.create({
     borderRadius: Radius.full,
   },
   pillFilled: {
-    backgroundColor: 'rgba(201,168,76,0.12)',
+    backgroundColor: blackAlpha(0.2),
+    borderWidth: 1,
+    borderColor: Colors.gold,
   },
   pillOutlined: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
+    borderColor: Colors.border,
     backgroundColor: 'transparent',
   },
   pillDimmed: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.25)',
+    borderColor: Colors.border,
     backgroundColor: 'transparent',
   },
   pillText: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: Colors.gold,
+    color: Colors.textPrimary,
   },
   pillTextDimmed: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.5,
-    color: 'rgba(201,168,76,0.7)',
+    color: Colors.textSecondary,
   },
   pillDisclosure: {
     borderWidth: 1,
-    borderColor: 'rgba(201,168,76,0.4)',
+    borderColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(201,168,76,0.04)',
+    backgroundColor: blackAlpha(0.12),
   },
 
   // Footer
@@ -638,17 +640,17 @@ const s = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(14,14,15,0.4)',
+    backgroundColor: backgroundAlpha(0.4),
   },
   footerMeta: {
     flex: 1,
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textSecondary,
   },
   footerMetaGold: {
-    color: Colors.gold,
+    color: Colors.textPrimary,
     fontWeight: '600',
   },
   hireBtn: {
@@ -660,8 +662,8 @@ const s = StyleSheet.create({
   },
   hireBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.gold,
   },
 

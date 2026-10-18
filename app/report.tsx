@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 
 // ── Reason options ────────────────────────────────────────────────────────────
@@ -188,7 +188,7 @@ export default function ReportScreen() {
           activeOpacity={0.85}
         >
           {submitting ? (
-            <ActivityIndicator color={Colors.background} />
+            <ActivityIndicator color={Colors.ink} />
           ) : (
             <Text style={styles.submitBtnText}>SUBMIT REPORT</Text>
           )}
@@ -208,23 +208,23 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxl,
   },
   eyebrow: {
-    color: Colors.gold,
-    fontSize: 11,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
     marginBottom: Spacing.xs,
   },
   heading: {
     color: Colors.textPrimary,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: Spacing.sm,
   },
   sub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
     marginBottom: Spacing.lg,
   },
 
@@ -239,20 +239,20 @@ const styles = StyleSheet.create({
   },
   reasonCardActive: {
     borderColor: Colors.gold,
-    backgroundColor: Colors.gold + '18',
+    backgroundColor: blackAlpha(0.2),
   },
   reasonText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
   },
-  reasonTextActive: { color: Colors.gold },
+  reasonTextActive: { color: Colors.textPrimary },
 
   // Details
   detailsLabel: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: Spacing.xs,
   },
@@ -266,16 +266,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     minHeight: 90,
     textAlignVertical: 'top',
   },
   charCount: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: Spacing.md,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   submitError: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
@@ -298,9 +298,9 @@ const styles = StyleSheet.create({
   },
   submitBtnDisabled: { opacity: 0.5 },
   submitBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 1.5,
+    fontSize: 17,
+    letterSpacing: 1,
   },
 });

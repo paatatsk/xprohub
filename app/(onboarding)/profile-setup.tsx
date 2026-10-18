@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Fonts, Radius, Spacing } from '../../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
 export default function ProfileSetupScreen() {
@@ -209,7 +209,7 @@ export default function ProfileSetupScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={Colors.background} />
+              <ActivityIndicator color={Colors.ink} />
             ) : (
               <Text style={styles.buttonText}>{isGate ? 'SAVE AND CONTINUE' : 'LET\'S GO →'}</Text>
             )}
@@ -231,26 +231,26 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xl,
   },
   eyebrow: {
-    color: Colors.gold,
-    fontSize: 11,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
     marginBottom: Spacing.xs,
   },
   title: {
     color: Colors.textPrimary,
-    fontSize: 34,
+    fontSize: 37,
     fontWeight: '800',
     letterSpacing: 0.5,
-    lineHeight: 40,
+    lineHeight: 43,
     marginBottom: Spacing.sm,
   },
   sub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     marginBottom: Spacing.xl,
-    lineHeight: 22,
+    lineHeight: 24,
   },
   avatarContainer: {
     alignSelf: 'center',
@@ -276,35 +276,35 @@ const styles = StyleSheet.create({
   },
   avatarIcon: {
     color: Colors.gold,
-    fontSize: 28,
+    fontSize: 31,
     fontWeight: '300',
-    lineHeight: 32,
+    lineHeight: 35,
   },
   avatarLabel: {
-    color: Colors.gold,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginTop: 2,
   },
   avatarHint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 10,
+    fontSize: 13,
     marginTop: 2,
   },
   avatarRequired: {
-    color: Colors.gold,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
     marginTop: 2,
   },
   avatarEditBadge: {
     position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: 'rgba(201, 168, 76, 0.15)',
+    backgroundColor: blackAlpha(0.2),
     borderWidth: 1.5,
     borderColor: Colors.gold,
     borderRadius: 10,
@@ -312,33 +312,33 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   avatarEditText: {
-    color: Colors.gold,
-    fontSize: 9,
+    color: Colors.textPrimary,
+    fontSize: 13,
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
   errorText: {
     fontFamily: Fonts.body,
-    color: '#FF6B6B',
-    fontSize: 14,
+    color: Colors.red,
+    fontSize: 16,
     marginBottom: Spacing.md,
-    backgroundColor: '#2A1515',
+    backgroundColor: Colors.errorFill,
     padding: Spacing.sm,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: '#FF6B6B',
+    borderColor: Colors.red,
   },
   label: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: Spacing.xs,
   },
   firstNameHint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     marginBottom: Spacing.xs,
   },
   input: {
@@ -347,16 +347,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: 18,
     height: 52,
     paddingHorizontal: Spacing.md,
   },
   hint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     marginTop: Spacing.md,
-    lineHeight: 19,
+    lineHeight: 21,
   },
   button: {
     backgroundColor: Colors.gold,
@@ -370,9 +370,9 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: Colors.background,
-    fontSize: 16,
+    color: Colors.ink,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
   },
 });

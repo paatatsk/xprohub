@@ -90,27 +90,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 8,
   },
-  iconGlyph: { fontSize: 44 },
+  iconGlyph: { fontSize: 46 },
   heading: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 26,
-    letterSpacing: 2,
+    fontSize: 29,
+    letterSpacing: 1.3,
     textAlign: 'center',
   },
   subhead: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
+    fontSize: 17,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  body: {
+    fontFamily: Fonts.bodyMed,
+    color: Colors.textSecondary,
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 22,
-  },
-  body: {
-    fontFamily: Fonts.body,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 20,
   },
 
   // Buttons
@@ -122,10 +122,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryBtnText: {
-    color: Colors.background,
+    color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 2,
+    fontSize: 16,
+    letterSpacing: 1.3,
   },
   secondaryBtn: {
     borderWidth: 1.5,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   secondaryBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 2,
+    fontSize: 16,
+    letterSpacing: 1.3,
   },
 });

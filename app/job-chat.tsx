@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { SUPPORT_EMAIL } from '../lib/legal';
 import { supabase } from '../lib/supabase';
 import { uploadJobPhoto, type PhotoType } from '../lib/photos';
@@ -724,7 +724,7 @@ export default function JobChatScreen() {
               )
             }
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 13, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -764,7 +764,7 @@ export default function JobChatScreen() {
               )
             }
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 13, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -853,7 +853,7 @@ export default function JobChatScreen() {
             )}
 
             {actionError ? (
-              <Text style={{ color: Colors.red, fontSize: 12, textAlign: 'center' }}>
+              <Text style={{ color: Colors.red, fontSize: 13, textAlign: 'center' }}>
                 {actionError}
               </Text>
             ) : null}
@@ -1052,7 +1052,7 @@ export default function JobChatScreen() {
             activeOpacity={0.8}
           >
             {sending
-              ? <ActivityIndicator size="small" color={Colors.background} />
+              ? <ActivityIndicator size="small" color={Colors.ink} />
               : <Text style={styles.sendBtnText}>{'\u2191'}</Text>
             }
           </TouchableOpacity>
@@ -1090,21 +1090,21 @@ const styles = StyleSheet.create({
 
   // ── State screens (loading / error / auth guard) ───────────────
   stateGlyph: {
-    fontSize: 40,
+    fontSize: 42,
   },
   stateHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   stateSub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 19,
+    lineHeight: 21,
   },
   backBtn: {
     marginTop: 8,
@@ -1117,8 +1117,8 @@ const styles = StyleSheet.create({
   backBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 
   // ── Header context strip ───────────────────────────────────────
@@ -1143,18 +1143,19 @@ const styles = StyleSheet.create({
   },
   contextOverflowIcon: {
     color: Colors.textSecondary,
-    fontSize: 18,
-    letterSpacing: 2,
+    fontSize: 21,
+    fontWeight: '500',
+    letterSpacing: 1.3,
   },
   contextName: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   contextJob: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
 
   // ── Lifecycle banner ──────────────────────────────────────────
@@ -1177,8 +1178,8 @@ const styles = StyleSheet.create({
   lifecycleBtnText: {
     color: Colors.gold,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
   lifecycleStaticBadge: {
     borderWidth: 1,
@@ -1204,16 +1205,16 @@ const styles = StyleSheet.create({
   lifecycleStaticText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
   },
 
   // ── Cancel hire link ────────────────────────────────────────────
   cancelHireText: {
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
     paddingVertical: 4,
   },
 
@@ -1225,9 +1226,9 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     fontStyle: 'italic',
   },
 
@@ -1251,7 +1252,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   bubbleOutgoing: {
-    backgroundColor: Colors.gold + '22',
+    backgroundColor: blackAlpha(0.2),
     borderColor: Colors.gold,
     borderBottomRightRadius: 4,
   },
@@ -1263,12 +1264,13 @@ const styles = StyleSheet.create({
   bubbleText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
   },
   bubbleTime: {
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: '500',
     alignSelf: 'flex-end',
   },
 
@@ -1287,12 +1289,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body,
     flex: 1,
     color: Colors.red,
-    fontSize: 13,
-    lineHeight: 17,
+    fontSize: 15,
+    lineHeight: 19,
   },
   sendErrorDismiss: {
     color: Colors.textSecondary,
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '500',
     paddingHorizontal: 4,
   },
 
@@ -1318,8 +1321,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     color: Colors.textPrimary,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
   },
   sendBtn: {
     width: 44,
@@ -1334,10 +1337,10 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   sendBtnText: {
-    color: Colors.background,
-    fontSize: 20,
+    color: Colors.ink,
+    fontSize: 23,
     fontWeight: 'bold',
-    lineHeight: 24,
+    lineHeight: 27,
   },
 
   // ── Evidence photo cards (in-thread) ───────────────────────────
@@ -1358,18 +1361,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   photoCardLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
   photoCardLabelAfter: {
     color: Colors.green,
   },
   photoCardTime: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
   },
   photoCardImage: {
     width: '100%',
@@ -1378,8 +1381,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   photoCardAttribution: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
 
@@ -1392,15 +1395,16 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   cameraBtnIcon: {
-    fontSize: 22,
+    fontSize: 25,
+    fontWeight: '700',
   },
   photoCapNote: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    width: 40,
-    lineHeight: 11,
+    width: 64,
+    lineHeight: 16,
   },
   photoTypePicker: {
     paddingHorizontal: Spacing.md,
@@ -1413,8 +1417,8 @@ const styles = StyleSheet.create({
   },
   photoTypeLabel: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 13,
+    letterSpacing: 1.3,
     color: Colors.textSecondary,
   },
   photoTypeBtnRow: {
@@ -1430,8 +1434,8 @@ const styles = StyleSheet.create({
   },
   photoTypeBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
-    letterSpacing: 1,
+    fontSize: 16,
+    letterSpacing: 0.7,
     color: Colors.textSecondary,
   },
   photoTypeBtnAfter: {
@@ -1441,24 +1445,24 @@ const styles = StyleSheet.create({
     color: Colors.green,
   },
   photoTypeCancelText: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    color: Colors.textTertiary,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 15,
+    color: Colors.textSecondary,
   },
 
   // ── Pending confirmation + dispute ──────────────────────────
   bannerCopy: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
   },
   timerText: {
     color: Colors.gold,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
     textAlign: 'center',
   },
   bannerBtnRow: {
@@ -1476,16 +1480,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     minHeight: 70,
     textAlignVertical: 'top',
   },
   disputeCharCount: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'right',
   },
   disputedBadge: {
@@ -1498,21 +1502,21 @@ const styles = StyleSheet.create({
   disputedBadgeText: {
     color: Colors.red,
     fontWeight: 'bold',
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
   },
   disputeReasonText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
     fontStyle: 'italic',
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
     paddingHorizontal: Spacing.sm,
   },
   emailLink: {
     color: Colors.gold,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.5,
     textDecorationLine: 'underline',
@@ -1538,14 +1542,14 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   feeLabel: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
   feeValue: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
   },
 
@@ -1559,9 +1563,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   agreementLinkText: {
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
 });

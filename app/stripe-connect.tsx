@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
+import { Colors, Fonts, Radius, Spacing, blackAlpha } from '../constants/theme';
 import { supabase } from '../lib/supabase';
 import { useStripeStatus, StripeStatus } from '../hooks/useStripeStatus';
 
@@ -76,7 +76,7 @@ function badgeBorderStyle(state: StripeStatus) {
 
 function badgeTextColor(state: StripeStatus) {
   const isGreen = state === StripeStatus.CHARGES_ACTIVE || state === StripeStatus.FULLY_VERIFIED;
-  return { color: isGreen ? Colors.green : Colors.gold };
+  return { color: isGreen ? Colors.green : Colors.textPrimary };
 }
 
 // ── Screen ────────────────────────────────────────────────────
@@ -285,7 +285,7 @@ export default function StripeConnectScreen() {
               activeOpacity={0.85}
             >
               {ctaLoading
-                ? <ActivityIndicator color={Colors.background} />
+                ? <ActivityIndicator color={Colors.ink} />
                 : <Text style={styles.primaryBtnText}>GET VERIFIED →</Text>}
             </TouchableOpacity>
           )}
@@ -338,49 +338,50 @@ const styles = StyleSheet.create({
                     borderColor: Colors.border, borderRadius: Radius.md,
                     padding: Spacing.lg, gap: 14 },
   cardGlow:       { borderColor: Colors.gold,
-                    backgroundColor: Colors.gold + '1A' },
+                    backgroundColor: blackAlpha(0.2) },
 
   // Progress dots
   dotsRow:        { flexDirection: 'row', gap: 20, alignItems: 'center' },
   dotsLabels:     { flexDirection: 'row', gap: 8 },
   dot:            { width: 10, height: 10, borderRadius: 5, borderWidth: 1.5 },
-  dotLabel:       { color: Colors.textSecondary, fontSize: 10, flex: 1,
+  dotLabel:       { color: Colors.textSecondary, fontSize: 13,
+    fontWeight: '700', flex: 1,
                     textAlign: 'center' },
 
   // Typography
-  eyebrow:        { color: Colors.gold, fontSize: 11, fontWeight: '700',
-                    letterSpacing: 3 },
-  heading:        { color: Colors.gold, fontSize: 28, fontWeight: 'bold',
-                    letterSpacing: 2, fontFamily: Fonts.heading },
-  body:           { color: Colors.textSecondary, fontSize: 14, lineHeight: 20 },
+  eyebrow:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '700',
+                    letterSpacing: 2 },
+  heading:        { color: Colors.gold, fontSize: 31, fontWeight: 'bold',
+                    letterSpacing: 1.3, fontFamily: Fonts.heading },
+  body:           { color: Colors.textSecondary, fontSize: 16, lineHeight: 22, fontWeight: '500' },
 
   // Badge
   badge:          { borderWidth: 1.5, borderRadius: Radius.full,
                     paddingHorizontal: 9, paddingVertical: 3,
                     alignSelf: 'flex-start' },
-  badgeText:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5 },
+  badgeText:      { fontSize: 13, fontWeight: '700', letterSpacing: 1 },
 
   // Buttons
   primaryBtn:     { backgroundColor: Colors.gold, borderRadius: Radius.md,
                     paddingVertical: 16, alignItems: 'center' },
-  primaryBtnText: { color: Colors.background, fontWeight: 'bold', fontSize: 15,
-                    letterSpacing: 1.5 },
+  primaryBtnText: { color: Colors.ink, fontWeight: 'bold', fontSize: 17,
+                    letterSpacing: 1 },
   outlineBtn:     { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 12,
                     alignItems: 'center' },
-  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 14,
-                    letterSpacing: 1.5 },
+  outlineBtnText: { color: Colors.gold, fontWeight: 'bold', fontSize: 16,
+                    letterSpacing: 1 },
   btnDisabled:    { opacity: 0.5 },
 
   // Error states
-  ctaError:       { color: Colors.red, fontSize: 13, textAlign: 'center' },
-  fetchError:     { color: Colors.red, fontSize: 14, textAlign: 'center',
-                    backgroundColor: '#2A1515', padding: Spacing.sm,
+  ctaError:       { color: Colors.red, fontSize: 15, textAlign: 'center' },
+  fetchError:     { color: Colors.red, fontSize: 16, textAlign: 'center',
+                    backgroundColor: Colors.errorFill, padding: Spacing.sm,
                     borderRadius: Radius.sm, borderWidth: 1,
                     borderColor: Colors.red },
   retryBtn:       { borderWidth: 1.5, borderColor: Colors.gold,
                     borderRadius: Radius.full, paddingVertical: 10,
                     paddingHorizontal: 28 },
-  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 13,
-                    letterSpacing: 1.5 },
+  retryBtnText:   { color: Colors.gold, fontWeight: 'bold', fontSize: 15,
+                    letterSpacing: 1 },
 });
