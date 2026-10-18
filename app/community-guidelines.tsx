@@ -64,23 +64,23 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: Fonts.heading,
     color: Colors.textPrimary,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: '700',
     marginBottom: Spacing.lg,
   },
   subheading: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '600',
     marginTop: Spacing.md,
     marginBottom: Spacing.xs,
   },
   body: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 16,
+    lineHeight: 23,
     marginBottom: Spacing.md,
   },
   link: {

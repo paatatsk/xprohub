@@ -356,8 +356,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: 18,
+    lineHeight: 24,
   },
 
   // ── Status badge ──────────────────────────────────────────────
@@ -369,9 +369,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   statusText: {
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // ── Category pill ─────────────────────────────────────────────
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -400,17 +400,17 @@ const styles = StyleSheet.create({
   bidCount: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   noBids: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
   },
   timeAgo: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
   footerRight: {
     flexDirection: 'row',
@@ -420,8 +420,8 @@ const styles = StyleSheet.create({
   deleteText: {
     color: Colors.red,
     fontWeight: 'bold',
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
 
   // ── Empty state ───────────────────────────────────────────────
@@ -440,21 +440,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyIconGlyph: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
 
   // ── Retry / action button ─────────────────────────────────────
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 });

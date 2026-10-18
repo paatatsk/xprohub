@@ -23,7 +23,7 @@ export default function TabLayout() {
           backgroundColor: Colors.background,
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          height: 84,
+          height: 90,
           paddingTop: 8,
         },
         tabBarActiveTintColor: Colors.ink,
@@ -31,8 +31,8 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors.textSecondary,
         tabBarLabelStyle: {
           fontFamily: Fonts.heading,
-          fontSize: 10,
-          letterSpacing: 1.5,
+          fontSize: 13,
+          letterSpacing: 1,
           textTransform: 'uppercase',
         },
       }}

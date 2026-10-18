@@ -442,9 +442,9 @@ const styles = StyleSheet.create({
   },
 
   // Empty / error
-  emptyGlyph:   { fontSize: 36, marginBottom: 4 },
-  emptyHeading: { fontFamily: Fonts.display, fontSize: 16, color: Colors.textPrimary, letterSpacing: 2 },
-  emptySub:     { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  emptyGlyph:   { fontSize: 38, marginBottom: 4 },
+  emptyHeading: { fontFamily: Fonts.display, fontSize: 18, color: Colors.textPrimary, letterSpacing: 1.3 },
+  emptySub:     { fontFamily: Fonts.bodyMed, fontSize: 16, color: Colors.textSecondary, textAlign: 'center' },
   outlineBtn: {
     marginTop: 16,
     paddingVertical: 12,
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.gold,
   },
-  outlineBtnText: { fontFamily: Fonts.display, fontSize: 13, color: Colors.textPrimary, letterSpacing: 2 },
+  outlineBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.textPrimary, letterSpacing: 1.3 },
 
   // Hero
   heroSection: { alignItems: 'center', paddingTop: Spacing.lg, paddingBottom: Spacing.md },
@@ -474,18 +474,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials: { fontFamily: Fonts.heading, fontSize: 28, color: Colors.textSecondary },
+  avatarInitials: { fontFamily: Fonts.heading, fontSize: 31, color: Colors.textSecondary },
 
   workerName: {
     fontFamily: Fonts.serif,
-    fontSize: 26,
+    fontSize: 29,
     color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: 6,
   },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusLabel: { fontFamily: Fonts.body, fontSize: 13, color: Colors.textSecondary },
+  statusLabel: { fontFamily: Fonts.bodySemi, fontSize: 15, color: Colors.textSecondary },
 
   // Sections
   section: {
@@ -495,14 +495,14 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: Spacing.sm,
   },
 
   // Bio
-  bioText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary, lineHeight: 22 },
+  bioText: { fontFamily: Fonts.body, fontSize: 17, color: Colors.textPrimary, lineHeight: 24 },
 
   // Stats
   statsRow: {
@@ -513,20 +513,20 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   statBox:     { flex: 1, alignItems: 'center' },
-  statNumber:  { fontFamily: Fonts.heading, fontSize: 28, color: Colors.textPrimary },
-  statCaption: { fontFamily: Fonts.display, fontSize: 9, color: Colors.textSecondary, letterSpacing: 1.5, marginTop: 4 },
+  statNumber:  { fontFamily: Fonts.heading, fontSize: 31, color: Colors.textPrimary },
+  statCaption: { fontFamily: Fonts.display, fontSize: 13, color: Colors.textSecondary, letterSpacing: 1, marginTop: 4 },
   statDivider: { width: 1, height: 32, backgroundColor: Colors.border },
 
   // Rate
-  rateText: { fontFamily: Fonts.heading, fontSize: 20, color: Colors.textPrimary },
+  rateText: { fontFamily: Fonts.heading, fontSize: 23, color: Colors.textPrimary },
 
   // Skills
   skillGroup:      { marginBottom: Spacing.md },
   skillGroupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: 6,
   },
   skillRow: {
@@ -537,10 +537,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
-  skillNameFeatured: { fontFamily: Fonts.bodyMed, fontSize: 14, color: Colors.textPrimary, flex: 1 },
-  skillName:         { fontFamily: Fonts.body, fontSize: 14, color: Colors.textPrimary, flex: 1 },
-  skillPrice:        { fontFamily: Fonts.mono, fontSize: 14, color: Colors.textSecondary, marginLeft: Spacing.sm },
-  emptySkills:       { fontFamily: Fonts.body, fontSize: 14, color: Colors.textSecondary, fontStyle: 'italic' },
+  skillNameFeatured: { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.textPrimary, flex: 1 },
+  skillName:         { fontFamily: Fonts.bodySemi, fontSize: 16, color: Colors.textPrimary, flex: 1 },
+  skillPrice:        { fontFamily: Fonts.monoMed, fontSize: 16, color: Colors.textSecondary, marginLeft: Spacing.sm },
+  emptySkills:       { fontFamily: Fonts.bodyMed, fontSize: 16, color: Colors.textSecondary, fontStyle: 'italic' },
 
   // Portfolio
   portfolioSection: { borderRadius: Radius.sm, overflow: 'hidden' },
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
   },
 
   // Location
-  locationText: { fontFamily: Fonts.body, fontSize: 15, color: Colors.textPrimary },
+  locationText: { fontFamily: Fonts.body, fontSize: 17, color: Colors.textPrimary },
 
   // Footer
   footer: {
@@ -601,7 +601,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: 'center',
   },
-  hireBtnText: { fontFamily: Fonts.display, fontSize: 15, color: '#1A0F00', letterSpacing: 2 },
+  hireBtnText: { fontFamily: Fonts.display, fontSize: 17, color: '#1A0F00', letterSpacing: 1.3 },
   editBtn: {
     borderWidth: 1.5,
     borderColor: Colors.gold,
@@ -609,5 +609,5 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
     alignItems: 'center',
   },
-  editBtnText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.textPrimary, letterSpacing: 2 },
+  editBtnText: { fontFamily: Fonts.display, fontSize: 17, color: Colors.textPrimary, letterSpacing: 1.3 },
 });

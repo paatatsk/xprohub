@@ -66,9 +66,10 @@ export function backgroundAlpha(alpha: number): string {
 export const Fonts = {
   heading:  'SpaceGrotesk_700Bold',            // All headings — Space Grotesk Bold
   body:     'Inter_400Regular',                // All body text — Inter
-  bodyMed:  'Inter_500Medium',                 // Body medium weight
+  bodyMed:  'Inter_500Medium',                 // Body medium — secondary text (one step up for readability)
+  bodySemi: 'Inter_600SemiBold',               // Body semibold — prices, names, status / button labels
   serif:    'PlayfairDisplay_700Bold_Italic',   // Serif accent — names, editorial quotes
-  display:  'Oswald_600SemiBold',              // Editorial labels, eyebrows, credential headers
+  display:  'Oswald_700Bold',                  // Editorial labels, eyebrows, buttons — bold since gold no longer marks them (was Oswald_600SemiBold)
   displayB: 'Oswald_700Bold',                  // Display bold variant
   mono:     'IBMPlexMono_400Regular',          // Ledger voice — dates, trace IDs, money metadata
   monoMed:  'IBMPlexMono_500Medium',           // Mono medium — track records, ID numbers

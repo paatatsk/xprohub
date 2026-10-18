@@ -2012,15 +2012,15 @@ const s = StyleSheet.create({
 
   // ── Masthead ──
   editionLine: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     marginBottom: 6,
   },
   greeting: {
     fontFamily: Fonts.serif,
-    fontSize: 24,
+    fontSize: 27,
     color: Colors.textPrimary,
     marginBottom: Spacing.lg,
   },
@@ -2028,8 +2028,8 @@ const s = StyleSheet.create({
   // ── Eyebrow ──
   eyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 4,
+    fontSize: 13,
+    letterSpacing: 2.6,
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
@@ -2067,14 +2067,14 @@ const s = StyleSheet.create({
   },
   segLabel: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
 
   // ── Status line ──
   statusLine: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginTop: Spacing.sm,
     marginBottom: Spacing.lg,
@@ -2083,8 +2083,8 @@ const s = StyleSheet.create({
   // ── Preview ──
   previewLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
@@ -2092,8 +2092,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   photoHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.lg,
@@ -2107,8 +2107,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   skillCount: {
-    fontFamily: Fonts.mono,
-    fontSize: 10,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
@@ -2129,19 +2129,19 @@ const s = StyleSheet.create({
   },
   chipText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textPrimary,
   },
   chipRemove: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
     opacity: 0.6,
   },
   skillsFallback: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
@@ -2158,8 +2158,8 @@ const s = StyleSheet.create({
   },
   addSkillText: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
 
@@ -2179,14 +2179,14 @@ const s = StyleSheet.create({
   },
   sliderValue: {
     fontFamily: Fonts.heading,
-    fontSize: 28,
+    fontSize: 31,
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
   sliderUnit: {
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
   sliderTrack: {
@@ -2239,8 +2239,8 @@ const s = StyleSheet.create({
     marginTop: 2,
   },
   sliderLabelText: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
@@ -2282,13 +2282,13 @@ const s = StyleSheet.create({
   },
   publishBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1.5,
+    fontSize: 15,
+    letterSpacing: 1,
     color: INK,
   },
   publishHint: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
 
@@ -2313,20 +2313,20 @@ const s = StyleSheet.create({
   },
   toastTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.cream,
     marginBottom: 2,
   },
   toastSub: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
   toastUndo: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -2354,19 +2354,19 @@ const s = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   emptyRingIcon: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     color: Colors.textPrimary,
     textAlign: 'center',
   },
   emptyBody: {
-    fontFamily: Fonts.body,
-    fontSize: 14,
-    lineHeight: 20,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 16,
+    lineHeight: 22,
     color: Colors.textSecondary,
     textAlign: 'center',
   },
@@ -2379,13 +2379,13 @@ const s = StyleSheet.create({
   },
   emptyCtaText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
   emptyLocked: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     textAlign: 'center',
   },
@@ -2414,14 +2414,14 @@ const s = StyleSheet.create({
   },
   pickerTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.textPrimary,
     paddingHorizontal: Spacing.md,
     marginBottom: 4,
   },
   pickerSubhead: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.md,
@@ -2434,8 +2434,8 @@ const s = StyleSheet.create({
   },
   pickerGroupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
@@ -2467,12 +2467,12 @@ const s = StyleSheet.create({
   },
   pickerRowText: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerRowTextSelected: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerRowTextDimmed: {
@@ -2480,12 +2480,12 @@ const s = StyleSheet.create({
   },
   pickerCheck: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerCapText: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.amberText,
     fontStyle: 'italic',
     marginTop: 4,
@@ -2504,17 +2504,17 @@ const s = StyleSheet.create({
     marginBottom: 6,
   },
   pickerCatEmoji: {
-    fontSize: 20,
+    fontSize: 23,
   },
   pickerCatName: {
     flex: 1,
-    fontFamily: Fonts.bodyMed,
-    fontSize: 14,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   pickerCatChevron: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
   pickerTaskRow: {
@@ -2536,8 +2536,8 @@ const s = StyleSheet.create({
     gap: 8,
   },
   pickerUnverified: {
-    fontFamily: Fonts.mono,
-    fontSize: 9,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     fontStyle: 'italic',
@@ -2558,8 +2558,8 @@ const s = StyleSheet.create({
   },
   pickerDoneText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
 
@@ -2578,13 +2578,13 @@ const s = StyleSheet.create({
   },
   bioSheetTitle: {
     fontFamily: Fonts.serif,
-    fontSize: 20,
+    fontSize: 23,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
   bioSheetHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginBottom: Spacing.md,
   },
@@ -2598,19 +2598,19 @@ const s = StyleSheet.create({
   },
   bioProofName: {
     fontFamily: Fonts.serif,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
     marginBottom: 4,
   },
   bioProofLine: {
-    fontFamily: Fonts.body,
-    fontSize: 11.5,
-    lineHeight: 16,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
+    lineHeight: 17.5,
     color: Colors.textSecondary,
   },
   bioTextInput: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -2626,15 +2626,15 @@ const s = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   bioCounter: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     fontVariant: ['tabular-nums'] as any,
   },
   bioCoach: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
   },
   bioActions: {
@@ -2651,8 +2651,8 @@ const s = StyleSheet.create({
   },
   bioCancelText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
   bioSaveBtn: {
@@ -2664,8 +2664,8 @@ const s = StyleSheet.create({
   },
   bioSaveText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: INK,
   },
 
@@ -2682,8 +2682,8 @@ const s = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   manageValue: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
     marginTop: 4,
@@ -2697,8 +2697,8 @@ const s = StyleSheet.create({
   },
   managePillText: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
 
@@ -2733,9 +2733,9 @@ const s = StyleSheet.create({
   },
   portfolioDeleteText: {
     color: Colors.onDark,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold' as const,
-    lineHeight: 16,
+    lineHeight: 18,
   },
   portfolioAdd: {
     width: 100,
@@ -2748,13 +2748,13 @@ const s = StyleSheet.create({
     justifyContent: 'center' as const,
   },
   portfolioAddText: {
-    fontSize: 28,
+    fontSize: 31,
     color: Colors.textPrimary,
     fontWeight: '300' as const,
   },
   portfolioHint: {
-    fontFamily: Fonts.body,
-    fontSize: 12,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
@@ -2768,13 +2768,13 @@ const s = StyleSheet.create({
   },
   rosterEditToggle: {
     fontFamily: Fonts.heading,
-    fontSize: 10,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
   rosterHint: {
-    fontFamily: Fonts.body,
-    fontSize: 11,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     marginBottom: Spacing.sm,
   },
@@ -2788,7 +2788,7 @@ const s = StyleSheet.create({
   },
   rosterChipFeaturedText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textPrimary,
   },
@@ -2804,18 +2804,18 @@ const s = StyleSheet.create({
   },
   rosterChipOutlineText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textPrimary,
   },
   rosterRemoveX: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.red,
   },
   capLine: {
     fontFamily: Fonts.body,
-    fontSize: 11,
+    fontSize: 13,
     color: Colors.amberText,
     fontStyle: 'italic' as const,
     marginTop: Spacing.sm,
@@ -2831,13 +2831,13 @@ const s = StyleSheet.create({
   },
   addFlowBack: {
     fontFamily: Fonts.body,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textPrimary,
   },
   addFlowStep: {
     fontFamily: Fonts.display,
-    fontSize: 9,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textPrimary,
   },
   addConfirmContent: {
@@ -2846,13 +2846,13 @@ const s = StyleSheet.create({
   },
   addConfirmTitle: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.textPrimary,
   },
   addConfirmBody: {
-    fontFamily: Fonts.body,
-    fontSize: 13,
-    lineHeight: 19,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 15,
+    lineHeight: 21,
     color: Colors.textSecondary,
   },
 

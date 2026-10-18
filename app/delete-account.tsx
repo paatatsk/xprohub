@@ -137,15 +137,15 @@ const styles = StyleSheet.create({
   title: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 20,
-    letterSpacing: 2,
+    fontSize: 23,
+    letterSpacing: 1.3,
     textAlign: 'center',
   },
   body: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 17,
+    lineHeight: 24,
     textAlign: 'center',
   },
   deleteBtn: {
@@ -158,8 +158,8 @@ const styles = StyleSheet.create({
   deleteBtnText: {
     color: Colors.onDark,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 1.5,
+    fontSize: 17,
+    letterSpacing: 1,
   },
   cancelBtn: {
     borderWidth: 1.5,
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   cancelBtnText: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 1,
+    fontSize: 17,
+    letterSpacing: 0.7,
   },
 });

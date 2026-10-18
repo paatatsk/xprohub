@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 17,
+    fontSize: 20,
     textAlign: 'center',
   },
 });

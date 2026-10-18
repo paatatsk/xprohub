@@ -400,8 +400,8 @@ const s = StyleSheet.create({
   },
   stripeLeft: {
     fontFamily: Fonts.displayB,
-    fontSize: 12,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textPrimary,
   },
   stripeRightRow: {
@@ -411,15 +411,15 @@ const s = StyleSheet.create({
   },
   stripeRight: {
     fontFamily: Fonts.monoMed,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
   stripeOverflow: {
     fontFamily: Fonts.monoMed,
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.textSecondary,
-    letterSpacing: 2,
+    letterSpacing: 1.3,
   },
 
   // Body row
@@ -451,7 +451,7 @@ const s = StyleSheet.create({
   },
   portraitInitials: {
     fontFamily: Fonts.serif,
-    fontSize: 34,
+    fontSize: 37,
     color: Colors.textPrimary,
   },
   photoStamp: {
@@ -466,9 +466,9 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   photoStampText: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
   photoBadge: {
@@ -484,8 +484,8 @@ const s = StyleSheet.create({
   },
   photoBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
 
@@ -494,9 +494,9 @@ const s = StyleSheet.create({
     flex: 1,
   },
   nameLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 2,
@@ -509,7 +509,7 @@ const s = StyleSheet.create({
   },
   nameText: {
     fontFamily: Fonts.serif,
-    fontSize: 21,
+    fontSize: 24,
     color: Colors.textPrimary,
     flexShrink: 1,
   },
@@ -524,8 +524,8 @@ const s = StyleSheet.create({
   },
   bio: {
     fontFamily: Fonts.bodyMed,
-    fontSize: 16,
-    lineHeight: 16,
+    fontSize: 18,
+    lineHeight: 18,
     color: Colors.textPrimary,
     marginBottom: 9,
   },
@@ -546,8 +546,8 @@ const s = StyleSheet.create({
   },
   bioBadgeText: {
     fontFamily: Fonts.heading,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
 
@@ -557,20 +557,20 @@ const s = StyleSheet.create({
   },
   trackText: {
     fontFamily: Fonts.monoMed,
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: 0.3,
     color: Colors.textSecondary,
   },
   trackGold: {
     fontFamily: Fonts.monoMed,
-    fontSize: 13,
+    fontSize: 15,
     letterSpacing: 0.3,
     color: Colors.textPrimary,
     fontWeight: '600',
   },
   trackSep: {
-    fontFamily: Fonts.mono,
-    fontSize: 13,
+    fontFamily: Fonts.monoMed,
+    fontSize: 15,
     color: Colors.textSecondary,
   },
 
@@ -580,8 +580,8 @@ const s = StyleSheet.create({
   },
   skillLabel: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 2.5,
+    fontSize: 13,
+    letterSpacing: 1.6,
     color: Colors.textPrimary,
     marginBottom: 3,
   },
@@ -613,13 +613,13 @@ const s = StyleSheet.create({
   },
   pillText: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textPrimary,
   },
   pillTextDimmed: {
     fontFamily: Fonts.heading,
-    fontSize: 12,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
@@ -644,9 +644,9 @@ const s = StyleSheet.create({
   },
   footerMeta: {
     flex: 1,
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textSecondary,
   },
   footerMetaGold: {
@@ -662,8 +662,8 @@ const s = StyleSheet.create({
   },
   hireBtnText: {
     fontFamily: Fonts.heading,
-    fontSize: 13,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: 0.7,
     color: Colors.textPrimary,
   },
 

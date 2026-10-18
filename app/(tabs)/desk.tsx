@@ -452,21 +452,21 @@ const s = StyleSheet.create({
   // Masthead
   eyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 4,
+    fontSize: 13,
+    letterSpacing: 2.6,
     color: Colors.textPrimary,
     marginBottom: 6,
   },
   title: {
     fontFamily: Fonts.serif,
-    fontSize: 30,
+    fontSize: 33,
     color: Colors.textPrimary,
     marginBottom: 6,
   },
   edition: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: Spacing.lg,
@@ -475,8 +475,8 @@ const s = StyleSheet.create({
   // Section eyebrows
   sectionEyebrow: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textPrimary,
     marginTop: Spacing.lg,
     marginBottom: Spacing.sm,
@@ -484,8 +484,8 @@ const s = StyleSheet.create({
 
   // Empty
   emptyLine: {
-    fontFamily: Fonts.body,
-    fontSize: 15,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 17,
     color: Colors.textSecondary,
     fontStyle: 'italic',
     marginBottom: Spacing.sm,
@@ -494,8 +494,8 @@ const s = StyleSheet.create({
   // Active group labels
   groupLabel: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 3,
+    fontSize: 13,
+    letterSpacing: 2,
     color: Colors.textSecondary,
     marginTop: Spacing.md,
     marginBottom: Spacing.sm,
@@ -507,8 +507,8 @@ const s = StyleSheet.create({
   },
   viewAllText: {
     fontFamily: Fonts.display,
-    fontSize: 12.5,
-    letterSpacing: 2,
+    fontSize: 13,
+    letterSpacing: 1.3,
     color: Colors.textPrimary,
   },
 
@@ -524,15 +524,15 @@ const s = StyleSheet.create({
   },
   roleTag: {
     fontFamily: Fonts.displayB,
-    fontSize: 11,
-    letterSpacing: 2,
+    fontSize: 13,
+    letterSpacing: 1.3,
   },
   roleTagGreen: { color: Colors.green },
   roleTagAmber: { color: Colors.amberText },
   roleTagBlue: { color: Colors.blue },
   activeTitle: {
-    fontFamily: Fonts.bodyMed,
-    fontSize: 16,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 18,
     color: Colors.textPrimary,
   },
   activeFoot: {
@@ -541,14 +541,14 @@ const s = StyleSheet.create({
     alignItems: 'baseline',
   },
   activeMeta: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.5,
     color: Colors.textSecondary,
   },
   activePrice: {
     fontFamily: Fonts.heading,
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -564,15 +564,15 @@ const s = StyleSheet.create({
   },
   earningsTotal: {
     fontFamily: Fonts.heading,
-    fontSize: 38,
+    fontSize: 40,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
     marginBottom: 4,
   },
   earningsSub: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 2,
+    fontSize: 13,
+    letterSpacing: 1.3,
     color: Colors.textSecondary,
   },
 
@@ -588,8 +588,8 @@ const s = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   historyDate: {
-    fontFamily: Fonts.mono,
-    fontSize: 12,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     color: Colors.textSecondary,
     width: 70,
     letterSpacing: 0.5,
@@ -599,14 +599,14 @@ const s = StyleSheet.create({
     gap: 3,
   },
   historyTitle: {
-    fontFamily: Fonts.body,
-    fontSize: 15,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 17,
     color: Colors.textPrimary,
   },
   historyReceipt: {
     fontFamily: Fonts.display,
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textPrimary,
   },
   historyValueCol: {
@@ -615,7 +615,7 @@ const s = StyleSheet.create({
   },
   historyValue: {
     fontFamily: Fonts.heading,
-    fontSize: 15.5,
+    fontSize: 17.5,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
@@ -624,8 +624,8 @@ const s = StyleSheet.create({
   },
   historyDirection: {
     fontFamily: Fonts.mono,
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
   dirEarned: { color: Colors.green },
   dirSpent: { color: Colors.textSecondary },

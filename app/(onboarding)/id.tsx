@@ -611,31 +611,31 @@ const styles = StyleSheet.create({
   // Header
   eyebrow: {
     color: Colors.textPrimary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
     marginBottom: 4,
   },
   heading: {
     color: Colors.textPrimary,
-    fontSize: 28,
+    fontSize: 31,
     fontWeight: 'bold',
-    letterSpacing: 2,
+    letterSpacing: 1.3,
     marginBottom: 4,
   },
   subhead: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     marginBottom: Spacing.lg,
   },
 
   // Section label (step 2 category group header)
   sectionLabel: {
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: 8,
   },
 
@@ -657,16 +657,16 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   catTileActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
-  catEmoji:       { fontSize: 28 },
+  catEmoji:       { fontSize: 31 },
   catName: {
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 'bold',
     letterSpacing: 0.5,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   catNameActive:  { color: Colors.textPrimary },
-  catCount:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
+  catCount:       { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13 },
 
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
@@ -683,9 +683,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   chipActive:      { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
-  chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
+  chipName:        { color: Colors.textPrimary, fontSize: 15, fontWeight: '700' },
   chipNameActive:  { color: Colors.textPrimary },
-  chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
+  chipPrice:       { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13 },
   chipPriceActive: { color: Colors.textPrimary, opacity: 0.8 },
 
   // Superpower rows (step 4)
@@ -712,11 +712,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   superCheckActive:     { borderColor: Colors.gold, backgroundColor: Colors.gold },
-  superCheckMark:       { color: Colors.ink, fontSize: 13, fontWeight: 'bold' },
+  superCheckMark:       { color: Colors.ink, fontSize: 15, fontWeight: 'bold' },
   superTaskInfo:        { flex: 1 },
-  superTaskName:        { color: Colors.textPrimary, fontSize: 14, fontWeight: '600' },
+  superTaskName:        { color: Colors.textPrimary, fontSize: 16, fontWeight: '700' },
   superTaskNameActive:  { color: Colors.textPrimary },
-  superTaskPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  superTaskPrice:       { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
 
   // Avatar (step 1)
   avatarContainer: {
@@ -744,15 +744,15 @@ const styles = StyleSheet.create({
   },
   avatarIcon: {
     color: Colors.textPrimary,
-    fontSize: 32,
+    fontSize: 35,
     fontWeight: '300',
-    lineHeight: 36,
+    lineHeight: 39,
   },
   avatarLabel: {
     color: Colors.textPrimary,
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginTop: 2,
   },
   avatarEditBadge: {
@@ -768,9 +768,9 @@ const styles = StyleSheet.create({
   },
   avatarEditText: {
     color: Colors.textPrimary,
-    fontSize: 9,
+    fontSize: 13,
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // Sticky footer (pinned below ScrollView)
@@ -790,9 +790,9 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   counterText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
   },
   bottomRow: {
@@ -809,7 +809,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backBtnText:         { color: Colors.textSecondary, fontWeight: '600', fontSize: 14 },
+  backBtnText:         { color: Colors.textSecondary, fontWeight: '700', fontSize: 16 },
   continueBtn: {
     backgroundColor: Colors.gold,
     borderRadius: Radius.md,
@@ -822,13 +822,13 @@ const styles = StyleSheet.create({
   continueBtnText: {
     color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 1.5,
+    fontSize: 17,
+    letterSpacing: 1,
   },
   errorText: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginTop: 4,
   },

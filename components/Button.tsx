@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   label: {
     color: Colors.ink,
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 18,
   },
   labelAlt: {
     color: Colors.textPrimary,

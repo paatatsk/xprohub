@@ -301,11 +301,11 @@ export default function DirectHireScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <View style={styles.center}>
-          <Text style={{ fontSize: 36, marginBottom: 16 }}>🚧</Text>
-          <Text style={[styles.label, { fontSize: 16, textAlign: 'center', letterSpacing: 2 }]}>
+          <Text style={{ fontSize: 38, marginBottom: 16 }}>🚧</Text>
+          <Text style={[styles.label, { fontSize: 18, textAlign: 'center', letterSpacing: 1.3 }]}>
             CAN'T HIRE YOURSELF
           </Text>
-          <Text style={{ fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 14, textAlign: 'center', marginTop: 8 }}>
+          <Text style={{ fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 16, textAlign: 'center', marginTop: 8 }}>
             You can't create a job targeting yourself.
           </Text>
           <TouchableOpacity
@@ -575,19 +575,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitials: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 16 },
+  avatarInitials: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 18 },
   workerMeta:     { flex: 1 },
   hiringEyebrow: {
     color: Colors.textPrimary,
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
     marginBottom: 2,
   },
   workerName: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 17,
+    fontSize: 20,
     letterSpacing: 0.3,
     marginBottom: 6,
   },
@@ -599,24 +599,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  spChipText: { color: Colors.textPrimary, fontSize: 10, fontWeight: '600' },
+  spChipText: { color: Colors.textPrimary, fontSize: 13, fontWeight: '700' },
 
   // Field group
   fieldGroup: { marginBottom: Spacing.lg },
   label: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1.5,
+    letterSpacing: 1,
     marginBottom: 8,
   },
   required: { color: Colors.red },
   optional: { color: Colors.textSecondary, fontWeight: 'normal' },
   fieldHint: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     marginBottom: 8,
   },
 
@@ -632,11 +632,11 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   chipActive:      { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.3) },
-  chipName:        { color: Colors.textPrimary, fontSize: 13, fontWeight: '600' },
+  chipName:        { color: Colors.textPrimary, fontSize: 15, fontWeight: '700' },
   chipNameActive:  { color: Colors.textPrimary },
-  chipPrice:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11 },
+  chipPrice:       { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13 },
   chipPriceActive: { color: Colors.textPrimary, opacity: 0.8 },
-  emptyText:       { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 13, fontStyle: 'italic' },
+  emptyText:       { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 15, fontStyle: 'italic' },
 
   // Inputs
   input: {
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 15,
+    fontSize: 17,
     paddingHorizontal: Spacing.md,
     paddingVertical: 12,
   },
@@ -654,12 +654,12 @@ const styles = StyleSheet.create({
 
   // Helpers
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
-  charCount:  { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 11, marginTop: 4 },
-  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 12, marginTop: 4 },
+  charCount:  { fontFamily: Fonts.bodySemi, color: Colors.textSecondary, fontSize: 13, marginTop: 4 },
+  errorText:  { fontFamily: Fonts.body, color: Colors.red, fontSize: 13, marginTop: 4 },
 
   // Price
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  priceDollar: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 22 },
+  priceDollar: { color: Colors.textPrimary, fontWeight: 'bold', fontSize: 25 },
   priceInput: { flex: 1 },
 
   // Timing
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timingBtnActive:  { borderColor: Colors.gold, backgroundColor: whiteAlpha(0.35) },
-  timingText:       { color: Colors.textSecondary, fontSize: 12, fontWeight: 'bold' },
+  timingText:       { color: Colors.textSecondary, fontSize: 13, fontWeight: 'bold' },
   timingTextActive: { color: Colors.textPrimary },
 
   // Urgent toggle
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Spacing.md,
   },
-  urgentSub: { fontFamily: Fonts.body, color: Colors.textSecondary, fontSize: 12, marginTop: 2 },
+  urgentSub: { fontFamily: Fonts.bodyMed, color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
   toggleTrack: {
     width: 48,
     height: 28,
@@ -720,13 +720,13 @@ const styles = StyleSheet.create({
   submitText: {
     color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 2,
+    fontSize: 17,
+    letterSpacing: 1.3,
   },
   submitError: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginTop: Spacing.sm,
   },

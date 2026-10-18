@@ -148,7 +148,8 @@ const styles = StyleSheet.create({
   },
   tagline: {
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
+    fontWeight: '700',
     letterSpacing: 0.4,
     textAlign: 'center',
     marginTop: 10,

@@ -58,8 +58,8 @@ const s = StyleSheet.create({
   },
   text: {
     fontFamily: Fonts.displayB,
-    fontSize: 8.5,
-    letterSpacing: 2,
+    fontSize: 11,
+    letterSpacing: 1.5,
   },
   textUrgent: {
     color: Colors.onDark,

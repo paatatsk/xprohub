@@ -475,9 +475,9 @@ const s = StyleSheet.create({
   },
   wordmark: {
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: Fonts.heading,
-    letterSpacing: 4,
+    letterSpacing: 2.6,
   },
 
   // Live-count chip
@@ -514,30 +514,30 @@ const s = StyleSheet.create({
     backgroundColor: Colors.textTertiary,
   },
   chipCount: {
-    fontFamily: 'SpaceGrotesk_600SemiBold',
-    fontSize: 13,
+    fontFamily: 'SpaceGrotesk_700Bold',
+    fontSize: 15,
     color: Colors.textPrimary,
     fontVariant: ['tabular-nums'],
   },
   chipLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
   chipZeroLabel: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1,
     color: Colors.textSecondary,
   },
 
   // Greeting
   greeting: {
-    fontFamily: 'SpaceGrotesk_500Medium',
-    fontSize: 30,
+    fontFamily: 'SpaceGrotesk_700Bold',
+    fontSize: 33,
     letterSpacing: -0.6,
-    lineHeight: 32,
+    lineHeight: 35,
     color: Colors.textPrimary,
   },
   greetingName: {
@@ -558,9 +558,9 @@ const s = StyleSheet.create({
     backgroundColor: Colors.textPrimary,
   },
   dateLine: {
-    fontFamily: Fonts.mono,
-    fontSize: 12,
-    letterSpacing: 1,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.textSecondary,
   },
 
@@ -594,8 +594,8 @@ const s = StyleSheet.create({
   },
   cardLabel: {
     fontFamily: Fonts.display,
-    fontSize: 12,
-    letterSpacing: 4,
+    fontSize: 13,
+    letterSpacing: 2.6,
     color: Colors.textSecondary,
     textTransform: 'uppercase',
     paddingHorizontal: 14,
@@ -621,8 +621,8 @@ const s = StyleSheet.create({
     minHeight: 50,
   },
   glyphFrame: {
-    width: 30,
-    height: 30,
+    width: 34,
+    height: 34,
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',
@@ -631,7 +631,7 @@ const s = StyleSheet.create({
   },
   rowLeadGold: {
     fontFamily: Fonts.heading,
-    fontSize: 21,
+    fontSize: 24,
     color: Colors.textPrimary,
   },
   rowLeadSquare: {
@@ -641,12 +641,12 @@ const s = StyleSheet.create({
   },
   rowLeadAmber: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.amberText,
   },
   rowLeadGreen: {
     fontFamily: Fonts.heading,
-    fontSize: 18,
+    fontSize: 21,
     color: Colors.green,
   },
   rowLeadGreenDot: {
@@ -656,8 +656,8 @@ const s = StyleSheet.create({
     backgroundColor: Colors.green,
   },
   rowLabel: {
-    fontFamily: Fonts.bodyMed,
-    fontSize: 16,
+    fontFamily: Fonts.bodySemi,
+    fontSize: 18,
     color: Colors.textPrimary,
     flex: 1,
   },
@@ -667,8 +667,8 @@ const s = StyleSheet.create({
     gap: 8,
   },
   chevron: {
-    fontFamily: Fonts.body,
-    fontSize: 18,
+    fontFamily: Fonts.bodyMed,
+    fontSize: 21,
     color: Colors.textSecondary,
   },
 
@@ -681,9 +681,9 @@ const s = StyleSheet.create({
   statusLive: { backgroundColor: Colors.green },
   statusDraft: { backgroundColor: Colors.amberText },
   statusText: {
-    fontFamily: Fonts.mono,
-    fontSize: 11.5,
-    letterSpacing: 1,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
   statusLiveText: { color: Colors.green },
   statusDraftText: { color: Colors.amberText },
@@ -691,22 +691,22 @@ const s = StyleSheet.create({
   // Live counts
   countAmber: {
     fontFamily: Fonts.monoMed,
-    fontSize: 11.5,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.amberText,
   },
   countGreen: {
     fontFamily: Fonts.monoMed,
-    fontSize: 11.5,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
     color: Colors.green,
   },
 
   // Section
   sectionLabel: {
     fontFamily: Fonts.display,
-    fontSize: 11.5,
-    letterSpacing: 5,
+    fontSize: 13,
+    letterSpacing: 3.2,
     color: Colors.textPrimary,
     textTransform: 'uppercase',
     paddingTop: 6,
@@ -728,8 +728,8 @@ const s = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   catEmoji: {
-    fontSize: 23,
-    width: 30,
+    fontSize: 26,
+    width: 34,
     textAlign: 'center',
   },
   catTextBlock: {
@@ -739,13 +739,13 @@ const s = StyleSheet.create({
   catName: {
     color: Colors.textPrimary,
     fontFamily: 'Inter_600SemiBold',
-    fontSize: 14,
+    fontSize: 16,
     letterSpacing: 0.4,
   },
   catDiff: {
     color: Colors.textSecondary,
-    fontFamily: Fonts.mono,
-    fontSize: 11,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
     letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
@@ -756,8 +756,8 @@ const s = StyleSheet.create({
   },
   catPrice: {
     color: Colors.textPrimary,
-    fontFamily: 'SpaceGrotesk_600SemiBold',
-    fontSize: 15,
+    fontFamily: 'SpaceGrotesk_700Bold',
+    fontSize: 17,
     letterSpacing: -0.2,
     fontVariant: ['tabular-nums'],
   },
@@ -773,8 +773,8 @@ const s = StyleSheet.create({
   proText: {
     color: Colors.textPrimary,
     fontFamily: Fonts.displayB,
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontSize: 13,
+    letterSpacing: 1,
   },
 
   // End cap
@@ -792,16 +792,16 @@ const s = StyleSheet.create({
     backgroundColor: Colors.border,
   },
   endCap: {
-    fontFamily: Fonts.mono,
-    fontSize: 11,
-    letterSpacing: 2,
+    fontFamily: Fonts.monoMed,
+    fontSize: 13,
+    letterSpacing: 1.3,
     color: Colors.textSecondary,
   },
 
   // Error
   errorText: {
     color: Colors.red,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
     marginTop: 32,
     paddingHorizontal: 24,

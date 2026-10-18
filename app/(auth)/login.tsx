@@ -165,21 +165,21 @@ const styles = StyleSheet.create({
   },
   title: {
     color: Colors.textPrimary,
-    fontSize: 28,
+    fontSize: 31,
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
     marginBottom: Spacing.xs,
   },
   sub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     marginBottom: Spacing.xl,
   },
   errorText: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 14,
+    fontSize: 16,
     marginBottom: Spacing.md,
     backgroundColor: Colors.errorFill,
     padding: Spacing.sm,
@@ -188,9 +188,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.red,
   },
   label: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: Spacing.xs,
     marginTop: Spacing.md,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 16,
+    fontSize: 18,
     height: 52,
     paddingHorizontal: Spacing.md,
   },
@@ -254,8 +254,8 @@ const styles = StyleSheet.create({
   },
   faceIDLabel: {
     color: Colors.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
   },
   forgotRow: {
     alignItems: 'flex-end',
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   forgotText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 15,
   },
   buttonRow: {
     marginTop: Spacing.xl,
@@ -275,14 +275,14 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   switchText: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
   },
   switchLink: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
   },
 });

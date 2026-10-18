@@ -39,13 +39,13 @@ import type { ReceiptData } from '../../../types/receipt';
 
 // ── Font family constants ────────────────────────────────────
 const FONT = {
-  spaceGrotesk:  'SpaceGrotesk_500Medium',
-  spaceGroteskB: 'SpaceGrotesk_600SemiBold',
+  spaceGrotesk:  'SpaceGrotesk_600SemiBold',
+  spaceGroteskB: 'SpaceGrotesk_700Bold',
   inter:         'Inter_400Regular',
   interMed:      'Inter_500Medium',
   playfair:      'PlayfairDisplay_700Bold',
   playfairIt:    'PlayfairDisplay_700Bold_Italic',
-  oswald:        'Oswald_600SemiBold',
+  oswald:        'Oswald_700Bold',
   oswaldB:       'Oswald_700Bold',
   mono:          'IBMPlexMono_400Regular',
   monoMed:       'IBMPlexMono_500Medium',
@@ -675,27 +675,27 @@ const s = StyleSheet.create({
     transform: [{ rotate: '45deg' }],
   },
   navTitle: {
-    fontFamily: FONT.oswald, fontSize: 12, letterSpacing: 4,
+    fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2.6,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
-  navShare: { color: Colors.textPrimary, fontSize: 20, lineHeight: 20 },
+  navShare: { color: Colors.textPrimary, fontSize: 23, lineHeight: 23 },
 
   body: { paddingHorizontal: 30, paddingBottom: 40 },
 
   // Ornate divider
   ornate:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginVertical: 14 },
   ornateRule:    { flex: 1, height: 1, backgroundColor: Colors.gold, opacity: 0.4 },
-  ornateDiamond: { color: Colors.textPrimary, fontSize: 8 },
+  ornateDiamond: { color: Colors.textPrimary, fontSize: 13 },
 
   // Stamp
   stampRow:     { alignItems: 'center', marginBottom: 20 },
   eyebrowGold: {
-    fontFamily: FONT.oswald, fontSize: 11, letterSpacing: 4,
+    fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2.6,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
   stampDate: {
-    fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
-    letterSpacing: 1.5, marginTop: 6,
+    fontFamily: FONT.monoMed, fontSize: 13, color: Colors.textSecondary,
+    letterSpacing: 1, marginTop: 6,
   },
 
   // Photo hero
@@ -713,7 +713,7 @@ const s = StyleSheet.create({
   },
   photoStamp: {
     position: 'absolute', top: 22, left: 22,
-    fontFamily: FONT.oswaldB, fontSize: 10, letterSpacing: 4,
+    fontFamily: FONT.oswaldB, fontSize: 11, letterSpacing: 2.6,
     color: Colors.textPrimary, borderWidth: 1.5, borderColor: Colors.gold,
     paddingHorizontal: 9, paddingVertical: 5,
     transform: [{ rotate: '-3deg' }],
@@ -721,32 +721,32 @@ const s = StyleSheet.create({
   },
   photoMeta: {
     position: 'absolute', bottom: 18, right: 22,
-    fontFamily: FONT.mono, fontSize: 9, color: Colors.textPrimary,
-    letterSpacing: 1.5,
+    fontFamily: FONT.mono, fontSize: 13, color: Colors.textPrimary,
+    letterSpacing: 1,
   },
   photoPlaceholderCenter: {
     alignItems: 'center',
   },
   photoStampLabel: {
-    fontFamily: FONT.oswald, fontSize: 11, letterSpacing: 3,
+    fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2,
     color: Colors.textPrimary, marginBottom: 6,
   },
   photoPlaceholderBody: {
-    fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
+    fontFamily: FONT.monoMed, fontSize: 13, color: Colors.textSecondary,
   },
   // Worker block
   workerBlock: { marginTop: 36 },
   workerName: {
-    fontFamily: FONT.playfair, fontSize: 36,
-    color: Colors.textPrimary, letterSpacing: -1, lineHeight: 38,
+    fontFamily: FONT.playfair, fontSize: 38,
+    color: Colors.textPrimary, letterSpacing: -1, lineHeight: 40,
   },
   workerAction: {
-    fontFamily: FONT.inter, fontSize: 14, color: INK_DIM,
-    marginTop: 10, lineHeight: 21,
+    fontFamily: FONT.inter, fontSize: 16, color: INK_DIM,
+    marginTop: 10, lineHeight: 23,
   },
   workerContext: {
-    fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
-    letterSpacing: 1.5, marginTop: 8,
+    fontFamily: FONT.monoMed, fontSize: 13, color: Colors.textSecondary,
+    letterSpacing: 1, marginTop: 8,
   },
 
   // Invoice
@@ -755,7 +755,7 @@ const s = StyleSheet.create({
     borderTopWidth: 1, borderColor: Colors.border,
   },
   sectionLabel: {
-    fontFamily: FONT.oswald, fontSize: 10, letterSpacing: 4,
+    fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2.6,
     color: Colors.textSecondary, textTransform: 'uppercase',
     marginBottom: 14,
   },
@@ -763,7 +763,7 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'flex-end', gap: 6, paddingVertical: 7,
   },
   lineLbl: {
-    fontFamily: FONT.inter, fontSize: 14,
+    fontFamily: FONT.inter, fontSize: 16,
   },
   lineLeader: {
     flex: 1, height: 1,
@@ -771,7 +771,7 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   lineAmt: {
-    fontFamily: FONT.spaceGrotesk, fontSize: 14, fontVariant: ['tabular-nums'],
+    fontFamily: FONT.spaceGrotesk, fontSize: 16, fontVariant: ['tabular-nums'],
     minWidth: 64, textAlign: 'right',
   },
   ruleThin: { height: 1, backgroundColor: Colors.border, marginVertical: 6 },
@@ -784,15 +784,15 @@ const s = StyleSheet.create({
     paddingBottom: 6,
   },
   totalLabel: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 2,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
   totalAmount: {
-    fontFamily: FONT.spaceGroteskB, fontSize: 44, letterSpacing: -1,
-    color: Colors.textPrimary, lineHeight: 44, fontVariant: ['tabular-nums'],
+    fontFamily: FONT.spaceGroteskB, fontSize: 46, letterSpacing: -1,
+    color: Colors.textPrimary, lineHeight: 46, fontVariant: ['tabular-nums'],
   },
   reconcile: {
-    fontFamily: FONT.inter, fontSize: 12, color: Colors.textSecondary,
+    fontFamily: FONT.interMed, fontSize: 13, color: Colors.textSecondary,
     marginTop: 2,
   },
   reconcileEm:   { color: INK_DIM, fontFamily: FONT.interMed },
@@ -809,15 +809,15 @@ const s = StyleSheet.create({
   noteRule: { width: 2, backgroundColor: Colors.gold, marginVertical: 4 },
   noteText: {
     flex: 1,
-    fontFamily: FONT.playfairIt, fontSize: 18, lineHeight: 26,
+    fontFamily: FONT.playfairIt, fontSize: 21, lineHeight: 29,
     color: INK_DIM, fontStyle: 'italic',
   },
   noteSignoff: {
-    fontFamily: FONT.playfairIt, fontSize: 14, color: Colors.textSecondary,
+    fontFamily: FONT.playfairIt, fontSize: 16, color: Colors.textSecondary,
     marginTop: 10, marginLeft: 16, fontStyle: 'italic',
   },
   noteEmpty: {
-    fontFamily: FONT.playfairIt, fontSize: 15, fontStyle: 'italic',
+    fontFamily: FONT.playfairIt, fontSize: 17, fontStyle: 'italic',
     color: Colors.textSecondary,
   },
 
@@ -828,12 +828,12 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'baseline', paddingVertical: 2,
   },
   traceK: {
-    fontFamily: FONT.mono, fontSize: 10, color: Colors.textSecondary,
-    letterSpacing: 0.5, lineHeight: 18, width: 80,
+    fontFamily: FONT.monoMed, fontSize: 13, color: Colors.textSecondary,
+    letterSpacing: 0.5, lineHeight: 21, width: 80,
   },
   traceV: {
-    fontFamily: FONT.mono, fontSize: 10, color: INK_DIM,
-    letterSpacing: 0.5, lineHeight: 18, flex: 1,
+    fontFamily: FONT.mono, fontSize: 13, color: INK_DIM,
+    letterSpacing: 0.5, lineHeight: 21, flex: 1,
   },
 
   // Actions
@@ -849,11 +849,11 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   endorseCheckGlyph: {
-    fontSize: 9, color: Colors.textPrimary, lineHeight: 9,
+    fontSize: 13, color: Colors.textPrimary, lineHeight: 13,
     marginTop: Platform.OS === 'ios' ? 0 : -1,
   },
   endorseBtnText: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 2,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
   endorsedPill: {
@@ -861,7 +861,7 @@ const s = StyleSheet.create({
     backgroundColor: Colors.gold, borderRadius: 999, alignItems: 'center',
   },
   endorsedText: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 2,
     color: '#1A0F00', textTransform: 'uppercase',
   },
   concernPill: {
@@ -869,17 +869,17 @@ const s = StyleSheet.create({
     borderWidth: 1.5, borderColor: Colors.red, borderRadius: 999, alignItems: 'center',
   },
   concernPillText: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 3,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 2,
     color: Colors.red, textTransform: 'uppercase',
   },
   concernRow: {
     marginTop: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'baseline',
   },
   concernPrefix: {
-    fontFamily: FONT.inter, fontSize: 12, color: Colors.textSecondary,
+    fontFamily: FONT.interMed, fontSize: 13, color: Colors.textSecondary,
   },
   concernLink: {
-    fontFamily: FONT.inter, fontSize: 12,
+    fontFamily: FONT.inter, fontSize: 13,
     color: Colors.red, textDecorationLine: 'underline',
     textDecorationStyle: 'dotted',
   },
@@ -891,7 +891,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    fontFamily: FONT.oswald, fontSize: 10, letterSpacing: 3,
+    fontFamily: FONT.oswald, fontSize: 13, letterSpacing: 2,
     color: Colors.textPrimary, textTransform: 'uppercase',
   },
 
@@ -901,24 +901,24 @@ const s = StyleSheet.create({
     borderWidth: 2, borderColor: Colors.gold,
     alignItems: 'center', justifyContent: 'center', marginBottom: 8,
   },
-  errorGlyph: { fontSize: 36, color: Colors.textPrimary },
+  errorGlyph: { fontSize: 38, color: Colors.textPrimary },
   errorHead: {
-    fontFamily: FONT.oswaldB, fontSize: 18, letterSpacing: 1.5,
+    fontFamily: FONT.oswaldB, fontSize: 21, letterSpacing: 1,
     color: Colors.textPrimary, textAlign: 'center',
   },
   errorBody: {
-    fontFamily: FONT.inter, fontSize: 14, color: Colors.textSecondary,
-    textAlign: 'center', lineHeight: 20,
+    fontFamily: FONT.interMed, fontSize: 16, color: Colors.textSecondary,
+    textAlign: 'center', lineHeight: 22,
   },
   errorBtn: {
     marginTop: 8, borderWidth: 1.5, borderColor: Colors.gold, borderRadius: 999,
     paddingVertical: 10, paddingHorizontal: 28,
   },
   errorBtnText: {
-    fontFamily: FONT.oswaldB, fontSize: 13, letterSpacing: 1.5, color: Colors.textPrimary,
+    fontFamily: FONT.oswaldB, fontSize: 15, letterSpacing: 1, color: Colors.textPrimary,
   },
   errorBack: {
-    fontFamily: FONT.inter, fontSize: 14, color: Colors.textSecondary,
+    fontFamily: FONT.interMed, fontSize: 16, color: Colors.textSecondary,
     textDecorationLine: 'underline',
   },
 });

@@ -563,8 +563,8 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 17,
-    lineHeight: 23,
+    fontSize: 20,
+    lineHeight: 26,
   },
 
   // ── Bid status badge ──────────────────────────────────────────
@@ -576,9 +576,9 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   statusText: {
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
 
   // ── Pill row ──────────────────────────────────────────────────
@@ -597,9 +597,9 @@ const styles = StyleSheet.create({
   },
   directHireText: {
     color: Colors.textPrimary,
-    fontSize: 11.5,
+    fontSize: 13,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 0.7,
   },
   categoryPill: {
     alignSelf: 'flex-start',
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
   categoryText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
     letterSpacing: 0.4,
   },
@@ -624,16 +624,16 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   jobStatusText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     letterSpacing: 0.4,
   },
 
   // ── Customer line ─────────────────────────────────────────────
   customerLine: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
+    fontSize: 16,
   },
   customerNameAccepted: {
     color: Colors.textPrimary,
@@ -647,16 +647,16 @@ const styles = StyleSheet.create({
   price: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 21,
     letterSpacing: 0.5,
   },
 
   // ── Message ───────────────────────────────────────────────────
   message: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 19,
+    fontSize: 16,
+    lineHeight: 21,
   },
 
   // ── Card footer ───────────────────────────────────────────────
@@ -666,15 +666,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeAgo: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 13,
+    fontSize: 15,
   },
   hideText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 12,
-    letterSpacing: 1,
+    fontSize: 13,
+    letterSpacing: 0.7,
   },
 
   // ── Empty state ───────────────────────────────────────────────
@@ -693,21 +693,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyIconGlyph: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
 
   // ── Accept / Decline action row (direct offers) ───────────────
@@ -726,8 +726,8 @@ const styles = StyleSheet.create({
   acceptBtnText: {
     color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
   declineBtn: {
     flex: 1,
@@ -740,8 +740,8 @@ const styles = StyleSheet.create({
   declineBtnText: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.2,
+    fontSize: 16,
+    letterSpacing: 0.8,
   },
 
   // ── Retry / action button ─────────────────────────────────────
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 });

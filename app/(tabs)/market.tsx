@@ -530,8 +530,8 @@ const styles = StyleSheet.create({
   toggleText: {
     color: Colors.textSecondary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
   toggleTextActive: {
     color: Colors.textPrimary,
@@ -556,13 +556,13 @@ const styles = StyleSheet.create({
   filterText: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     paddingVertical: 10,
   },
   filterClear: {
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     paddingVertical: 10,
     paddingRight: 14,
@@ -604,21 +604,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyIconGlyph: {
-    fontSize: 36,
+    fontSize: 38,
   },
   emptyHeading: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 18,
-    letterSpacing: 1.5,
+    fontSize: 21,
+    letterSpacing: 1,
     textAlign: 'center',
   },
   emptySub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
   },
   retryBtn: {
     marginTop: 8,
@@ -631,8 +631,8 @@ const styles = StyleSheet.create({
   retryText: {
     color: Colors.textPrimary,
     fontWeight: 'bold',
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
   },
 
   // Anchored post bar
@@ -649,8 +649,8 @@ const styles = StyleSheet.create({
   },
   postBarText: {
     fontFamily: Fonts.heading,
-    fontSize: 14,
-    letterSpacing: 1.5,
+    fontSize: 16,
+    letterSpacing: 1,
     color: Colors.ink,
   },
 });

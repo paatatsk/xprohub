@@ -209,22 +209,22 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     color: Colors.textPrimary,
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 2,
     marginBottom: Spacing.xs,
   },
   heading: {
     color: Colors.textPrimary,
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: Spacing.sm,
   },
   sub: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodyMed,
     color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 22,
     marginBottom: Spacing.lg,
   },
 
@@ -244,15 +244,15 @@ const styles = StyleSheet.create({
   reasonText: {
     fontFamily: Fonts.body,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
   },
   reasonTextActive: { color: Colors.textPrimary },
 
   // Details
   detailsLabel: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: Spacing.xs,
   },
@@ -266,16 +266,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: Radius.md,
     color: Colors.textPrimary,
-    fontSize: 14,
+    fontSize: 16,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     minHeight: 90,
     textAlignVertical: 'top',
   },
   charCount: {
-    fontFamily: Fonts.body,
+    fontFamily: Fonts.bodySemi,
     color: Colors.textSecondary,
-    fontSize: 11,
+    fontSize: 13,
     textAlign: 'right',
     marginTop: 4,
     marginBottom: Spacing.md,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   submitError: {
     fontFamily: Fonts.body,
     color: Colors.red,
-    fontSize: 13,
+    fontSize: 15,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   submitBtnText: {
     color: Colors.ink,
     fontWeight: 'bold',
-    fontSize: 15,
-    letterSpacing: 1.5,
+    fontSize: 17,
+    letterSpacing: 1,
   },
 });
