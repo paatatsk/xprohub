@@ -577,6 +577,15 @@ See `POLISH_PASS.md` for the full idea queue. Includes: mode-aware Home redesign
 
 - **Live "market pulse" card (Home)** — a richer, animated activity element: live job count, recent activity, distilled market info updating in real time, to add liveness and interest. DELIBERATELY DEFERRED until the marketplace has real liquidity — an animated "live activity" card on a near-empty launch market shows "this place is dead" exactly when we need it to look viable, and would misrepresent reality (counter to the v1 trust model). Trigger: build when daily job volume is consistently high enough that the card tells a flattering, truthful story. Until then, Home keeps only a calm, honest status indicator (the "JOBS OPEN NOW" pill) that reads well at any scale. The full card graduates from that pill when volume justifies it.
 
+## Trademark
+
+**XPROHUB** — International Class 035 · USPTO serial no. **99843798** · owner Paata Tskhadiashvili.
+
+- **Status:** approved for publication. Scheduled to publish in the Official Gazette on **2026-10-20**.
+- **Opposition window:** publication opens a 30-day window (ends about **2026-11-19**). Watch the correspondence email — including spam — for any opposition or extension-of-time filing. If one is filed, get a trademark attorney.
+- **If no opposition:** a Notice of Allowance is issued. A **Statement of Use** (proof of use in commerce for the services) must then be filed. That requires the app to be live, so launch timing affects this.
+- **To do:** confirm the correspondence email in TSDR (tsdr.uspto.gov, serial 99843798) is correct.
+
 ## Session Start Checklist
 - [ ] `npx expo start --clear`
 - [ ] Open EAS dev client on iPhone → scan QR
