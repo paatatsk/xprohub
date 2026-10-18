@@ -400,7 +400,7 @@ export default function HomeScreen() {
               <Text style={s.catDiff}>{item.data.difficulty_range.toUpperCase()}</Text>
             </View>
             <View style={s.catRightBlock}>
-              <Text style={s.catPrice} numberOfLines={1}>${item.data.price_min}{'\u2013'}${item.data.price_max}</Text>
+              <Text style={s.catPrice} numberOfLines={1}>${item.data.price_min}{'\u2009\u2013\u2009'}${item.data.price_max}</Text>
               {item.data.tier === 2 && (
                 <View style={s.proBadge}>
                   <Text style={s.proText}>PRO</Text>
@@ -761,7 +761,9 @@ const s = StyleSheet.create({
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 17,
     lineHeight: 22,
-    letterSpacing: -0.2,
+    // No negative tracking + thin spaces around the dash: at bold 17pt the
+    // en dash otherwise touches the digits and the $ and reads as a strike line.
+    letterSpacing: 0,
     fontVariant: ['tabular-nums'],
   },
   proBadge: {
