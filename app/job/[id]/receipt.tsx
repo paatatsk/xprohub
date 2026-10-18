@@ -262,7 +262,7 @@ function LineItem({ label, amountCents, muted = false, signed = false }: {
   const sign = signed && amountCents > 0 ? '\u2212' : '';
   return (
     <View style={s.lineItem}>
-      <Text style={[s.lineLbl, { color }]} numberOfLines={1}>{label}</Text>
+      <Text style={[s.lineLbl, { color }]} numberOfLines={2}>{label}</Text>
       <View style={s.lineLeader} />
       <Text
         style={[s.lineAmt, { color }]}
@@ -763,16 +763,17 @@ const s = StyleSheet.create({
     flexDirection: 'row', alignItems: 'flex-end', gap: 6, paddingVertical: 7,
   },
   lineLbl: {
-    fontFamily: FONT.inter, fontSize: 16,
+    fontFamily: FONT.inter, fontSize: 16, lineHeight: 22,
+    flexShrink: 1,
   },
   lineLeader: {
-    flex: 1, height: 1,
+    flex: 1, minWidth: 12, height: 1,
     borderBottomWidth: 1, borderStyle: 'dotted', borderColor: Colors.border,
     marginBottom: 4,
   },
   lineAmt: {
     fontFamily: FONT.spaceGrotesk, fontSize: 16, fontVariant: ['tabular-nums'],
-    minWidth: 64, textAlign: 'right',
+    minWidth: 96, flexShrink: 0, textAlign: 'right',
   },
   ruleThin: { height: 1, backgroundColor: Colors.border, marginVertical: 6 },
   ruleDouble: {

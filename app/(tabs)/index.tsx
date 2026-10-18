@@ -400,7 +400,7 @@ export default function HomeScreen() {
               <Text style={s.catDiff}>{item.data.difficulty_range.toUpperCase()}</Text>
             </View>
             <View style={s.catRightBlock}>
-              <Text style={s.catPrice}>${item.data.price_min}{'\u2013'}${item.data.price_max}</Text>
+              <Text style={s.catPrice} numberOfLines={1}>${item.data.price_min}{'\u2013'}${item.data.price_max}</Text>
               {item.data.tier === 2 && (
                 <View style={s.proBadge}>
                   <Text style={s.proText}>PRO</Text>
@@ -734,6 +734,7 @@ const s = StyleSheet.create({
   },
   catTextBlock: {
     flex: 1,
+    minWidth: 0,
     gap: 3,
   },
   catName: {
@@ -751,13 +752,15 @@ const s = StyleSheet.create({
   },
   catRightBlock: {
     alignItems: 'flex-end',
-    minWidth: 80,
-    gap: 4,
+    minWidth: 96,
+    flexShrink: 0,
+    gap: 8,
   },
   catPrice: {
     color: Colors.textPrimary,
     fontFamily: 'SpaceGrotesk_700Bold',
     fontSize: 17,
+    lineHeight: 22,
     letterSpacing: -0.2,
     fontVariant: ['tabular-nums'],
   },
@@ -774,6 +777,7 @@ const s = StyleSheet.create({
     color: Colors.textPrimary,
     fontFamily: Fonts.displayB,
     fontSize: 13,
+    lineHeight: 16,
     letterSpacing: 1,
   },
 

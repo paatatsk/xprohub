@@ -231,7 +231,7 @@ function StatusSegment({
               <Animated.View
                 style={[
                   s.segDot,
-                  { backgroundColor: isSelected ? Colors.green : Colors.textTertiary },
+                  { backgroundColor: isSelected ? INK : Colors.textTertiary },
                   isSelected && {
                     shadowColor: Colors.green,
                     shadowOpacity: pulseAnim,
@@ -245,9 +245,8 @@ function StatusSegment({
                 style={[
                   s.segDot,
                   {
-                    backgroundColor: state === 'booked' && isSelected
-                      ? Colors.amber
-                      : Colors.textTertiary,
+                    // Selected segment sits on its status-color fill, so the dot uses ink.
+                    backgroundColor: isSelected ? INK : Colors.textTertiary,
                   },
                 ]}
               />
