@@ -58,13 +58,12 @@ Differentiates from Uber/TaskRabbit by:
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
 - **Test device:** iPhone via EAS dev client on LAN mode
 
-**Design system: Neutral Grey + Highlighter Gold (changed 2026-10-18; was Dark Gold).**
-- bg `#A6A6A6`, card `#B6B6B6`, border `#808080`, gold `#F5E663` (fills/borders only, never text)
-- text `#111111` / `#383838` (tertiary `#5A5A5A`, non-text), ink `#111111`, onDark `#FFFFFF`
-- green `#1C412D`, blue `#133E5D`, purple `#471998`, red `#770F0F`, amber fill `#F2A93B`, amberText `#513305`, errorFill `#CCC3C3`
-- 2026-10-18: changed from Dark Gold — bg `#0E0E0F`, card `#171719`, border `#2E2E33`, gold `#C9A84C`,
-  text `#FFFFFF`/`#888890`/`#555558`, green `#4CAF7A`, blue `#4A9EDB`, purple `#9B6EE8`, red `#E05252`, amber `#E5901A`.
-  Surface fills via `whiteAlpha()` / `blackAlpha()`.
+**Design system: Mid Grey + Gold (changed 2026-10-18).**
+- bg `#4A4A4D`, card `#555558`, border `#7C7C80`, gold `#F0D48A` (text only at ≥18 or bold ≥14)
+- text `#FFFFFF` / `#D0D0D4` (tertiary `#A8A8AE`, non-text), ink `#111111` on fills, onDark `#FFFFFF`
+- green `#88DDB0`, blue `#9ED2F7`, purple `#D8C2FC`, red `#FFBBBB`, amber `#FFBF87`, errorFill `#5E3B3E`
+- 2026-10-18: changed from the light-grey palette (bg `#A6A6A6`, card `#B6B6B6`, text `#111111`, gold `#F5E663`),
+  which replaced Dark Gold (bg `#0E0E0F`, gold `#C9A84C`). Selected fills via `blackAlpha()`.
 - Five-voice typography: Space Grotesk (headings), Inter (body), Playfair Display
   (serif accent — worker names, quotes), Oswald (editorial labels), IBM Plex Mono
   (ledger voice — dates, trace IDs, money metadata)
