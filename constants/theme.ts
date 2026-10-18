@@ -1,31 +1,32 @@
-// XProHub Design System — Neutral Grey + Highlighter Gold (2026-10-18)
+// XProHub Design System — Mid Grey + Gold (2026-10-18)
 // Single source of truth for all colors, fonts, and spacing.
 // Never hardcode these values in screen files — always import from here.
 //
-// Palette: neutral mid-grey surfaces (R=G=B), near-black text, and light
-// highlighter gold / amber used only as fills, borders and accents — never as
-// text. Green / blue / purple / red are dark enough to pass 4.5:1 as text;
-// text on those fills uses onDark. Surface fills use whiteAlpha() / blackAlpha().
-// (Replaced the Dark Gold palette on 2026-10-18.)
+// Palette: mid-grey surfaces (R=G=B ± a touch of blue), white text, soft gold
+// for big numbers, prices, names, eyebrows and active states. Gold as TEXT
+// only at fontSize >= 18, or bold at >= 14; smaller text stays white or
+// textSecondary. Status colors are light enough to pass 4.5:1 as text on both
+// background and card; text on their fills uses ink. Surface fills use
+// whiteAlpha() / blackAlpha() — never gold tints.
+// (Replaced the light-grey palette on 2026-10-18, which replaced Dark Gold.)
 
 export const Colors = {
-  background:     '#A6A6A6',  // All screens — neutral grey (was #1C1C1E)
-  gold:           '#F5E663',  // Highlighter yellow — solid fills, borders, accents only, never text (was #BFA356)
-  card:           '#B6B6B6',  // All cards and surfaces (was #262629)
-  border:         '#808080',  // Card borders, dividers (was #3B3B40)
-  textPrimary:    '#111111',  // All headings and body text (was #FFFFFF)
-  textSecondary:  '#383838',  // Supporting text, metadata (was #96969E)
-  textTertiary:   '#5A5A5A',  // Offline status, fine separators — non-text only (was #727278)
-  cream:          '#111111',  // Editorial accent, meta-row emphasis — now same as textPrimary (was #F5EEDC)
-  green:          '#1C412D',  // Success, completions, Worker mode — darkened for text (was #4CAF7A)
-  blue:           '#133E5D',  // Trust, verification, info — darkened for text (was #4A9EDB)
-  purple:         '#471998',  // XP, growth — darkened for text (was #A178E9)
-  red:            '#770F0F',  // Urgent, live, alerts, cancel — darkened for text (was #EC6868)
-  amber:          '#F2A93B',  // In-progress, soft warnings — light fill only, never text (was #D28D2D)
-  amberText:      '#513305',  // In-progress / warning TEXT — dark amber that passes 4.5:1
-  ink:            '#111111',  // Text and icons on gold / amber / light fills
-  onDark:         '#FFFFFF',  // Text on dark fills (green, blue, purple, red), photos and black scrims
-  errorFill:      '#CCC3C3',  // Error-box background — light red-grey behind red text + red border
+  background:     '#4A4A4D',  // All screens (was #A6A6A6)
+  gold:           '#F0D48A',  // Big numbers, prices, names, eyebrows, active states, CTAs (was #F5E663)
+  card:           '#555558',  // All cards and surfaces (was #B6B6B6)
+  border:         '#7C7C80',  // Card borders, dividers (was #808080)
+  textPrimary:    '#FFFFFF',  // All headings and body text (was #111111)
+  textSecondary:  '#D0D0D4',  // Supporting text, metadata (was #383838)
+  textTertiary:   '#A8A8AE',  // Offline status, fine separators — non-text only (was #5A5A5A)
+  cream:          '#FFFFFF',  // Legacy editorial-accent token — same as textPrimary (was #111111)
+  green:          '#88DDB0',  // Success, completions (was #1C412D)
+  blue:           '#9ED2F7',  // Trust, verification, info (was #133E5D)
+  purple:         '#D8C2FC',  // XP, growth (was #471998)
+  red:            '#FFBBBB',  // Urgent, alerts, cancel (was #770F0F)
+  amber:          '#FFBF87',  // In-progress, soft warnings — text and fills (was #F2A93B; amberText #513305 merged in)
+  ink:            '#111111',  // Text and icons on gold / amber / status-color fills
+  onDark:         '#FFFFFF',  // Text on photos and black scrims
+  errorFill:      '#5E3B3E',  // Error-box background — dark red tint behind red text + red border (was #CCC3C3)
 };
 
 function hexAlpha(color: string, alpha: number): string {
