@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFonts } from 'expo-font';
 import {
   Oswald_600SemiBold,
@@ -9,6 +9,7 @@ import {
   PlayfairDisplay_700Bold_Italic,
 } from '@expo-google-fonts/playfair-display';
 import {
+  AccessibilityInfo,
   Animated,
   ScrollView,
   StyleSheet,
@@ -17,7 +18,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Colors, Spacing, Radius } from '../../constants/theme';
 
@@ -27,6 +28,7 @@ const BG    = Colors.background;  // #4A4A4D
 const PAPER = Colors.textPrimary;  // was '#F5EEDC' (light text on dark)
 const CREAM = Colors.textSecondary; // was '#E8DCC0' (light text on dark)
 const INK   = '#1A0F00';
+const AUTO_SWAP_MS = 3000; // yin-yang auto-swap interval
 
 // ─── Ornate gold divider (line ◆ line) ────────────────────────
 function OrnateDivider() {
@@ -155,15 +157,39 @@ export default function WelcomeScreen() {
   // ── Change 5: top-box color swap on yin-yang tap ───────────
   const [topBoxesSwapped, setTopBoxesSwapped] = useState(false);
   const swapAnim = useRef(new Animated.Value(0)).current;
+  // Ref mirrors the state so the auto-swap interval never reads a stale value.
+  const swappedRef = useRef(false);
 
-  const handleSwap = () => {
-    const next = !topBoxesSwapped;
+  const swap = useCallback(() => {
+    const next = !swappedRef.current;
+    swappedRef.current = next;
     setTopBoxesSwapped(next);
     Animated.timing(swapAnim, {
       toValue: next ? 1 : 0,
       duration: 300,
       useNativeDriver: false, // colour interpolation requires JS driver
     }).start();
+  }, [swapAnim]);
+
+  // ── Auto-swap every 3s while focused; skipped when Reduce Motion is on ──
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => sub.remove();
+  }, []);
+
+  // Bumped on every tap so the interval restarts and doesn't flip right after.
+  const [swapTimerKey, setSwapTimerKey] = useState(0);
+  useFocusEffect(useCallback(() => {
+    if (reduceMotion) return undefined;
+    const id = setInterval(swap, AUTO_SWAP_MS);
+    return () => clearInterval(id);
+  }, [reduceMotion, swap, swapTimerKey]));
+
+  const handleSwap = () => {
+    swap();
+    setSwapTimerKey((k) => k + 1);
   };
 
   // Left box: GOLD bg → BG bg
