@@ -2278,8 +2278,7 @@ const s = StyleSheet.create({
     borderColor: Colors.gold,
   },
   publishBtnDisabled: {
-    backgroundColor: Colors.gold,
-    opacity: 0.4,
+    backgroundColor: Colors.border,
   },
   publishBtnText: {
     fontFamily: Fonts.heading,

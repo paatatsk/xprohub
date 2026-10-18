@@ -418,8 +418,7 @@ const styles = StyleSheet.create({
   kickerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: GOLD,
-    opacity: 0.6,
+    backgroundColor: Colors.border,
     marginHorizontal: 12,
   },
   kickerText: {
@@ -630,8 +629,7 @@ const styles = StyleSheet.create({
   trustDivider: {
     width: 1,
     height: 32,
-    backgroundColor: GOLD,
-    opacity: 0.5,
+    backgroundColor: Colors.border,
   },
   trustLabel: {
     color: CREAM,

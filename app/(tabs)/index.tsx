@@ -555,7 +555,7 @@ const s = StyleSheet.create({
   dateTick: {
     width: 4,
     height: 4,
-    backgroundColor: Colors.gold,
+    backgroundColor: Colors.textPrimary,
   },
   dateLine: {
     fontFamily: Fonts.mono,
@@ -575,14 +575,12 @@ const s = StyleSheet.create({
   ornamentLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.gold,
-    opacity: 0.3,
+    backgroundColor: Colors.border,
   },
   ornamentDiamond: {
     width: 6,
     height: 6,
-    backgroundColor: Colors.gold,
-    opacity: 0.3,
+    backgroundColor: Colors.textPrimary,
     transform: [{ rotate: '45deg' }],
   },
 
@@ -791,8 +789,7 @@ const s = StyleSheet.create({
   endCapLine: {
     flex: 1,
     height: 1,
-    backgroundColor: Colors.gold,
-    opacity: 0.2,
+    backgroundColor: Colors.border,
   },
   endCap: {
     fontFamily: Fonts.mono,

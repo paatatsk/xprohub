@@ -3,7 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
-import { Colors } from '../constants/theme';
+import { Colors, whiteAlpha } from '../constants/theme';
 import { XProHubLogo } from '../components/XProHubLogo';
 
 const MIN_DISPLAY_MS = 2500;
@@ -143,8 +143,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 120,
     borderRadius: 60,
-    backgroundColor: Colors.gold,
-    opacity: 0.08,
+    backgroundColor: whiteAlpha(0.15),
     // Soft blur approximated via large border radius + low opacity layer stack
   },
   tagline: {
