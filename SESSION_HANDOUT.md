@@ -58,9 +58,13 @@ Differentiates from Uber/TaskRabbit by:
 - **Local:** C:\Users\sophi\Documents\xprohub-v3 (Windows)
 - **Test device:** iPhone via EAS dev client on LAN mode
 
-**Design system: Dark Gold (locked).**
-- bg `#0E0E0F`, gold `#C9A84C`, card `#171719`, border `#2E2E33`
-- text `#FFFFFF`/`#888890`, green `#4CAF7A`, red `#E05252`, amber `#E5901A`
+**Design system: Neutral Grey + Highlighter Gold (changed 2026-10-18; was Dark Gold).**
+- bg `#A6A6A6`, card `#B6B6B6`, border `#808080`, gold `#F5E663` (fills/borders only, never text)
+- text `#111111` / `#383838` (tertiary `#5A5A5A`, non-text), ink `#111111`, onDark `#FFFFFF`
+- green `#1C412D`, blue `#133E5D`, purple `#471998`, red `#770F0F`, amber fill `#F2A93B`, amberText `#513305`, errorFill `#CCC3C3`
+- 2026-10-18: changed from Dark Gold — bg `#0E0E0F`, card `#171719`, border `#2E2E33`, gold `#C9A84C`,
+  text `#FFFFFF`/`#888890`/`#555558`, green `#4CAF7A`, blue `#4A9EDB`, purple `#9B6EE8`, red `#E05252`, amber `#E5901A`.
+  Surface fills via `whiteAlpha()` / `blackAlpha()`.
 - Five-voice typography: Space Grotesk (headings), Inter (body), Playfair Display
   (serif accent — worker names, quotes), Oswald (editorial labels), IBM Plex Mono
   (ledger voice — dates, trace IDs, money metadata)

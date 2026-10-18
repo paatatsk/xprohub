@@ -141,24 +141,34 @@ Photo + >=1 skill claim = the apply-gate minimum. 4-step wizard: photo, category
 | Push | Expo Push Notifications (not implemented in v1) |
 | Est. cost | $0/month until real traction |
 
-## Design System — Dark Gold (Locked)
+## Design System — Neutral Grey + Highlighter Gold (changed 2026-10-18)
 
-An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Daylight Ledger / Union Hall / Neighborly / Operator / Atelier). Dark Gold was confirmed as the v1 direction. Operator (pro-mode) and Atelier (premium-tier) are banked as possible future directions in `POLISH_PASS.md`. The exploration informed but did not change the locked visual invariants.
+An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Daylight Ledger / Union Hall / Neighborly / Operator / Atelier). Dark Gold was confirmed as the v1 direction then. Operator (pro-mode) and Atelier (premium-tier) are banked as possible future directions in `POLISH_PASS.md`.
+
+**2026-10-18 retheme (Paata's call):** Dark Gold was replaced with a neutral mid-grey background, near-black text and highlighter-yellow accents. `#808080` was evaluated first and rejected — even pure black only reaches 5.3:1 on it, leaving no room for a secondary text level — so the background is `#A6A6A6`. Changed from (original Dark Gold): background `#0E0E0F`, card `#171719`, border `#2E2E33`, gold `#C9A84C`, text `#FFFFFF` / `#888890` / `#555558`, green `#4CAF7A`, blue `#4A9EDB`, purple `#9B6EE8`, red `#E05252`, amber `#E5901A`.
 
 ### Color Tokens
 | Token | Value | Use |
 |---|---|---|
-| Background | `#0E0E0F` | All screens — never changes |
-| Gold | `#C9A84C` | CTAs, highlights, big numbers, borders |
-| Card | `#171719` | All cards and surfaces |
-| Border | `#2E2E33` | Card borders, dividers |
-| Text Primary | `#FFFFFF` | All headings and body text |
-| Text Secondary | `#888890` | Supporting text, metadata |
-| Green | `#4CAF7A` | Success, completions |
-| Blue | `#4A9EDB` | Trust, verification, info |
-| Purple | `#9B6EE8` | XP, growth |
-| Red | `#E05252` | Urgent, alerts, cancel |
-| Amber | `#E5901A` | In-progress, soft warnings |
+| Background | `#A6A6A6` | All screens — neutral grey (R=G=B) |
+| Card | `#B6B6B6` | All cards and surfaces (1.2:1 vs background; borders carry the separation) |
+| Border | `#808080` | Card borders, dividers |
+| Gold | `#F5E663` | Highlighter yellow — **solid fills, borders, accents only. Never text** (1.9:1 on background) |
+| Amber | `#F2A93B` | In-progress / warning **fills only** (buttons, badges with ink text). Never text |
+| Amber Text | `#513305` | In-progress / warning text and status dots (4.7:1) |
+| Text Primary | `#111111` | All headings and body text (7.8:1 bg / 9.3:1 card) |
+| Text Secondary | `#383838` | Supporting text, metadata (4.8:1 bg / 5.8:1 card) |
+| Text Tertiary | `#5A5A5A` | Non-text only — dots, separators (3.4:1 card) |
+| Ink | `#111111` | Text and icons on gold / amber / light fills |
+| On Dark | `#FFFFFF` | Text on dark fills (green, blue, purple, red), photos, black scrims |
+| Green | `#1C412D` | Success, completions — darkened to pass as text (4.7:1) |
+| Blue | `#133E5D` | Trust, verification, info (4.6:1) |
+| Purple | `#471998` | XP, growth (4.6:1) |
+| Red | `#770F0F` | Urgent, alerts, cancel (4.6:1) |
+| Error Fill | `#CCC3C3` | Error-box background behind red text + red border (red text 6.5:1) |
+| Cream | `#111111` | Legacy editorial-accent token — now identical to Text Primary |
+
+**Rules:** gold is never a text color — gold text becomes Text Primary, or sits inside a gold-filled chip with Ink text. Selected states = solid gold border + neutral fill. Surface fills use neutral overlays — `whiteAlpha()` / `blackAlpha()` from `constants/theme.ts` — never `goldAlpha()` (kept, unused). Never hardcode `rgba()` of a token.
 
 ### Five-Voice Typography System
 | Voice | Font | Use |
@@ -169,8 +179,8 @@ An unrestricted "Five Worlds" aesthetic exploration was conducted 2026-06-18 (Da
 | Editorial labels | Oswald (600/700) | Section labels, eyebrows, buttons (4px tracked) |
 | Ledger voice | IBM Plex Mono (400/500) | Dates, trace IDs, money metadata — the accounting register |
 
-- **Big numbers**: always gold — the loudest element on every screen
-- **Cards**: dark background (`#171719`), 1px border, square corners on category tiles (editorial register), soft corners on content cards
+- **Big numbers**: Text Primary in Space Grotesk — size and weight make them the loudest element (gold text no longer passes contrast)
+- **Cards**: card grey (`#B6B6B6`), 1px border, square corners on category tiles (editorial register), soft corners on content cards
 - **Icons**: Currently native emoji. Gold Forge custom icon system under exploration (not shipped).
 
 ### Locked Editorial Moments
@@ -470,7 +480,7 @@ Explorer users browse freely. Gate fires only at:
 - Tap "Apply" on job card → ID gate then Stripe gate → Apply flow
 
 ## Code Rules
-1. **Design system** — Dark Gold only: `#0E0E0F` bg, `#C9A84C` gold, `#171719` cards
+1. **Design system** — Neutral Grey + Highlighter Gold: `#A6A6A6` bg, `#B6B6B6` cards, `#111111` text, `#F5E663` gold (fills/borders only)
 2. **SafeAreaView** — import from `react-native-safe-area-context` ONLY (not `react-native` — SDK 54 breaking change)
 3. **New files** — always `app/filename.tsx`, NEVER `app/app/filename.tsx` (causes Unmatched Route)
 4. **Live Market is primary nav** — flat Expo Router `router.push()` is the pattern
