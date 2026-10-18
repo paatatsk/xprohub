@@ -12,8 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { Colors, Fonts, Radius, Spacing } from '../constants/theme';
 import { supabase } from '../lib/supabase';
+import { useImageAspects } from '../lib/useImageAspects';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
+
+// Portfolio carousel: frame follows the active photo's real aspect ratio,
+// clamped so very tall or very wide photos don't break the layout. Photos
+// render with "contain", so nothing is ever cropped.
+const PORTFOLIO_W = SCREEN_WIDTH - Spacing.md * 2;
+const PORTFOLIO_MIN_H = 200;
+const PORTFOLIO_MAX_H = 440;
+const DEFAULT_ASPECT = 4 / 3;
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -76,6 +85,12 @@ export default function WorkerProfileScreen() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const portfolioAspects = useImageAspects(portfolioPhotos.map(p => p.url));
+  const activePortfolioUrl = portfolioPhotos[activePhotoIndex]?.url;
+  const portfolioFrameH = Math.min(
+    PORTFOLIO_MAX_H,
+    Math.max(PORTFOLIO_MIN_H, PORTFOLIO_W / ((activePortfolioUrl && portfolioAspects[activePortfolioUrl]) || DEFAULT_ASPECT)),
+  );
 
   useFocusEffect(useCallback(() => {
     setLoading(true);
@@ -314,16 +329,24 @@ export default function WorkerProfileScreen() {
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
+                extraData={portfolioFrameH}
                 onMomentumScrollEnd={(e) => {
-                  const idx = Math.round(e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - Spacing.md * 2));
+                  const idx = Math.round(e.nativeEvent.contentOffset.x / PORTFOLIO_W);
                   setActivePhotoIndex(idx);
                 }}
                 renderItem={({ item }) => (
-                  <Image
-                    source={{ uri: item.url }}
-                    style={[styles.portfolioImage, { width: SCREEN_WIDTH - Spacing.md * 2 }]}
-                    accessibilityLabel="Portfolio photo"
-                  />
+                  <TouchableOpacity
+                    onPress={() => setFullscreenImage(item.url)}
+                    activeOpacity={0.9}
+                    accessibilityLabel="Portfolio photo, tap to view full size"
+                    accessibilityRole="button"
+                  >
+                    <Image
+                      source={{ uri: item.url }}
+                      style={[styles.portfolioImage, { width: PORTFOLIO_W, height: portfolioFrameH }]}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
                 )}
               />
               {portfolioPhotos.length > 1 && (
@@ -390,7 +413,7 @@ export default function WorkerProfileScreen() {
               source={{ uri: fullscreenImage }}
               style={styles.fullscreenImage}
               resizeMode="contain"
-              accessibilityLabel="Full-size credential"
+              accessibilityLabel="Full-size photo"
             />
           )}
         </Pressable>
@@ -544,7 +567,7 @@ const styles = StyleSheet.create({
 
   // Portfolio
   portfolioSection: { borderRadius: Radius.sm, overflow: 'hidden' },
-  portfolioImage:   { height: 220, resizeMode: 'cover' as const },
+  portfolioImage:   { backgroundColor: Colors.card },
   portfolioDots: {
     flexDirection: 'row',
     justifyContent: 'center',

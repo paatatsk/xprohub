@@ -23,6 +23,7 @@ import { Colors, Fonts, Spacing, Radius, blackAlpha } from '../constants/theme';
 import { strings } from '../constants/strings';
 import { supabase } from '../lib/supabase';
 import { uploadPortfolioPhoto } from '../lib/photos';
+import { useImageAspects } from '../lib/useImageAspects';
 import WorkerCardComponent, { type Worker } from '../components/WorkerCard';
 
 // ── Types ──────────────────────────────────────────────────────
@@ -68,6 +69,12 @@ const RADIUS_STEP = 1;
 const SKILL_CAP = 8;
 const PORTFOLIO_CAP = 6;
 const CREDENTIAL_CAP = 6;
+
+// Portfolio tiles keep a fixed height and take their width from the photo's
+// real aspect ratio (clamped), so the whole photo shows — no cropping.
+const PORTFOLIO_TILE_H = 100;
+const PORTFOLIO_TILE_MIN_W = 64;
+const PORTFOLIO_TILE_MAX_W = 200;
 
 type PortfolioType = 'photo' | 'certificate' | 'reference';
 
@@ -774,6 +781,8 @@ export default function MyCardScreen() {
   const [certificates, setCertificates] = useState<PortfolioItem[]>([]);
   const [references, setReferences] = useState<PortfolioItem[]>([]);
   const [portfolioUploading, setPortfolioUploading] = useState<PortfolioType | null>(null);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const portfolioAspects = useImageAspects(portfolioPhotos.map(p => p.url));
 
   // ── Data fetch ───────────────────────────────────────────────
 
@@ -1443,12 +1452,23 @@ export default function MyCardScreen() {
           contentContainerStyle={s.portfolioStrip}
         >
           {portfolioPhotos.map(photo => (
-            <View key={photo.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: photo.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Portfolio photo"
-              />
+            <View key={photo.id} style={[s.portfolioThumb, {
+                width: Math.min(PORTFOLIO_TILE_MAX_W, Math.max(PORTFOLIO_TILE_MIN_W,
+                  PORTFOLIO_TILE_H * (portfolioAspects[photo.url] ?? 1))),
+              }]}>
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(photo.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Portfolio photo, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: photo.url }}
+                  style={s.portfolioImage}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(photo.id, 'photo')}
@@ -1494,11 +1514,18 @@ export default function MyCardScreen() {
         >
           {certificates.map(cert => (
             <View key={cert.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: cert.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Certificate"
-              />
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(cert.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Certificate, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: cert.url }}
+                  style={s.credentialImage}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(cert.id, 'certificate')}
@@ -1544,11 +1571,18 @@ export default function MyCardScreen() {
         >
           {references.map(ref => (
             <View key={ref.id} style={s.portfolioThumb}>
-              <Image
-                source={{ uri: ref.url }}
-                style={s.portfolioImage}
-                accessibilityLabel="Reference"
-              />
+              <TouchableOpacity
+                style={s.tilePress}
+                onPress={() => setFullscreenImage(ref.url)}
+                activeOpacity={0.85}
+                accessibilityLabel="Reference, tap to view full size"
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: ref.url }}
+                  style={s.credentialImage}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={s.portfolioDelete}
                 onPress={() => handleDeletePortfolioItem(ref.id, 'reference')}
@@ -1693,6 +1727,25 @@ export default function MyCardScreen() {
       />
 
       {/* ── Bio edit sheet ── */}
+      {/* ── Fullscreen photo viewer (whole photo, never cropped) ── */}
+      <Modal visible={!!fullscreenImage} transparent animationType="fade" onRequestClose={() => setFullscreenImage(null)}>
+        <Pressable
+          style={s.fullscreenOverlay}
+          onPress={() => setFullscreenImage(null)}
+          accessibilityLabel="Dismiss full-size photo"
+          accessibilityRole="button"
+        >
+          {fullscreenImage && (
+            <Image
+              source={{ uri: fullscreenImage }}
+              style={s.fullscreenImage}
+              resizeMode="contain"
+              accessibilityLabel="Full-size photo"
+            />
+          )}
+        </Pressable>
+      </Modal>
+
       <Modal visible={showBioSheet} transparent animationType="none">
         <Pressable style={s.pickerScrim} onPress={handleBioCancel}>
           <KeyboardAvoidingView
@@ -2708,7 +2761,7 @@ const s = StyleSheet.create({
   },
   portfolioThumb: {
     width: 100,
-    height: 100,
+    height: PORTFOLIO_TILE_H,
     borderRadius: 8,
     overflow: 'hidden' as const,
     borderWidth: 1,
@@ -2717,6 +2770,27 @@ const s = StyleSheet.create({
   portfolioImage: {
     width: '100%' as const,
     height: '100%' as const,
+    backgroundColor: Colors.card,
+  },
+  tilePress: {
+    width: '100%' as const,
+    height: '100%' as const,
+  },
+  // Certificate / reference tiles stay cropped squares; tap opens the full photo.
+  credentialImage: {
+    width: '100%' as const,
+    height: '100%' as const,
+    resizeMode: 'cover' as const,
+  },
+  fullscreenOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  fullscreenImage: {
+    width: '95%' as const,
+    height: '90%' as const,
   },
   portfolioDelete: {
     position: 'absolute' as const,
